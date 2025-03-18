@@ -1,10 +1,10 @@
 package it.unibo.wastemaster.core.models;
 
-public class Client extends Person{
+public class Customer extends Person{
     private String ClientCode;
 
     // Constructor class Client
-    public Client(int id, String name, String address, String email, String phone, String ClientCode) {
+    public Customer(int id, String name, String address, String email, String phone, String ClientCode) {
         super(id, name, address, email, phone);
         this.ClientCode = ClientCode;
     }
