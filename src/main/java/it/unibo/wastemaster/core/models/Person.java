@@ -16,5 +16,21 @@ public abstract class Person {
         this.email = email;
         this.phone = phone;
     }
+    // Getter method for obtaining all the attributes of the class Person
+    public int getId() {
+        return id;
+    }
+    public String getName() {
+        return name;
+    }
+    public String getAddress() {
+        return address;
+    }
+    public String getEmail() {
+        return email;
+    }
+    public String getPhone() {
+        return phone;
+    }
     
 }
