@@ -45,5 +45,9 @@ public abstract class Person {
     public void setPhone(String phone) {
         this.phone = phone;
     }
-    
+
+    // Returns a formatted string with all the attributes of the Person
+    public String getInfo() {
+        return String.format("ID: %d, Name: %s, Address: %s, Email: %s, Phone: %s", id, name, address, email, phone);
+    }
 }
