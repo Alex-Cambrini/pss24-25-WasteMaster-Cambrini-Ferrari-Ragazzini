@@ -32,5 +32,18 @@ public abstract class Person {
     public String getPhone() {
         return phone;
     }
+    // Setter method for setting all the attributes of the class Person
+    public void setName(String name) {
+        this.name = name;
+    }
+    public void setAddress(String address) {
+        this.address = address;
+    }
+    public void setEmail(String email) {
+        this.email = email;
+    }
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
     
 }
