@@ -8,13 +8,23 @@ public class Collection {
     private Date date;
     private String status;
     private String type;
-
+    private int cancelLimitDays;
+    
     public Collection(int id, Customer customer, Date date, String status, String type) {
+        this(id, customer, date, status, type, 2);
+    }
+
+    public Collection(int id, Customer customer, Date date, String status, String type, int cancelLimitDays) {
         this.id = id;
         this.customer = customer;
         this.date = date;
         this.status = status;
         this.type = type;
+        this.cancelLimitDays = cancelLimitDays;
+    }
+
+    public int getCancelPreNoticeDays() {
+        return cancelLimitDays;
     }
 
     public int getId() {
