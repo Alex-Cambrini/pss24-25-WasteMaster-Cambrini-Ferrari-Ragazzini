@@ -1,26 +1,31 @@
 package it.unibo.wastemaster.core.models;
 
 public class Customer extends Person{
-    private String ClientCode;
+    private int customerId;
 
-    // Constructor class Client
-    public Customer(int id, String name, String address, String email, String phone, String ClientCode) {
-        super(id, name, address, email, phone);
-        this.ClientCode = ClientCode;
+    public Customer(int id, String name, String surname, Location address, String email, String phone, int customerId) {
+        super(id, name, surname, address, email, phone);
+        this.customerId = customerId;
     }
 
-    // Getter method for obtaining the attribute of the class Client
-    public String getClientCode() {
-        return ClientCode;
+    public int getCustomerId() {
+        return customerId;
     }
 
-    // Setter method for setting the attribute of the class Client
-    public void setClientCode(String ClientCode) {
-        this.ClientCode = ClientCode;
-    }
-
-    // Add getInfo method to return all the attributes of the class Client
     public String getInfo() {
-        return super.getInfo() + String.format(", ClientCode: %s", ClientCode);
+        return super.getInfo() + String.format(", CustomerId: %d", customerId);
     }
+
+
+        //TEST
+        // public static void main(String[] args) {
+        //     Location location = new Location(1, "Via Roma", "10", "Milano", "Italy");
+    
+        //     Customer customer = new Customer(1, "Mario", "Rossi", location, "mario.rossi@example.com", "1234567890", 1001);
+    
+        //     System.out.println("Customer Info: " + customer.getInfo());
+    
+        //     System.out.println("Customer ID: " + customer.getCustomerId());
+        // }
+   
 }
