@@ -33,4 +33,9 @@ public class Vehicle {
     public void setStatus(String status) {
         this.status = status;
     }
+
+    // add updateStatus method to update the status of the vehicle
+    public void updateStatus(String status) {
+        this.status = status;
+    }
 }
