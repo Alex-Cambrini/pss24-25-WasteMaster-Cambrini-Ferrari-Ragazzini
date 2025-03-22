@@ -6,19 +6,19 @@ public class Collection {
     private Customer customer;
     private Date date;
     private Waste.WasteType waste;
-    private Status status;
+    private CollectionStatus status;
     private int cancelLimitDays;
     private int scheduleId;
     private boolean isExtra;
 
-    public enum Status {
+    public enum CollectionStatus {
         PENDING,
         IN_PROGRESS,
         COMPLETED,
         CANCELLED
     }
 
-    public Collection(int collectionId, Customer customer, Date date, Waste.WasteType waste, Status status, int cancelLimitDays, int scheduleId, boolean isExtra) {
+    public Collection(int collectionId, Customer customer, Date date, Waste.WasteType waste, CollectionStatus status, int cancelLimitDays, int scheduleId, boolean isExtra) {
         this.collectionId = collectionId;
         this.customer = customer;
         this.date = date;
@@ -57,11 +57,11 @@ public class Collection {
         this.waste = waste;
     }
 
-    public Status getStatus() {
+    public CollectionStatus getStatus() {
         return status;
     }
 
-    public void setStatus(Status status) {
+    public void setStatus(CollectionStatus status) {
         this.status = status;
     }
 
