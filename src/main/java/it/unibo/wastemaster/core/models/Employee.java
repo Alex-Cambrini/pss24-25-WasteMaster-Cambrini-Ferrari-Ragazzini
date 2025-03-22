@@ -10,8 +10,8 @@ public class Employee extends Person {
         Operator
     }
 
-    public Employee(int id, String name, Location address, String email, String phone, int employeeId, Role role) {
-        super(id, name, address, email, phone);
+    public Employee(int id, String name, String surname, Location address, String email, String phone, int employeeId, Role role) {
+        super(id, name, surname, address, email, phone);
         this.employeeId = employeeId;
         this.role = role;
     }
@@ -32,24 +32,18 @@ public class Employee extends Person {
         return super.getInfo() + String.format(", EmployeeId: %d, Role: %s", employeeId, role);
     }
 
-    public static void main(String[] args) {
-        // Creazione di un oggetto Location per il test
-        Location location = new Location(0, "Via Roma", "10", "Milano", "Italy");
+    // public static void main(String[] args) {
+    //     Location location = new Location(0, "Via Roma", "10", "Milano", "Italy");
 
-        // Creazione di un oggetto Employee
-        Employee employee = new Employee(1, "Mario Rossi", location, "mario.rossi@example.com", "1234567890", 1001, Role.Operator);
+    //     Employee employee = new Employee(1, "Mario", "Rossi", location, "mario.rossi@example.com", "1234567890", 1001, Role.Operator);
 
-        // Stampa delle informazioni iniziali dell'employee
-        System.out.println("Info iniziali: " + employee.getInfo());
+    //     System.out.println("Info iniziali: " + employee.getInfo());
 
-        // Test del getter per il ruolo e ID dell'employee
-        System.out.println("Employee ID: " + employee.getEmployeeId());
-        System.out.println("Employee Role: " + employee.getRole());
+    //     System.out.println("Employee ID: " + employee.getEmployeeId());
+    //     System.out.println("Employee Role: " + employee.getRole());
 
-        // Modifica del ruolo con il setter
-        employee.setRole(Role.Administrator);
+    //     employee.setRole(Role.Administrator);
 
-        // Stampa delle informazioni dopo la modifica del ruolo
-        System.out.println("Info dopo la modifica: " + employee.getInfo());
-    }
+    //     System.out.println("Info dopo la modifica: " + employee.getInfo());
+    // }
 }
