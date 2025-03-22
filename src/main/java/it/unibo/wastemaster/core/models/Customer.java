@@ -3,8 +3,8 @@ package it.unibo.wastemaster.core.models;
 public class Customer extends Person{
     private int customerId;
 
-    public Customer(int id, String name, String surname, Location address, String email, String phone, int customerId) {
-        super(id, name, surname, address, email, phone);
+    public Customer(int personId, String name, String surname, Location address, String email, String phone, int customerId) {
+        super(personId, name, surname, address, email, phone);
         this.customerId = customerId;
     }
 

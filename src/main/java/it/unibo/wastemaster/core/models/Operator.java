@@ -1,8 +1,8 @@
 package it.unibo.wastemaster.core.models;
 public class Operator extends Employee {
 
-    public Operator(int id, String name, String surname, Location address, String email, String phone, int employeeId) {
-        super(id, name, surname, address, email, phone, employeeId, Role.Operator);
+    public Operator(int personId, String name, String surname, Location address, String email, String phone, int employeeId) {
+        super(personId, name, surname, address, email, phone, employeeId, Role.Operator);
     }
 
     @Override

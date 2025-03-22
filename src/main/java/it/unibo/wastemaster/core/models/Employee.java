@@ -10,8 +10,8 @@ public class Employee extends Person {
         Operator
     }
 
-    public Employee(int id, String name, String surname, Location address, String email, String phone, int employeeId, Role role) {
-        super(id, name, surname, address, email, phone);
+    public Employee(int personId, String name, String surname, Location address, String email, String phone, int employeeId, Role role) {
+        super(personId, name, surname, address, email, phone);
         this.employeeId = employeeId;
         this.role = role;
     }
