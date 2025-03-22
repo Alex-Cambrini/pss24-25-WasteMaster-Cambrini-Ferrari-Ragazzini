@@ -1,64 +1,78 @@
 package it.unibo.wastemaster.core.models;
 
 public class Waste {
-    private int id;
-    private String type;
-    private String category;
+    private int wasteId;
+    private WasteType type;
+    private Boolean isRecyclable;
+    private Boolean isDangerous;
 
-    // Constructor for Waste
-    public Waste(int id, String type, String category) {
-        this.id = id;
+    public enum WasteType {
+        PLASTIC, 
+        GLASS, 
+        PAPER, 
+        ORGANIC, 
+        HAZARDOUS, 
+        UNSORTED
+    }
+
+    public Waste(int wasteId, WasteType type, Boolean isRecyclable, Boolean isDangerous) {
+        this.wasteId = wasteId;
         this.type = type;
-        this.category = category;
+        this.isRecyclable = isRecyclable;
+        this.isDangerous = isDangerous;
     }
 
-    // add get for the attributes of the class Waste
-    public int getId() {
-        return id;
+    public int getWasteId() {
+        return wasteId;
     }
 
-    public String getType() {
+    public WasteType getType() {
         return type;
     }
 
-    public String getCategory() {
-        return category;
-    }
-
-    // add set for the attributes of the class Waste
-    public void setType(String type) {
+    public void setType(WasteType type) {
         this.type = type;
     }
 
-    public void setCategory(String category) {
-        this.category = category;
+    public Boolean getIsRecyclable() {
+        return isRecyclable;
     }
 
-    // add analyzeType and getCategoryType method to analyze the waste
-    public String getCategoryType() {
-        if (category.equalsIgnoreCase("Plastic") || category.equalsIgnoreCase("Glass") || category.equalsIgnoreCase("Paper")) {
-            return "Recyclable";
-        }
-        if (category.equalsIgnoreCase("Organic")) {
-            return "Organic";
-        }
-        if (category.equalsIgnoreCase("Hazardous")) {
-            return "Hazardous";
-        }
-        return "Unknown";
+    public void setIsRecyclable(Boolean isRecyclable) {
+        this.isRecyclable = isRecyclable;
+    }
+
+    public Boolean getIsDangerous() {
+        return isDangerous;
+    }
+
+    public void setIsDangerous(Boolean isDangerous) {
+        this.isDangerous = isDangerous;
     }
     
-    public String analyzeType() {
-        String type = getCategoryType();
-        switch (type) {
-            case "Recyclable":
-                return "Questo rifiuto può essere riciclato.";
-            case "Organic":
-                return "Rifiuto organico da smaltire separatamente.";
-            case "Hazardous":
-                return "Attenzione: rifiuto pericoloso da gestire con cautela.";
-            default:
-                return "Rifiuto non classificato.";
-        }
-    }
+//TEST    
+    // public static void main(String[] args) {
+
+    //     Waste waste = new Waste(1, Waste.WasteType.PAPER, true, false);
+
+    //     if (waste.getWasteId() == 1 && waste.getType() == Waste.WasteType.PAPER && 
+    //         waste.getIsRecyclable() == true && waste.getIsDangerous() == false) {
+    //         System.out.println("ok"); 
+    //     } else {
+    //         System.out.println("error");
+    //     }
+
+    //     waste.setType(Waste.WasteType.GLASS);
+    //     waste.setIsRecyclable(false);
+    //     waste.setIsDangerous(true);
+
+    //     if (waste.getWasteId() == 1 && waste.getType() == Waste.WasteType.GLASS && 
+    //         waste.getIsRecyclable() == false && waste.getIsDangerous() == true) {
+    //         System.out.println("ok");
+    //     } else {
+    //         System.out.println("error");
+    //     }
+    // }
+
+
 }
