@@ -47,12 +47,12 @@ dependencies {
     // JUnit API and testing engine
     testImplementation("org.junit.jupiter:junit-jupiter-api:$jUnitVersion")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:$jUnitVersion")
+
+    // JDBC dependency for MySQL
+    implementation("mysql:mysql-connector-java:8.0.33")  // Dipendenza per il connettore MySQL
+
 }
 
-tasks.withType<Test> {
-    // Enables JUnit 5 Jupiter module
-    useJUnitPlatform()
-}
 
 application {
     // Define the main class for the application
