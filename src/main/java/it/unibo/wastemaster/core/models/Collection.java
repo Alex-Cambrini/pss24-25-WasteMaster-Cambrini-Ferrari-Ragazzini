@@ -6,7 +6,7 @@ public class Collection {
     private Customer customer;
     private Date date;
     private Waste.WasteType waste;
-    private CollectionStatus status;
+    private CollectionStatus CollectionStatus;
     private int cancelLimitDays;
     private int scheduleId;
     private boolean isExtra;
@@ -18,12 +18,12 @@ public class Collection {
         CANCELLED
     }
 
-    public Collection(int collectionId, Customer customer, Date date, Waste.WasteType waste, CollectionStatus status, int cancelLimitDays, int scheduleId, boolean isExtra) {
+    public Collection(int collectionId, Customer customer, Date date, Waste.WasteType waste, CollectionStatus CollectionStatus, int cancelLimitDays, int scheduleId, boolean isExtra) {
         this.collectionId = collectionId;
         this.customer = customer;
         this.date = date;
         this.waste = waste;
-        this.status = status;
+        this.CollectionStatus = CollectionStatus;
         this.cancelLimitDays = cancelLimitDays;
         this.scheduleId = scheduleId;
         this.isExtra = isExtra;
@@ -58,11 +58,11 @@ public class Collection {
     }
 
     public CollectionStatus getStatus() {
-        return status;
+        return CollectionStatus;
     }
 
     public void setStatus(CollectionStatus status) {
-        this.status = status;
+        this.CollectionStatus = status;
     }
 
     public int getCancelLimitDays() {
@@ -91,7 +91,7 @@ public class Collection {
 
     public String getInfo() {
         return String.format("Collection ID: %d, Customer: %s, Date: %s, Waste: %s, Status: %s, Cancel Limit Days: %d, Schedule ID: %d, Extra: %b",
-                collectionId, customer.getName(), date.toString(), waste, status, cancelLimitDays, scheduleId, isExtra);
+                collectionId, customer.getName(), date.toString(), waste, CollectionStatus, cancelLimitDays, scheduleId, isExtra);
     }
 
 
