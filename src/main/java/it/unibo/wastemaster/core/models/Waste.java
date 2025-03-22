@@ -33,4 +33,32 @@ public class Waste {
     public void setCategory(String category) {
         this.category = category;
     }
+
+    // add analyzeType and getCategoryType method to analyze the waste
+    public String getCategoryType() {
+        if (category.equalsIgnoreCase("Plastic") || category.equalsIgnoreCase("Glass") || category.equalsIgnoreCase("Paper")) {
+            return "Recyclable";
+        }
+        if (category.equalsIgnoreCase("Organic")) {
+            return "Organic";
+        }
+        if (category.equalsIgnoreCase("Hazardous")) {
+            return "Hazardous";
+        }
+        return "Unknown";
+    }
+    
+    public String analyzeType() {
+        String type = getCategoryType();
+        switch (type) {
+            case "Recyclable":
+                return "Questo rifiuto può essere riciclato.";
+            case "Organic":
+                return "Rifiuto organico da smaltire separatamente.";
+            case "Hazardous":
+                return "Attenzione: rifiuto pericoloso da gestire con cautela.";
+            default:
+                return "Rifiuto non classificato.";
+        }
+    }
 }
