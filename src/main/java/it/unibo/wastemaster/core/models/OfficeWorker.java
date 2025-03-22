@@ -2,8 +2,8 @@ package it.unibo.wastemaster.core.models;
 
 public class OfficeWorker extends Employee {
     
-    public OfficeWorker(int id, String name, String surname, Location address, String email, String phone, int employeeId ) {
-        super(id, name, surname, address, email, phone, employeeId, Role.OfficeWorker);
+    public OfficeWorker(int personId, String name, String surname, Location address, String email, String phone, int employeeId ) {
+        super(personId, name, surname, address, email, phone, employeeId, Role.OfficeWorker);
     }
 
     @Override

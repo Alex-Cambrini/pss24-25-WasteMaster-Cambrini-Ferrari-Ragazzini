@@ -1,7 +1,7 @@
 package it.unibo.wastemaster.core.models;
 
 public class Person {
-    protected int id;
+    protected int personId;
     protected String name;
     protected String surname;
     protected Location address;
@@ -10,8 +10,8 @@ public class Person {
 
 
     // Constructor class Person
-    public Person(int id, String name, String surname, Location address, String email, String phone) {
-        this.id = id;
+    public Person(int personId, String name, String surname, Location address, String email, String phone) {
+        this.personId = personId;
         this.name = name;
         this.surname = surname;
         this.address = address;
@@ -20,7 +20,7 @@ public class Person {
     }
 
     public int getId() {
-        return id;
+        return personId;
     }
 
     public String getName() {
@@ -59,7 +59,7 @@ public class Person {
     }
 
     public String getInfo() {
-        return String.format("ID: %d, Name: %s, Surname: %s, Address: %s, Email: %s, Phone: %s", id, name, surname, address, email, phone);
+        return String.format("ID: %d, Name: %s, Surname: %s, Address: %s, Email: %s, Phone: %s", personId, name, surname, address, email, phone);
     }
 
     // //TEST
