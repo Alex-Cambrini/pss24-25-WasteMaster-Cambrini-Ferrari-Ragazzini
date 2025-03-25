@@ -48,9 +48,11 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter-api:$jUnitVersion")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:$jUnitVersion")
 
-    // JDBC dependency for MySQL
-    implementation("mysql:mysql-connector-java:8.0.33")  // Dipendenza per il connettore MySQL
+    // Hibernate Core per la gestione della persistenza
+    implementation("org.hibernate:hibernate-core:6.2.0.Final")
 
+    // Driver JDBC per MySQL
+    implementation("mysql:mysql-connector-java:8.0.33")
 }
 
 
