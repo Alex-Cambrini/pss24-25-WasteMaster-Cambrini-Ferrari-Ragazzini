@@ -1,6 +1,8 @@
 package it.unibo.wastemaster.core.models;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -11,10 +13,11 @@ import jakarta.persistence.Table;
 public class Employee extends Person {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-
     private int employeeId;
+    
+    @Enumerated(EnumType.STRING)
     private Role role;
-
+    
     public enum Role {
         ADMINISTRATOR,
         OFFICE_WORKER,
