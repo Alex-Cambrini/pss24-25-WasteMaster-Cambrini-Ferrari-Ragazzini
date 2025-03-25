@@ -26,9 +26,8 @@ public class Location {
         this.postalCode = postalCode;
     }
 
+    public Location() {}
 
-
-    // Getter e Setter
     public int getId() {
         return id;
     }
