@@ -1,12 +1,30 @@
 package it.unibo.wastemaster.core.models;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+
 import java.util.Date;
 
+@Entity
+@Table(name = "reservation")
 public class Reservation {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int reservationId;
+    
+    @ManyToOne
     private Customer customer;
+
     private Date bookingDate;
     private Date pickupDate;
+
+    @Enumerated(EnumType.STRING)
     private ReservationStatus status;
 
     public enum ReservationStatus {
@@ -15,8 +33,7 @@ public class Reservation {
         CANCELLED
     }
 
-    public Reservation(int reservationId, Customer customer, Date bookingDate, Date pickupDate, ReservationStatus status) {
-        this.reservationId = reservationId;
+    public Reservation(Customer customer, Date bookingDate, Date pickupDate, ReservationStatus status) {
         this.customer = customer;
         this.bookingDate = bookingDate;
         this.pickupDate = pickupDate;
@@ -60,41 +77,4 @@ public class Reservation {
                 reservationId, customer.getName(), bookingDate.toString(), pickupDate.toString(), status);
     }
 
-
-    //test
-    // public static void main(String[] args) {
-    //     Customer customer = new Customer(1, "John", "Doe", new Location(1, "Street", "10", "City", "Country"), "john@example.com", "1234567890", 123);
-    //     Date bookingDate = new Date();
-    //     Date pickupDate = new Date(System.currentTimeMillis() + 86400000L);
-
-    //     Reservation reservation = new Reservation(1, customer, bookingDate, pickupDate, ReservationStatus.PENDING);
-
-    //     if (reservation.getReservationId() == 1 && reservation.getCustomer().equals(customer) && reservation.getBookingDate().equals(bookingDate)
-    //             && reservation.getPickupDate().equals(pickupDate) && reservation.getStatus() == ReservationStatus.PENDING) {
-    //         System.out.println("ok");
-    //     } else {
-    //         System.out.println("error");
-    //     }
-
-    //     reservation.confirmReservation();
-    //     if (reservation.getStatus() == ReservationStatus.CONFIRMED) {
-    //         System.out.println("ok");
-    //     } else {
-    //         System.out.println("error");
-    //     }
-
-    //     reservation.cancelReservation();
-    //     if (reservation.getStatus() == ReservationStatus.CANCELLED) {
-    //         System.out.println("ok");
-    //     } else {
-    //         System.out.println("error");
-    //     }
-
-    //     String info = reservation.getInfo();
-    //     System.out.println("Expected output of getInfo:");
-    //     System.out.println("Reservation ID: 1, Customer: John, Booking Date: " + bookingDate.toString() + ", Pickup Date: " + pickupDate.toString() + ", Status: CANCELLED");
-
-    //     System.out.println("Actual output of getInfo:");
-    //     System.out.println(info);
-    // }
 }

@@ -1,12 +1,22 @@
 package it.unibo.wastemaster.core.models;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.Id;
+import jakarta.persistence.EnumType;
+@Entity
 public class Vehicle {
+    
+    @Id
+    private String plate;
     private int capacity;
     private String brand;
     private String model;
     private int year;
-    private String plate;
+    @Enumerated(EnumType.STRING)
     private LicenceType licenceType;
+
+    @Enumerated(EnumType.STRING)
     private VehicleStatus vehicleStatus;
 
     public enum LicenceType {
@@ -22,14 +32,20 @@ public class Vehicle {
         OUT_OF_SERVICE
     }
 
-    public Vehicle(int capacity, String brand, String model, int year, String plate, LicenceType licenceType, VehicleStatus vehicleStatus) {
+    // Costruttore
+    public Vehicle(String plate, int capacity, String brand, String model, int year, LicenceType licenceType, VehicleStatus vehicleStatus) {
+        this.plate = plate;
         this.capacity = capacity;
         this.brand = brand;
         this.model = model;
         this.year = year;
-        this.plate = plate;
         this.licenceType = licenceType;
         this.vehicleStatus = vehicleStatus;
+    }
+
+    // Getter
+    public String getPlate() {
+        return plate;
     }
 
     public int getCapacity() {
@@ -48,10 +64,6 @@ public class Vehicle {
         return year;
     }
 
-    public String getPlate() {
-        return plate;
-    }
-
     public LicenceType getLicenceType() {
         return licenceType;
     }
@@ -60,7 +72,7 @@ public class Vehicle {
         return vehicleStatus;
     }
 
-
+    // Setter
     public void setCapacity(int capacity) {
         this.capacity = capacity;
     }
@@ -75,10 +87,6 @@ public class Vehicle {
 
     public void setYear(int year) {
         this.year = year;
-    }
-
-    public void setPlate(String plate) {
-        this.plate = plate;
     }
 
     public void setLicenceType(LicenceType licenceType) {
@@ -97,42 +105,5 @@ public class Vehicle {
         return String.format("Vehicle Info: Brand: %s, Model: %s, Year: %d, Plate: %s, Licence: %s, Status: %s",
                 brand, model, year, plate, licenceType, vehicleStatus);
     }
-
-
-
-//TEST
-    // public static void main(String[] args) {
-    //     Vehicle vehicle = new Vehicle(1000, "BrandX", "ModelY", 2020, "AB123CD", Vehicle.LicenceType.C, Vehicle.VehicleStatus.IN_SERVICE);
-
-    //     if (vehicle.getCapacity() == 1000 && vehicle.getBrand().equals("BrandX") && vehicle.getModel().equals("ModelY")
-    //             && vehicle.getYear() == 2020 && vehicle.getPlate().equals("AB123CD") && vehicle.getLicenceType() == Vehicle.LicenceType.C
-    //             && vehicle.getVehicleStatus() == Vehicle.VehicleStatus.IN_SERVICE) {
-    //         System.out.println("ok");
-    //     } else {
-    //         System.out.println("error");
-    //     }
-
-    //     vehicle.updateStatus(Vehicle.VehicleStatus.IN_MAINTENANCE);
-    //     if (vehicle.getVehicleStatus() == Vehicle.VehicleStatus.IN_MAINTENANCE) {
-    //         System.out.println("ok");
-    //     } else {
-    //         System.out.println("error");
-    //     }
-
-    //     String info = vehicle.getInfo();
-    //     if (info.contains("BrandX") && info.contains("ModelY") && info.contains("2020") && info.contains("AB123CD")
-    //             && info.contains("C") && info.contains("IN_MAINTENANCE")) {
-    //         System.out.println("ok");
-    //     } else {
-    //         System.out.println("error");
-    //     }
-
-    //     vehicle.updateStatus(Vehicle.VehicleStatus.OUT_OF_SERVICE);
-    //     if (vehicle.getVehicleStatus() == Vehicle.VehicleStatus.OUT_OF_SERVICE) {
-    //         System.out.println("ok");
-    //     } else {
-    //         System.out.println("error");
-    //     }
-    // }
 
 }
