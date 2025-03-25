@@ -1,24 +1,39 @@
 package it.unibo.wastemaster.core.models;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+
+@Entity
+@Table(name = "employee")
 public class Employee extends Person {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+
     private int employeeId;
     private Role role;
 
     public enum Role {
-        Administrator,
-        OfficeWorker,
-        Operator
+        ADMINISTRATOR,
+        OFFICE_WORKER,
+        OPERATOR
     }
 
-    public Employee(int personId, String name, String surname, Location address, String email, String phone, int employeeId, Role role) {
-        super(personId, name, surname, address, email, phone);
-        this.employeeId = employeeId;
+    public Employee(String name, String surname, Location address, String email, String phone, Role role) {
+        super(name, surname, address, email, phone);
         this.role = role;
+    }
+
+    public Employee() {
+        super();
     }
 
     public int getEmployeeId() {
         return employeeId;
     }
+
     public Role getRole() {
         return role;
     }
@@ -31,19 +46,4 @@ public class Employee extends Person {
     public String getInfo() {
         return super.getInfo() + String.format(", EmployeeId: %d, Role: %s", employeeId, role);
     }
-
-    // public static void main(String[] args) {
-    //     Location location = new Location(0, "Via Roma", "10", "Milano", "Italy");
-
-    //     Employee employee = new Employee(1, "Mario", "Rossi", location, "mario.rossi@example.com", "1234567890", 1001, Role.Operator);
-
-    //     System.out.println("Info iniziali: " + employee.getInfo());
-
-    //     System.out.println("Employee ID: " + employee.getEmployeeId());
-    //     System.out.println("Employee Role: " + employee.getRole());
-
-    //     employee.setRole(Role.Administrator);
-
-    //     System.out.println("Info dopo la modifica: " + employee.getInfo());
-    // }
 }
