@@ -6,17 +6,31 @@
 
     <persistence-unit name="myJpaUnit">
 
+    <class>it.unibo.wastemaster.core.models.Customer</class>
+    <class>it.unibo.wastemaster.core.models.Location</class>
+    <class>it.unibo.wastemaster.core.models.Employee</class>
+
         <properties>
             <property name="jakarta.persistence.jdbc.driver" value="com.mysql.cj.jdbc.Driver"/>
             <property name="jakarta.persistence.jdbc.url" value="jdbc:mysql://localhost:3306/wastemaster_db"/>
             <property name="jakarta.persistence.jdbc.user" value="wastemaster"/>
             <property name="jakarta.persistence.jdbc.password" value="wastemaster"/>
 
-            <property name="hibernate.dialect" value="org.hibernate.dialect.MySQLDialect"/>
+            <property name="hibernate.dialect" value="org.hibernate.dialect.MariaDBDialect"/>
             <property name="hibernate.hbm2ddl.auto" value="update"/>
             <property name="hibernate.show_sql" value="true"/>
             <property name="hibernate.format_sql" value="true"/>
+            <property name="hibernate.use_sql_comments" value="true"/>
+
             <property name="hibernate.cache.use_second_level_cache" value="false"/>
+
+            <property name="hibernate.connection.provider_class" value="org.hibernate.hikaricp.internal.HikariCPConnectionProvider"/>
+            <property name="hibernate.hikari.maximumPoolSize" value="10"/>
+            <property name="hibernate.hikari.minimumIdle" value="2"/>
+            <property name="hibernate.hikari.idleTimeout" value="30000"/>
+            <property name="hibernate.hikari.connectionTimeout" value="30000"/>
+            <property name="hibernate.hikari.poolName" value="WasteMasterHikariCP"/>
+
         </properties>
     </persistence-unit>
 </persistence>
