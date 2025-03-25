@@ -9,6 +9,10 @@
     <class>it.unibo.wastemaster.core.models.Customer</class>
     <class>it.unibo.wastemaster.core.models.Location</class>
     <class>it.unibo.wastemaster.core.models.Employee</class>
+    <class>it.unibo.wastemaster.core.models.Collection</class>
+    <class>it.unibo.wastemaster.core.models.Reservation</class>
+    <class>it.unibo.wastemaster.core.models.Vehicle</class>
+    <class>it.unibo.wastemaster.core.models.Waste</class>
 
         <properties>
             <property name="jakarta.persistence.jdbc.driver" value="com.mysql.cj.jdbc.Driver"/>
