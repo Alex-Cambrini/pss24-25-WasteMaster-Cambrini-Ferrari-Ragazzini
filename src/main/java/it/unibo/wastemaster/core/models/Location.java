@@ -1,22 +1,40 @@
 package it.unibo.wastemaster.core.models;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+
+@Entity
+@Table(name = "location")
 public class Location {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
+
     private String street;
     private String civicNumber;
     private String city;
     private String postalCode;
 
-    public Location(int id, String street, String civicNumber, String city, String postalCode) {
-        this.id = id;
+    public Location(String street, String civicNumber, String city, String postalCode) {
         this.street = street;
         this.civicNumber = civicNumber;
         this.city = city;
         this.postalCode = postalCode;
     }
 
+
+
+    // Getter e Setter
     public int getId() {
         return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public String getStreet() {
@@ -55,26 +73,4 @@ public class Location {
     public String toString() {
         return street + ", " + civicNumber + ", " + city + ", " + postalCode;
     }
-
-    // TEST
-    // public static void main(String[] args) {
-    //     Location location = new Location(0, "Via Roma", "10", "Milano", "20100");
-
-    //     System.out.println("ID Location: " + location.getId());
-    //     System.out.println("Street: " + location.getStreet());
-    //     System.out.println("Civic Number: " + location.getCivicNumber());
-    //     System.out.println("City: " + location.getCity());
-    //     System.out.println("Postal Code: " + location.getPostalCode());
-
-    //     location.setStreet("Via Milano");
-    //     location.setCivicNumber("15");
-    //     location.setCity("Bologna");
-    //     location.setPostalCode("40100");
-
-    //     System.out.println("\nDopo modifica:");
-    //     System.out.println("Street: " + location.getStreet());
-    //     System.out.println("Civic Number: " + location.getCivicNumber());
-    //     System.out.println("City: " + location.getCity());
-    //     System.out.println("Postal Code: " + location.getPostalCode());
-    // }
 }
