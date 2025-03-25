@@ -1,12 +1,34 @@
 package it.unibo.wastemaster.core.models;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.Table;
 import java.util.Date;
+
+@Entity
+@Table(name = "collections")
 public class Collection {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int collectionId;
+
+    @ManyToOne
     private Customer customer;
+
     private Date date;
+
+    @Enumerated(EnumType.STRING)
     private Waste.WasteType waste;
-    private CollectionStatus CollectionStatus;
+
+    @Enumerated(EnumType.STRING)
+    private CollectionStatus collectionStatus;
+
     private int cancelLimitDays;
     private int scheduleId;
     private boolean isExtra;
@@ -18,19 +40,23 @@ public class Collection {
         CANCELLED
     }
 
-    public Collection(int collectionId, Customer customer, Date date, Waste.WasteType waste, CollectionStatus CollectionStatus, int cancelLimitDays, int scheduleId, boolean isExtra) {
-        this.collectionId = collectionId;
+    public Collection(Customer customer, Date date, Waste.WasteType waste, CollectionStatus collectionStatus, int cancelLimitDays, int scheduleId, boolean isExtra) {
         this.customer = customer;
         this.date = date;
         this.waste = waste;
-        this.CollectionStatus = CollectionStatus;
+        this.collectionStatus = collectionStatus;
         this.cancelLimitDays = cancelLimitDays;
         this.scheduleId = scheduleId;
         this.isExtra = isExtra;
     }
 
+    // Getters e Setters
     public int getCollectionId() {
         return collectionId;
+    }
+
+    public void setCollectionId(int collectionId) {
+        this.collectionId = collectionId;
     }
 
     public Customer getCustomer() {
@@ -57,12 +83,12 @@ public class Collection {
         this.waste = waste;
     }
 
-    public CollectionStatus getStatus() {
-        return CollectionStatus;
+    public CollectionStatus getCollectionStatus() {
+        return collectionStatus;
     }
 
-    public void setStatus(CollectionStatus status) {
-        this.CollectionStatus = status;
+    public void setCollectionStatus(CollectionStatus collectionStatus) {
+        this.collectionStatus = collectionStatus;
     }
 
     public int getCancelLimitDays() {
@@ -91,67 +117,7 @@ public class Collection {
 
     public String getInfo() {
         return String.format("Collection ID: %d, Customer: %s, Date: %s, Waste: %s, Status: %s, Cancel Limit Days: %d, Schedule ID: %d, Extra: %b",
-                collectionId, customer.getName(), date.toString(), waste, CollectionStatus, cancelLimitDays, scheduleId, isExtra);
+                collectionId, customer.getName(), date.toString(), waste, collectionStatus, cancelLimitDays, scheduleId, isExtra);
     }
-
-
-    //TEST
-
-    // public static void main(String[] args) {
-    //     Customer customer = new Customer(1, "Mario", "Rossi", new Location(0, "Via Roma", "10", "Milano", "Italy"), "mario@example.com", "1234567890", 12345);
-        
-    //     Waste waste = new Waste(1, Waste.WasteType.PAPER, true, false);
-
-    //     Collection collection = new Collection(
-    //             1, 
-    //             customer, 
-    //             new Date(), 
-    //             waste.getType(), 
-    //             Collection.Status.PENDING, 
-    //             3, 
-    //             101, 
-    //             false
-    //     );
-
-    //     if (collection.getCollectionId() == 1 && 
-    //         collection.getCustomer() == customer && 
-    //         collection.getDate() != null && 
-    //         collection.getWaste() == Waste.WasteType.PAPER && 
-    //         collection.getStatus() == Collection.Status.PENDING && 
-    //         collection.getCancelLimitDays() == 3 && 
-    //         collection.getScheduleId() == 101 && 
-    //         !collection.isExtra()) {
-    //         System.out.println("ok");
-    //     } else {
-    //         System.out.println("error");
-    //     }
-
-
-    //     collection.setStatus(Collection.Status.IN_PROGRESS);
-    //     collection.setExtra(true);
-    //     collection.setCancelLimitDays(5);
-        
-    //     if (collection.getStatus() == Collection.Status.IN_PROGRESS && 
-    //         collection.isExtra() && 
-    //         collection.getCancelLimitDays() == 5) {
-    //         System.out.println("ok");
-    //     } else {
-    //         System.out.println("error");
-    //     }
-
- 
-    //     String info = collection.getInfo();
-    //     if (info.contains("Collection ID: 1") && 
-    //         info.contains("Customer: Mario") && 
-    //         info.contains("Waste: PAPER") && 
-    //         info.contains("Status: IN_PROGRESS") &&
-    //         info.contains("Cancel Limit Days: 5")) {
-    //         System.out.println("ok");
-    //     } else {
-    //         System.out.println("error"); 
-    //     }
-    // }
-
-
 
 }
