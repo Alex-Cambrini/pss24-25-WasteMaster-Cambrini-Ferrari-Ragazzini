@@ -1,22 +1,24 @@
 package it.unibo.wastemaster.main;
 
-import it.unibo.wastemaster.database.DatabaseConnection;
-import java.sql.Connection;
-import java.sql.SQLException;
+import it.unibo.wastemaster.database.HibernateUtil;
+import jakarta.persistence.EntityManager;
 
 public class App {
     public static void main(String[] args) {
-        System.out.println("Hello World!");
+        System.out.println("Test di connessione al database con Hibernate!");
 
-        // Test di connessione al database
-        try (Connection connection = DatabaseConnection.getConnection()) {
-            if (connection != null) {
-                System.out.println("Connessione al database riuscita!");
-            } else {
-                System.out.println("Connessione al database fallita!");
-            }
-        } catch (SQLException e) {
+        EntityManager entityManager = HibernateUtil.getEntityManagerFactory().createEntityManager();
+
+        try {
+            entityManager.getTransaction().begin();
+            entityManager.createNativeQuery("SELECT 1").getResultList();
+            entityManager.getTransaction().commit();
+            System.out.println("Connessione al database riuscita!");
+        } catch (Exception e) {
             System.err.println("Errore di connessione: " + e.getMessage());
+        } finally {
+            entityManager.close();
+            HibernateUtil.shutdown();
         }
     }
 }
