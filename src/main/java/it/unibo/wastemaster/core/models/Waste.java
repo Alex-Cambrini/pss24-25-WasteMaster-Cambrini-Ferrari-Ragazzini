@@ -1,8 +1,21 @@
 package it.unibo.wastemaster.core.models;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+
+@Entity
 public class Waste {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int wasteId;
+
+    @Enumerated(EnumType.STRING)
     private WasteType type;
+
     private Boolean isRecyclable;
     private Boolean isDangerous;
 
@@ -15,8 +28,7 @@ public class Waste {
         UNSORTED
     }
 
-    public Waste(int wasteId, WasteType type, Boolean isRecyclable, Boolean isDangerous) {
-        this.wasteId = wasteId;
+    public Waste(WasteType type, Boolean isRecyclable, Boolean isDangerous) {
         this.type = type;
         this.isRecyclable = isRecyclable;
         this.isDangerous = isDangerous;
@@ -49,30 +61,4 @@ public class Waste {
     public void setIsDangerous(Boolean isDangerous) {
         this.isDangerous = isDangerous;
     }
-    
-//TEST    
-    // public static void main(String[] args) {
-
-    //     Waste waste = new Waste(1, Waste.WasteType.PAPER, true, false);
-
-    //     if (waste.getWasteId() == 1 && waste.getType() == Waste.WasteType.PAPER && 
-    //         waste.getIsRecyclable() == true && waste.getIsDangerous() == false) {
-    //         System.out.println("ok"); 
-    //     } else {
-    //         System.out.println("error");
-    //     }
-
-    //     waste.setType(Waste.WasteType.GLASS);
-    //     waste.setIsRecyclable(false);
-    //     waste.setIsDangerous(true);
-
-    //     if (waste.getWasteId() == 1 && waste.getType() == Waste.WasteType.GLASS && 
-    //         waste.getIsRecyclable() == false && waste.getIsDangerous() == true) {
-    //         System.out.println("ok");
-    //     } else {
-    //         System.out.println("error");
-    //     }
-    // }
-
-
 }
