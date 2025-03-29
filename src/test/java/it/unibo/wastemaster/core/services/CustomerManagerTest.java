@@ -58,4 +58,18 @@ class CustomerManagerTest {
 		assertEquals("0000000000", updated.getPhone());
 	}
 
+    @Test
+	void testDeleteCustomer() {
+		String email = generateUniqueEmail("delete");
+		Customer customer = customerManager.addCustomer(
+			"Test", "Delete", email, "1234567890",
+			"Via Roma", "10", "Bologna", "40100"
+		);
+
+		int id = customer.getCustomerId();
+		customerManager.deleteCustomer(customer);
+
+		Customer deleted = customerManager.getCustomerById(id);
+		assertNull(deleted);
+	}
 }
