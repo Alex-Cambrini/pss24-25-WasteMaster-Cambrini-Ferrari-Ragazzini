@@ -31,6 +31,18 @@ class CustomerManagerTest {
 		assertEquals(email, found.getEmail());
 	}
 
+    @Test
+	void testEmailDuplicationCheck() {
+		String email = generateUniqueEmail("dup");
+		customerManager.addCustomer(
+			"Test", "Dup", email, "1234567890",
+			"Via Roma", "10", "Bologna", "40100"
+		);
+
+		assertTrue(customerManager.existsByEmail(email));
+	}
+
+	
 
 	
 }
