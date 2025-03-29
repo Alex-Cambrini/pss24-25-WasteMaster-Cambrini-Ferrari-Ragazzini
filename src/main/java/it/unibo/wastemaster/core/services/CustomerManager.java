@@ -16,7 +16,7 @@ public class CustomerManager {
         customerDAO = new GenericDAO<>(entityManager, Customer.class);
     }
 
-    public void addCustomer(String name, String surname, String email, String phone, String street, String civicNumber, String city, String postalCode) {
+    public Customer addCustomer(String name, String surname, String email, String phone, String street, String civicNumber, String city, String postalCode) {
         if(name == null || name.isBlank() || email == null || email.isBlank()){
             throw new IllegalArgumentException("Nome ed email non possono essere vuoti");
         }
@@ -24,8 +24,9 @@ public class CustomerManager {
             throw new IllegalArgumentException("Un cliente con questa email esiste già");
         }
         Location location = new Location(street, civicNumber, city, postalCode);
-		Customer customer = new Customer(name, surname, location, email, phone);
+        Customer customer = new Customer(name, surname, location, email, phone);
         customerDAO.insert(customer);
+        return customer;
     }
 
     public boolean existsByEmail(String email) {
