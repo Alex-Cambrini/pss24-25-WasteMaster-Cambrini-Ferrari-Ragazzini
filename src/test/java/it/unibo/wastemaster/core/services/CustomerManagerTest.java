@@ -32,12 +32,12 @@ class CustomerManagerTest {
     @Test
 	void testAddAndGetCustomer() {
 		String email = generateUniqueEmail("add");
-		Customer added = customerManager.addCustomer(
+		testCustomer = customerManager.addCustomer(
 			"Test", "User", email, "1234567890",
 			"Via Roma", "10", "Bologna", "40100"
 		);
 
-		Customer found = customerManager.getCustomerById(added.getCustomerId());
+		Customer found = customerManager.getCustomerById(testCustomer.getCustomerId());
 		assertNotNull(found);
 		assertEquals(email, found.getEmail());
 	}
@@ -45,7 +45,7 @@ class CustomerManagerTest {
     @Test
 	void testEmailDuplicationCheck() {
 		String email = generateUniqueEmail("dup");
-		customerManager.addCustomer(
+		testCustomer = customerManager.addCustomer(
 			"Test", "Dup", email, "1234567890",
 			"Via Roma", "10", "Bologna", "40100"
 		);
@@ -56,15 +56,15 @@ class CustomerManagerTest {
 	@Test
 	void testUpdateCustomer() {
 		String email = generateUniqueEmail("update");
-		Customer customer = customerManager.addCustomer(
+		testCustomer  = customerManager.addCustomer(
 			"Test", "Update", email, "1234567890",
 			"Via Roma", "10", "Bologna", "40100"
 		);
 
-		customer.setPhone("0000000000");
-		customerManager.updateCustomer(customer);
+		testCustomer.setPhone("0000000000");
+		customerManager.updateCustomer(testCustomer);
 
-		Customer updated = customerManager.getCustomerById(customer.getCustomerId());
+		Customer updated = customerManager.getCustomerById(testCustomer.getCustomerId());
 		assertNotNull(updated);
 		assertEquals("0000000000", updated.getPhone());
 	}
@@ -72,15 +72,17 @@ class CustomerManagerTest {
     @Test
 	void testDeleteCustomer() {
 		String email = generateUniqueEmail("delete");
-		Customer customer = customerManager.addCustomer(
+		testCustomer = customerManager.addCustomer(
 			"Test", "Delete", email, "1234567890",
 			"Via Roma", "10", "Bologna", "40100"
 		);
 
-		int id = customer.getCustomerId();
-		customerManager.deleteCustomer(customer);
+		int id = testCustomer.getCustomerId();
+		customerManager.deleteCustomer(testCustomer);
 
 		Customer deleted = customerManager.getCustomerById(id);
 		assertNull(deleted);
+
+        testCustomer = null;
 	}
 }
