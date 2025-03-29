@@ -42,7 +42,20 @@ class CustomerManagerTest {
 		assertTrue(customerManager.existsByEmail(email));
 	}
 
-	
+	@Test
+	void testUpdateCustomer() {
+		String email = generateUniqueEmail("update");
+		Customer customer = customerManager.addCustomer(
+			"Test", "Update", email, "1234567890",
+			"Via Roma", "10", "Bologna", "40100"
+		);
 
-	
+		customer.setPhone("0000000000");
+		customerManager.updateCustomer(customer);
+
+		Customer updated = customerManager.getCustomerById(customer.getCustomerId());
+		assertNotNull(updated);
+		assertEquals("0000000000", updated.getPhone());
+	}
+
 }
