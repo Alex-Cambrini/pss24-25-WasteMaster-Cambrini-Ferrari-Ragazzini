@@ -18,6 +18,19 @@ class CustomerManagerTest {
 	private String generateUniqueEmail(String prefix) {
 		return prefix + "_" + System.currentTimeMillis() + "@example.com";
 	}
+    @Test
+	void testAddAndGetCustomer() {
+		String email = generateUniqueEmail("add");
+		Customer added = customerManager.addCustomer(
+			"Test", "User", email, "1234567890",
+			"Via Roma", "10", "Bologna", "40100"
+		);
+
+		Customer found = customerManager.getCustomerById(added.getCustomerId());
+		assertNotNull(found);
+		assertEquals(email, found.getEmail());
+	}
+
 
 	
 }
