@@ -1,18 +1,29 @@
 package it.unibo.wastemaster.core.services;
 
 import it.unibo.wastemaster.core.models.Customer;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class CustomerManagerTest {
 
 	private CustomerManager customerManager;
+    private Customer testCustomer;
 
 	@BeforeEach
 	void setUp() {
 		customerManager = new CustomerManager();
+        testCustomer = null;
+	}
+
+    @AfterEach
+	void tearDown() {
+		if (testCustomer != null) {
+			Customer found = customerManager.getCustomerById(testCustomer.getCustomerId());
+			if (found != null) {
+				customerManager.deleteCustomer(found);
+			}
+		}
 	}
 
 	private String generateUniqueEmail(String prefix) {
