@@ -17,8 +17,22 @@ public class CustomerManager {
     }
 
     public void addCustomer(String name, String surname, String email, String phone, String street, String civicNumber, String city, String postalCode) {
+        if(name == null || name.isBlank() || email == null || email.isBlank()){
+            throw new IllegalArgumentException("Nome ed email non possono essere vuoti");
+        }
+        if(existsByEmail(email)){
+            throw new IllegalArgumentException("Un cliente con questa email esiste già");
+        }
         Location location = new Location(street, civicNumber, city, postalCode);
 		Customer customer = new Customer(name, surname, location, email, phone);
         customerDAO.insert(customer);
+    }
+
+    public boolean existsByEmail(String email) {
+        Long count = entityManager
+        .createQuery("SELECT COUNT(c) FROM Customer c WHERE c.email = :email", Long.class)
+        .setParameter("email", email)
+        .getSingleResult();
+        return count > 0;
     }
 }
