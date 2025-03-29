@@ -20,7 +20,7 @@
             <property name="jakarta.persistence.jdbc.user" value="wastemaster"/>
             <property name="jakarta.persistence.jdbc.password" value="wastemaster"/>
 
-            <property name="hibernate.dialect" value="org.hibernate.dialect.MariaDBDialect"/>
+            <property name="hibernate.dialect" value="org.hibernate.dialect.MariaDB103Dialect"/>
             <property name="hibernate.hbm2ddl.auto" value="update"/>
             <property name="hibernate.show_sql" value="true"/>
             <property name="hibernate.format_sql" value="true"/>
