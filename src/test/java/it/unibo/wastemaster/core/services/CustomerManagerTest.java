@@ -139,4 +139,21 @@ class CustomerManagerTest {
         assertDoesNotThrow(() -> customerManager.updateCustomer(fake));
     }
 
+    @Test
+    void testDeleteAlreadyDeletedCustomer() {
+        String email = generateUniqueEmail("deleteTwice");
+        testCustomer = customerManager.addCustomer("Anna", "Neri", email, "3333333333", "Via Roma", "10", "Bologna", "40100");
+
+        customerManager.deleteCustomer(testCustomer);
+
+        assertDoesNotThrow(() -> customerManager.deleteCustomer(testCustomer));
+
+        testCustomer = null;
+    }
+
+    @Test
+    void testGetCustomerByInvalidIdReturnsNull() {
+        Customer result = customerManager.getCustomerById(-1);
+        assertNull(result);
+    }
 }
