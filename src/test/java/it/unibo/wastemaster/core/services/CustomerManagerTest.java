@@ -131,4 +131,12 @@ class CustomerManagerTest {
         });
     }
 
+    @Test
+    void testUpdateNonExistentCustomer() {
+        Customer fake = new Customer("Ghost", "User", null, "ghost@example.com", "0000000000");
+        fake.setCustomerId(-999);
+
+        assertDoesNotThrow(() -> customerManager.updateCustomer(fake));
+    }
+
 }
