@@ -35,4 +35,16 @@ public class CustomerManager {
         .getSingleResult();
         return count > 0;
     }
+
+    public Customer getCustomerById(int customerId) {
+        return customerDAO.findById(customerId);
+    }
+
+    public void updateCustomer(Customer updateCustomer) {
+        customerDAO.update(updateCustomer);
+    }
+
+    public void deleteCustomer(Customer customer) {
+        customerDAO.delete(customer);
+    }
 }
