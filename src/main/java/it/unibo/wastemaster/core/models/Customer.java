@@ -24,6 +24,10 @@ public class Customer extends Person {
         return customerId;
     }
 
+    public void setCustomerId(int customerId) {
+        this.customerId = customerId;
+    }    
+
     @Override
     public String getInfo() {
         return super.getInfo() + String.format(", CustomerId: %d", customerId);
