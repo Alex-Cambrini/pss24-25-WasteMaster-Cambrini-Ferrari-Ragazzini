@@ -27,7 +27,10 @@ public class GenericDAO<T> {
     }
 
     public void delete(T entity) {
-        TransactionHelper.executeTransaction(entityManager, () -> entityManager.remove(entity));
+        TransactionHelper.executeTransaction(entityManager, () -> {
+            T attached = entityManager.contains(entity) ? entity : entityManager.merge(entity);
+            entityManager.remove(attached);
+        });
     }
 
     public T findById(int id) {
