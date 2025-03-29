@@ -85,4 +85,40 @@ class CustomerManagerTest {
 
         testCustomer = null;
 	}
+
+    @Test
+    void testAddCustomerWithInvalidInputs() {
+        String validPhone = "1234567890";
+        String validStreet = "Via Roma";
+        String validCivic = "10";
+        String validCity = "Bologna";
+        String validPostal = "40100";
+
+        assertAll(
+            () -> assertThrows(IllegalArgumentException.class, () ->
+                customerManager.addCustomer("Mario", "Rossi", null, validPhone, validStreet, validCivic, validCity, validPostal)
+            ),
+
+            () -> assertThrows(IllegalArgumentException.class, () ->
+                customerManager.addCustomer("Mario", "Rossi", "", validPhone, validStreet, validCivic, validCity, validPostal)
+            ),
+
+            () -> assertThrows(IllegalArgumentException.class, () ->
+                customerManager.addCustomer("Mario", "Rossi", "   ", validPhone, validStreet, validCivic, validCity, validPostal)
+            ),
+
+            () -> assertThrows(IllegalArgumentException.class, () ->
+                customerManager.addCustomer(null, "Rossi", "test1@example.com", validPhone, validStreet, validCivic, validCity, validPostal)
+            ),
+
+            () -> assertThrows(IllegalArgumentException.class, () ->
+                customerManager.addCustomer("", "Rossi", "test2@example.com", validPhone, validStreet, validCivic, validCity, validPostal)
+            ),
+
+            () -> assertThrows(IllegalArgumentException.class, () ->
+                customerManager.addCustomer("   ", "Rossi", "test3@example.com", validPhone, validStreet, validCivic, validCity, validPostal)
+            )
+        );
+    }
+
 }
