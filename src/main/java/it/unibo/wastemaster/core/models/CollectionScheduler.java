@@ -1,0 +1,99 @@
+package it.unibo.wastemaster.core.models;
+
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.Table;
+import java.util.List;
+
+@Entity
+@Table(name = "scheduled_collections")
+public class CollectionScheduler {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private int scheduledCollectionId;
+
+    @ManyToOne
+    @JoinColumn(name = "customer_id")
+    private Customer customer;
+
+    @Enumerated(EnumType.STRING)
+    private Frequency frequency;
+
+    @Enumerated(EnumType.STRING)
+    private ScheduledCollectionStatus status;
+
+    @OneToMany(mappedBy = "scheduledCollection")
+    private List<Collection> collections;
+
+    public enum Frequency {
+        WEEKLY,
+        MONTHLY
+    }
+
+    public enum ScheduledCollectionStatus {
+        ACTIVE,
+        COMPLETED,
+        CANCELLED
+    }
+
+    public CollectionScheduler(Customer customer, Frequency frequency, ScheduledCollectionStatus status) {
+        this.customer = customer;
+        this.frequency = frequency;
+        this.status = status;
+    }
+
+    // Getters e Setters
+    public int getScheduledCollectionId() {
+        return scheduledCollectionId;
+    }
+
+    public void setScheduledCollectionId(int scheduledCollectionId) {
+        this.scheduledCollectionId = scheduledCollectionId;
+    }
+
+    public Customer getCustomer() {
+        return customer;
+    }
+
+    public void setCustomer(Customer customer) {
+        this.customer = customer;
+    }
+
+    public Frequency getFrequency() {
+        return frequency;
+    }
+
+    public void setFrequency(Frequency frequency) {
+        this.frequency = frequency;
+    }
+
+    public ScheduledCollectionStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(ScheduledCollectionStatus status) {
+        this.status = status;
+    }
+
+    public List<Collection> getCollections() {
+        return collections;
+    }
+
+    public void setCollections(List<Collection> collections) {
+        this.collections = collections;
+    }
+
+    @Override
+    public String toString() {
+        return String.format("ScheduledCollection {ID: %d, Customer: %s, Frequency: %s, Status: %s, Collections: %d}",
+                scheduledCollectionId, customer != null ? customer.getName() : "N/A", frequency, status, collections.size());
+    }
+}
