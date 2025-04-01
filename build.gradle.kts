@@ -43,10 +43,12 @@ dependencies {
         }
     }
 
-    val jUnitVersion = "5.10.0"
+    val jUnitVersion = "5.11.4"
     // JUnit API and testing engine
-    testImplementation("org.junit.jupiter:junit-jupiter:$jUnitVersion")
-    testRuntimeOnly("org.junit.platform:junit-platform-launcher:1.10.0")
+    testImplementation("org.junit.jupiter:junit-jupiter-api:$jUnitVersion")
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:$jUnitVersion")
+    
+
 
 
     // Hibernate Core per la gestione della persistenza
@@ -62,8 +64,10 @@ dependencies {
 
 
 }
-tasks.test {
-	useJUnitPlatform()
+
+tasks.withType<Test> {
+    // Enables JUnit 5 Jupiter module
+    useJUnitPlatform()
 }
 
 application {
