@@ -34,7 +34,12 @@ public class Collection {
 
     private int cancelLimitDays;
     private int scheduleId;
-    private boolean isExtra;
+    private ScheduleType scheduleType;
+
+    public enum ScheduleType {
+        SCHEDULED,
+        EXTRA
+    }
 
     public enum CollectionStatus {
         PENDING,
@@ -43,14 +48,14 @@ public class Collection {
         CANCELLED
     }
 
-    public Collection(Customer customer, Date date, Waste.WasteType waste, CollectionStatus collectionStatus, int cancelLimitDays, int scheduleId, boolean isExtra) {
+    public Collection(Customer customer, Date date, Waste.WasteType waste, CollectionStatus collectionStatus, int cancelLimitDays, int scheduleId, ScheduleType scheduleType) {
         this.customer = customer;
         this.date = date;
         this.waste = waste;
         this.collectionStatus = collectionStatus;
         this.cancelLimitDays = cancelLimitDays;
         this.scheduleId = scheduleId;
-        this.isExtra = isExtra;
+        this.scheduleType = scheduleType;
     }
 
     // Getters e Setters
@@ -110,17 +115,26 @@ public class Collection {
         this.scheduleId = scheduleId;
     }
 
-    public boolean isExtra() {
-        return isExtra;
+    public ScheduleType getScheduleType() {
+        return scheduleType;
     }
 
-    public void setExtra(boolean isExtra) {
-        this.isExtra = isExtra;
+    public void setScheduleType(ScheduleType scheduleType) {
+        this.scheduleType = scheduleType;
     }
 
-    public String getInfo() {
-        return String.format("Collection ID: %d, Customer: %s, Date: %s, Waste: %s, Status: %s, Cancel Limit Days: %d, Schedule ID: %d, Extra: %b",
-                collectionId, customer.getName(), date.toString(), waste, collectionStatus, cancelLimitDays, scheduleId, isExtra);
+    @Override
+    public String toString() {
+        return String.format(
+            "Collection {ID: %d, Customer: %s, Date: %s, Waste: %s, Status: %s, Cancel Limit Days: %d, Schedule ID: %s, Schedule Type: %s}",
+            collectionId,
+            customer != null ? customer.getName() : "N/A",
+            date != null ? date.toString() : "N/A",
+            waste,
+            collectionStatus,
+            cancelLimitDays,
+            scheduleId,
+            scheduleType
+        );
     }
-
 }
