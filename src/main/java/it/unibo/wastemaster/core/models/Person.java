@@ -12,6 +12,7 @@ public abstract class Person {
     private Location address;
     protected String email;
     protected String phone;
+    protected boolean isDeleted = false;
 
     public Person(String name, String surname, Location address, String email, String phone) {
         this.name = name;
@@ -42,6 +43,18 @@ public abstract class Person {
 
     public String getPhone() {
         return phone;
+    }
+
+    public boolean isDeleted() {
+        return isDeleted;
+    }
+
+    public void delete() {
+        isDeleted = true;
+    }
+
+    public void restore() {
+        isDeleted = false;
     }
 
     public void setName(String name) {
