@@ -5,6 +5,7 @@ import it.unibo.wastemaster.core.dao.GenericDAO;
 import it.unibo.wastemaster.core.models.Customer;
 import it.unibo.wastemaster.core.models.Location;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityManagerFactory;
 import it.unibo.wastemaster.database.HibernateUtil;
 
 public class CustomerManager {
@@ -12,8 +13,12 @@ public class CustomerManager {
     private final EntityManager entityManager;
     
     public CustomerManager() {
-        entityManager = HibernateUtil.getEntityManagerFactory().createEntityManager();
-        customerDAO = new GenericDAO<>(entityManager, Customer.class);
+	this(HibernateUtil.getEntityManagerFactory());
+    }
+
+    public CustomerManager(EntityManagerFactory emf) {
+        this.entityManager = emf.createEntityManager();
+        this.customerDAO = new GenericDAO<>(entityManager, Customer.class);
     }
 
     public Customer addCustomer(String name, String surname, String email, String phone, String street, String civicNumber, String city, String postalCode) {

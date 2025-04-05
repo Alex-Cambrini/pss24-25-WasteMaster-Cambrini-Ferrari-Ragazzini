@@ -22,7 +22,7 @@ class CollectionTest {
 
     @BeforeEach
     void setUp() {
-        entityManagerFactory = Persistence.createEntityManagerFactory("myJpaUnit");
+        entityManagerFactory = Persistence.createEntityManagerFactory("test-pu");
         entityManager = entityManagerFactory.createEntityManager();
     }
 
