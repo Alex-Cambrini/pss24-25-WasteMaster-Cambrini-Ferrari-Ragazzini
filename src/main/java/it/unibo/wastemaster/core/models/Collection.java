@@ -10,6 +10,7 @@ import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Table;
+import jakarta.persistence.Column;
 import java.util.Date;
 
 @Entity
@@ -48,6 +49,9 @@ public class Collection {
         CANCELLED
     }
 
+    @Column(nullable = false)
+    private boolean isExtra;
+
     public Collection(Customer customer, Date date, Waste.WasteType waste, CollectionStatus collectionStatus, int cancelLimitDays, int scheduleId, ScheduleType scheduleType) {
         this.customer = customer;
         this.date = date;
@@ -56,6 +60,7 @@ public class Collection {
         this.cancelLimitDays = cancelLimitDays;
         this.scheduleId = scheduleId;
         this.scheduleType = scheduleType;
+        this.isExtra = false;
     }
 
     // Getters e Setters
@@ -122,6 +127,14 @@ public class Collection {
     public void setScheduleType(ScheduleType scheduleType) {
         this.scheduleType = scheduleType;
     }
+
+    public boolean isExtra() {
+        return isExtra;
+    }
+    
+    public void setExtra(boolean isExtra) {
+        this.isExtra = isExtra;
+    }    
 
     @Override
     public String toString() {
