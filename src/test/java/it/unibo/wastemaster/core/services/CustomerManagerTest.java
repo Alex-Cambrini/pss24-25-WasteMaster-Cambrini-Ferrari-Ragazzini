@@ -1,6 +1,9 @@
 package it.unibo.wastemaster.core.services;
 
 import it.unibo.wastemaster.core.models.Customer;
+import jakarta.persistence.EntityManagerFactory;
+import jakarta.persistence.Persistence;
+
 import org.junit.jupiter.api.*;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -9,10 +12,12 @@ class CustomerManagerTest {
 
 	private CustomerManager customerManager;
     private Customer testCustomer;
+    private EntityManagerFactory emf;
 
 	@BeforeEach
 	void setUp() {
-		customerManager = new CustomerManager();
+        emf = Persistence.createEntityManagerFactory("test-pu");
+		customerManager = new CustomerManager(emf);
         testCustomer = null;
 	}
 
@@ -23,6 +28,9 @@ class CustomerManagerTest {
 			if (found != null) {
 				customerManager.deleteCustomer(found);
 			}
+		}
+        if (emf != null && emf.isOpen()) {
+			emf.close();
 		}
 	}
 
