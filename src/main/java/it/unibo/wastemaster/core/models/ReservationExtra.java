@@ -41,6 +41,8 @@ public class ReservationExtra {
         this.wasteType = wasteType;
     }
 
+    public ReservationExtra() {}
+    
     // Getter e Setter
     public int getReservationId() {
         return reservationId;
