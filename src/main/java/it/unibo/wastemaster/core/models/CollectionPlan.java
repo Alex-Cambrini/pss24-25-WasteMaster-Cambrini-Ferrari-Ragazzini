@@ -10,11 +10,14 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.Table;
+import java.util.Date;
 import java.util.List;
+import jakarta.persistence.Temporal;
+import jakarta.persistence.TemporalType;
 
 @Entity
 @Table(name = "scheduled_collections")
-public class CollectionScheduler {
+public class CollectionPlan {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -36,6 +39,10 @@ public class CollectionScheduler {
     @OneToMany(mappedBy = "scheduledCollection")
     private List<Collection> collections;
 
+    // Aggiunto campo startDate per la data di inizio
+    @Temporal(TemporalType.DATE)
+    private Date startDate; // La data di inizio della programmazione
+
     public enum Frequency {
         WEEKLY,
         MONTHLY
@@ -47,14 +54,21 @@ public class CollectionScheduler {
         CANCELLED
     }
 
-    public CollectionScheduler(Customer customer, Frequency frequency, ScheduledCollectionStatus status, Waste.WasteType wasteType) {
+    public CollectionPlan(Customer customer, Frequency frequency, ScheduledCollectionStatus status, Waste.WasteType wasteType, Date startDate) {
         this.customer = customer;
         this.frequency = frequency;
         this.status = status;
         this.wasteType = wasteType;
+        this.startDate = startDate;
     }
 
-    // Getters e Setters
+    public Date getStartDate() {
+        return startDate;
+    }
+
+    public void setStartDate(Date startDate) {
+        this.startDate = startDate;
+    }
 
     public Waste.WasteType getWasteType() {
         return wasteType;
@@ -106,7 +120,7 @@ public class CollectionScheduler {
 
     @Override
     public String toString() {
-        return String.format("ScheduledCollection {ID: %d, Customer: %s, Frequency: %s, Status: %s, Collections: %d}",
-                scheduledCollectionId, customer != null ? customer.getName() : "N/A", frequency, status, collections.size());
+        return String.format("ScheduledCollection {ID: %d, Customer: %s, Frequency: %s, Status: %s, StartDate: %s, Collections: %d}",
+                scheduledCollectionId, customer != null ? customer.getName() : "N/A", frequency, status, startDate, collections.size());
     }
 }
