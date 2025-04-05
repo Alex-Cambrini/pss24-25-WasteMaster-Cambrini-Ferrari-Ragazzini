@@ -30,6 +30,7 @@ public class ReservationExtraManager {
             reservation.getReservationId(),
             Collection.ScheduleType.EXTRA
         );
+        collection.setExtra(true);
 
         collectionDAO.insert(collection);
 
