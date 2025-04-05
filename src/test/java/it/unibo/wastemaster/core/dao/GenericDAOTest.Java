@@ -20,7 +20,7 @@ public class GenericDAOTest {
 
     @BeforeEach
     public void setUp() {
-        entityManagerFactory = Persistence.createEntityManagerFactory("testPU");
+        entityManagerFactory = Persistence.createEntityManagerFactory("test-pu");
         entityManager = entityManagerFactory.createEntityManager();
 
         collectionDAO = new GenericDAO<>(entityManager, Collection.class);
