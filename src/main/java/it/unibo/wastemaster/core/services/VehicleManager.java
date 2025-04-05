@@ -13,4 +13,11 @@ public class VehicleManager {
 		this.em = emf.createEntityManager();
 		this.vehicleDAO = new GenericDAO<>(em, Vehicle.class);
 	}
+
+    public Vehicle addVehicle(String plate, int capacity, String brand, String model, int year,
+							  Vehicle.LicenceType licenceType, Vehicle.VehicleStatus status) {
+		Vehicle vehicle = new Vehicle(plate, capacity, brand, model, year, licenceType, status);
+		vehicleDAO.insert(vehicle);
+		return vehicle;
+	}
 }
