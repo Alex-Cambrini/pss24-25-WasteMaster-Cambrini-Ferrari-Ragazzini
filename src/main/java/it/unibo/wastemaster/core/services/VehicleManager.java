@@ -1,5 +1,7 @@
 package it.unibo.wastemaster.core.services;
 
+import java.util.List;
+
 import it.unibo.wastemaster.core.dao.GenericDAO;
 import it.unibo.wastemaster.core.models.Vehicle;
 import jakarta.persistence.EntityManager;
@@ -39,5 +41,15 @@ public class VehicleManager {
 			vehicle.setVehicleStatus(newStatus);
 			updateVehicle(vehicle);
 		}
+	}
+
+    public List<Vehicle> getAllVehicles() {
+		return em.createQuery("SELECT v FROM Vehicle v", Vehicle.class).getResultList();
+	}
+
+	public List<Vehicle> getVehiclesByStatus(Vehicle.VehicleStatus status) {
+		return em.createQuery("SELECT v FROM Vehicle v WHERE v.vehicleStatus = :status", Vehicle.class)
+				.setParameter("status", status)
+				.getResultList();
 	}
 }
