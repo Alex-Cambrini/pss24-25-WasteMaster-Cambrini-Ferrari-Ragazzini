@@ -30,6 +30,9 @@ public class CollectionScheduler {
     @Enumerated(EnumType.STRING)
     private ScheduledCollectionStatus status;
 
+    @Enumerated(EnumType.STRING)
+    private Waste.WasteType wasteType;
+
     @OneToMany(mappedBy = "scheduledCollection")
     private List<Collection> collections;
 
@@ -44,13 +47,23 @@ public class CollectionScheduler {
         CANCELLED
     }
 
-    public CollectionScheduler(Customer customer, Frequency frequency, ScheduledCollectionStatus status) {
+    public CollectionScheduler(Customer customer, Frequency frequency, ScheduledCollectionStatus status, Waste.WasteType wasteType) {
         this.customer = customer;
         this.frequency = frequency;
         this.status = status;
+        this.wasteType = wasteType;
     }
 
     // Getters e Setters
+
+    public Waste.WasteType getWasteType() {
+        return wasteType;
+    }
+
+    public void setWasteType(Waste.WasteType wasteType) {
+        this.wasteType = wasteType;
+    }
+    
     public int getScheduledCollectionId() {
         return scheduledCollectionId;
     }
