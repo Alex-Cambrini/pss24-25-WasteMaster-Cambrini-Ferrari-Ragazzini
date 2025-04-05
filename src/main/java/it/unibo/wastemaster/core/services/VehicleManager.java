@@ -20,4 +20,8 @@ public class VehicleManager {
 		vehicleDAO.insert(vehicle);
 		return vehicle;
 	}
+
+    public Vehicle getVehicleByPlate(String plate) {
+		return em.find(Vehicle.class, plate);
+	}
 }
