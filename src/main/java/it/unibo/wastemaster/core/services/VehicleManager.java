@@ -32,4 +32,12 @@ public class VehicleManager {
 	public void deleteVehicle(Vehicle vehicle) {
 		vehicleDAO.delete(vehicle);
 	}
+
+    public void updateStatus(String plate, Vehicle.VehicleStatus newStatus) {
+		Vehicle vehicle = getVehicleByPlate(plate);
+		if (vehicle != null) {
+			vehicle.setVehicleStatus(newStatus);
+			updateVehicle(vehicle);
+		}
+	}
 }
