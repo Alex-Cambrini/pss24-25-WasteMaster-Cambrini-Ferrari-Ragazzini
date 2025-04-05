@@ -2,6 +2,7 @@ package it.unibo.wastemaster.core.dao;
 
 import it.unibo.wastemaster.core.utils.TransactionHelper;
 import jakarta.persistence.EntityManager;
+import java.util.List;
 
 public class GenericDAO<T> {
     private final EntityManager entityManager;
@@ -29,5 +30,10 @@ public class GenericDAO<T> {
 
     public T findById(int id) {
         return entityManager.find(entityClass, id);
+    }
+
+    public List<T> findAll() {
+        return entityManager.createQuery("FROM " + entityClass.getName(), entityClass)
+                            .getResultList();
     }
 }
