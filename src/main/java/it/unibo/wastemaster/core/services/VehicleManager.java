@@ -24,4 +24,12 @@ public class VehicleManager {
     public Vehicle getVehicleByPlate(String plate) {
 		return em.find(Vehicle.class, plate);
 	}
+
+    public void updateVehicle(Vehicle vehicle) {
+		vehicleDAO.update(vehicle);
+	}
+
+	public void deleteVehicle(Vehicle vehicle) {
+		vehicleDAO.delete(vehicle);
+	}
 }
