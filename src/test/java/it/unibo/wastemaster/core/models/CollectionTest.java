@@ -28,7 +28,7 @@ class CollectionTest {
 
     @AfterEach
     void tearDown() {
-        if (entityManager != null) {
+        if (entityManager != null && entityManager.isOpen()) {
             entityManager.close();
         }
     }
@@ -77,33 +77,36 @@ class CollectionTest {
     }
     
 
-    @Test
-    void testPersistence() {
-        Customer customer = new Customer("John", "Doe", new Location("Via Roma", "10", "Bologna", "40100"), "john.doe@example.com", "1234567890");
-        Date date = new Date();
-        Waste.WasteType wasteType = Waste.WasteType.PLASTIC;
-        Collection.CollectionStatus status = Collection.CollectionStatus.PENDING;
-        Collection.ScheduleType scheduleType = Collection.ScheduleType.SCHEDULED;
-    
-        Collection collection = new Collection(customer, date, wasteType, status, 5, 123, scheduleType);
-    
-        entityManager.getTransaction().begin();
-        entityManager.persist(collection);
-        entityManager.getTransaction().commit();
-    
-        assertNotNull(collection.getCollectionId());
-        assertTrue(collection.getCollectionId() > 0);
-    
-        Collection retrievedCollection = entityManager.find(Collection.class, collection.getCollectionId());
-    
-        assertNotNull(retrievedCollection);
-        assertEquals(collection.getCollectionId(), retrievedCollection.getCollectionId());
-        assertEquals(collection.getCustomer().getName(), retrievedCollection.getCustomer().getName());
-        assertEquals(collection.getScheduleType(), retrievedCollection.getScheduleType());
-    
-        entityManager.getTransaction().begin();
-        entityManager.remove(retrievedCollection);
-        entityManager.getTransaction().commit();
-    }
-    
+	@Test
+	void testPersistence() {
+		Customer customer = new Customer("John", "Doe", new Location("Via Roma", "10", "Bologna", "40100"), "john.doe@example.com", "1234567890");
+		Date date = new Date();
+		Waste.WasteType wasteType = Waste.WasteType.PLASTIC;
+		Collection.CollectionStatus status = Collection.CollectionStatus.PENDING;
+		Collection.ScheduleType scheduleType = Collection.ScheduleType.SCHEDULED;
+
+		entityManager.getTransaction().begin();
+		entityManager.persist(customer);
+		entityManager.getTransaction().commit();
+
+		Collection collection = new Collection(customer, date, wasteType, status, 5, 123, scheduleType);
+
+		entityManager.getTransaction().begin();
+		entityManager.persist(collection);
+		entityManager.getTransaction().commit();
+
+		assertNotNull(collection.getCollectionId());
+		assertTrue(collection.getCollectionId() > 0);
+
+		Collection retrievedCollection = entityManager.find(Collection.class, collection.getCollectionId());
+
+		assertNotNull(retrievedCollection);
+		assertEquals(collection.getCollectionId(), retrievedCollection.getCollectionId());
+		assertEquals(collection.getCustomer().getName(), retrievedCollection.getCustomer().getName());
+		assertEquals(collection.getScheduleType(), retrievedCollection.getScheduleType());
+		entityManager.getTransaction().begin();
+		entityManager.remove(retrievedCollection);
+		entityManager.remove(customer);
+		entityManager.getTransaction().commit();
+	}
 }
