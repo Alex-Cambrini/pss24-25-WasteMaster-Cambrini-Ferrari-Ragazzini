@@ -36,6 +36,8 @@ public class WasteSchedule {
      * 7 = Sabato
      */
 
+    public WasteSchedule() {
+    }
 
     public WasteSchedule(Waste waste, int dayOfWeek) {
         this.waste = waste;
@@ -60,5 +62,14 @@ public class WasteSchedule {
 
     public void setDayOfWeek(int dayOfWeek) {
         this.dayOfWeek = dayOfWeek;
+    }
+
+    @Override
+    public String toString() {
+        return "WasteSchedule{" +
+                "scheduleId=" + scheduleId +
+                ", dayOfWeek='" + dayOfWeek + '\'' +
+                ", waste=" + (waste != null ? waste.toString() : "N/A") +
+                '}';
     }
 }
