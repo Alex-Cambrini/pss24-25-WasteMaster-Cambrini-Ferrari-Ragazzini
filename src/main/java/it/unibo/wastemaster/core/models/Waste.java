@@ -28,6 +28,9 @@ public class Waste {
         UNSORTED
     }
 
+    public Waste() {
+    }
+
     public Waste(WasteType type, Boolean isRecyclable, Boolean isDangerous) {
         this.type = type;
         this.isRecyclable = isRecyclable;
@@ -60,5 +63,15 @@ public class Waste {
 
     public void setIsDangerous(Boolean isDangerous) {
         this.isDangerous = isDangerous;
+    }
+
+    @Override
+    public String toString() {
+        return "Waste{" +
+                "wasteId=" + wasteId +
+                ", type=" + type +
+                ", isRecyclable=" + isRecyclable +
+                ", isDangerous=" + isDangerous +
+                '}';
     }
 }
