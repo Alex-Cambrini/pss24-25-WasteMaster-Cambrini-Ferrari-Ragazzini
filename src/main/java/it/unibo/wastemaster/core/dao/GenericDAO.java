@@ -5,7 +5,7 @@ import jakarta.persistence.EntityManager;
 import java.util.List;
 
 public class GenericDAO<T> {
-    private final EntityManager entityManager;
+    protected final EntityManager entityManager;
     private final Class<T> entityClass;
 
     public GenericDAO(EntityManager entityManager, Class<T> entityClass) {
