@@ -2,6 +2,7 @@ package it.unibo.wastemaster.core.services;
 
 import it.unibo.wastemaster.core.dao.GenericDAO;
 import it.unibo.wastemaster.core.models.Customer;
+import it.unibo.wastemaster.core.models.OneTimeSchedule;
 import it.unibo.wastemaster.core.models.RecurringSchedule;
 import it.unibo.wastemaster.core.models.RecurringSchedule.Frequency;
 import it.unibo.wastemaster.core.models.Schedule.ScheduleStatus;
@@ -15,10 +16,17 @@ public class ScheduleManager {
 
     private WasteScheduleManager wasteScheduleManager;
     private GenericDAO<RecurringSchedule> recurringScheduleDAO;
+    private GenericDAO<OneTimeSchedule> oneTimeScheduleDAO;
 
-    public ScheduleManager(WasteScheduleManager wasteScheduleManager, GenericDAO<RecurringSchedule> recurringScheduleDAO) {
+    public ScheduleManager(WasteScheduleManager wasteScheduleManager, GenericDAO<RecurringSchedule> recurringScheduleDAO, GenericDAO<OneTimeSchedule> oneTimeScheduleDAO) {
         this.wasteScheduleManager = wasteScheduleManager;
         this.recurringScheduleDAO = recurringScheduleDAO;
+        this.oneTimeScheduleDAO = oneTimeScheduleDAO;
+    }
+
+    public void createOneTimeSchedule(Customer customer, Waste.WasteType wasteType, ScheduleStatus status, Date pickupDate) {
+        OneTimeSchedule schedule = new OneTimeSchedule(customer, wasteType, status, pickupDate);
+        oneTimeScheduleDAO.insert(schedule);
     }
 
     public void createRecurringSchedule(Customer customer, Waste.WasteType wasteType, ScheduleStatus status, Frequency frequency) {
