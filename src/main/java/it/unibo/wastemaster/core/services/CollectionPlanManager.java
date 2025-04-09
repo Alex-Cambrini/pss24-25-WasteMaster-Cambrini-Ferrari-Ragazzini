@@ -14,10 +14,11 @@ public class CollectionPlanManager {
     private WasteScheduleManager wasteScheduleManager;
     private GenericDAO<CollectionPlan> collectionPlanDAO;
 
-    public CollectionPlanManager(WasteScheduleManager wasteScheduleManager) {
-        this.wasteScheduleManager = wasteScheduleManager;
-    }
-
+    public CollectionPlanManager(WasteScheduleManager wasteScheduleManager, GenericDAO<CollectionPlan> collectionPlanDAO) {
+		this.wasteScheduleManager = wasteScheduleManager;
+		this.collectionPlanDAO = collectionPlanDAO;
+	}
+    
     public void createNewCollectionPlan(Customer customer, CollectionPlan.Frequency frequency,
             CollectionPlan.ScheduledCollectionStatus status, Waste.WasteType wasteType) {
                 
