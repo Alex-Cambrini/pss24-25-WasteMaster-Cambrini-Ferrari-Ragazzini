@@ -1,18 +1,11 @@
 package it.unibo.wastemaster.main;
 
 import it.unibo.wastemaster.database.HibernateUtil;
-
-import it.unibo.wastemaster.core.models.Collection;
-import it.unibo.wastemaster.core.models.Collection.CollectionStatus;
-import it.unibo.wastemaster.core.models.Collection.ScheduleType;
-import it.unibo.wastemaster.core.models.Customer;
-import it.unibo.wastemaster.core.models.Employee;
-import it.unibo.wastemaster.core.models.Location;
-import it.unibo.wastemaster.core.models.ReservationExtra;
-import it.unibo.wastemaster.core.models.ReservationExtra.ReservationStatus;
-import it.unibo.wastemaster.core.models.Waste;
-import it.unibo.wastemaster.core.models.Vehicle;
-
+import it.unibo.wastemaster.core.dao.GenericDAO;
+import it.unibo.wastemaster.core.dao.WasteScheduleDAO;
+import it.unibo.wastemaster.core.models.*;
+import it.unibo.wastemaster.core.services.ScheduleManager;
+import it.unibo.wastemaster.core.services.WasteScheduleManager;
 import jakarta.persistence.EntityManager;
 import java.util.Date;
 
@@ -23,33 +16,50 @@ public class App {
         // Crea una connessione al database
         EntityManager entityManager = HibernateUtil.getEntityManagerFactory().createEntityManager();
 
+        WasteScheduleDAO wasteScheduleDAO = new WasteScheduleDAO(entityManager);
+        WasteScheduleManager wasteScheduleManager = new WasteScheduleManager(wasteScheduleDAO);
+
+        // Nuovo ScheduleManager che gestisce entrambi i tipi di schedule
+        GenericDAO<RecurringSchedule> recurringScheduleDAO = new GenericDAO<>(entityManager, RecurringSchedule.class);
+        GenericDAO<OneTimeSchedule> oneTimeScheduleDAO = new GenericDAO<>(entityManager, OneTimeSchedule.class);
+        ScheduleManager scheduleManager = new ScheduleManager(wasteScheduleManager, recurringScheduleDAO, oneTimeScheduleDAO);
+
         try {
             // Avvia una transazione
             entityManager.getTransaction().begin();
 
+            // Creazione della Location e Customer
             Location location = new Location("Via Roma", "10", "Milano", "Italy");
             Customer customer = new Customer("Mario", "Rossi", location, "mario@example.com", "1234567890");
-            Employee employee = new Employee("Giuseppe", "Verdi", location, "giuseppe@example.com", "0987654321", Employee.Role.OPERATOR);
-            Collection collection = new Collection(customer, new Date(), Waste.WasteType.PLASTIC, CollectionStatus.PENDING, 3, 1001, ScheduleType.SCHEDULED);
 
-            customer.delete();
-            Date bookingDate = new Date();
-            // ReservationExtra reservation = new ReservationExtra(customer, bookingDate, ReservationStatus.PENDING);
-
-            Vehicle vehicle = new Vehicle("ABe23CD", 1000, "Fiat", "Panda", 2010, Vehicle.LicenceType.C, Vehicle.VehicleStatus.IN_SERVICE);
-
-            Waste waste = new Waste(Waste.WasteType.PLASTIC, true, false);
-
-            entityManager.persist(employee);
+            // Persisti la location e il customer
+            entityManager.persist(location);
             entityManager.persist(customer);
-            entityManager.persist(collection);
-      
-            entityManager.persist(vehicle);
-            entityManager.persist(waste);
 
+            // Aggiungi un nuovo tipo di Waste (PLASTIC)
+            Waste plasticWaste = new Waste(Waste.WasteType.PLASTIC, true, false);
+            entityManager.persist(plasticWaste); // Salva il tipo di Waste
+
+            // Crea una nuova programmazione (WasteSchedule) per il rifiuto PLASTIC il Venerdì (6)
+            WasteSchedule wasteSchedule = new WasteSchedule(plasticWaste, 6); // 6 corrisponde al Venerdì
+            entityManager.persist(wasteSchedule); // Salva la WasteSchedule
+
+            // Creazione di una nuova programmazione ricorrente (monthly)
+
+
+            scheduleManager.createRecurringSchedule(customer, Waste.WasteType.PLASTIC, Schedule.ScheduleStatus.ACTIVE, RecurringSchedule.Frequency.MONTHLY);
+
+            // Creazione di una nuova programmazione una tantum (reservation)
+            Date reservationDate = new Date(); // Data della prenotazione (esempio)
+
+            scheduleManager.createOneTimeSchedule(customer, Waste.WasteType.PLASTIC, Schedule.ScheduleStatus.ACTIVE, reservationDate);
+
+
+            // Commit della transazione
             entityManager.getTransaction().commit();
 
-            System.out.println("Connessione al database riuscita e tabella creata!");
+            System.out.println("Waste e WasteSchedule aggiunti con successo!");
+
         } catch (Exception e) {
             System.err.println("Errore di connessione: " + e.getMessage());
             e.printStackTrace();
