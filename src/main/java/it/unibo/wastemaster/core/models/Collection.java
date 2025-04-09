@@ -13,6 +13,8 @@ import jakarta.persistence.Table;
 import jakarta.persistence.Column;
 import java.util.Date;
 
+
+
 @Entity
 @Table(name = "collections")
 public class Collection {
@@ -34,12 +36,16 @@ public class Collection {
     private CollectionStatus collectionStatus;
 
     private int cancelLimitDays;
-    private int scheduleId;
-    private ScheduleType scheduleType;
 
-    public enum ScheduleType {
-        SCHEDULED,
-        EXTRA
+    @ManyToOne
+    @JoinColumn(name = "schedule_id")
+    private Schedule schedule;
+    
+    private ScheduleCategory scheduleCategory;
+
+    public enum ScheduleCategory {
+        ONE_TIME,
+        RECURRING
     }
 
     public enum CollectionStatus {
@@ -52,15 +58,14 @@ public class Collection {
     @Column(nullable = false)
     private boolean isExtra;
 
-    public Collection(Customer customer, Date date, Waste.WasteType waste, CollectionStatus collectionStatus, int cancelLimitDays, int scheduleId, ScheduleType scheduleType) {
+    public Collection(Customer customer, Date date, Waste.WasteType waste, CollectionStatus collectionStatus, int cancelLimitDays, Schedule schedule, ScheduleCategory scheduleCategory) {
         this.customer = customer;
         this.date = date;
         this.waste = waste;
         this.collectionStatus = collectionStatus;
         this.cancelLimitDays = cancelLimitDays;
-        this.scheduleId = scheduleId;
-        this.scheduleType = scheduleType;
-        this.isExtra = false;
+        this.scheduleCategory = scheduleCategory;
+        this.schedule = schedule;
     }
 
     // Getters e Setters
@@ -112,20 +117,20 @@ public class Collection {
         this.cancelLimitDays = cancelLimitDays;
     }
 
-    public int getScheduleId() {
-        return scheduleId;
+    public Schedule getScheduleId() {
+        return schedule;
     }
 
-    public void setScheduleId(int scheduleId) {
-        this.scheduleId = scheduleId;
+    public void setScheduleId(Schedule schedule) {
+        this.schedule = schedule;
     }
 
-    public ScheduleType getScheduleType() {
-        return scheduleType;
+    public ScheduleCategory getScheduleCategory() {
+        return scheduleCategory;
     }
 
-    public void setScheduleType(ScheduleType scheduleType) {
-        this.scheduleType = scheduleType;
+    public void setScheduleCategory(ScheduleCategory scheduleCategory) {
+        this.scheduleCategory = scheduleCategory;
     }
 
     public boolean isExtra() {
@@ -139,15 +144,15 @@ public class Collection {
     @Override
     public String toString() {
         return String.format(
-            "Collection {ID: %d, Customer: %s, Date: %s, Waste: %s, Status: %s, Cancel Limit Days: %d, Schedule ID: %s, Schedule Type: %s}",
+            "Collection {ID: %d, Customer: %s, Date: %s, Waste: %s, Status: %s, Cancel Limit Days: %d, Schedule ID: %s, Schedule Category: %s}",
             collectionId,
             customer != null ? customer.getName() : "N/A",
             date != null ? date.toString() : "N/A",
             waste,
             collectionStatus,
             cancelLimitDays,
-            scheduleId,
-            scheduleType
+            schedule,
+            scheduleCategory
         );
     }
 }
