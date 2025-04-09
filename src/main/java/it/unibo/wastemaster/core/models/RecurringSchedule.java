@@ -5,12 +5,13 @@ import java.util.Date;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
-import jakarta.persistence.Table;
+import jakarta.persistence.Inheritance;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
+import jakarta.persistence.InheritanceType;
 
 @Entity
-@Table(name = "recurring_schedules")
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 public class RecurringSchedule extends Schedule {
 
     @Enumerated(EnumType.STRING)
@@ -47,19 +48,5 @@ public class RecurringSchedule extends Schedule {
 
     public void setNextCollectionDate(Date nextCollectionDate) {
         this.nextCollectionDate = nextCollectionDate;
-    }
-
-    @Override
-    public String toString() {
-        return String.format(
-                "RecurringSchedule {Customer: %s, WasteType: %s, Status: %s, Frequency: %s, NextCollectionDate: %s, CreationDate: %s, CollectionId: %s}",
-                getCustomer() != null ? getCustomer().getName() : "N/A",
-                getWasteType(),
-                getStatus(),
-                frequency,
-                nextCollectionDate != null ? nextCollectionDate.toString() : "N/A",
-                getCreationDate(),
-                getCollection() != null ? getCollection().getCollectionId() : "N/A"
-        );
     }
 }

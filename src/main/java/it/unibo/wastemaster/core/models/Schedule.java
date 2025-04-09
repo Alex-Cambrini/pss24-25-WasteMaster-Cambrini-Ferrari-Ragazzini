@@ -1,18 +1,26 @@
 package it.unibo.wastemaster.core.models;
 
-import jakarta.persistence.MappedSuperclass;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
-import jakarta.persistence.OneToOne;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
 
 import java.sql.Date;
+import java.util.List;
 
-@MappedSuperclass
+@Entity
 public abstract class Schedule {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    protected int id;
 
     @ManyToOne
     @JoinColumn(name = "customer_id", nullable = false)
@@ -27,9 +35,9 @@ public abstract class Schedule {
     @Temporal(TemporalType.DATE)
     private Date creationDate;
 
-    @OneToOne
-    @JoinColumn(name = "collection_id", unique = true)
-    private Collection collection;
+    @OneToMany(mappedBy = "schedule")
+    private List<Collection> collections;
+    
 
     public enum ScheduleStatus {
         SCHEDULED,
@@ -81,23 +89,25 @@ public abstract class Schedule {
         this.creationDate = creationDate;
     }
 
-    public Collection getCollection() {
-        return collection;
+    public List<Collection> getCollections() { 
+        return collections;
     }
 
-    public void setCollection(Collection collection) {
-        this.collection = collection;
+    public void setCollections(List<Collection> collections) {
+        this.collections = collections;
     }
 
     @Override
     public String toString() {
         return String.format(
-                "Schedule {Customer: %s, WasteType: %s, Status: %s, CreationDate: %s, CollectionID: %s}",
+                "Schedule {Customer: %s, WasteType: %s, Status: %s, CreationDate: %s, CollectionIDs: %s}",
                 customer != null ? customer.getName() : "N/A",
                 wasteType != null ? wasteType : "N/A",
                 status != null ? status : "N/A",
                 creationDate != null ? creationDate.toString() : "N/A",
-                collection != null ? collection.getCollectionId() : "N/A");
+                collections != null ? collections.stream()
+                        .map(c -> String.valueOf(c.getCollectionId()))
+                        .reduce((id1, id2) -> id1 + ", " + id2).orElse("N/A") : "N/A");
     }
 
 }
