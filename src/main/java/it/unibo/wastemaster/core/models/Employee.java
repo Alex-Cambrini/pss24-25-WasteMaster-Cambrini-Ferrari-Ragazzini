@@ -22,10 +22,9 @@ public class Employee extends Person {
 	private LicenceType licenceType;
 
     public enum LicenceType {
-        C1("Fino a 3.5 t"),
-        C("Oltre 3.5 t"),
-        C1E("3.5 t + rimorchio"),
-        CE("3.5 t + rimorchio pesante");
+        B("Fino a 3.5 t"),
+        C1("3.5 t - 7.5 t"),
+        C("Oltre 7.5 t");
     
         private final String description;
     
@@ -48,7 +47,16 @@ public class Employee extends Person {
     public Employee(String name, String surname, Location address, String email, String phone, Role role, LicenceType licenceType) {
         super(name, surname, address, email, phone);
         this.role = role;
-        this.licenceType = (role == Role.OPERATOR) ? licenceType : null;
+
+        if (licenceType == null) {
+            throw new IllegalArgumentException("All employees must have a licence");
+        }
+    
+        if (role == Role.OPERATOR && licenceType == LicenceType.B) {
+            throw new IllegalArgumentException("Operators must have at least a C1 licence");
+        }
+
+        this.licenceType = licenceType;
     }
 
     public Employee() {
@@ -72,18 +80,24 @@ public class Employee extends Person {
 	}
 
     public void setLicenceType(LicenceType licenceType) {
-		if (this.role == Role.OPERATOR) {
-			this.licenceType = licenceType;
-		}
+		if (licenceType == null) {
+            throw new IllegalArgumentException("LicenceType cannot be null");
+        }
+    
+        if (this.role == Role.OPERATOR && licenceType == LicenceType.B) {
+            throw new IllegalArgumentException("Operators must have at least a C1 licence");
+        }
+    
+		this.licenceType = licenceType;
 	}
 
     @Override
     public String getInfo() {
-        return String.format("%s, EmployeeId: %d, Role: %s%s",
+        return String.format("%s, EmployeeId: %d, Role: %s, Licence: %s",
             super.getInfo(),
             employeeId,
             role,
-            (role == Role.OPERATOR && licenceType != null) ? ", Licence: " + licenceType : ""
+            licenceType != null ? licenceType : "N/A"
         );
     }
 }
