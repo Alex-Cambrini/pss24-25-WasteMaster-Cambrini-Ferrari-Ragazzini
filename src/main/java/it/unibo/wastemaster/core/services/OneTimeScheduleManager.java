@@ -25,6 +25,7 @@ public class OneTimeScheduleManager {
             Date pickupDate) {
         OneTimeSchedule schedule = new OneTimeSchedule(customer, wasteType, status, pickupDate);
         oneTimeScheduleDAO.insert(schedule);
+        collectionManager.generateOneTimeCollection(schedule);
     }
 
     private boolean canModifyOrCancel(Date pickupDate, int cancelLimitDays) {
