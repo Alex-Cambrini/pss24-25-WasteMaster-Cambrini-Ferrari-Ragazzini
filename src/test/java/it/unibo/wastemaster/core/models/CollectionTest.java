@@ -10,7 +10,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
-
+import it.unibo.wastemaster.core.models.Schedule.ScheduleStatus;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
@@ -39,16 +39,16 @@ class CollectionTest {
         Date date = new Date();
         Waste.WasteType wasteType = Waste.WasteType.PLASTIC;
         Collection.CollectionStatus status = Collection.CollectionStatus.PENDING;
-        Collection.ScheduleType scheduleType = Collection.ScheduleType.SCHEDULED;
-        Collection collection = new Collection(customer, date, wasteType, status, 3, 1001, scheduleType);
-    
+        Collection.ScheduleCategory scheduleCategory = Collection.ScheduleCategory.ONE_TIME;
+        OneTimeSchedule schedule = new OneTimeSchedule(customer, wasteType, ScheduleStatus.SCHEDULED, new java.sql.Date(System.currentTimeMillis()));
+		Collection collection = new Collection(customer, date, wasteType, status, 3, schedule, scheduleCategory);    
         assertEquals(customer, collection.getCustomer());
         assertEquals(date, collection.getDate());
         assertEquals(wasteType, collection.getWaste());
         assertEquals(status, collection.getCollectionStatus());
         assertEquals(3, collection.getCancelLimitDays());
         assertEquals(1001, collection.getScheduleId());
-        assertEquals(scheduleType, collection.getScheduleType());
+        assertEquals(scheduleCategory, collection.getScheduleCategory());
     }
 
     @Test
@@ -57,9 +57,11 @@ class CollectionTest {
         Date date = new Date();
         Waste.WasteType wasteType = Waste.WasteType.PAPER;
         Collection.CollectionStatus status = Collection.CollectionStatus.COMPLETED;
-        Collection.ScheduleType scheduleType = Collection.ScheduleType.SCHEDULED;
+        Collection.ScheduleCategory scheduleCategory = Collection.ScheduleCategory.ONE_TIME;
     
-        Collection collection = new Collection(customer, date, wasteType, status, 10, 456, scheduleType);
+        OneTimeSchedule schedule = new OneTimeSchedule(customer, wasteType, ScheduleStatus.SCHEDULED, new java.sql.Date(System.currentTimeMillis()));
+		Collection collection = new Collection(customer, date, wasteType, status, 3, schedule, scheduleCategory);    
+
     
         String expectedInfo = String.format(
             "Collection {ID: %d, Customer: %s, Date: %s, Waste: %s, Status: %s, Cancel Limit Days: %d, Schedule ID: %d, Schedule Type: %s}",
@@ -70,7 +72,7 @@ class CollectionTest {
             status, 
             collection.getCancelLimitDays(), 
             collection.getScheduleId(), 
-            collection.getScheduleType()
+            collection.getScheduleCategory()
         );
     
         assertEquals(expectedInfo, collection.toString());
@@ -83,13 +85,15 @@ class CollectionTest {
 		Date date = new Date();
 		Waste.WasteType wasteType = Waste.WasteType.PLASTIC;
 		Collection.CollectionStatus status = Collection.CollectionStatus.PENDING;
-		Collection.ScheduleType scheduleType = Collection.ScheduleType.SCHEDULED;
+		Collection.ScheduleCategory scheduleCategory = Collection.ScheduleCategory.ONE_TIME;
 
 		entityManager.getTransaction().begin();
 		entityManager.persist(customer);
 		entityManager.getTransaction().commit();
 
-		Collection collection = new Collection(customer, date, wasteType, status, 5, 123, scheduleType);
+		OneTimeSchedule schedule = new OneTimeSchedule(customer, wasteType, ScheduleStatus.SCHEDULED, new java.sql.Date(System.currentTimeMillis()));
+        Collection collection = new Collection(customer, date, wasteType, status, 3, schedule, scheduleCategory);
+
 
 		entityManager.getTransaction().begin();
 		entityManager.persist(collection);
@@ -103,7 +107,7 @@ class CollectionTest {
 		assertNotNull(retrievedCollection);
 		assertEquals(collection.getCollectionId(), retrievedCollection.getCollectionId());
 		assertEquals(collection.getCustomer().getName(), retrievedCollection.getCustomer().getName());
-		assertEquals(collection.getScheduleType(), retrievedCollection.getScheduleType());
+		assertEquals(collection.getScheduleCategory(), retrievedCollection.getScheduleCategory());
 		entityManager.getTransaction().begin();
 		entityManager.remove(retrievedCollection);
 		entityManager.remove(customer);
