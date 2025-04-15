@@ -39,30 +39,32 @@ public class ScheduleManager {
     private Date calculateNextDate(RecurringSchedule schedule) {
         Waste.WasteType wasteType = schedule.getWasteType();
         RecurringSchedule.Frequency frequency = schedule.getFrequency();
-        Date currentDate = schedule.getNextCollectionDate();
-        
         WasteSchedule scheduleData = wasteScheduleManager.getWasteScheduleForWaste(wasteType);
-        int scheduledDay = scheduleData.getDayOfWeek(); // 1 = domenica ... 7 = sabato
-
+        int scheduledDay = scheduleData.getDayOfWeek();
+    
         Calendar calendar = Calendar.getInstance();
-        if (currentDate == null) {
-            calendar.setTime(new java.util.Date());
+    
+        if (schedule.getNextCollectionDate() == null) {
+            calendar.setTime(schedule.getCreationDate());
             calendar.add(Calendar.DAY_OF_MONTH, 2);
         } else {
-            calendar.setTime(currentDate);
+            calendar.setTime(schedule.getNextCollectionDate());
         }
-
-        if (frequency == RecurringSchedule.Frequency.WEEKLY) {
-            calendar.add(Calendar.DAY_OF_MONTH, 7);
-        } else if (frequency == RecurringSchedule.Frequency.MONTHLY) {
-            calendar.add(Calendar.DAY_OF_MONTH, 28);
-        }
-
+    
         while (calendar.get(Calendar.DAY_OF_WEEK) != scheduledDay) {
             calendar.add(Calendar.DAY_OF_MONTH, 1);
         }
-
+    
+        if (schedule.getNextCollectionDate() != null) {
+            if (frequency == RecurringSchedule.Frequency.WEEKLY) {
+                calendar.add(Calendar.DAY_OF_MONTH, 7);
+            } else if (frequency == RecurringSchedule.Frequency.MONTHLY) {
+                calendar.add(Calendar.DAY_OF_MONTH, 28);
+            }
+        }
+    
         return new java.sql.Date(calendar.getTimeInMillis());
     }
+    
 }
 
