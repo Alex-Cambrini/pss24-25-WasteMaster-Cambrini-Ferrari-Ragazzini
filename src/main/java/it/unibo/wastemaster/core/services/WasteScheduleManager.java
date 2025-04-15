@@ -11,6 +11,18 @@ public class WasteScheduleManager {
         this.wasteScheduleDAO = wasteScheduleDAO;
     }
 
+    public WasteSchedule setupCollectionRoutine(Waste waste, int dayOfWeek) {
+        WasteSchedule wasteSchedule = new WasteSchedule(waste, dayOfWeek);
+        wasteScheduleDAO.insert(wasteSchedule);
+        return wasteSchedule;
+    }
+
+    public WasteSchedule changeCollectionDay(WasteSchedule wasteSchedule, int newDayOfWeek) {
+        wasteSchedule.setDayOfWeek(newDayOfWeek);
+        wasteScheduleDAO.update(wasteSchedule);
+        return wasteSchedule;
+    }
+
     public WasteSchedule getWasteScheduleForWaste(Waste.WasteType wasteType) {
         return wasteScheduleDAO.findByWasteType(wasteType);
     }
