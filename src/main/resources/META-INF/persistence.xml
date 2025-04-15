@@ -6,15 +6,19 @@
 
     <persistence-unit name="myJpaUnit">
 
-    <class>it.unibo.wastemaster.core.models.Customer</class>
-    <class>it.unibo.wastemaster.core.models.Location</class>
-    <class>it.unibo.wastemaster.core.models.Employee</class>
     <class>it.unibo.wastemaster.core.models.Collection</class>
+    <class>it.unibo.wastemaster.core.models.Customer</class>
+    <class>it.unibo.wastemaster.core.models.Employee</class>
+    <class>it.unibo.wastemaster.core.models.Location</class>
+    <class>it.unibo.wastemaster.core.models.OneTimeSchedule</class>
+    <class>it.unibo.wastemaster.core.models.Person</class>
+    <class>it.unibo.wastemaster.core.models.RecurringSchedule</class>
+    <class>it.unibo.wastemaster.core.models.Schedule</class>
     <class>it.unibo.wastemaster.core.models.Vehicle</class>
     <class>it.unibo.wastemaster.core.models.Waste</class>
     <class>it.unibo.wastemaster.core.models.WasteSchedule</class>
-    <class>it.unibo.wastemaster.core.models.OneTimeSchedule</class>
-    <class>it.unibo.wastemaster.core.models.RecurringSchedule</class>
+
+
 
 
         <properties>
