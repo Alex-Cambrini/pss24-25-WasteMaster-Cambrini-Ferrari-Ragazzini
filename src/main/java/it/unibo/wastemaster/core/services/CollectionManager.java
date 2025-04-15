@@ -4,7 +4,6 @@ import java.util.Date;
 import java.util.List;
 
 import it.unibo.wastemaster.core.dao.GenericDAO;
-import it.unibo.wastemaster.core.dao.RecurringScheduleDAO;
 import it.unibo.wastemaster.core.models.Collection;
 import it.unibo.wastemaster.core.models.Collection.ScheduleCategory;
 import it.unibo.wastemaster.core.models.OneTimeSchedule;
@@ -13,11 +12,12 @@ import it.unibo.wastemaster.core.models.Schedule;
 
 public class CollectionManager {
     private GenericDAO<Collection> collectionDAO;
-    private RecurringScheduleDAO recurringScheduleDAO;
+    private ScheduleManager scheduleManager;
 
-    public CollectionManager(GenericDAO<Collection> collectionDAO, RecurringScheduleDAO recurringScheduleDAO) {
+
+    public CollectionManager(GenericDAO<Collection> collectionDAO, ScheduleManager scheduleManager) {
         this.collectionDAO = collectionDAO;
-        this.recurringScheduleDAO = recurringScheduleDAO;
+        this.scheduleManager = scheduleManager;
     }
 
     public void generateCollection(Schedule schedule) {
@@ -52,8 +52,7 @@ public class CollectionManager {
     }
 
     public void generateRecurringCollections() {
-        List<RecurringSchedule> upcomingSchedules = recurringScheduleDAO
-                .findRecurringSchedulesWithoutFutureCollections();
+        List<RecurringSchedule> upcomingSchedules = scheduleManager.getRecurringSchedulesWithoutCollections();
         for (RecurringSchedule schedule : upcomingSchedules) {
             generateCollection(schedule);
         }
