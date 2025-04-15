@@ -1,5 +1,6 @@
 package it.unibo.wastemaster.core.models;
 
+import it.unibo.wastemaster.core.models.Vehicle.LicenceType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -17,6 +18,9 @@ public class Employee extends Person {
     
     @Enumerated(EnumType.STRING)
     private Role role;
+
+    @Enumerated(EnumType.STRING)
+	private LicenceType licenceType;
     
     public enum Role {
         ADMINISTRATOR,
@@ -24,9 +28,10 @@ public class Employee extends Person {
         OPERATOR
     }
 
-    public Employee(String name, String surname, Location address, String email, String phone, Role role) {
+    public Employee(String name, String surname, Location address, String email, String phone, Role role, LicenceType licenceType) {
         super(name, surname, address, email, phone);
         this.role = role;
+        this.licenceType = (role == Role.OPERATOR) ? licenceType : null;
     }
 
     public Employee() {
@@ -45,8 +50,18 @@ public class Employee extends Person {
         this.role = role;
     }
 
+    public LicenceType getLicenceType() {
+		return licenceType;
+	}
+
+    public void setLicenceType(LicenceType licenceType) {
+		if (this.role == Role.OPERATOR) {
+			this.licenceType = licenceType;
+		}
+	}
+
     @Override
     public String getInfo() {
-        return super.getInfo() + String.format(", EmployeeId: %d, Role: %s", employeeId, role);
+        return super.getInfo() + String.format(", EmployeeId: %d, Role: %s", employeeId, role, role == Role.OPERATOR ? ", Licence: " + licenceType : "");
     }
 }
