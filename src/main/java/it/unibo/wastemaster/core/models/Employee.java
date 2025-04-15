@@ -1,6 +1,5 @@
 package it.unibo.wastemaster.core.models;
 
-import it.unibo.wastemaster.core.models.Vehicle.LicenceType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -21,6 +20,24 @@ public class Employee extends Person {
 
     @Enumerated(EnumType.STRING)
 	private LicenceType licenceType;
+
+    public enum LicenceType {
+        C1("Fino a 3.5 t"),
+        C("Oltre 3.5 t"),
+        C1E("3.5 t + rimorchio"),
+        CE("3.5 t + rimorchio pesante");
+    
+        private final String description;
+    
+        LicenceType(String description) {
+            this.description = description;
+        }
+    
+        public String getDescription() {
+            return description;
+        }
+    }
+    
     
     public enum Role {
         ADMINISTRATOR,
