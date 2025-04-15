@@ -58,6 +58,9 @@ public class Collection {
     @Column(nullable = false)
     private boolean isExtra;
 
+    // No-args constructor required by JPA
+    public Collection() {}
+
     public Collection(Customer customer, Date date, Waste.WasteType waste, CollectionStatus collectionStatus, int cancelLimitDays, Schedule schedule, ScheduleCategory scheduleCategory) {
         this.customer = customer;
         this.date = date;
