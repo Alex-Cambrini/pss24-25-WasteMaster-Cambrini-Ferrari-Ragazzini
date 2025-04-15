@@ -62,4 +62,8 @@ public class CollectionManager {
             generateCollection(schedule);
         }
     }
+
+    public void updateCollection(Collection collection) {
+        collectionDAO.update(collection);
+    }
 }
