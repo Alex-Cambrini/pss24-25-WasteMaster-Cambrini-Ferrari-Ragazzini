@@ -9,13 +9,16 @@ import it.unibo.wastemaster.core.models.Customer;
 import it.unibo.wastemaster.core.models.OneTimeSchedule;
 import it.unibo.wastemaster.core.models.Schedule.ScheduleStatus;
 import it.unibo.wastemaster.core.models.Waste;
+import it.unibo.wastemaster.core.models.Collection.CollectionStatus;
 
 public class OneTimeScheduleManager {
 
     private final OneTimeScheduleDAO oneTimeScheduleDAO;
+    private CollectionManager collectionManager;
 
-    public OneTimeScheduleManager(OneTimeScheduleDAO oneTimeScheduleDAO) {
+    public OneTimeScheduleManager(OneTimeScheduleDAO oneTimeScheduleDAO, CollectionManager collectionManager) {
         this.oneTimeScheduleDAO = oneTimeScheduleDAO;
+        this.collectionManager = collectionManager;
     }
 
     public void createOneTimeSchedule(Customer customer, Waste.WasteType wasteType, ScheduleStatus status,
@@ -47,6 +50,9 @@ public class OneTimeScheduleManager {
         if (canModifyOrCancel(schedule.getPickupDate(), cancelLimitDays)) {
             schedule.setPickupDate(newPickupDate);
             oneTimeScheduleDAO.update(schedule);
+
+            collection.setDate(newPickupDate);
+            collectionManager.updateCollection(collection);
             return true;
         }
 
@@ -65,6 +71,9 @@ public class OneTimeScheduleManager {
         if (canModifyOrCancel(schedule.getPickupDate(), cancelLimitDays)) {
             schedule.setWasteType(wasteType);
             oneTimeScheduleDAO.update(schedule);
+
+            collection.setWaste(wasteType);
+            collectionManager.updateCollection(collection);
             return true;
         }
 
@@ -83,6 +92,8 @@ public class OneTimeScheduleManager {
         if (canModifyOrCancel(schedule.getPickupDate(), cancelLimitDays)) {
             schedule.setStatus(ScheduleStatus.CANCELLED);
             oneTimeScheduleDAO.update(schedule);
+            collection.setCollectionStatus(CollectionStatus.CANCELLED);
+            collectionManager.updateCollection(collection);     
             return true;
         }
 
