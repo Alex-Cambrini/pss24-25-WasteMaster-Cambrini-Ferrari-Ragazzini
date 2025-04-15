@@ -18,7 +18,8 @@ public class OneTimeScheduleManager {
         this.oneTimeScheduleDAO = oneTimeScheduleDAO;
     }
 
-    public void createOneTimeSchedule(Customer customer, Waste.WasteType wasteType, ScheduleStatus status, Date pickupDate) {
+    public void createOneTimeSchedule(Customer customer, Waste.WasteType wasteType, ScheduleStatus status,
+            Date pickupDate) {
         OneTimeSchedule schedule = new OneTimeSchedule(customer, wasteType, status, pickupDate);
         oneTimeScheduleDAO.insert(schedule);
     }
@@ -34,11 +35,12 @@ public class OneTimeScheduleManager {
         return today.before(cancelLimitDate);
     }
 
-    public boolean updateOneTimeSchedule(OneTimeSchedule schedule, Date newPickupDate) {
+    public boolean updateDateOneTimeSchedule(OneTimeSchedule schedule, Date newPickupDate) {
         int scheduleId = schedule.getId();
         Collection collection = oneTimeScheduleDAO.findCollectionByScheduleId(scheduleId);
 
-        if (collection == null) return false;
+        if (collection == null)
+            return false;
 
         int cancelLimitDays = collection.getCancelLimitDays();
 
@@ -51,11 +53,30 @@ public class OneTimeScheduleManager {
         return false;
     }
 
+    public boolean updateWasteTypeOneTimeSchedule(OneTimeSchedule schedule, Waste.WasteType wasteType) {
+        int scheduleId = schedule.getId();
+        Collection collection = oneTimeScheduleDAO.findCollectionByScheduleId(scheduleId);
+
+        if (collection == null)
+            return false;
+
+        int cancelLimitDays = collection.getCancelLimitDays();
+
+        if (canModifyOrCancel(schedule.getPickupDate(), cancelLimitDays)) {
+            schedule.setWasteType(wasteType);
+            oneTimeScheduleDAO.update(schedule);
+            return true;
+        }
+
+        return false;
+    }
+
     public boolean cancelOneTimeSchedule(OneTimeSchedule schedule) {
         int scheduleId = schedule.getId();
         Collection collection = oneTimeScheduleDAO.findCollectionByScheduleId(scheduleId);
 
-        if (collection == null) return false;
+        if (collection == null)
+            return false;
 
         int cancelLimitDays = collection.getCancelLimitDays();
 
@@ -67,4 +88,5 @@ public class OneTimeScheduleManager {
 
         return false;
     }
+
 }
