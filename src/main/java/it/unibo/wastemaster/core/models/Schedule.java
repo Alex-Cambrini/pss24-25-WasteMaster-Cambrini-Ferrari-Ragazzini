@@ -57,6 +57,10 @@ public abstract class Schedule {
         this.creationDate = new Date(System.currentTimeMillis());
     }
 
+    public int getId() {
+        return id;
+    }
+
     public Customer getCustomer() {
         return customer;
     }
