@@ -3,7 +3,6 @@ package it.unibo.wastemaster.core.services;
 import it.unibo.wastemaster.core.models.Customer;
 import it.unibo.wastemaster.core.dao.GenericDAO;
 import it.unibo.wastemaster.core.models.Collection;
-import it.unibo.wastemaster.core.models.ReservationExtra;
 import it.unibo.wastemaster.core.models.Waste;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
@@ -16,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import java.util.Date;
 
 
-class ReservationExtraManagerTest {
+class ScheduleManagerTest {
 
     private EntityManagerFactory emf;
     private EntityManager em;
