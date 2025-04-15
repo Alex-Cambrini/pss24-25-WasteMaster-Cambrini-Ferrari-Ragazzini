@@ -1,6 +1,7 @@
 package it.unibo.wastemaster.core.services;
 
 import it.unibo.wastemaster.core.dao.GenericDAO;
+import it.unibo.wastemaster.core.dao.RecurringScheduleDAO;
 import it.unibo.wastemaster.core.models.Customer;
 import it.unibo.wastemaster.core.models.OneTimeSchedule;
 import it.unibo.wastemaster.core.models.RecurringSchedule;
@@ -11,14 +12,15 @@ import it.unibo.wastemaster.core.models.WasteSchedule;
 
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 public class ScheduleManager {
 
     private WasteScheduleManager wasteScheduleManager;
-    private GenericDAO<RecurringSchedule> recurringScheduleDAO;
+    private RecurringScheduleDAO recurringScheduleDAO;
     private GenericDAO<OneTimeSchedule> oneTimeScheduleDAO;
 
-    public ScheduleManager(WasteScheduleManager wasteScheduleManager, GenericDAO<RecurringSchedule> recurringScheduleDAO, GenericDAO<OneTimeSchedule> oneTimeScheduleDAO) {
+    public ScheduleManager(WasteScheduleManager wasteScheduleManager, RecurringScheduleDAO recurringScheduleDAO, GenericDAO<OneTimeSchedule> oneTimeScheduleDAO) {
         this.wasteScheduleManager = wasteScheduleManager;
         this.recurringScheduleDAO = recurringScheduleDAO;
         this.oneTimeScheduleDAO = oneTimeScheduleDAO;
@@ -65,6 +67,9 @@ public class ScheduleManager {
     
         return new java.sql.Date(calendar.getTimeInMillis());
     }
-    
+ 
+    public List<RecurringSchedule> getRecurringSchedulesWithoutCollections() {
+        return recurringScheduleDAO.findRecurringSchedulesWithoutFutureCollections();
+    }
 }
 
