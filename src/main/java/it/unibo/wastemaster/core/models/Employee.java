@@ -79,6 +79,11 @@ public class Employee extends Person {
 
     @Override
     public String getInfo() {
-        return super.getInfo() + String.format(", EmployeeId: %d, Role: %s", employeeId, role, role == Role.OPERATOR ? ", Licence: " + licenceType : "");
+        return String.format("%s, EmployeeId: %d, Role: %s%s",
+            super.getInfo(),
+            employeeId,
+            role,
+            (role == Role.OPERATOR && licenceType != null) ? ", Licence: " + licenceType : ""
+        );
     }
 }
