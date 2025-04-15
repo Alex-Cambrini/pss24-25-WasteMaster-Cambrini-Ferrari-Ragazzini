@@ -17,6 +17,26 @@ public class Employee extends Person {
     
     @Enumerated(EnumType.STRING)
     private Role role;
+
+    @Enumerated(EnumType.STRING)
+	private LicenceType licenceType;
+
+    public enum LicenceType {
+        B("Fino a 3.5 t"),
+        C1("3.5 t - 7.5 t"),
+        C("Oltre 7.5 t");
+    
+        private final String description;
+    
+        LicenceType(String description) {
+            this.description = description;
+        }
+    
+        public String getDescription() {
+            return description;
+        }
+    }
+    
     
     public enum Role {
         ADMINISTRATOR,
@@ -24,9 +44,19 @@ public class Employee extends Person {
         OPERATOR
     }
 
-    public Employee(String name, String surname, Location address, String email, String phone, Role role) {
+    public Employee(String name, String surname, Location address, String email, String phone, Role role, LicenceType licenceType) {
         super(name, surname, address, email, phone);
         this.role = role;
+
+        if (licenceType == null) {
+            throw new IllegalArgumentException("All employees must have a licence");
+        }
+    
+        if (role == Role.OPERATOR && licenceType == LicenceType.B) {
+            throw new IllegalArgumentException("Operators must have at least a C1 licence");
+        }
+
+        this.licenceType = licenceType;
     }
 
     public Employee() {
@@ -45,8 +75,29 @@ public class Employee extends Person {
         this.role = role;
     }
 
+    public LicenceType getLicenceType() {
+		return licenceType;
+	}
+
+    public void setLicenceType(LicenceType licenceType) {
+		if (licenceType == null) {
+            throw new IllegalArgumentException("LicenceType cannot be null");
+        }
+    
+        if (this.role == Role.OPERATOR && licenceType == LicenceType.B) {
+            throw new IllegalArgumentException("Operators must have at least a C1 licence");
+        }
+    
+		this.licenceType = licenceType;
+	}
+
     @Override
     public String getInfo() {
-        return super.getInfo() + String.format(", EmployeeId: %d, Role: %s", employeeId, role);
+        return String.format("%s, EmployeeId: %d, Role: %s, Licence: %s",
+            super.getInfo(),
+            employeeId,
+            role,
+            licenceType != null ? licenceType : "N/A"
+        );
     }
 }
