@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.List;
 
 import it.unibo.wastemaster.core.dao.RecurringScheduleDAO;
+import it.unibo.wastemaster.core.models.Collection;
 import it.unibo.wastemaster.core.models.Customer;
 import it.unibo.wastemaster.core.models.RecurringSchedule;
 import it.unibo.wastemaster.core.models.RecurringSchedule.Frequency;
@@ -41,7 +42,7 @@ public class RecurringScheduleManager {
 
         if (schedule.getNextCollectionDate() == null) {
             calendar.setTime(schedule.getCreationDate());
-            calendar.add(Calendar.DAY_OF_MONTH, 2);
+            calendar.add(Calendar.DAY_OF_MONTH, Collection.CANCEL_LIMIT_DAYS);
         } else {
             calendar.setTime(schedule.getNextCollectionDate());
         }
