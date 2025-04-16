@@ -76,4 +76,7 @@ tasks.withType<Test> {
 application {
     // Define the main class for the application
     mainClass.set("it.unibo.wastemaster.main.App")
+    applicationDefaultJvmArgs = listOf(
+        "-Djava.util.logging.config.file=src/main/resources/logging.properties"
+    )
 }
