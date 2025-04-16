@@ -21,19 +21,22 @@ public class OneTimeScheduleManager {
         this.collectionManager = collectionManager;
     }
 
-    public void createOneTimeSchedule(Customer customer, Waste.WasteType wasteType, ScheduleStatus status,
-            Date pickupDate) {
+    public void createOneTimeSchedule(Customer customer, Waste.WasteType wasteType, ScheduleStatus status, Date pickupDate) {
+         
+        if (!isDateValid(pickupDate, Collection.CANCEL_LIMIT_DAYS)) {
+            throw new IllegalArgumentException("La data di ritiro deve essere almeno tra " + Collection.CANCEL_LIMIT_DAYS + " giorni.");
+        }    
         OneTimeSchedule schedule = new OneTimeSchedule(customer, wasteType, status, pickupDate);
         oneTimeScheduleDAO.insert(schedule);
         collectionManager.generateOneTimeCollection(schedule);
     }
 
-    private boolean canModifyOrCancel(Date pickupDate, int cancelLimitDays) {
+    private boolean isDateValid(Date date, int limitDays) {
         Date today = new Date();
 
         Calendar calendar = Calendar.getInstance();
-        calendar.setTime(pickupDate);
-        calendar.add(Calendar.DAY_OF_MONTH, -cancelLimitDays);
+        calendar.setTime(date);
+        calendar.add(Calendar.DAY_OF_MONTH, -limitDays);
 
         Date cancelLimitDate = calendar.getTime();
         return today.before(cancelLimitDate);
@@ -48,7 +51,7 @@ public class OneTimeScheduleManager {
 
         int cancelLimitDays = collection.getCancelLimitDays();
 
-        if (canModifyOrCancel(schedule.getPickupDate(), cancelLimitDays)) {
+        if (isDateValid(schedule.getPickupDate(), cancelLimitDays)) {
             schedule.setPickupDate(newPickupDate);
             oneTimeScheduleDAO.update(schedule);
 
@@ -69,7 +72,7 @@ public class OneTimeScheduleManager {
 
         int cancelLimitDays = collection.getCancelLimitDays();
 
-        if (canModifyOrCancel(schedule.getPickupDate(), cancelLimitDays)) {
+        if (isDateValid(schedule.getPickupDate(), cancelLimitDays)) {
             schedule.setWasteType(wasteType);
             oneTimeScheduleDAO.update(schedule);
 
@@ -90,7 +93,7 @@ public class OneTimeScheduleManager {
 
         int cancelLimitDays = collection.getCancelLimitDays();
 
-        if (canModifyOrCancel(schedule.getPickupDate(), cancelLimitDays)) {
+        if (isDateValid(schedule.getPickupDate(), cancelLimitDays)) {
             schedule.setStatus(ScheduleStatus.CANCELLED);
             oneTimeScheduleDAO.update(schedule);
             collection.setCollectionStatus(CollectionStatus.CANCELLED);
