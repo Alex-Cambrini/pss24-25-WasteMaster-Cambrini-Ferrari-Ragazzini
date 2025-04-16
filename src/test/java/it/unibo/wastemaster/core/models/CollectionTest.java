@@ -20,21 +20,20 @@ class CollectionTest extends AbstractDatabaseTest {
 
 
     @Test
-    void testConstructorAndGetters() {
-        Customer customer = new Customer("John", "Doe", new Location("Via Roma", "10", "Bologna", "40100"), "john.doe@example.com", "1234567890");
-        Date date = new Date();
-        Waste.WasteType wasteType = Waste.WasteType.PLASTIC;
-        Collection.CollectionStatus status = Collection.CollectionStatus.PENDING;
-        Collection.ScheduleCategory scheduleCategory = Collection.ScheduleCategory.ONE_TIME;
-        OneTimeSchedule schedule = new OneTimeSchedule(customer, wasteType, ScheduleStatus.SCHEDULED, new java.sql.Date(System.currentTimeMillis()));
-		Collection collection = new Collection(customer, date, wasteType, status, schedule, scheduleCategory);    
-        assertEquals(customer, collection.getCustomer());
-        assertEquals(date, collection.getDate());
-        assertEquals(wasteType, collection.getWaste());
-        assertEquals(status, collection.getCollectionStatus());
-        assertEquals(schedule, collection.getScheduleId());
-        assertEquals(scheduleCategory, collection.getScheduleCategory());
-    }
+	void testConstructorAndGetters() {
+		Date date = new Date();
+		Waste.WasteType wasteType = Waste.WasteType.PLASTIC;
+		Collection.CollectionStatus status = Collection.CollectionStatus.PENDING;
+		Collection.ScheduleCategory scheduleCategory = Collection.ScheduleCategory.ONE_TIME;
+		OneTimeSchedule schedule = new OneTimeSchedule(customer, wasteType, ScheduleStatus.SCHEDULED, new java.sql.Date(System.currentTimeMillis()));
+		Collection collection = new Collection(customer, date, wasteType, status, schedule, scheduleCategory);
+		assertEquals(customer, collection.getCustomer());
+		assertEquals(date, collection.getDate());
+		assertEquals(wasteType, collection.getWaste());
+		assertEquals(status, collection.getCollectionStatus());
+		assertEquals(scheduleCategory, collection.getScheduleCategory());
+		assertEquals(Collection.CANCEL_LIMIT_DAYS, collection.getCancelLimitDays());
+	}
 
     @Test
     void testToString() {
