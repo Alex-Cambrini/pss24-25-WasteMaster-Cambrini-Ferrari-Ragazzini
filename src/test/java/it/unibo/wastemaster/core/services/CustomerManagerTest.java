@@ -21,14 +21,16 @@ class CustomerManagerTest extends AbstractDatabaseTest {
     @Test
 	void testAddAndGetCustomer() {
 		String email = generateUniqueEmail("add");
-		testCustomer = customerManager.addCustomer(
-			"Test", "User", email, "1234567890",
-			"Via Roma", "10", "Bologna", "40100"
-		);
+		Customer customer = customerManager.addCustomer("Test", "User", email, "1234567890",
+			"Via Roma", "10", "Bologna", "40100");
 
-		Customer found = customerManager.getCustomerById(testCustomer.getCustomerId());
+		Customer found = customerManager.getCustomerById(customer.getCustomerId());
 		assertNotNull(found);
 		assertEquals(email, found.getEmail());
+
+		em.getTransaction().begin();
+		em.remove(found);
+		em.getTransaction().commit();
 	}
 
     @Test
