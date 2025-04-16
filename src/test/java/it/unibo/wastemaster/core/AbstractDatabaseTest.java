@@ -1,5 +1,6 @@
 package it.unibo.wastemaster.core;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 
 import it.unibo.wastemaster.core.models.Customer;
@@ -26,5 +27,18 @@ public class AbstractDatabaseTest {
 		em.persist(customer);
 
 		em.getTransaction().commit();
+	}
+
+    @AfterEach
+	public void tearDown() {
+		if (em.getTransaction().isActive()) {
+			em.getTransaction().rollback();
+		}
+		if (em.isOpen()) {
+			em.close();
+		}
+		if (emf.isOpen()) {
+			emf.close();
+		}
 	}
 }
