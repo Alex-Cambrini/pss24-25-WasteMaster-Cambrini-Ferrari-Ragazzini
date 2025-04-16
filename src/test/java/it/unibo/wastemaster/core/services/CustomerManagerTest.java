@@ -36,12 +36,16 @@ class CustomerManagerTest extends AbstractDatabaseTest {
     @Test
 	void testEmailDuplicationCheck() {
 		String email = generateUniqueEmail("dup");
-		testCustomer = customerManager.addCustomer(
-			"Test", "Dup", email, "1234567890",
-			"Via Roma", "10", "Bologna", "40100"
-		);
+		Customer customer = customerManager.addCustomer("Test", "Dup", email, "1234567890",
+			"Via Roma", "10", "Bologna", "40100");
 
-		assertTrue(customerManager.existsByEmail(email));
+		assertThrows(IllegalArgumentException.class, () ->
+			customerManager.addCustomer("Test", "Dup", email, "1234567890",
+				"Via Roma", "10", "Bologna", "40100"));
+
+		em.getTransaction().begin();
+		em.remove(customer);
+		em.getTransaction().commit();
 	}
 
 	@Test
