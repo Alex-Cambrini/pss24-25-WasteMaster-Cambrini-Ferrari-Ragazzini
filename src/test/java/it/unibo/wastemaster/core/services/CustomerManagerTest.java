@@ -103,12 +103,15 @@ class CustomerManagerTest extends AbstractDatabaseTest {
     @Test
     void testDuplicateEmailThrowsException() {
         String email = generateUniqueEmail("dupCase");
-        testCustomer = customerManager.addCustomer("Luca", "Bianchi", email, "1234567890", "Via Roma", "10", "Bologna", "40100");
+        Customer c = customerManager.addCustomer("Luca", "Bianchi", email, "1234567890", "Via Roma", "10", "Bologna", "40100");
 
-        assertThrows(IllegalArgumentException.class, () -> {
-            customerManager.addCustomer("Luca", "Bianchi", email, "1234567890", "Via Roma", "10", "Bologna", "40100");
-        });
-    }
+        assertThrows(IllegalArgumentException.class, () ->
+            customerManager.addCustomer("Luca", "Bianchi", email, "1234567890", "Via Roma", "10", "Bologna", "40100"));
+
+        em.getTransaction().begin();
+        em.remove(c);
+        em.getTransaction().commit();
+	}
 
     @Test
     void testUpdateNonExistentCustomer() {
