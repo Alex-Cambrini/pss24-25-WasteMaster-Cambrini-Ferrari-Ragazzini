@@ -41,13 +41,12 @@ class CollectionTest {
         Collection.CollectionStatus status = Collection.CollectionStatus.PENDING;
         Collection.ScheduleCategory scheduleCategory = Collection.ScheduleCategory.ONE_TIME;
         OneTimeSchedule schedule = new OneTimeSchedule(customer, wasteType, ScheduleStatus.SCHEDULED, new java.sql.Date(System.currentTimeMillis()));
-		Collection collection = new Collection(customer, date, wasteType, status, 3, schedule, scheduleCategory);    
+		Collection collection = new Collection(customer, date, wasteType, status, schedule, scheduleCategory);    
         assertEquals(customer, collection.getCustomer());
         assertEquals(date, collection.getDate());
         assertEquals(wasteType, collection.getWaste());
         assertEquals(status, collection.getCollectionStatus());
-        assertEquals(3, collection.getCancelLimitDays());
-        assertEquals(1001, collection.getScheduleId());
+        assertEquals(schedule, collection.getScheduleId());
         assertEquals(scheduleCategory, collection.getScheduleCategory());
     }
 
@@ -60,20 +59,21 @@ class CollectionTest {
         Collection.ScheduleCategory scheduleCategory = Collection.ScheduleCategory.ONE_TIME;
     
         OneTimeSchedule schedule = new OneTimeSchedule(customer, wasteType, ScheduleStatus.SCHEDULED, new java.sql.Date(System.currentTimeMillis()));
-		Collection collection = new Collection(customer, date, wasteType, status, 3, schedule, scheduleCategory);    
+		Collection collection = new Collection(customer, date, wasteType, status, schedule, scheduleCategory);    
 
     
         String expectedInfo = String.format(
-            "Collection {ID: %d, Customer: %s, Date: %s, Waste: %s, Status: %s, Cancel Limit Days: %d, Schedule ID: %d, Schedule Type: %s}",
+            "Collection {ID: %d, Customer: %s, Date: %s, Waste: %s, Status: %s, Cancel Limit Days: %d, Schedule ID: %s, Schedule Category: %s}",
             collection.getCollectionId(), 
             customer.getName(), 
             date.toString(), 
             wasteType, 
             status, 
-            collection.getCancelLimitDays(), 
-            collection.getScheduleId(), 
-            collection.getScheduleCategory()
+            Collection.CANCEL_LIMIT_DAYS,
+            schedule, 
+            scheduleCategory
         );
+
     
         assertEquals(expectedInfo, collection.toString());
     }
@@ -92,7 +92,7 @@ class CollectionTest {
 		entityManager.getTransaction().commit();
 
 		OneTimeSchedule schedule = new OneTimeSchedule(customer, wasteType, ScheduleStatus.SCHEDULED, new java.sql.Date(System.currentTimeMillis()));
-        Collection collection = new Collection(customer, date, wasteType, status, 3, schedule, scheduleCategory);
+        Collection collection = new Collection(customer, date, wasteType, status, schedule, scheduleCategory);
 
 
 		entityManager.getTransaction().begin();
