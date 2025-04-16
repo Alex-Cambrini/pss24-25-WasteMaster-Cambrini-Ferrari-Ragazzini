@@ -37,31 +37,38 @@ public class RecurringScheduleManager {
         RecurringSchedule.Frequency frequency = schedule.getFrequency();
         WasteSchedule scheduleData = wasteScheduleManager.getWasteScheduleForWaste(wasteType);
         int scheduledDay = scheduleData.getDayOfWeek();
-
+    
+        Date today = new Date();
+        Date existingNext = schedule.getNextCollectionDate();
+    
+        if (existingNext != null && !existingNext.before(today)) {
+            return existingNext;
+        }
+    
         Calendar calendar = Calendar.getInstance();
-
-        if (schedule.getNextCollectionDate() == null) {
+    
+        if (existingNext == null) {
             calendar.setTime(schedule.getStartDate());
             calendar.add(Calendar.DAY_OF_MONTH, Collection.CANCEL_LIMIT_DAYS);
         } else {
-            calendar.setTime(schedule.getNextCollectionDate());
+            calendar.setTime(existingNext);
         }
-
+    
         while (calendar.get(Calendar.DAY_OF_WEEK) != scheduledDay) {
             calendar.add(Calendar.DAY_OF_MONTH, 1);
         }
-
-        if (schedule.getNextCollectionDate() != null) {
+    
+        if (existingNext != null) {
             if (frequency == RecurringSchedule.Frequency.WEEKLY) {
                 calendar.add(Calendar.DAY_OF_MONTH, 7);
             } else if (frequency == RecurringSchedule.Frequency.MONTHLY) {
                 calendar.add(Calendar.DAY_OF_MONTH, 28);
             }
         }
-
+    
         return new java.sql.Date(calendar.getTimeInMillis());
     }
-
+    
     public List<RecurringSchedule> getRecurringSchedulesWithoutCollections() {
         return recurringScheduleDAO.findRecurringSchedulesWithoutFutureCollections();
     }
