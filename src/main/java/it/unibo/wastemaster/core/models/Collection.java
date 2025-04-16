@@ -19,6 +19,8 @@ import java.util.Date;
 @Table(name = "collections")
 public class Collection {
 
+    public static final int CANCEL_LIMIT_DAYS = 2;
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int collectionId;
@@ -61,12 +63,12 @@ public class Collection {
     // No-args constructor required by JPA
     public Collection() {}
 
-    public Collection(Customer customer, Date date, Waste.WasteType waste, CollectionStatus collectionStatus, int cancelLimitDays, Schedule schedule, ScheduleCategory scheduleCategory) {
+    public Collection(Customer customer, Date date, Waste.WasteType waste, CollectionStatus collectionStatus, Schedule schedule, ScheduleCategory scheduleCategory) {
         this.customer = customer;
         this.date = date;
         this.waste = waste;
         this.collectionStatus = collectionStatus;
-        this.cancelLimitDays = cancelLimitDays;
+        this.cancelLimitDays = CANCEL_LIMIT_DAYS;
         this.scheduleCategory = scheduleCategory;
         this.schedule = schedule;
     }
