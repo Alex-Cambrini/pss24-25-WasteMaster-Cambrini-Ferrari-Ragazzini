@@ -17,19 +17,23 @@ public class RecurringScheduleManager {
 
     private RecurringScheduleDAO recurringScheduleDAO;
     private WasteScheduleManager wasteScheduleManager;
+    private CollectionManager collectionManager;
 
     public RecurringScheduleManager(RecurringScheduleDAO recurringScheduleDAO,
-            WasteScheduleManager wasteScheduleManager) {
+            WasteScheduleManager wasteScheduleManager, CollectionManager collectionManager) {
         this.wasteScheduleManager = wasteScheduleManager;
         this.recurringScheduleDAO = recurringScheduleDAO;
+        this.collectionManager = collectionManager;
     }
 
-    public void createRecurringSchedule(Customer customer, Waste.WasteType wasteType, ScheduleStatus status, Date startDate,
+    public void createRecurringSchedule(Customer customer, Waste.WasteType wasteType, ScheduleStatus status,
+            Date startDate,
             Frequency frequency) {
         RecurringSchedule schedule = new RecurringSchedule(customer, wasteType, status, startDate, frequency);
         Date nextCollectionDate = calculateNextDate(schedule);
         schedule.setNextCollectionDate(nextCollectionDate);
         recurringScheduleDAO.insert(schedule);
+        collectionManager.generateCollection(schedule);
     }
 
     private Date calculateNextDate(RecurringSchedule schedule) {
@@ -37,39 +41,54 @@ public class RecurringScheduleManager {
         RecurringSchedule.Frequency frequency = schedule.getFrequency();
         WasteSchedule scheduleData = wasteScheduleManager.getWasteScheduleForWaste(wasteType);
         int scheduledDay = scheduleData.getDayOfWeek();
-    
+
         Date today = new Date();
         Date existingNext = schedule.getNextCollectionDate();
-    
+
         if (existingNext != null && !existingNext.before(today)) {
             return existingNext;
         }
-    
+
         Calendar calendar = Calendar.getInstance();
-    
+
         if (existingNext == null) {
             calendar.setTime(schedule.getStartDate());
             calendar.add(Calendar.DAY_OF_MONTH, Collection.CANCEL_LIMIT_DAYS);
         } else {
             calendar.setTime(existingNext);
         }
-    
+        if (existingNext != null) {
+            calendar = alignToScheduledDay(calendar, scheduledDay);
+            while (calendar.getTime().before(today)) {
+                if (frequency == RecurringSchedule.Frequency.WEEKLY) {
+                    calendar.add(Calendar.DAY_OF_MONTH, 7);
+                } else if (frequency == RecurringSchedule.Frequency.MONTHLY) {
+                    calendar.add(Calendar.DAY_OF_MONTH, 28);
+                }
+                calendar = alignToScheduledDay(calendar, scheduledDay);
+            }
+        }
+        return new java.sql.Date(calendar.getTimeInMillis());
+    }
+
+    private Calendar alignToScheduledDay(Calendar calendar, int scheduledDay) {
         while (calendar.get(Calendar.DAY_OF_WEEK) != scheduledDay) {
             calendar.add(Calendar.DAY_OF_MONTH, 1);
         }
-    
-        if (existingNext != null) {
-            if (frequency == RecurringSchedule.Frequency.WEEKLY) {
-                calendar.add(Calendar.DAY_OF_MONTH, 7);
-            } else if (frequency == RecurringSchedule.Frequency.MONTHLY) {
-                calendar.add(Calendar.DAY_OF_MONTH, 28);
-            }
-        }
-    
-        return new java.sql.Date(calendar.getTimeInMillis());
+        return calendar;
     }
-    
+
     public List<RecurringSchedule> getRecurringSchedulesWithoutCollections() {
-        return recurringScheduleDAO.findRecurringSchedulesWithoutFutureCollections();
+        return recurringScheduleDAO.findActiveSchedulesWithoutFutureCollections();
+    }
+
+    public void updateNextDates() {
+        List<RecurringSchedule> schedules = recurringScheduleDAO.findActiveSchedulesWithNextDateBeforeToday();
+        for (RecurringSchedule schedule : schedules) {
+            Date nextDate = calculateNextDate(schedule);
+            schedule.setNextCollectionDate(nextDate);
+            recurringScheduleDAO.update(schedule);
+        }
+        collectionManager.generateRecurringCollections();
     }
 }
