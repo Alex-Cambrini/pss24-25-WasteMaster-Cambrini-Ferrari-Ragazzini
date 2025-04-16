@@ -117,20 +117,16 @@ class CustomerManagerTest extends AbstractDatabaseTest {
     void testUpdateNonExistentCustomer() {
         Customer fake = new Customer("Ghost", "User", null, "ghost@example.com", "0000000000");
         fake.setCustomerId(-999);
-
         assertDoesNotThrow(() -> customerManager.updateCustomer(fake));
     }
 
     @Test
     void testDeleteAlreadyDeletedCustomer() {
         String email = generateUniqueEmail("deleteTwice");
-        testCustomer = customerManager.addCustomer("Anna", "Neri", email, "3333333333", "Via Roma", "10", "Bologna", "40100");
+        Customer toDelete = customerManager.addCustomer("Anna", "Neri", email, "3333333333", "Via Roma", "10", "Bologna", "40100");
 
-        customerManager.deleteCustomer(testCustomer);
-
-        assertDoesNotThrow(() -> customerManager.deleteCustomer(testCustomer));
-
-        testCustomer = null;
+		customerManager.deleteCustomer(toDelete);
+		assertDoesNotThrow(() -> customerManager.deleteCustomer(toDelete));
     }
 
     @Test
