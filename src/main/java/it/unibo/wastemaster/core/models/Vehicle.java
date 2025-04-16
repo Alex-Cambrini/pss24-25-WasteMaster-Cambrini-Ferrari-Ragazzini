@@ -32,6 +32,8 @@ public class Vehicle {
         OUT_OF_SERVICE
     }
 
+    public Vehicle() {}
+
     // Costruttore
     public Vehicle(String plate, int capacity, String brand, String model, int year, LicenceType licenceType, VehicleStatus vehicleStatus) {
         this.plate = plate;
