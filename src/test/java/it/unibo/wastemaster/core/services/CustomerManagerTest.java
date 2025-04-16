@@ -3,8 +3,6 @@ package it.unibo.wastemaster.core.services;
 import it.unibo.wastemaster.core.AbstractDatabaseTest;
 import it.unibo.wastemaster.core.dao.CustomerDAO;
 import it.unibo.wastemaster.core.models.Customer;
-import jakarta.persistence.EntityManagerFactory;
-import jakarta.persistence.Persistence;
 
 import org.junit.jupiter.api.*;
 
