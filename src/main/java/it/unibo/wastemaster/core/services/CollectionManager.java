@@ -29,7 +29,6 @@ public class CollectionManager {
         Date collectionDate = null;
         ScheduleCategory scheduleCategory = null;
         Collection.CollectionStatus collectionStatus = Collection.CollectionStatus.IN_PROGRESS;
-        int cancelLimit = 2;
 
         if (schedule instanceof OneTimeSchedule) {
             collectionDate = ((OneTimeSchedule) schedule).getPickupDate();
@@ -45,7 +44,6 @@ public class CollectionManager {
                     collectionDate,
                     schedule.getWasteType(),
                     collectionStatus,
-                    cancelLimit,
                     schedule,
                     scheduleCategory);
             collectionDAO.insert(collection);
