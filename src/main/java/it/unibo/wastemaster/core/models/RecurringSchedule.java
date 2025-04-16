@@ -18,6 +18,9 @@ public class RecurringSchedule extends Schedule {
     private Frequency frequency;
 
     @Temporal(TemporalType.DATE)
+    private Date startDate;
+
+    @Temporal(TemporalType.DATE)
     private Date nextCollectionDate;
 
     public enum Frequency {
@@ -26,12 +29,23 @@ public class RecurringSchedule extends Schedule {
     }
 
     // No-args constructor required by JPA
-    public RecurringSchedule() {}
+    public RecurringSchedule() {
+    }
 
-    public RecurringSchedule(Customer customer, Waste.WasteType wasteType, ScheduleStatus status, Frequency frequency) {
+    public RecurringSchedule(Customer customer, Waste.WasteType wasteType, ScheduleStatus status, Date startDate,
+            Frequency frequency) {
         super(customer, wasteType, status);
         this.frequency = frequency;
+        this.startDate = startDate;
         this.nextCollectionDate = null;
+    }
+
+    public Date getStartDate() {
+        return startDate;
+    }
+
+    public void setStartDate(Date startDate) {
+        this.startDate = startDate;
     }
 
     public Frequency getFrequency() {
