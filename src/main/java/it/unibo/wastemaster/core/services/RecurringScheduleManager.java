@@ -24,9 +24,9 @@ public class RecurringScheduleManager {
         this.recurringScheduleDAO = recurringScheduleDAO;
     }
 
-    public void createRecurringSchedule(Customer customer, Waste.WasteType wasteType, ScheduleStatus status,
+    public void createRecurringSchedule(Customer customer, Waste.WasteType wasteType, ScheduleStatus status, Date startDate,
             Frequency frequency) {
-        RecurringSchedule schedule = new RecurringSchedule(customer, wasteType, status, frequency);
+        RecurringSchedule schedule = new RecurringSchedule(customer, wasteType, status, startDate, frequency);
         Date nextCollectionDate = calculateNextDate(schedule);
         schedule.setNextCollectionDate(nextCollectionDate);
         recurringScheduleDAO.insert(schedule);
@@ -41,7 +41,7 @@ public class RecurringScheduleManager {
         Calendar calendar = Calendar.getInstance();
 
         if (schedule.getNextCollectionDate() == null) {
-            calendar.setTime(schedule.getCreationDate());
+            calendar.setTime(schedule.getStartDate());
             calendar.add(Calendar.DAY_OF_MONTH, Collection.CANCEL_LIMIT_DAYS);
         } else {
             calendar.setTime(schedule.getNextCollectionDate());
