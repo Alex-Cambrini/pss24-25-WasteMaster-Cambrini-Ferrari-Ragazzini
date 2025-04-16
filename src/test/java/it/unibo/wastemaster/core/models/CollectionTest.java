@@ -10,28 +10,14 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
+import it.unibo.wastemaster.core.AbstractDatabaseTest;
 import it.unibo.wastemaster.core.models.Schedule.ScheduleStatus;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
 
-class CollectionTest {
+class CollectionTest extends AbstractDatabaseTest {
 
-    private static EntityManagerFactory entityManagerFactory;
-    private EntityManager entityManager;
-
-    @BeforeEach
-    void setUp() {
-        entityManagerFactory = Persistence.createEntityManagerFactory("test-pu");
-        entityManager = entityManagerFactory.createEntityManager();
-    }
-
-    @AfterEach
-    void tearDown() {
-        if (entityManager != null && entityManager.isOpen()) {
-            entityManager.close();
-        }
-    }
 
     @Test
     void testConstructorAndGetters() {
