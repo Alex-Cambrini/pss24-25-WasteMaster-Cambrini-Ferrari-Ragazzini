@@ -22,6 +22,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 
 class RecurringScheduleManagerTest extends AbstractDatabaseTest {
@@ -65,6 +66,38 @@ class RecurringScheduleManagerTest extends AbstractDatabaseTest {
         Date resultPast = manager.calculateNextDate(schedulePast);
         assertTrue(resultPast.after(new Date()));
     }
+
+    @Test
+    void testCreateRecurringSchedule() {
+        Date startDate = new Date();
+
+        manager.createRecurringSchedule(
+            customer,
+            Waste.WasteType.PLASTIC,
+            ScheduleStatus.ACTIVE,
+            startDate,
+            Frequency.WEEKLY
+        );
+
+        List<RecurringSchedule> schedules = recurringScheduleDAO.findAll();
+        assertEquals(1, schedules.size());
+
+        RecurringSchedule schedule = schedules.get(0);
+        assertEquals(customer.getCustomerId(), schedule.getCustomer().getCustomerId());
+        assertEquals(Waste.WasteType.PLASTIC, schedule.getWasteType());
+        assertEquals(ScheduleStatus.ACTIVE, schedule.getStatus());
+        assertEquals(Frequency.WEEKLY, schedule.getFrequency());
+        assertNotNull(schedule.getNextCollectionDate());
+
+        List<Collection> collections = collectionDAO.findAll();
+        assertEquals(1, collections.size());
+
+        Collection collection = collections.get(0);
+        assertEquals(customer.getCustomerId(), collection.getCustomer().getCustomerId());
+        assertEquals(schedule.getNextCollectionDate(), collection.getDate());
+        assertEquals(Collection.CollectionStatus.IN_PROGRESS, collection.getCollectionStatus());
+    }
+
 
     @Test
     void testCreateReservationExtra() {
