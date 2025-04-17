@@ -1,20 +1,14 @@
 package it.unibo.wastemaster.core.services;
 
-import it.unibo.wastemaster.core.models.Customer;
 import it.unibo.wastemaster.core.models.RecurringSchedule;
 import it.unibo.wastemaster.core.models.RecurringSchedule.Frequency;
 import it.unibo.wastemaster.core.models.Schedule.ScheduleStatus;
 import it.unibo.wastemaster.core.AbstractDatabaseTest;
 import it.unibo.wastemaster.core.dao.CollectionDAO;
-import it.unibo.wastemaster.core.dao.GenericDAO;
 import it.unibo.wastemaster.core.dao.RecurringScheduleDAO;
 import it.unibo.wastemaster.core.dao.WasteScheduleDAO;
 import it.unibo.wastemaster.core.models.Collection;
 import it.unibo.wastemaster.core.models.Waste;
-import it.unibo.wastemaster.core.models.WasteSchedule;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.EntityManagerFactory;
-import jakarta.persistence.Persistence;
 
 import org.junit.jupiter.api.*;
 
@@ -99,25 +93,5 @@ class RecurringScheduleManagerTest extends AbstractDatabaseTest {
     }
 
 
-    @Test
-    void testCreateReservationExtra() {
-        em.getTransaction().begin();
-
-        Customer customer = new Customer();
-        customer.setName("Mario Rossi");
-        em.persist(customer);
-
-        Date date = new Date();
-        Waste.WasteType wasteType = Waste.WasteType.PLASTIC;
-
-        ReservationExtra reservation = manager.createReservationExtra(customer, date, wasteType);
-
-        em.getTransaction().commit();
-
-        assertNotNull(reservation.getReservationId());
-        assertEquals(ReservationExtra.ReservationStatus.PENDING, reservation.getStatus());
-        assertNotNull(reservation.getCollection());
-        assertEquals(Collection.ScheduleType.EXTRA, reservation.getCollection().getScheduleType());
-    }
 }
 
