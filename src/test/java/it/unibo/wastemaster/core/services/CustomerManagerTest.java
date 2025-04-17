@@ -1,7 +1,6 @@
 package it.unibo.wastemaster.core.services;
 
 import it.unibo.wastemaster.core.AbstractDatabaseTest;
-import it.unibo.wastemaster.core.dao.CustomerDAO;
 import it.unibo.wastemaster.core.models.Customer;
 
 import org.junit.jupiter.api.*;
@@ -9,13 +8,6 @@ import org.junit.jupiter.api.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 class CustomerManagerTest extends AbstractDatabaseTest {
-
-    private CustomerManager customerManager;
-
-    @BeforeEach
-    void initManager() {
-        customerManager = new CustomerManager(new CustomerDAO(em));
-    }
 
     private String generateUniqueEmail(String prefix) {
         return prefix + "_" + System.currentTimeMillis() + "@example.com";
