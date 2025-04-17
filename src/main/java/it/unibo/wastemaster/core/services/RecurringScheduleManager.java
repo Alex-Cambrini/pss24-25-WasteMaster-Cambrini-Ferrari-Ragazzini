@@ -5,13 +5,13 @@ import java.util.Date;
 import java.util.List;
 
 import it.unibo.wastemaster.core.dao.RecurringScheduleDAO;
-import it.unibo.wastemaster.core.models.Collection;
 import it.unibo.wastemaster.core.models.Customer;
 import it.unibo.wastemaster.core.models.RecurringSchedule;
 import it.unibo.wastemaster.core.models.RecurringSchedule.Frequency;
 import it.unibo.wastemaster.core.models.Schedule.ScheduleStatus;
 import it.unibo.wastemaster.core.models.Waste;
 import it.unibo.wastemaster.core.models.WasteSchedule;
+import it.unibo.wastemaster.core.utils.DateUtils;
 
 public class RecurringScheduleManager {
 
@@ -20,9 +20,12 @@ public class RecurringScheduleManager {
     private CollectionManager collectionManager;
 
     public RecurringScheduleManager(RecurringScheduleDAO recurringScheduleDAO,
-            WasteScheduleManager wasteScheduleManager, CollectionManager collectionManager) {
+            WasteScheduleManager wasteScheduleManager) {
         this.wasteScheduleManager = wasteScheduleManager;
         this.recurringScheduleDAO = recurringScheduleDAO;
+    }
+
+    public void setCollectionManager(CollectionManager collectionManager) {
         this.collectionManager = collectionManager;
     }
 
@@ -41,36 +44,37 @@ public class RecurringScheduleManager {
         RecurringSchedule.Frequency frequency = schedule.getFrequency();
         WasteSchedule scheduleData = wasteScheduleManager.getWasteScheduleForWaste(wasteType);
         int scheduledDay = scheduleData.getDayOfWeek();
-
-        Date today = new Date();
+    
+        Date today = DateUtils.getCurrentDate();
         Date existingNext = schedule.getNextCollectionDate();
-
-        if (existingNext != null && !existingNext.before(today)) {
-            return existingNext;
-        }
-
+    
         Calendar calendar = Calendar.getInstance();
-
+    
+        // Se la data esistente è null, significa che è il primo ritiro
         if (existingNext == null) {
             calendar.setTime(schedule.getStartDate());
-            calendar.add(Calendar.DAY_OF_MONTH, Collection.CANCEL_LIMIT_DAYS);
-        } else {
-            calendar.setTime(existingNext);
-        }
-        if (existingNext != null) {
-            calendar = alignToScheduledDay(calendar, scheduledDay);
+            calendar.add(Calendar.DAY_OF_MONTH, 2); // Aggiungi 2 giorni alla start date per il primo ritiro
+            calendar = alignToScheduledDay(calendar, scheduledDay); // Allineamento iniziale
+        } else { // significa che non è il primo ritiro
+            calendar.setTime(existingNext);    
+            // Aggiungi la frequenza (settimanale o mensile)
+            if (frequency == RecurringSchedule.Frequency.WEEKLY) {
+                calendar.add(Calendar.DAY_OF_MONTH, 7); // Aggiungi 7 giorni per la frequenza settimanale
+            } else if (frequency == RecurringSchedule.Frequency.MONTHLY) {
+                calendar.add(Calendar.MONTH, 1); // Aggiungi 1 mese per la frequenza mensile
+                calendar = alignToScheduledDay(calendar, scheduledDay); // Allineamento per frequenza mensile
+            }
+    
+            // Se la data risultante è nel passato, scorrere giorno per giorno
             while (calendar.getTime().before(today)) {
-                if (frequency == RecurringSchedule.Frequency.WEEKLY) {
-                    calendar.add(Calendar.DAY_OF_MONTH, 7);
-                } else if (frequency == RecurringSchedule.Frequency.MONTHLY) {
-                    calendar.add(Calendar.DAY_OF_MONTH, 28);
-                }
-                calendar = alignToScheduledDay(calendar, scheduledDay);
+                calendar.add(Calendar.DAY_OF_MONTH, 1); // Incrementa di un giorno
+                calendar = alignToScheduledDay(calendar, scheduledDay); // Allineamento per trovare il giorno giusto
             }
         }
+    
         return new java.sql.Date(calendar.getTimeInMillis());
-    }
-
+    }    
+    
     private Calendar alignToScheduledDay(Calendar calendar, int scheduledDay) {
         while (calendar.get(Calendar.DAY_OF_WEEK) != scheduledDay) {
             calendar.add(Calendar.DAY_OF_MONTH, 1);
@@ -90,5 +94,9 @@ public class RecurringScheduleManager {
             recurringScheduleDAO.update(schedule);
         }
         collectionManager.generateRecurringCollections();
+    }
+
+    public List<RecurringSchedule> getSchedulesByCustomer(Customer customer) {
+        return recurringScheduleDAO.findScheduleByCustomer(customer);
     }
 }
