@@ -16,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import java.util.Date;
 
 
-class ScheduleManagerTest extends AbstractDatabaseTest {
+class RecurringScheduleManagerTest extends AbstractDatabaseTest {
 
     private EntityManagerFactory emf;
     private EntityManager em;
