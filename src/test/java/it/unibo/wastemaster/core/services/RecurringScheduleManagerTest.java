@@ -32,35 +32,38 @@ class RecurringScheduleManagerTest extends AbstractDatabaseTest {
     @Test
     void testCalculateNextDate() {
         Calendar start = Calendar.getInstance();
-        start.add(Calendar.DAY_OF_MONTH, -5);
-        RecurringSchedule scheduleNull = new RecurringSchedule(customer, Waste.WasteType.PLASTIC, ScheduleStatus.ACTIVE, new java.sql.Date(start.getTimeInMillis()), Frequency.WEEKLY);
-        scheduleNull.setNextCollectionDate(null);
+        start.add(Calendar.DAY_OF_MONTH, -10);
 
-        Date calculatedDate = manager.calculateNextDate(scheduleNull);
-        assertNotNull(calculatedDate);
+        RecurringSchedule pastSchedule = new RecurringSchedule(
+            customer,
+            waste.getType(),
+            ScheduleStatus.ACTIVE,
+            new java.sql.Date(start.getTimeInMillis()),
+            Frequency.WEEKLY
+        );
+        pastSchedule.setNextCollectionDate(new java.sql.Date(start.getTimeInMillis()));
 
-        RecurringSchedule scheduleToday = new RecurringSchedule(customer, Waste.WasteType.PLASTIC, ScheduleStatus.ACTIVE, new Date(), Frequency.WEEKLY);
-        scheduleToday.setNextCollectionDate(new java.sql.Date(System.currentTimeMillis()));
+        em.getTransaction().begin();
+        em.persist(pastSchedule);
+        em.getTransaction().commit();
 
-        Date resultToday = manager.calculateNextDate(scheduleToday);
-        assertEquals(scheduleToday.getNextCollectionDate(), resultToday);
+        manager.updateNextDates();
 
-        Calendar future = Calendar.getInstance();
-        future.add(Calendar.DAY_OF_MONTH, 5);
-        RecurringSchedule scheduleFuture = new RecurringSchedule(customer, Waste.WasteType.PLASTIC, ScheduleStatus.ACTIVE, new Date(), Frequency.WEEKLY);
-        scheduleFuture.setNextCollectionDate(new java.sql.Date(future.getTimeInMillis()));
+        RecurringSchedule updated = em.find(RecurringSchedule.class, pastSchedule.getId());
+        assertNotNull(updated.getNextCollectionDate());
+        assertTrue(updated.getNextCollectionDate().after(new Date()));
 
-        Date resultFuture = manager.calculateNextDate(scheduleFuture);
-        assertEquals(scheduleFuture.getNextCollectionDate(), resultFuture);
+        List<Collection> collections = collectionDAO.findAll();
+        assertEquals(1, collections.size());
 
-        Calendar past = Calendar.getInstance();
-        past.add(Calendar.DAY_OF_MONTH, -7);
-        RecurringSchedule schedulePast = new RecurringSchedule(customer, Waste.WasteType.PLASTIC, ScheduleStatus.ACTIVE, new Date(), Frequency.WEEKLY);
-        schedulePast.setNextCollectionDate(new java.sql.Date(past.getTimeInMillis()));
+        Collection collection = collections.get(0);
+        assertEquals(updated.getNextCollectionDate(), collection.getDate());
+        assertEquals(customer.getCustomerId(), collection.getCustomer().getCustomerId());
+        assertEquals(Collection.ScheduleCategory.RECURRING, collection.getScheduleCategory());
+        assertEquals(updated.getId(), collection.getScheduleId().getId());
 
-        Date resultPast = manager.calculateNextDate(schedulePast);
-        assertTrue(resultPast.after(new Date()));
     }
+
 
     @Test
     void testCreateRecurringSchedule() {
