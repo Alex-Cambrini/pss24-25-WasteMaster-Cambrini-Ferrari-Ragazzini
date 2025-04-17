@@ -15,7 +15,10 @@ import it.unibo.wastemaster.core.models.Customer;
 import it.unibo.wastemaster.core.models.Location;
 import it.unibo.wastemaster.core.models.Waste;
 import it.unibo.wastemaster.core.models.WasteSchedule;
+import it.unibo.wastemaster.core.services.CollectionManager;
 import it.unibo.wastemaster.core.services.CustomerManager;
+import it.unibo.wastemaster.core.services.RecurringScheduleManager;
+import it.unibo.wastemaster.core.services.WasteScheduleManager;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
@@ -38,6 +41,11 @@ public class AbstractDatabaseTest {
     protected <T> GenericDAO<T> createGenericDAO(Class<T> clazz) {
         return new GenericDAO<>(em, clazz);
     }
+
+    protected WasteScheduleManager wasteScheduleManager;
+    protected CollectionManager collectionManager;
+    protected RecurringScheduleManager recurringScheduleManager;
+
     
 
 
@@ -70,6 +78,11 @@ public class AbstractDatabaseTest {
         oneTimeScheduleDAO = new OneTimeScheduleDAO(em);
         recurringScheduleDAO = new RecurringScheduleDAO(em);
         wasteScheduleDAO = new WasteScheduleDAO(em);
+
+        wasteScheduleManager = new WasteScheduleManager(wasteScheduleDAO);
+        collectionManager = new CollectionManager(collectionDAO, null);
+        recurringScheduleManager = new RecurringScheduleManager(recurringScheduleDAO, wasteScheduleManager);
+
     }
 
 
