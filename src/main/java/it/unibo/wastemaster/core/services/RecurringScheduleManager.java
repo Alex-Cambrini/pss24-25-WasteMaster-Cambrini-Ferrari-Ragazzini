@@ -71,7 +71,7 @@ public class RecurringScheduleManager {
         return new java.sql.Date(calendar.getTimeInMillis());
     }
 
-    private Calendar alignToScheduledDay(Calendar calendar, int scheduledDay) {
+    protected Calendar alignToScheduledDay(Calendar calendar, int scheduledDay) {
         while (calendar.get(Calendar.DAY_OF_WEEK) != scheduledDay) {
             calendar.add(Calendar.DAY_OF_MONTH, 1);
         }
