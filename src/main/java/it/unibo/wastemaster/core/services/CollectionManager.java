@@ -10,6 +10,7 @@ import it.unibo.wastemaster.core.models.Collection.ScheduleCategory;
 import it.unibo.wastemaster.core.models.OneTimeSchedule;
 import it.unibo.wastemaster.core.models.RecurringSchedule;
 import it.unibo.wastemaster.core.models.Schedule;
+import it.unibo.wastemaster.core.utils.DateUtils;
 
 public class CollectionManager {
 
@@ -38,7 +39,7 @@ public class CollectionManager {
             scheduleCategory = ScheduleCategory.RECURRING;
         }
 
-        if (collectionDate != null && collectionDate.after(new Date())) {
+        if (collectionDate != null && collectionDate.after(DateUtils.getCurrentDate())) {
             Collection collection = new Collection(
                     schedule.getCustomer(),
                     collectionDate,
