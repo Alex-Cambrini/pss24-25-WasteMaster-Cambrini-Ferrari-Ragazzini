@@ -34,49 +34,37 @@ class RecurringScheduleManagerTest extends AbstractDatabaseTest {
 	RecurringScheduleManager manager = new RecurringScheduleManager(recurringScheduleDAO, wasteScheduleManager, collectionManager);
 
     @Test
-	void testCalculateNextDate() {
+    void testCalculateNextDate() {
+        Calendar start = Calendar.getInstance();
+        start.add(Calendar.DAY_OF_MONTH, -5);
+        RecurringSchedule scheduleNull = new RecurringSchedule(customer, Waste.WasteType.PLASTIC, ScheduleStatus.ACTIVE, new java.sql.Date(start.getTimeInMillis()), Frequency.WEEKLY);
+        scheduleNull.setNextCollectionDate(null);
 
-		Waste waste = new Waste(Waste.WasteType.PLASTIC, true, false);
-		em.getTransaction().begin();
-		em.persist(waste);
-		em.persist(customer);
-		em.getTransaction().commit();
+        Date calculatedDate = manager.calculateNextDate(scheduleNull);
+        assertNotNull(calculatedDate);
 
-		int scheduledDay = Calendar.getInstance().get(Calendar.DAY_OF_WEEK);
-		wasteScheduleDAO.insert(new WasteSchedule(waste, scheduledDay));
+        RecurringSchedule scheduleToday = new RecurringSchedule(customer, Waste.WasteType.PLASTIC, ScheduleStatus.ACTIVE, new Date(), Frequency.WEEKLY);
+        scheduleToday.setNextCollectionDate(new java.sql.Date(System.currentTimeMillis()));
 
-		Calendar start = Calendar.getInstance();
-		start.add(Calendar.DAY_OF_MONTH, -5);
-		RecurringSchedule scheduleNull = new RecurringSchedule(customer, Waste.WasteType.PLASTIC, ScheduleStatus.ACTIVE, new java.sql.Date(start.getTimeInMillis()), Frequency.WEEKLY);
-		scheduleNull.setNextCollectionDate(null);
+        Date resultToday = manager.calculateNextDate(scheduleToday);
+        assertEquals(scheduleToday.getNextCollectionDate(), resultToday);
 
-		Date calculatedDate = manager.calculateNextDate(scheduleNull);
-		assertNotNull(calculatedDate);
+        Calendar future = Calendar.getInstance();
+        future.add(Calendar.DAY_OF_MONTH, 5);
+        RecurringSchedule scheduleFuture = new RecurringSchedule(customer, Waste.WasteType.PLASTIC, ScheduleStatus.ACTIVE, new Date(), Frequency.WEEKLY);
+        scheduleFuture.setNextCollectionDate(new java.sql.Date(future.getTimeInMillis()));
 
-		RecurringSchedule scheduleToday = new RecurringSchedule(customer, Waste.WasteType.PLASTIC, ScheduleStatus.ACTIVE, new Date(), Frequency.WEEKLY);
-		scheduleToday.setNextCollectionDate(new java.sql.Date(System.currentTimeMillis()));
+        Date resultFuture = manager.calculateNextDate(scheduleFuture);
+        assertEquals(scheduleFuture.getNextCollectionDate(), resultFuture);
 
-		Date resultToday = manager.calculateNextDate(scheduleToday);
-		assertEquals(scheduleToday.getNextCollectionDate(), resultToday);
+        Calendar past = Calendar.getInstance();
+        past.add(Calendar.DAY_OF_MONTH, -7);
+        RecurringSchedule schedulePast = new RecurringSchedule(customer, Waste.WasteType.PLASTIC, ScheduleStatus.ACTIVE, new Date(), Frequency.WEEKLY);
+        schedulePast.setNextCollectionDate(new java.sql.Date(past.getTimeInMillis()));
 
-		Calendar future = Calendar.getInstance();
-		future.add(Calendar.DAY_OF_MONTH, 5);
-		RecurringSchedule scheduleFuture = new RecurringSchedule(customer, Waste.WasteType.PLASTIC, ScheduleStatus.ACTIVE, new Date(), Frequency.WEEKLY);
-		scheduleFuture.setNextCollectionDate(new java.sql.Date(future.getTimeInMillis()));
-
-		Date resultFuture = manager.calculateNextDate(scheduleFuture);
-		assertEquals(scheduleFuture.getNextCollectionDate(), resultFuture);
-
-		Calendar past = Calendar.getInstance();
-		past.add(Calendar.DAY_OF_MONTH, -7);
-		RecurringSchedule schedulePast = new RecurringSchedule(customer, Waste.WasteType.PLASTIC, ScheduleStatus.ACTIVE, new Date(), Frequency.WEEKLY);
-		schedulePast.setNextCollectionDate(new java.sql.Date(past.getTimeInMillis()));
-
-		Date resultPast = manager.calculateNextDate(schedulePast);
-		assertTrue(resultPast.after(new Date()));
-	}
-}
-
+        Date resultPast = manager.calculateNextDate(schedulePast);
+        assertTrue(resultPast.after(new Date()));
+    }
 
     @Test
     void testCreateReservationExtra() {
