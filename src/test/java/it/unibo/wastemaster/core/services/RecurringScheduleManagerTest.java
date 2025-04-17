@@ -118,6 +118,30 @@ class RecurringScheduleManagerTest extends AbstractDatabaseTest {
         assertTrue(resultTransition.get(Calendar.MONTH) != endOfMonth.get(Calendar.MONTH) || resultTransition.get(Calendar.DAY_OF_MONTH) != endOfMonth.get(Calendar.DAY_OF_MONTH));
     }
 
-    
+    @Test
+    void testGetRecurringSchedulesWithoutCollections() {
+        List<RecurringSchedule> result = manager.getRecurringSchedulesWithoutCollections();
+        assertNotNull(result);
+    }
+
+    @Test
+    void testUpdateNextDates() {
+        Calendar start = Calendar.getInstance();
+        start.add(Calendar.DAY_OF_MONTH, -10);
+
+        RecurringSchedule pastSchedule = new RecurringSchedule(customer, waste.getType(), ScheduleStatus.ACTIVE, new java.sql.Date(start.getTimeInMillis()), Frequency.WEEKLY);
+        pastSchedule.setNextCollectionDate(new java.sql.Date(start.getTimeInMillis()));
+
+        em.getTransaction().begin();
+        em.persist(pastSchedule);
+        em.getTransaction().commit();
+
+        manager.updateNextDates();
+
+        RecurringSchedule updated = em.find(RecurringSchedule.class, pastSchedule.getId());
+        assertNotNull(updated.getNextCollectionDate());
+        assertTrue(updated.getNextCollectionDate().after(new Date()));
+    }
+
 }
 
