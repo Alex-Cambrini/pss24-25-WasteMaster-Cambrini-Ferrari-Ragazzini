@@ -1,20 +1,14 @@
 package it.unibo.wastemaster.core.services;
 
-import it.unibo.wastemaster.core.models.Customer;
 import it.unibo.wastemaster.core.models.RecurringSchedule;
 import it.unibo.wastemaster.core.models.RecurringSchedule.Frequency;
 import it.unibo.wastemaster.core.models.Schedule.ScheduleStatus;
 import it.unibo.wastemaster.core.AbstractDatabaseTest;
 import it.unibo.wastemaster.core.dao.CollectionDAO;
-import it.unibo.wastemaster.core.dao.GenericDAO;
 import it.unibo.wastemaster.core.dao.RecurringScheduleDAO;
 import it.unibo.wastemaster.core.dao.WasteScheduleDAO;
 import it.unibo.wastemaster.core.models.Collection;
 import it.unibo.wastemaster.core.models.Waste;
-import it.unibo.wastemaster.core.models.WasteSchedule;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.EntityManagerFactory;
-import jakarta.persistence.Persistence;
 
 import org.junit.jupiter.api.*;
 
@@ -22,6 +16,8 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
+import java.lang.reflect.Method;
 
 
 class RecurringScheduleManagerTest extends AbstractDatabaseTest {
@@ -34,69 +30,121 @@ class RecurringScheduleManagerTest extends AbstractDatabaseTest {
 	RecurringScheduleManager manager = new RecurringScheduleManager(recurringScheduleDAO, wasteScheduleManager, collectionManager);
 
     @Test
-	void testCalculateNextDate() {
+    void testCalculateNextDate() {
+        Calendar start = Calendar.getInstance();
+        start.add(Calendar.DAY_OF_MONTH, -10);
 
-		Waste waste = new Waste(Waste.WasteType.PLASTIC, true, false);
-		em.getTransaction().begin();
-		em.persist(waste);
-		em.persist(customer);
-		em.getTransaction().commit();
+        RecurringSchedule pastSchedule = new RecurringSchedule(
+            customer,
+            waste.getType(),
+            ScheduleStatus.ACTIVE,
+            new java.sql.Date(start.getTimeInMillis()),
+            Frequency.WEEKLY
+        );
+        pastSchedule.setNextCollectionDate(new java.sql.Date(start.getTimeInMillis()));
 
-		int scheduledDay = Calendar.getInstance().get(Calendar.DAY_OF_WEEK);
-		wasteScheduleDAO.insert(new WasteSchedule(waste, scheduledDay));
+        em.getTransaction().begin();
+        em.persist(pastSchedule);
+        em.getTransaction().commit();
 
-		Calendar start = Calendar.getInstance();
-		start.add(Calendar.DAY_OF_MONTH, -5);
-		RecurringSchedule scheduleNull = new RecurringSchedule(customer, Waste.WasteType.PLASTIC, ScheduleStatus.ACTIVE, new java.sql.Date(start.getTimeInMillis()), Frequency.WEEKLY);
-		scheduleNull.setNextCollectionDate(null);
+        manager.updateNextDates();
 
-		Date calculatedDate = manager.calculateNextDate(scheduleNull);
-		assertNotNull(calculatedDate);
+        RecurringSchedule updated = em.find(RecurringSchedule.class, pastSchedule.getId());
+        assertNotNull(updated.getNextCollectionDate());
+        assertTrue(updated.getNextCollectionDate().after(new Date()));
 
-		RecurringSchedule scheduleToday = new RecurringSchedule(customer, Waste.WasteType.PLASTIC, ScheduleStatus.ACTIVE, new Date(), Frequency.WEEKLY);
-		scheduleToday.setNextCollectionDate(new java.sql.Date(System.currentTimeMillis()));
+        List<Collection> collections = collectionDAO.findAll();
+        assertEquals(1, collections.size());
 
-		Date resultToday = manager.calculateNextDate(scheduleToday);
-		assertEquals(scheduleToday.getNextCollectionDate(), resultToday);
+        Collection collection = collections.get(0);
+        assertEquals(updated.getNextCollectionDate(), collection.getDate());
+        assertEquals(customer.getCustomerId(), collection.getCustomer().getCustomerId());
+        assertEquals(Collection.ScheduleCategory.RECURRING, collection.getScheduleCategory());
+        assertEquals(updated.getId(), collection.getScheduleId().getId());
 
-		Calendar future = Calendar.getInstance();
-		future.add(Calendar.DAY_OF_MONTH, 5);
-		RecurringSchedule scheduleFuture = new RecurringSchedule(customer, Waste.WasteType.PLASTIC, ScheduleStatus.ACTIVE, new Date(), Frequency.WEEKLY);
-		scheduleFuture.setNextCollectionDate(new java.sql.Date(future.getTimeInMillis()));
-
-		Date resultFuture = manager.calculateNextDate(scheduleFuture);
-		assertEquals(scheduleFuture.getNextCollectionDate(), resultFuture);
-
-		Calendar past = Calendar.getInstance();
-		past.add(Calendar.DAY_OF_MONTH, -7);
-		RecurringSchedule schedulePast = new RecurringSchedule(customer, Waste.WasteType.PLASTIC, ScheduleStatus.ACTIVE, new Date(), Frequency.WEEKLY);
-		schedulePast.setNextCollectionDate(new java.sql.Date(past.getTimeInMillis()));
-
-		Date resultPast = manager.calculateNextDate(schedulePast);
-		assertTrue(resultPast.after(new Date()));
-	}
-}
+    }
 
 
     @Test
-    void testCreateReservationExtra() {
+    void testCreateRecurringSchedule() {
+        Date startDate = new Date();
+
+        manager.createRecurringSchedule(
+            customer,
+            Waste.WasteType.PLASTIC,
+            ScheduleStatus.ACTIVE,
+            startDate,
+            Frequency.WEEKLY
+        );
+
+        List<RecurringSchedule> schedules = recurringScheduleDAO.findAll();
+        assertEquals(1, schedules.size());
+
+        RecurringSchedule schedule = schedules.get(0);
+        assertEquals(customer.getCustomerId(), schedule.getCustomer().getCustomerId());
+        assertEquals(Waste.WasteType.PLASTIC, schedule.getWasteType());
+        assertEquals(ScheduleStatus.ACTIVE, schedule.getStatus());
+        assertEquals(Frequency.WEEKLY, schedule.getFrequency());
+        assertNotNull(schedule.getNextCollectionDate());
+
+        List<Collection> collections = collectionDAO.findAll();
+        assertEquals(1, collections.size());
+
+        Collection collection = collections.get(0);
+        assertEquals(customer.getCustomerId(), collection.getCustomer().getCustomerId());
+        assertEquals(schedule.getNextCollectionDate(), collection.getDate());
+        assertEquals(Collection.CollectionStatus.IN_PROGRESS, collection.getCollectionStatus());
+    }
+
+    @Test
+    void testAlignToScheduledDay() throws Exception {
+        Method method = RecurringScheduleManager.class.getDeclaredMethod("alignToScheduledDay", Calendar.class, int.class);
+        method.setAccessible(true);
+
+        Calendar cal = Calendar.getInstance();
+        cal.set(Calendar.DAY_OF_WEEK, Calendar.TUESDAY);
+
+        Calendar resultSame = (Calendar) method.invoke(manager, (Calendar) cal.clone(), Calendar.TUESDAY);
+        assertEquals(Calendar.TUESDAY, resultSame.get(Calendar.DAY_OF_WEEK));
+
+        Calendar resultNext = (Calendar) method.invoke(manager, (Calendar) cal.clone(), Calendar.FRIDAY);
+        assertEquals(Calendar.FRIDAY, resultNext.get(Calendar.DAY_OF_WEEK));
+        assertTrue(resultNext.after(cal));
+
+        Calendar resultSunday = (Calendar) method.invoke(manager, (Calendar) cal.clone(), Calendar.SUNDAY);
+        assertEquals(Calendar.SUNDAY, resultSunday.get(Calendar.DAY_OF_WEEK));
+
+        Calendar endOfMonth = Calendar.getInstance();
+        endOfMonth.set(Calendar.DAY_OF_MONTH, endOfMonth.getActualMaximum(Calendar.DAY_OF_MONTH));
+        Calendar resultTransition = (Calendar) method.invoke(manager, endOfMonth, Calendar.TUESDAY);
+        assertEquals(Calendar.TUESDAY, resultTransition.get(Calendar.DAY_OF_WEEK));
+        assertTrue(resultTransition.get(Calendar.MONTH) != endOfMonth.get(Calendar.MONTH) || resultTransition.get(Calendar.DAY_OF_MONTH) != endOfMonth.get(Calendar.DAY_OF_MONTH));
+    }
+
+    @Test
+    void testGetRecurringSchedulesWithoutCollections() {
+        List<RecurringSchedule> result = manager.getRecurringSchedulesWithoutCollections();
+        assertNotNull(result);
+    }
+
+    @Test
+    void testUpdateNextDates() {
+        Calendar start = Calendar.getInstance();
+        start.add(Calendar.DAY_OF_MONTH, -10);
+
+        RecurringSchedule pastSchedule = new RecurringSchedule(customer, waste.getType(), ScheduleStatus.ACTIVE, new java.sql.Date(start.getTimeInMillis()), Frequency.WEEKLY);
+        pastSchedule.setNextCollectionDate(new java.sql.Date(start.getTimeInMillis()));
+
         em.getTransaction().begin();
-
-        Customer customer = new Customer();
-        customer.setName("Mario Rossi");
-        em.persist(customer);
-
-        Date date = new Date();
-        Waste.WasteType wasteType = Waste.WasteType.PLASTIC;
-
-        ReservationExtra reservation = manager.createReservationExtra(customer, date, wasteType);
-
+        em.persist(pastSchedule);
         em.getTransaction().commit();
 
-        assertNotNull(reservation.getReservationId());
-        assertEquals(ReservationExtra.ReservationStatus.PENDING, reservation.getStatus());
-        assertNotNull(reservation.getCollection());
-        assertEquals(Collection.ScheduleType.EXTRA, reservation.getCollection().getScheduleType());
+        manager.updateNextDates();
+
+        RecurringSchedule updated = em.find(RecurringSchedule.class, pastSchedule.getId());
+        assertNotNull(updated.getNextCollectionDate());
+        assertTrue(updated.getNextCollectionDate().after(new Date()));
     }
+
 }
 
