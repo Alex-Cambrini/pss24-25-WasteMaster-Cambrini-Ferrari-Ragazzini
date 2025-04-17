@@ -13,7 +13,12 @@
         <class>it.unibo.wastemaster.core.models.Reservation</class>
         <class>it.unibo.wastemaster.core.models.Vehicle</class>
         <class>it.unibo.wastemaster.core.models.Waste</class>
-        <class>it.unibo.wastemaster.core.models.ReservationExtra</class>
+        <class>it.unibo.wastemaster.core.models.Schedule</class>
+        <class>it.unibo.wastemaster.core.models.RecurringSchedule</class>
+        <class>it.unibo.wastemaster.core.models.OneTimeSchedule</class>
+        <class>it.unibo.wastemaster.core.models.WasteSchedule</class>
+
+
 
         <properties>
             <property name="jakarta.persistence.jdbc.driver" value="org.h2.Driver"/>
