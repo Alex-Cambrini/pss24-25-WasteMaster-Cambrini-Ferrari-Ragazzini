@@ -17,6 +17,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.lang.reflect.Method;
 
 
 class RecurringScheduleManagerTest extends AbstractDatabaseTest {
@@ -92,6 +93,31 @@ class RecurringScheduleManagerTest extends AbstractDatabaseTest {
         assertEquals(Collection.CollectionStatus.IN_PROGRESS, collection.getCollectionStatus());
     }
 
+    @Test
+    void testAlignToScheduledDay() throws Exception {
+        Method method = RecurringScheduleManager.class.getDeclaredMethod("alignToScheduledDay", Calendar.class, int.class);
+        method.setAccessible(true);
 
+        Calendar cal = Calendar.getInstance();
+        cal.set(Calendar.DAY_OF_WEEK, Calendar.TUESDAY);
+
+        Calendar resultSame = (Calendar) method.invoke(manager, (Calendar) cal.clone(), Calendar.TUESDAY);
+        assertEquals(Calendar.TUESDAY, resultSame.get(Calendar.DAY_OF_WEEK));
+
+        Calendar resultNext = (Calendar) method.invoke(manager, (Calendar) cal.clone(), Calendar.FRIDAY);
+        assertEquals(Calendar.FRIDAY, resultNext.get(Calendar.DAY_OF_WEEK));
+        assertTrue(resultNext.after(cal));
+
+        Calendar resultSunday = (Calendar) method.invoke(manager, (Calendar) cal.clone(), Calendar.SUNDAY);
+        assertEquals(Calendar.SUNDAY, resultSunday.get(Calendar.DAY_OF_WEEK));
+
+        Calendar endOfMonth = Calendar.getInstance();
+        endOfMonth.set(Calendar.DAY_OF_MONTH, endOfMonth.getActualMaximum(Calendar.DAY_OF_MONTH));
+        Calendar resultTransition = (Calendar) method.invoke(manager, endOfMonth, Calendar.TUESDAY);
+        assertEquals(Calendar.TUESDAY, resultTransition.get(Calendar.DAY_OF_WEEK));
+        assertTrue(resultTransition.get(Calendar.MONTH) != endOfMonth.get(Calendar.MONTH) || resultTransition.get(Calendar.DAY_OF_MONTH) != endOfMonth.get(Calendar.DAY_OF_MONTH));
+    }
+
+    
 }
 
