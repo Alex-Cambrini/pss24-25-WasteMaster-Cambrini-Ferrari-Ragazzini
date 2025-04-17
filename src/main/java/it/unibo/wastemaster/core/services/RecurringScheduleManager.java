@@ -36,7 +36,7 @@ public class RecurringScheduleManager {
         collectionManager.generateCollection(schedule);
     }
 
-    private Date calculateNextDate(RecurringSchedule schedule) {
+    protected Date calculateNextDate(RecurringSchedule schedule) {
         Waste.WasteType wasteType = schedule.getWasteType();
         RecurringSchedule.Frequency frequency = schedule.getFrequency();
         WasteSchedule scheduleData = wasteScheduleManager.getWasteScheduleForWaste(wasteType);
