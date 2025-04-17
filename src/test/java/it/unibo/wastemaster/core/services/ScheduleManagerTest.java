@@ -1,6 +1,7 @@
 package it.unibo.wastemaster.core.services;
 
 import it.unibo.wastemaster.core.models.Customer;
+import it.unibo.wastemaster.core.AbstractDatabaseTest;
 import it.unibo.wastemaster.core.dao.GenericDAO;
 import it.unibo.wastemaster.core.models.Collection;
 import it.unibo.wastemaster.core.models.Waste;
@@ -15,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import java.util.Date;
 
 
-class ScheduleManagerTest {
+class ScheduleManagerTest extends AbstractDatabaseTest {
 
     private EntityManagerFactory emf;
     private EntityManager em;
@@ -23,34 +24,6 @@ class ScheduleManagerTest {
     private GenericDAO<ReservationExtra> reservationExtraDAO;
     private GenericDAO<Collection> collectionDAO;
 
-    @BeforeEach
-    void setUp() {
-        emf = Persistence.createEntityManagerFactory("test-pu");
-        em = emf.createEntityManager();
-        manager = new ReservationExtraManager(em);
-        reservationExtraDAO = new GenericDAO<>(em, ReservationExtra.class);
-        collectionDAO = new GenericDAO<>(em, Collection.class);
-    }
-
-    @AfterEach
-    void tearDown() {
-        em.getTransaction().begin();
-
-        Collection collection = em.find(Collection.class, 1);
-        if (collection != null) {
-            collectionDAO.delete(collection);
-        }
-
-        ReservationExtra reservation = em.find(ReservationExtra.class, 1);
-        if (reservation != null) {
-            reservationExtraDAO.delete(reservation);
-        }
-
-        em.getTransaction().commit();
-
-        if (em.isOpen()) em.close();
-        if (emf.isOpen()) emf.close();
-    }
 
     @Test
     void testCreateReservationExtra() {
