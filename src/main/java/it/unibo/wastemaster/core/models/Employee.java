@@ -25,6 +25,7 @@ public class Employee extends Person {
         B("Fino a 3.5 t"),
         C1("3.5 t - 7.5 t"),
         C("Oltre 7.5 t");
+
     
         private final String licenceDescription;
     
@@ -36,8 +37,7 @@ public class Employee extends Person {
             return licenceDescription;
         }
     }
-    
-    
+        
     public enum Role {
         ADMINISTRATOR,
         OFFICE_WORKER,
@@ -47,15 +47,6 @@ public class Employee extends Person {
     public Employee(String name, String surname, Location address, String email, String phone, Role role, LicenceType licenceType) {
         super(name, surname, address, email, phone);
         this.role = role;
-
-        if (licenceType == null) {
-            throw new IllegalArgumentException("All employees must have a licence");
-        }
-    
-        if (role == Role.OPERATOR && licenceType == LicenceType.B) {
-            throw new IllegalArgumentException("Operators must have at least a C1 licence");
-        }
-
         this.licenceType = licenceType;
     }
 
@@ -79,15 +70,7 @@ public class Employee extends Person {
 		return licenceType;
 	}
 
-    public void setLicenceType(LicenceType licenceType) {
-		if (licenceType == null) {
-            throw new IllegalArgumentException("LicenceType cannot be null");
-        }
-    
-        if (this.role == Role.OPERATOR && licenceType == LicenceType.B) {
-            throw new IllegalArgumentException("Operators must have at least a C1 licence");
-        }
-    
+    public void setLicenceType(LicenceType licenceType) {  
 		this.licenceType = licenceType;
 	}
 
