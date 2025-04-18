@@ -54,4 +54,28 @@ class WasteTest {
 		assertTrue(str.contains("true"));
 		assertTrue(str.contains("false"));
 	}
+
+	@Test
+	public void testConstructorRejectsNullType() {
+		Exception e = assertThrows(IllegalArgumentException.class, () ->
+			new Waste(null, true, false)
+		);
+		assertEquals("Waste type must not be null", e.getMessage());
+	}
+
+	@Test
+	public void testConstructorRejectsNullIsRecyclable() {
+		Exception e = assertThrows(IllegalArgumentException.class, () ->
+			new Waste(Waste.WasteType.PAPER, null, false)
+		);
+		assertEquals("isRecyclable must not be null", e.getMessage());
+	}
+
+	@Test
+	public void testConstructorRejectsNullIsDangerous() {
+		Exception e = assertThrows(IllegalArgumentException.class, () ->
+			new Waste(Waste.WasteType.PAPER, true, null)
+		);
+		assertEquals("isDangerous must not be null", e.getMessage());
+	}
 }
