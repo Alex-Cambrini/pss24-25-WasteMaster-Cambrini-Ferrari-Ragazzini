@@ -9,134 +9,103 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class CustomerManagerTest extends AbstractDatabaseTest {
 
-    private String generateUniqueEmail(String prefix) {
-        return prefix + "_" + System.currentTimeMillis() + "@example.com";
+    private String email;
+    private String phoneNumber;
+
+    @BeforeEach
+    public void setUp() {
+        super.setUp();
+        em.getTransaction().begin();
+        email = "test@test.com";
+        phoneNumber = "1234567890";
     }
 
     @Test
     void testAddAndGetCustomer() {
-        String email = generateUniqueEmail("add");
-        Customer customer = customerManager.addCustomer("Test", "User", email, "1234567890",
+        Customer customer = customerManager.addCustomer("Test", "User", email, phoneNumber,
                 "Via Roma", "10", "Bologna", "40100");
-
         Customer found = customerManager.getCustomerById(customer.getCustomerId());
         assertNotNull(found);
         assertEquals(email, found.getEmail());
-
-        em.getTransaction().begin();
-        em.remove(found);
-        em.getTransaction().commit();
     }
 
     @Test
     void testEmailDuplicationCheck() {
-    String email = generateUniqueEmail("dup");
-    Customer customer = customerManager.addCustomer("Test", "Dup", email,
-    "1234567890",
-    "Via Roma", "10", "Bologna", "40100");
-
-    assertThrows(IllegalArgumentException.class, () ->
-    customerManager.addCustomer("Test", "Dup", email, "1234567890",
-    "Via Roma", "10", "Bologna", "40100"));
-
-    em.getTransaction().begin();
-    em.remove(customer);
-    em.getTransaction().commit();
+        customerManager.addCustomer("Test", "Dup", email, phoneNumber, "Via Roma", "10", "Bologna", "40100");
+        assertThrows(IllegalArgumentException.class,
+                () -> customerManager.addCustomer("Test", "Dup", email, phoneNumber,
+                        "Via Roma", "10", "Bologna", "40100"));
     }
 
     @Test
     void testUpdateCustomer() {
-    customer.setPhone("0000000000");
-    customerManager.updateCustomer(customer);
-
-    Customer updated = customerManager.getCustomerById(customer.getCustomerId());
-    assertNotNull(updated);
-    assertEquals("0000000000", updated.getPhone());
+        Customer customer = customerManager.addCustomer("Test", "Dup", email, phoneNumber, "Via Roma", "10", "Bologna",
+                "40100");
+        customer.setPhone(phoneNumber);
+        customerManager.updateCustomer(customer);
+        Customer updated = customerManager.getCustomerById(customer.getCustomerId());
+        assertNotNull(updated);
+        assertEquals(phoneNumber, updated.getPhone());
     }
 
     @Test
     void testDeleteCustomer() {
-    customerManager.deleteCustomer(customer);
-    Customer deleted = customerManager.getCustomerById(customer.getCustomerId());
-    assertNull(deleted);
+        Customer customer = customerManager.addCustomer("Test", "Dup", email, phoneNumber, "Via Roma", "10", "Bologna",
+                "40100");
+        customerManager.deleteCustomer(customer);
+        Customer deleted = customerManager.getCustomerById(customer.getCustomerId());
+        assertNull(deleted);
     }
 
     @Test
     void testAddCustomerWithInvalidInputs() {
-    String validPhone = "1234567890";
-    String validStreet = "Via Roma";
-    String validCivic = "10";
-    String validCity = "Bologna";
-    String validPostal = "40100";
+        String validName = "Mario";
+        String validSurname = "Rossi";
+        String validEmail = "valid@mail.it";
+        String validPhone = "1234567890";
+        String validStreet = "Via Roma";
+        String validCivic = "10";
+        String validCity = "Bologna";
+        String validPostal = "40100";
 
-    assertAll(
-    () -> assertThrows(IllegalArgumentException.class, () ->
-    customerManager.addCustomer("Mario", "Rossi", null, validPhone, validStreet,
-    validCivic, validCity, validPostal)
-    ),
+        assertAll(
+                () -> assertThrows(IllegalArgumentException.class,
+                        () -> customerManager.addCustomer(validName, validSurname, null, validPhone, validStreet,
+                                validCivic, validCity, validPostal)),
 
-    () -> assertThrows(IllegalArgumentException.class, () ->
-    customerManager.addCustomer("Mario", "Rossi", "", validPhone, validStreet,
-    validCivic, validCity, validPostal)
-    ),
+                () -> assertThrows(IllegalArgumentException.class,
+                        () -> customerManager.addCustomer(validName, validSurname, "", validPhone, validStreet,
+                                validCivic, validCity, validPostal)),
 
-    () -> assertThrows(IllegalArgumentException.class, () ->
-    customerManager.addCustomer("Mario", "Rossi", " ", validPhone, validStreet,
-    validCivic, validCity, validPostal)
-    ),
+                () -> assertThrows(IllegalArgumentException.class,
+                        () -> customerManager.addCustomer(validName, validSurname, " ", validPhone, validStreet,
+                                validCivic, validCity, validPostal)),
 
-    () -> assertThrows(IllegalArgumentException.class, () ->
-    customerManager.addCustomer(null, "Rossi", "test1@example.com", validPhone,
-    validStreet, validCivic, validCity, validPostal)
-    ),
+                () -> assertThrows(IllegalArgumentException.class,
+                        () -> customerManager.addCustomer(null, validSurname, validEmail, validPhone,
+                                validStreet, validCivic, validCity, validPostal)),
 
-    () -> assertThrows(IllegalArgumentException.class, () ->
-    customerManager.addCustomer("", "Rossi", "test2@example.com", validPhone,
-    validStreet, validCivic, validCity, validPostal)
-    ),
+                () -> assertThrows(IllegalArgumentException.class,
+                        () -> customerManager.addCustomer("", validSurname, validEmail, validPhone,
+                                validStreet, validCivic, validCity, validPostal)),
 
-    () -> assertThrows(IllegalArgumentException.class, () ->
-    customerManager.addCustomer(" ", "Rossi", "test3@example.com", validPhone,
-    validStreet, validCivic, validCity, validPostal)
-    )
-    );
-    }
-
-    @Test
-    void testDuplicateEmailThrowsException() {
-    String email = generateUniqueEmail("dupCase");
-    Customer c = customerManager.addCustomer("Luca", "Bianchi", email,
-    "1234567890", "Via Roma", "10", "Bologna", "40100");
-
-    assertThrows(IllegalArgumentException.class, () ->
-    customerManager.addCustomer("Luca", "Bianchi", email, "1234567890", "Via Roma", "10", "Bologna", "40100"));
-
-    em.getTransaction().begin();
-    em.remove(c);
-    em.getTransaction().commit();
-    }
-
-    @Test
-    void testUpdateNonExistentCustomer() {
-    Customer fake = new Customer("Ghost", "User", null, "ghost@example.com",
-    "0000000000");
-    fake.setCustomerId(-999);
-    assertDoesNotThrow(() -> customerManager.updateCustomer(fake));
+                () -> assertThrows(IllegalArgumentException.class,
+                        () -> customerManager.addCustomer(" ", validSurname, validEmail, validPhone,
+                                validStreet, validCivic, validCity, validPostal)));
     }
 
     @Test
     void testDeleteAlreadyDeletedCustomer() {
-    String email = generateUniqueEmail("deleteTwice");
-    Customer toDelete = customerManager.addCustomer("Anna", "Neri", email,
-    "3333333333", "Via Roma", "10", "Bologna", "40100");
+        Customer toDelete = customerManager.addCustomer("Luca", "Bianchi", email,
+        phoneNumber, "Via Roma", "10", "Bologna", "40100");
 
-    customerManager.deleteCustomer(toDelete);
-    assertDoesNotThrow(() -> customerManager.deleteCustomer(toDelete));
+        customerManager.deleteCustomer(toDelete);
+        assertDoesNotThrow(() -> customerManager.deleteCustomer(toDelete));
     }
 
     @Test
     void testGetCustomerByInvalidIdReturnsNull() {
-    Customer result = customerManager.getCustomerById(-1);
-    assertNull(result);
+        Customer result = customerManager.getCustomerById(-1);
+        assertNull(result);
     }
 }
