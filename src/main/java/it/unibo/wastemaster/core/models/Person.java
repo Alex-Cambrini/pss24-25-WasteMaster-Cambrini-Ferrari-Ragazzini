@@ -2,6 +2,7 @@ package it.unibo.wastemaster.core.models;
 
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.MappedSuperclass;
+import it.unibo.wastemaster.core.utils.ValidateUtils;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 
@@ -25,6 +26,12 @@ public abstract class Person {
     protected boolean isDeleted = false;
 
     public Person(String name, String surname, Location address, String email, String phone) {
+        ValidateUtils.validateString(name, "Name cannot be null or empty");
+        ValidateUtils.validateString(surname, "Surname cannot be null or empty");
+        ValidateUtils.validateNotNull(address, "Address cannot be null");
+        ValidateUtils.validateString(email, "Email cannot be null or empty");
+        ValidateUtils.validateString(phone, "Phone cannot be null or empty");
+    
         this.name = name;
         this.surname = surname;
         this.address = address;
