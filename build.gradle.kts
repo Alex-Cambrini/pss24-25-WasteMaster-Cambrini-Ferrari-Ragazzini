@@ -56,7 +56,7 @@ dependencies {
     implementation("org.hibernate.orm:hibernate-hikaricp:6.2.0.Final")
 
     // Hibernate Validator
-    implementation ("org.hibernate.validator:hibernate-validator:6.2.0.Final")
+    implementation ("org.hibernate.validator:hibernate-validator:7.0.0.Final")
     // Jakarta Bean Validation API
     implementation("jakarta.validation:jakarta.validation-api:3.0.2")
     // Jakarta Persistence API
