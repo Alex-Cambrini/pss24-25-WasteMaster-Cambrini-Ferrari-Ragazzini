@@ -26,14 +26,14 @@ public class Employee extends Person {
         C1("3.5 t - 7.5 t"),
         C("Oltre 7.5 t");
     
-        private final String description;
+        private final String licenceDescription;
     
-        LicenceType(String description) {
-            this.description = description;
+        LicenceType(String licenceDescription) {
+            this.licenceDescription = licenceDescription;
         }
     
-        public String getDescription() {
-            return description;
+        public String getLicenceDescription() {
+            return licenceDescription;
         }
     }
     
