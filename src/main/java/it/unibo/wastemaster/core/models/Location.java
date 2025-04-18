@@ -1,5 +1,7 @@
 package it.unibo.wastemaster.core.models;
 
+import it.unibo.wastemaster.core.utils.ValidateUtils;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -14,19 +16,32 @@ public class Location {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
+    @Column(nullable = false)
     private String street;
+
+    @Column(nullable = false)
     private String civicNumber;
+
+    @Column(nullable = false)
     private String city;
+
+    @Column(nullable = false)
     private String postalCode;
 
+    //Default constructor for JPA
+    public Location() {};
+
     public Location(String street, String civicNumber, String city, String postalCode) {
+        ValidateUtils.validateString(street, "Street cannot be null or empty");
+        ValidateUtils.validateString(civicNumber, "CivicNumber cannot be null or empty");
+        ValidateUtils.validateString(city, "City cannot be null or empty");
+        ValidateUtils.validateString(postalCode, "PostalCode cannot be null or empty");
         this.street = street;
         this.civicNumber = civicNumber;
         this.city = city;
         this.postalCode = postalCode;
     }
 
-    public Location() {}
 
     public int getId() {
         return id;
