@@ -2,22 +2,19 @@ package it.unibo.wastemaster.core.models;
 
 import java.util.Date;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.Inheritance;
-import jakarta.persistence.Temporal;
-import jakarta.persistence.TemporalType;
-import jakarta.persistence.InheritanceType;
+import it.unibo.wastemaster.core.utils.ValidateUtils;
+import jakarta.persistence.*;
 
 @Entity
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 public class RecurringSchedule extends Schedule {
 
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private Frequency frequency;
 
     @Temporal(TemporalType.DATE)
+    @Column(nullable = false)
     private Date startDate;
 
     @Temporal(TemporalType.DATE)
@@ -28,13 +25,14 @@ public class RecurringSchedule extends Schedule {
         MONTHLY
     }
 
-    // No-args constructor required by JPA
     public RecurringSchedule() {
     }
 
     public RecurringSchedule(Customer customer, Waste.WasteType wasteType, ScheduleStatus status, Date startDate,
             Frequency frequency) {
         super(customer, wasteType, status);
+        ValidateUtils.validateNotNull(startDate, "Start date must not be null");
+        ValidateUtils.validateNotNull(frequency, "Frequency must not be null");
         this.frequency = frequency;
         this.startDate = startDate;
         this.nextCollectionDate = null;
@@ -45,6 +43,7 @@ public class RecurringSchedule extends Schedule {
     }
 
     public void setStartDate(Date startDate) {
+        ValidateUtils.validateNotNull(startDate, "Start date must not be null");
         this.startDate = startDate;
     }
 
@@ -53,6 +52,7 @@ public class RecurringSchedule extends Schedule {
     }
 
     public void setFrequency(Frequency frequency) {
+        ValidateUtils.validateNotNull(frequency, "Frequency must not be null");
         this.frequency = frequency;
     }
 

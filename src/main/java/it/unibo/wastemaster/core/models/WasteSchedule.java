@@ -1,11 +1,7 @@
 package it.unibo.wastemaster.core.models;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+import it.unibo.wastemaster.core.utils.ValidateUtils;
+import jakarta.persistence.*;
 
 @Entity
 public class WasteSchedule {
@@ -15,9 +11,10 @@ public class WasteSchedule {
     private int scheduleId;
 
     @ManyToOne
-    @JoinColumn(name = "waste_id")
+    @JoinColumn(name = "waste_id", nullable = false)
     private Waste waste;
 
+    @Column(nullable = false)
     private int dayOfWeek;
 
     /*
@@ -40,6 +37,9 @@ public class WasteSchedule {
     }
 
     public WasteSchedule(Waste waste, int dayOfWeek) {
+        ValidateUtils.validateNotNull(waste, "Waste must not be null");
+        validateDayOfWeek(dayOfWeek);
+
         this.waste = waste;
         this.dayOfWeek = dayOfWeek;
     }
@@ -53,6 +53,7 @@ public class WasteSchedule {
     }
 
     public void setWaste(Waste waste) {
+        ValidateUtils.validateNotNull(waste, "Waste must not be null");
         this.waste = waste;
     }
 
@@ -61,14 +62,21 @@ public class WasteSchedule {
     }
 
     public void setDayOfWeek(int dayOfWeek) {
+        validateDayOfWeek(dayOfWeek);
         this.dayOfWeek = dayOfWeek;
+    }
+
+    private void validateDayOfWeek(int dayOfWeek) {
+        if (dayOfWeek < 1 || dayOfWeek > 7) {
+            throw new IllegalArgumentException("dayOfWeek must be between 1 (Sunday) and 7 (Saturday)");
+        }
     }
 
     @Override
     public String toString() {
         return "WasteSchedule{" +
                 "scheduleId=" + scheduleId +
-                ", dayOfWeek='" + dayOfWeek + '\'' +
+                ", dayOfWeek=" + dayOfWeek +
                 ", waste=" + (waste != null ? waste.toString() : "N/A") +
                 '}';
     }
