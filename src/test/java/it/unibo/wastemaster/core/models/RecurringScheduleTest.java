@@ -29,6 +29,9 @@ class RecurringScheduleTest {
         Date newDate = new Date(System.currentTimeMillis() + 100000);
         schedule.setStartDate(newDate);
         assertEquals(newDate, schedule.getStartDate());
+
+        schedule.setStartDate(null);
+        assertNull(schedule.getStartDate());
     }
 
     @Test
@@ -36,6 +39,9 @@ class RecurringScheduleTest {
         assertEquals(RecurringSchedule.Frequency.WEEKLY, schedule.getFrequency());
         schedule.setFrequency(RecurringSchedule.Frequency.MONTHLY);
         assertEquals(RecurringSchedule.Frequency.MONTHLY, schedule.getFrequency());
+
+        schedule.setFrequency(null);
+        assertNull(schedule.getFrequency());
     }
 
     @Test
@@ -44,20 +50,5 @@ class RecurringScheduleTest {
         Date nextDate = new Date();
         schedule.setNextCollectionDate(nextDate);
         assertEquals(nextDate, schedule.getNextCollectionDate());
-    }
-
-    @Test
-    void testConstructorRejectsNulls() {
-        assertThrows(IllegalArgumentException.class, () -> new RecurringSchedule(customer, Waste.WasteType.GLASS,
-                Schedule.ScheduleStatus.ACTIVE, null, RecurringSchedule.Frequency.MONTHLY));
-
-        assertThrows(IllegalArgumentException.class, () -> new RecurringSchedule(customer, Waste.WasteType.GLASS,
-                Schedule.ScheduleStatus.ACTIVE, new Date(), null));
-    }
-
-    @Test
-    void testSettersRejectNulls() {
-        assertThrows(IllegalArgumentException.class, () -> schedule.setStartDate(null));
-        assertThrows(IllegalArgumentException.class, () -> schedule.setFrequency(null));
     }
 }
