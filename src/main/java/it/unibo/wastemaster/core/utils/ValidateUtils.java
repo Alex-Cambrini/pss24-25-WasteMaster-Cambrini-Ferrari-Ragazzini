@@ -1,9 +1,9 @@
 package it.unibo.wastemaster.core.utils;
 
 public class ValidateUtils {
-    public static void validateString(String toValidate) {
+    public static void validateString(String toValidate, String errorMessage) {
         if (toValidate == null || toValidate.isBlank()) {
-            throw new IllegalArgumentException("The string cannot be null or empty");
+            throw new IllegalArgumentException(errorMessage);
         }
     }
 }
