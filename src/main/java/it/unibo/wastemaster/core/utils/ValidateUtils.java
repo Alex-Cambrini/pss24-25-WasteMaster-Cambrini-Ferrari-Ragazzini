@@ -6,4 +6,10 @@ public class ValidateUtils {
             throw new IllegalArgumentException(errorMessage);
         }
     }
+
+    public static void validateNotNull(Object toValidate, String errorMessage) {
+        if (toValidate == null) {
+            throw new IllegalArgumentException(errorMessage);
+        }
+    }
 }
