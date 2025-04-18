@@ -15,34 +15,22 @@ class WasteTest {
 	}
 
 	@Test
-	public void testGetType() {
+	public void testGetAndSetType() {
 		assertEquals(Waste.WasteType.PLASTIC, waste.getType());
-	}
-
-	@Test
-	public void testSetType() {
 		waste.setType(Waste.WasteType.GLASS);
 		assertEquals(Waste.WasteType.GLASS, waste.getType());
 	}
 
 	@Test
-	public void testIsRecyclable() {
+	public void testGetAndSetIsRecyclable() {
 		assertTrue(waste.getIsRecyclable());
-	}
-
-	@Test
-	public void testSetIsRecyclable() {
 		waste.setIsRecyclable(false);
 		assertFalse(waste.getIsRecyclable());
 	}
 
 	@Test
-	public void testIsDangerous() {
+	public void testGetAndSetIsDangerous() {
 		assertFalse(waste.getIsDangerous());
-	}
-
-	@Test
-	public void testSetIsDangerous() {
 		waste.setIsDangerous(true);
 		assertTrue(waste.getIsDangerous());
 	}
@@ -56,26 +44,20 @@ class WasteTest {
 	}
 
 	@Test
-	public void testConstructorRejectsNullType() {
-		Exception e = assertThrows(IllegalArgumentException.class, () ->
+	public void testConstructorRejectsNullArguments() {
+		IllegalArgumentException e1 = assertThrows(IllegalArgumentException.class, () ->
 			new Waste(null, true, false)
 		);
-		assertEquals("Waste type must not be null", e.getMessage());
-	}
+		assertEquals("Waste type must not be null", e1.getMessage());
 
-	@Test
-	public void testConstructorRejectsNullIsRecyclable() {
-		Exception e = assertThrows(IllegalArgumentException.class, () ->
+		IllegalArgumentException e2 = assertThrows(IllegalArgumentException.class, () ->
 			new Waste(Waste.WasteType.PAPER, null, false)
 		);
-		assertEquals("isRecyclable must not be null", e.getMessage());
-	}
+		assertEquals("isRecyclable must not be null", e2.getMessage());
 
-	@Test
-	public void testConstructorRejectsNullIsDangerous() {
-		Exception e = assertThrows(IllegalArgumentException.class, () ->
+		IllegalArgumentException e3 = assertThrows(IllegalArgumentException.class, () ->
 			new Waste(Waste.WasteType.PAPER, true, null)
 		);
-		assertEquals("isDangerous must not be null", e.getMessage());
+		assertEquals("isDangerous must not be null", e3.getMessage());
 	}
 }
