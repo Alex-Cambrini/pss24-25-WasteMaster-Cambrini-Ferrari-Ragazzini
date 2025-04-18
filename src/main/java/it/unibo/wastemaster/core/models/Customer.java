@@ -12,7 +12,7 @@ public class Customer extends Person {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int customerId;
+    private Integer customerId;
 
     public Customer(String name, String surname, Location address, String email, String phone) {
         super(name, surname, address, email, phone); 
@@ -20,7 +20,7 @@ public class Customer extends Person {
 
     public Customer() {}
 
-    public int getCustomerId() {
+    public Integer getCustomerId() {
         return customerId;
     }
 
