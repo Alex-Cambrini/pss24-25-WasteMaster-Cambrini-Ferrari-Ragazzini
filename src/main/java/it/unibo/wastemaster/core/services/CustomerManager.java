@@ -5,6 +5,7 @@ import it.unibo.wastemaster.core.dao.CustomerDAO;
 
 import it.unibo.wastemaster.core.models.Customer;
 import it.unibo.wastemaster.core.models.Location;
+import it.unibo.wastemaster.core.utils.ValidateUtils;
 
 
 public class CustomerManager {
@@ -15,9 +16,15 @@ public class CustomerManager {
     }
 
     public Customer addCustomer(String name, String surname, String email, String phone, String street, String civicNumber, String city, String postalCode) {
-        if(name == null || name.isBlank() || email == null || email.isBlank()){
-            throw new IllegalArgumentException("Nome ed email non possono essere vuoti");
-        }
+        ValidateUtils.validateString(name);
+        ValidateUtils.validateString(surname);
+        ValidateUtils.validateString(email);
+        ValidateUtils.validateString(phone);
+        ValidateUtils.validateString(street);
+        ValidateUtils.validateString(civicNumber);
+        ValidateUtils.validateString(city);
+        ValidateUtils.validateString(postalCode);
+
         if(customerDAO.existsByEmail(email)){
             throw new IllegalArgumentException("Un cliente con questa email esiste già");
         }
@@ -35,7 +42,15 @@ public class CustomerManager {
         customerDAO.update(updateCustomer);
     }
 
-    public void deleteCustomer(Customer customer) {
-        customerDAO.delete(customer);
-    }
+    public boolean deleteCustomer(Customer customer) {
+        if (customer != null && customer.getCustomerId() != null) {
+            Customer managed = customerDAO.findById(customer.getCustomerId());
+            if (managed != null) {
+                customerDAO.delete(managed);
+                return true;
+            }
+        }
+        return false;
+    }  
+
 }
