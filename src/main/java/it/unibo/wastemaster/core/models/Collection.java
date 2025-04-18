@@ -1,19 +1,10 @@
 package it.unibo.wastemaster.core.models;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Table;
-import jakarta.persistence.Column;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.FutureOrPresent;
+import jakarta.validation.constraints.Min;
 import java.util.Date;
-
-
 
 @Entity
 @Table(name = "collections")
@@ -27,23 +18,33 @@ public class Collection {
 
     @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "customer_id")
+    @NotNull(message = "Il cliente non può essere nullo")
     private Customer customer;
 
+    @NotNull(message = "La data non può essere nulla")
+    @FutureOrPresent(message = "La data deve essere oggi o futura")
     private Date date;
 
     @Enumerated(EnumType.STRING)
+    @NotNull(message = "Il tipo di rifiuto non può essere nullo")
     private Waste.WasteType waste;
 
     @Enumerated(EnumType.STRING)
+    @NotNull(message = "Lo stato della raccolta non può essere nullo")
     private CollectionStatus collectionStatus;
 
+    @Min(value = 0, message = "I giorni di cancellazione devono essere >= 0")
     private int cancelLimitDays;
 
     @ManyToOne
     @JoinColumn(name = "schedule_id")
     private Schedule schedule;
-    
+
+    @Enumerated(EnumType.STRING)
     private ScheduleCategory scheduleCategory;
+
+    @Column(nullable = false)
+    private boolean isExtra;
 
     public enum ScheduleCategory {
         ONE_TIME,
@@ -57,23 +58,20 @@ public class Collection {
         CANCELLED
     }
 
-    @Column(nullable = false)
-    private boolean isExtra;
+    public Collection() {
+    }
 
-    // No-args constructor required by JPA
-    public Collection() {}
-
-    public Collection(Customer customer, Date date, Waste.WasteType waste, CollectionStatus collectionStatus, Schedule schedule, ScheduleCategory scheduleCategory) {
+    public Collection(Customer customer, Date date, Waste.WasteType waste, CollectionStatus collectionStatus,
+            Schedule schedule, ScheduleCategory scheduleCategory) {
         this.customer = customer;
         this.date = date;
         this.waste = waste;
         this.collectionStatus = collectionStatus;
         this.cancelLimitDays = CANCEL_LIMIT_DAYS;
-        this.scheduleCategory = scheduleCategory;
         this.schedule = schedule;
+        this.scheduleCategory = scheduleCategory;
     }
 
-    // Getters e Setters
     public int getCollectionId() {
         return collectionId;
     }
@@ -141,23 +139,22 @@ public class Collection {
     public boolean isExtra() {
         return isExtra;
     }
-    
+
     public void setExtra(boolean isExtra) {
         this.isExtra = isExtra;
-    }    
+    }
 
     @Override
     public String toString() {
         return String.format(
-            "Collection {ID: %d, Customer: %s, Date: %s, Waste: %s, Status: %s, Cancel Limit Days: %d, Schedule ID: %s, Schedule Category: %s}",
-            collectionId,
-            customer != null ? customer.getName() : "N/A",
-            date != null ? date.toString() : "N/A",
-            waste,
-            collectionStatus,
-            cancelLimitDays,
-            schedule,
-            scheduleCategory
-        );
+                "Collection {ID: %d, Customer: %s, Date: %s, Waste: %s, Status: %s, Cancel Limit Days: %d, Schedule ID: %s, Schedule Category: %s}",
+                collectionId,
+                customer != null ? customer.getName() : "N/A",
+                date != null ? date.toString() : "N/A",
+                waste,
+                collectionStatus,
+                cancelLimitDays,
+                schedule,
+                scheduleCategory);
     }
 }
