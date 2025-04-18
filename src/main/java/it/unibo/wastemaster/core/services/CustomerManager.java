@@ -5,8 +5,6 @@ import it.unibo.wastemaster.core.dao.CustomerDAO;
 
 import it.unibo.wastemaster.core.models.Customer;
 import it.unibo.wastemaster.core.models.Location;
-import it.unibo.wastemaster.core.utils.ValidateUtils;
-
 
 public class CustomerManager {
     private CustomerDAO customerDAO;
@@ -16,18 +14,9 @@ public class CustomerManager {
     }
 
     public Customer addCustomer(String name, String surname, String email, String phone, String street, String civicNumber, String city, String postalCode) {
-        ValidateUtils.validateString(name);
-        ValidateUtils.validateString(surname);
-        ValidateUtils.validateString(email);
-        ValidateUtils.validateString(phone);
-        ValidateUtils.validateString(street);
-        ValidateUtils.validateString(civicNumber);
-        ValidateUtils.validateString(city);
-        ValidateUtils.validateString(postalCode);
-
         if(customerDAO.existsByEmail(email)){
             throw new IllegalArgumentException("Un cliente con questa email esiste già");
-        }
+        }        
         Location location = new Location(street, civicNumber, city, postalCode);
         Customer customer = new Customer(name, surname, location, email, phone);
         customerDAO.insert(customer);
