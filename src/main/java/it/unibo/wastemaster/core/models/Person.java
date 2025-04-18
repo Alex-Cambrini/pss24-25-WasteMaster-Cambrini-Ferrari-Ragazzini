@@ -3,15 +3,25 @@ package it.unibo.wastemaster.core.models;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.MappedSuperclass;
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
 
 @MappedSuperclass
 public abstract class Person {
+    @Column(nullable = false)
     protected String name;
+    
+    @Column(nullable = false)
     protected String surname;
+
     @ManyToOne(cascade = CascadeType.PERSIST)
     private Location address;
+
+    @Column(nullable = false)
     protected String email;
+
+    @Column(nullable = false)
     protected String phone;
+
     protected boolean isDeleted = false;
 
     public Person(String name, String surname, Location address, String email, String phone) {
