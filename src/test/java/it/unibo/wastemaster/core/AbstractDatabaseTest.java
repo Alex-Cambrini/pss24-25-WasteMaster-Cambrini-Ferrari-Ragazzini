@@ -45,15 +45,22 @@ public abstract class AbstractDatabaseTest {
     @BeforeEach
     public void setUp() {
         em = emf.createEntityManager();
+
         customerDAO = new CustomerDAO(em);
         customerManager = new CustomerManager(customerDAO);
+
         wasteScheduleDAO = new WasteScheduleDAO(em);
         wasteScheduleManager = new WasteScheduleManager(wasteScheduleDAO);
+
         recurringScheduleDAO = new RecurringScheduleDAO(em);
         recurringScheduleManager = new RecurringScheduleManager(recurringScheduleDAO, wasteScheduleManager);
+
         collectionDAO = new CollectionDAO(em);
-        oneTimeScheduleDAO = new OneTimeScheduleDAO(em);
         collectionManager = new CollectionManager(collectionDAO, recurringScheduleManager);
+
+        recurringScheduleManager.setCollectionManager(collectionManager);
+
+        oneTimeScheduleDAO = new OneTimeScheduleDAO(em);
     }
 
     @AfterEach
@@ -64,7 +71,7 @@ public abstract class AbstractDatabaseTest {
             }
             em.close();
         }
-    }    
+    }
 
     @AfterAll
     public static void cleanUp() {
