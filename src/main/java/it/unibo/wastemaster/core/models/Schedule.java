@@ -11,9 +11,13 @@ import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
+import jakarta.persistence.Column;
 
-import java.sql.Date;
+import java.util.Date;
 import java.util.List;
+
+import it.unibo.wastemaster.core.utils.DateUtils;
+import it.unibo.wastemaster.core.utils.ValidateUtils;
 
 @Entity
 public abstract class Schedule {
@@ -27,17 +31,19 @@ public abstract class Schedule {
     private Customer customer;
 
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private Waste.WasteType wasteType;
 
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private ScheduleStatus status;
 
     @Temporal(TemporalType.DATE)
+    @Column(nullable = false)
     private Date creationDate;
 
     @OneToMany(mappedBy = "schedule")
     private List<Collection> collections;
-    
 
     public enum ScheduleStatus {
         SCHEDULED,
@@ -51,10 +57,14 @@ public abstract class Schedule {
     }
 
     public Schedule(Customer customer, Waste.WasteType wasteType, ScheduleStatus status) {
+        ValidateUtils.validateNotNull(customer, "Customer cannot be null");
+        ValidateUtils.validateNotNull(wasteType, "WasteType cannot be null");
+        ValidateUtils.validateNotNull(status, "Status cannot be null");
+        
         this.customer = customer;
         this.wasteType = wasteType;
         this.status = status;
-        this.creationDate = new Date(System.currentTimeMillis());
+        this.creationDate = DateUtils.getCurrentDate();
     }
 
     public int getId() {
@@ -66,6 +76,7 @@ public abstract class Schedule {
     }
 
     public void setCustomer(Customer customer) {
+        ValidateUtils.validateNotNull(customer, "Customer cannot be null");
         this.customer = customer;
     }
 
@@ -74,6 +85,7 @@ public abstract class Schedule {
     }
 
     public void setWasteType(Waste.WasteType wasteType) {
+        ValidateUtils.validateNotNull(wasteType, "WasteType cannot be null");
         this.wasteType = wasteType;
     }
 
@@ -82,6 +94,7 @@ public abstract class Schedule {
     }
 
     public void setStatus(ScheduleStatus status) {
+        ValidateUtils.validateNotNull(status, "Status cannot be null");
         this.status = status;
     }
 
@@ -90,6 +103,7 @@ public abstract class Schedule {
     }
 
     public void setCreationDate(Date creationDate) {
+        ValidateUtils.validateNotNull(creationDate, "CreationDate cannot be null");
         this.creationDate = creationDate;
     }
 
@@ -113,5 +127,4 @@ public abstract class Schedule {
                         .map(c -> String.valueOf(c.getCollectionId()))
                         .reduce((id1, id2) -> id1 + ", " + id2).orElse("N/A") : "N/A");
     }
-
 }
