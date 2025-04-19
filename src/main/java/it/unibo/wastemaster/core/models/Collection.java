@@ -120,11 +120,11 @@ public class Collection {
         this.cancelLimitDays = cancelLimitDays;
     }
 
-    public Schedule getScheduleId() {
+    public Schedule getSchedule() {
         return schedule;
     }
 
-    public void setScheduleId(Schedule schedule) {
+    public void setSchedule(Schedule schedule) {
         this.schedule = schedule;
     }
 
