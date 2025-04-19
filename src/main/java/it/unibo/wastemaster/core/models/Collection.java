@@ -2,6 +2,7 @@ package it.unibo.wastemaster.core.models;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.Min;
 
 import java.time.LocalDate;
@@ -19,23 +20,24 @@ public class Collection {
 
     @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "customer_id")
-    @NotNull(message = "Il cliente non può essere nullo")
+    @NotNull(message = "The customer cannot be null")
     private Customer customer;
-
-    @NotNull(message = "La data non può essere nulla")
+    
+    @FutureOrPresent(message = "The date must be today or in the future")
+    @NotNull(message = "The date cannot be null")
     private LocalDate date;
-
+    
     @Enumerated(EnumType.STRING)
-    @NotNull(message = "Il tipo di rifiuto non può essere nullo")
+    @NotNull(message = "The waste type cannot be null")
     private Waste.WasteType waste;
-
+    
     @Enumerated(EnumType.STRING)
-    @NotNull(message = "Lo stato della raccolta non può essere nullo")
+    @NotNull(message = "The collection status cannot be null")
     private CollectionStatus collectionStatus;
-
-    @Min(value = 0, message = "I giorni di cancellazione devono essere >= 0")
+    
+    @Min(value = 0, message = "Cancellation days must be >= 0")
     private int cancelLimitDays;
-
+    
     @ManyToOne
     @JoinColumn(name = "schedule_id")
     private Schedule schedule;
