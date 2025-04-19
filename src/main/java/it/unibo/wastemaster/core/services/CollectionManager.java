@@ -1,6 +1,6 @@
 package it.unibo.wastemaster.core.services;
 
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.List;
 
 import it.unibo.wastemaster.core.dao.CollectionDAO;
@@ -27,7 +27,7 @@ public class CollectionManager {
     }
 
     public void generateCollection(Schedule schedule) {
-        Date collectionDate = null;
+        LocalDate collectionDate = null;
         ScheduleCategory scheduleCategory = null;
         Collection.CollectionStatus collectionStatus = Collection.CollectionStatus.IN_PROGRESS;
 
@@ -39,7 +39,7 @@ public class CollectionManager {
             scheduleCategory = ScheduleCategory.RECURRING;
         }
 
-        if (collectionDate != null && collectionDate.after(DateUtils.getCurrentDate())) {
+        if (collectionDate != null && collectionDate.isAfter(DateUtils.getCurrentDate())) {
             Collection collection = new Collection(
                     schedule.getCustomer(),
                     collectionDate,

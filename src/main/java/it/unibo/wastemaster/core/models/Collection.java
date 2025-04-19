@@ -2,9 +2,10 @@ package it.unibo.wastemaster.core.models;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.Min;
-import java.util.Date;
+
+import java.time.LocalDate;
+
 
 @Entity
 @Table(name = "collections")
@@ -22,8 +23,7 @@ public class Collection {
     private Customer customer;
 
     @NotNull(message = "La data non può essere nulla")
-    @FutureOrPresent(message = "La data deve essere oggi o futura")
-    private Date date;
+    private LocalDate date;
 
     @Enumerated(EnumType.STRING)
     @NotNull(message = "Il tipo di rifiuto non può essere nullo")
@@ -61,7 +61,7 @@ public class Collection {
     public Collection() {
     }
 
-    public Collection(Customer customer, Date date, Waste.WasteType waste, CollectionStatus collectionStatus,
+    public Collection(Customer customer, LocalDate date, Waste.WasteType waste, CollectionStatus collectionStatus,
             Schedule schedule, ScheduleCategory scheduleCategory) {
         this.customer = customer;
         this.date = date;
@@ -88,11 +88,11 @@ public class Collection {
         this.customer = customer;
     }
 
-    public Date getDate() {
+    public LocalDate getDate() {
         return date;
     }
 
-    public void setDate(Date date) {
+    public void setDate(LocalDate date) {
         this.date = date;
     }
 

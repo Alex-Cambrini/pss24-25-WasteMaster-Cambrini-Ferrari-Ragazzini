@@ -1,15 +1,17 @@
 package it.unibo.wastemaster.core.utils;
 
-import java.util.Date;
+import java.time.LocalDate;
+
 
 public class DateUtils {
 
-    private static Date currentDate = new Date();
-    public static Date getCurrentDate() {
+    private static LocalDate currentDate = LocalDate.now();
+    
+    public static LocalDate getCurrentDate() {
         return currentDate;        
     }
 
-    public static void setCurrentDate(Date date) {
+    public static void setCurrentDate(LocalDate date) {
         currentDate = date;
     }
 }

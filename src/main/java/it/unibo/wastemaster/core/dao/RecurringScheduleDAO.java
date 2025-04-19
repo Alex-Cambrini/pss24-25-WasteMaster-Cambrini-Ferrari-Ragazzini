@@ -1,12 +1,14 @@
 package it.unibo.wastemaster.core.dao;
 
 import java.util.List;
-import java.sql.Date;
+
+import java.time.LocalDate;
+
 import it.unibo.wastemaster.core.models.Customer;
 import it.unibo.wastemaster.core.models.RecurringSchedule;
-import it.unibo.wastemaster.core.utils.DateUtils;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
+
 
 public class RecurringScheduleDAO extends GenericDAO<RecurringSchedule> {
 
@@ -15,6 +17,8 @@ public class RecurringScheduleDAO extends GenericDAO<RecurringSchedule> {
     }
 
     public List<RecurringSchedule> findActiveSchedulesWithoutFutureCollections() {
+
+        LocalDate currentDate = LocalDate.now();
         String jpql = "SELECT rs FROM RecurringSchedule rs " +
                 "WHERE rs.nextCollectionDate > :currentDate " +
                 "AND rs.status = 'ACTIVE' " +
@@ -23,16 +27,17 @@ public class RecurringScheduleDAO extends GenericDAO<RecurringSchedule> {
                 "WHERE c.schedule = rs AND c.date > :currentDate" +
                 ")";
         return entityManager.createQuery(jpql, RecurringSchedule.class)
-                            .setParameter("currentDate", new Date(DateUtils.getCurrentDate().getTime()))
+                            .setParameter("currentDate", currentDate)
                             .getResultList();
     }
 
     public List<RecurringSchedule> findActiveSchedulesWithNextDateBeforeToday() {
+        LocalDate currentDate = LocalDate.now();
         String jpql = "SELECT rs FROM RecurringSchedule rs " +
                 "WHERE rs.status = 'ACTIVE' " +
                 "AND rs.nextCollectionDate < :currentDate";
         return entityManager.createQuery(jpql, RecurringSchedule.class)
-                            .setParameter("currentDate", new Date(DateUtils.getCurrentDate().getTime()))
+                            .setParameter("currentDate",currentDate)
                             .getResultList();
     }
 

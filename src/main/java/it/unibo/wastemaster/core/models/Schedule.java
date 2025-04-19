@@ -13,6 +13,7 @@ import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
 import jakarta.persistence.Column;
 
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 
@@ -38,9 +39,8 @@ public abstract class Schedule {
     @Column(nullable = false)
     private ScheduleStatus status;
 
-    @Temporal(TemporalType.DATE)
     @Column(nullable = false)
-    private Date creationDate;
+    private LocalDate creationDate;
 
     @OneToMany(mappedBy = "schedule")
     private List<Collection> collections;
@@ -98,11 +98,11 @@ public abstract class Schedule {
         this.status = status;
     }
 
-    public Date getCreationDate() {
+    public LocalDate getCreationDate() {
         return creationDate;
     }
 
-    public void setCreationDate(Date creationDate) {
+    public void setCreationDate(LocalDate creationDate) {
         ValidateUtils.validateNotNull(creationDate, "CreationDate cannot be null");
         this.creationDate = creationDate;
     }
