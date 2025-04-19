@@ -1,8 +1,9 @@
 package it.unibo.wastemaster.core.models;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 
 @Entity
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
@@ -10,12 +11,11 @@ public class RecurringSchedule extends Schedule {
 
     @Enumerated(EnumType.STRING)
     private Frequency frequency;
+    
+    @NotNull 
+    private LocalDate startDate;
 
-    @Temporal(TemporalType.DATE)
-    private Date startDate;
-
-    @Temporal(TemporalType.DATE)
-    private Date nextCollectionDate;
+    private LocalDate nextCollectionDate;
 
     public enum Frequency {
         WEEKLY,
@@ -25,7 +25,7 @@ public class RecurringSchedule extends Schedule {
     public RecurringSchedule() {
     }
 
-    public RecurringSchedule(Customer customer, Waste.WasteType wasteType, ScheduleStatus status, Date startDate,
+    public RecurringSchedule(Customer customer, Waste.WasteType wasteType, ScheduleStatus status, LocalDate startDate,
             Frequency frequency) {
         super(customer, wasteType, status);
         this.frequency = frequency;
@@ -33,11 +33,11 @@ public class RecurringSchedule extends Schedule {
         this.nextCollectionDate = null;
     }
 
-    public Date getStartDate() {
+    public LocalDate getStartDate() {
         return startDate;
     }
 
-    public void setStartDate(Date startDate) {
+    public void setStartDate(LocalDate startDate) {
         this.startDate = startDate;
     }
 
@@ -49,11 +49,11 @@ public class RecurringSchedule extends Schedule {
         this.frequency = frequency;
     }
 
-    public Date getNextCollectionDate() {
+    public LocalDate getNextCollectionDate() {
         return nextCollectionDate;
     }
 
-    public void setNextCollectionDate(Date nextCollectionDate) {
+    public void setNextCollectionDate(LocalDate nextCollectionDate) {
         this.nextCollectionDate = nextCollectionDate;
     }
 }

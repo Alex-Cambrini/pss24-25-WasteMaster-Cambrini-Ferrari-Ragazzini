@@ -1,7 +1,7 @@
 package it.unibo.wastemaster.core.services;
 
-import java.util.Calendar;
-import java.util.Date;
+import java.time.LocalDate;
+
 
 import it.unibo.wastemaster.core.dao.OneTimeScheduleDAO;
 import it.unibo.wastemaster.core.models.Collection;
@@ -9,6 +9,7 @@ import it.unibo.wastemaster.core.models.Customer;
 import it.unibo.wastemaster.core.models.OneTimeSchedule;
 import it.unibo.wastemaster.core.models.Schedule.ScheduleStatus;
 import it.unibo.wastemaster.core.models.Waste;
+import it.unibo.wastemaster.core.utils.DateUtils;
 import it.unibo.wastemaster.core.models.Collection.CollectionStatus;
 
 public class OneTimeScheduleManager {
@@ -21,7 +22,7 @@ public class OneTimeScheduleManager {
         this.collectionManager = collectionManager;
     }
 
-    public void createOneTimeSchedule(Customer customer, Waste.WasteType wasteType, ScheduleStatus status, Date pickupDate) {
+    public void createOneTimeSchedule(Customer customer, Waste.WasteType wasteType, ScheduleStatus status, LocalDate pickupDate) {
          
         if (!isDateValid(pickupDate, Collection.CANCEL_LIMIT_DAYS)) {
             throw new IllegalArgumentException("La data di ritiro deve essere almeno tra " + Collection.CANCEL_LIMIT_DAYS + " giorni.");
@@ -31,18 +32,14 @@ public class OneTimeScheduleManager {
         collectionManager.generateOneTimeCollection(schedule);
     }
 
-    private boolean isDateValid(Date date, int limitDays) {
-        Date today = new Date();
-
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(date);
-        calendar.add(Calendar.DAY_OF_MONTH, -limitDays);
-
-        Date cancelLimitDate = calendar.getTime();
-        return today.before(cancelLimitDate);
+    private boolean isDateValid(LocalDate date, int limitDays) {
+        LocalDate today = DateUtils.getCurrentDate();
+        LocalDate cancelLimitDate = date.minusDays(limitDays);
+        return today.isBefore(cancelLimitDate);
     }
+    
 
-    public boolean updateDateOneTimeSchedule(OneTimeSchedule schedule, Date newPickupDate) {
+    public boolean updateDateOneTimeSchedule(OneTimeSchedule schedule, LocalDate newPickupDate) {
         int scheduleId = schedule.getId();
         Collection collection = oneTimeScheduleDAO.findCollectionByScheduleId(scheduleId);
 
