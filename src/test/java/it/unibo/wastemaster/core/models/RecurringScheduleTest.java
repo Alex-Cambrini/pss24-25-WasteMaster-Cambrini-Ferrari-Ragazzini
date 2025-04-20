@@ -3,7 +3,7 @@ package it.unibo.wastemaster.core.models;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -11,14 +11,14 @@ class RecurringScheduleTest {
 
     private Customer customer;
     private Location location;
-    private Date startDate;
+    private LocalDate startDate;
     private RecurringSchedule schedule;
 
     @BeforeEach
     void setUp() {
         location = new Location("Via Roma", "1", "Milano", "Italy");
         customer = new Customer("Mario", "Rossi", location, "mario@rossi.com", "1234567890");
-        startDate = new Date();
+        startDate = LocalDate.now();
         schedule = new RecurringSchedule(customer, Waste.WasteType.PLASTIC, Schedule.ScheduleStatus.ACTIVE, startDate,
                 RecurringSchedule.Frequency.WEEKLY);
     }
@@ -26,7 +26,7 @@ class RecurringScheduleTest {
     @Test
     void testGetAndSetStartDate() {
         assertEquals(startDate, schedule.getStartDate());
-        Date newDate = new Date(System.currentTimeMillis() + 100000);
+        LocalDate newDate = startDate.plusDays(3);
         schedule.setStartDate(newDate);
         assertEquals(newDate, schedule.getStartDate());
 
@@ -47,7 +47,7 @@ class RecurringScheduleTest {
     @Test
     void testGetAndSetNextCollectionDate() {
         assertNull(schedule.getNextCollectionDate());
-        Date nextDate = new Date();
+        LocalDate nextDate = startDate.plusWeeks(1);
         schedule.setNextCollectionDate(nextDate);
         assertEquals(nextDate, schedule.getNextCollectionDate());
     }
