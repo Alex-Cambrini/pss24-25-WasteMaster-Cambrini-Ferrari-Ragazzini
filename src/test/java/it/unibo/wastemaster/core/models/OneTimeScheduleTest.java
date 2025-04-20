@@ -3,7 +3,9 @@ package it.unibo.wastemaster.core.models;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.util.Date;
+import it.unibo.wastemaster.core.utils.DateUtils;
+
+import java.time.LocalDate;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -11,13 +13,13 @@ class OneTimeScheduleTest {
 
 	private OneTimeSchedule schedule;
 	private Customer customer;
-	private Date pickupDate;
+	private LocalDate pickupDate;
 
 	@BeforeEach
 	public void setUp() {
 		Location location = new Location("Via Dante", "5", "Roma", "00100");
 		customer = new Customer("Luca", "Verdi", location, "luca@example.com", "3456789012");
-		pickupDate = new Date();
+		pickupDate = DateUtils.getCurrentDate();
 		schedule = new OneTimeSchedule(customer, Waste.WasteType.ORGANIC, Schedule.ScheduleStatus.ACTIVE, pickupDate);
 	}
 
@@ -25,7 +27,7 @@ class OneTimeScheduleTest {
 	public void testGetAndSetPickupDate() {
 		assertEquals(pickupDate, schedule.getPickupDate());
 
-		Date newDate = new Date(pickupDate.getTime() + 1000000);
+		LocalDate newDate = pickupDate.plusDays(1); 
 		schedule.setPickupDate(newDate);
 		assertEquals(newDate, schedule.getPickupDate());
 	}
