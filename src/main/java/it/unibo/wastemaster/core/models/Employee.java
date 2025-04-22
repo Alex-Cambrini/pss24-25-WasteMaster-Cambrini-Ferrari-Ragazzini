@@ -9,6 +9,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotNull;
 
 @Entity
 @Table(name = "employee")
@@ -17,6 +18,7 @@ public class Employee extends Person {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int employeeId;
 
+    @NotNull
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Role role;
@@ -50,8 +52,6 @@ public class Employee extends Person {
 
     public Employee(String name, String surname, Location address, String email, String phone, Role role, LicenceType licenceType) {
         super(name, surname, address, email, phone);
-        ValidateUtils.validateNotNull(role, "Role cannot be null");
-        ValidateUtils.validateNotNull(licenceType, "Licence type cannot be null");
         this.role = role;
         this.licenceType = licenceType;
     }
