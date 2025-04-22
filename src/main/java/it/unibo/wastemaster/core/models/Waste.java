@@ -1,6 +1,5 @@
 package it.unibo.wastemaster.core.models;
 
-import it.unibo.wastemaster.core.utils.ValidateUtils;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -8,6 +7,7 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.validation.constraints.NotNull;
 
 @Entity
 public class Waste {
@@ -17,12 +17,15 @@ public class Waste {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
+    @NotNull(message = "Waste type must not be null")
     private WasteType type;
 
     @Column(nullable = false)
+    @NotNull(message = "isRecyclable must not be null")
     private Boolean isRecyclable;
 
     @Column(nullable = false)
+    @NotNull(message = "isDangerous must not be null")
     private Boolean isDangerous;
 
     public enum WasteType {
@@ -38,10 +41,6 @@ public class Waste {
     }
 
     public Waste(WasteType type, Boolean isRecyclable, Boolean isDangerous) {
-        ValidateUtils.validateNotNull(type, "Waste type must not be null");
-		ValidateUtils.validateNotNull(isRecyclable, "isRecyclable must not be null");
-		ValidateUtils.validateNotNull(isDangerous, "isDangerous must not be null");
-        
         this.type = type;
         this.isRecyclable = isRecyclable;
         this.isDangerous = isDangerous;
