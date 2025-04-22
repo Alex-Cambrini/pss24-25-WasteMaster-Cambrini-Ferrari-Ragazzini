@@ -3,35 +3,36 @@ package it.unibo.wastemaster.core.models;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import it.unibo.wastemaster.core.AbstractDatabaseTest;
+import it.unibo.wastemaster.core.utils.ValidateUtils;
+import jakarta.validation.ConstraintViolation;
+
 import static org.junit.jupiter.api.Assertions.*;
 
-class WasteTest {
+import java.util.Set;
+
+class WasteTest extends AbstractDatabaseTest {
 
 	private Waste waste;
 
 	@BeforeEach
 	public void setUp() {
+		super.setUp();
 		waste = new Waste(Waste.WasteType.PLASTIC, true, false);
 	}
 
 	@Test
-	public void testGetAndSetType() {
+	public void testWasteGettersAndSetters() {
 		assertEquals(Waste.WasteType.PLASTIC, waste.getType());
-		waste.setType(Waste.WasteType.GLASS);
-		assertEquals(Waste.WasteType.GLASS, waste.getType());
-	}
-
-	@Test
-	public void testGetAndSetIsRecyclable() {
 		assertTrue(waste.getIsRecyclable());
-		waste.setIsRecyclable(false);
-		assertFalse(waste.getIsRecyclable());
-	}
-
-	@Test
-	public void testGetAndSetIsDangerous() {
 		assertFalse(waste.getIsDangerous());
+
+		waste.setType(Waste.WasteType.GLASS);
+		waste.setIsRecyclable(false);
 		waste.setIsDangerous(true);
+
+		assertEquals(Waste.WasteType.GLASS, waste.getType());
+		assertFalse(waste.getIsRecyclable());
 		assertTrue(waste.getIsDangerous());
 	}
 
@@ -43,21 +44,35 @@ class WasteTest {
 		assertTrue(str.contains("false"));
 	}
 
-	@Test
-	public void testConstructorRejectsNullArguments() {
-		IllegalArgumentException e1 = assertThrows(IllegalArgumentException.class, () ->
-			new Waste(null, true, false)
-		);
-		assertEquals("Waste type must not be null", e1.getMessage());
+	    @Test
+    void testPersistence() {
+        em.getTransaction().begin();
+        em.persist(waste);
+        em.getTransaction().commit();
 
-		IllegalArgumentException e2 = assertThrows(IllegalArgumentException.class, () ->
-			new Waste(Waste.WasteType.PAPER, null, false)
-		);
-		assertEquals("isRecyclable must not be null", e2.getMessage());
+        Waste found = em.find(Waste.class, waste.getWasteId());
+        assertNotNull(found);
+        assertEquals(waste.getType(), found.getType());
+        assertEquals(waste.getIsRecyclable(), found.getIsRecyclable());
+        assertEquals(waste.getIsDangerous(), found.getIsDangerous());
 
-		IllegalArgumentException e3 = assertThrows(IllegalArgumentException.class, () ->
-			new Waste(Waste.WasteType.PAPER, true, null)
-		);
-		assertEquals("isDangerous must not be null", e3.getMessage());
+        em.getTransaction().begin();
+        em.remove(waste);
+        em.getTransaction().commit();
+
+        Waste deleted = em.find(Waste.class, waste.getWasteId());
+        assertNull(deleted);
 	}
+
+	@Test
+    void testWasteValidation() {
+        Waste invalidWaste = new Waste(null, null, null);
+
+        Set<ConstraintViolation<Waste>> violations = ValidateUtils.VALIDATOR.validate(invalidWaste);
+        assertFalse(violations.isEmpty());
+
+        assertTrue(violations.stream().anyMatch(v -> v.getMessage().contains("Waste type must not be null")));
+        assertTrue(violations.stream().anyMatch(v -> v.getMessage().contains("isRecyclable must not be null")));
+        assertTrue(violations.stream().anyMatch(v -> v.getMessage().contains("isDangerous must not be null")));
+    }
 }
