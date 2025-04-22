@@ -49,8 +49,6 @@ public class Vehicle {
     public enum LicenceType {
         C1, // Fino a 3.5 t
         C, // Oltre 3.5 t
-        C1E, // Oltre 3.5 t + rimorchio
-        CE // Oltre 3.5 t + rimorchio pesante
     }
 
     public enum VehicleStatus {
