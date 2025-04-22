@@ -13,26 +13,35 @@ import jakarta.validation.constraints.NotNull;
 public class Vehicle {
     
     @Id
-    @Column(length = 10)
+    @Column(length = 10, nullable = false)
     @NotBlank(message = "Plate must not be blank")
     private String plate;
 
+    @Column(nullable = false)
     @Min(value = 1, message = "Capacity must be greater than 0")
+    @NotNull(message = "capacity is required")
     private int capacity;
 
+    @Column(nullable = false)
     @NotBlank(message = "Brand must not be blank")
+    @NotNull(message = "brand is required")
     private String brand;
 
+    @Column(nullable = false)
     @NotBlank(message = "Model must not be blank")
+    @NotNull(message = "model is required")
     private String model;
 
-    @Min(value = 1980, message = "Year must be >= 1980")
+    @Column(nullable = false)
+    @NotNull(message = "year is required")
     private int year;
 
+    @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     @NotNull(message = "Licence type is required")
     private LicenceType licenceType;
-
+    
+    @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     @NotNull(message = "Vehicle status is required")
     private VehicleStatus vehicleStatus;
