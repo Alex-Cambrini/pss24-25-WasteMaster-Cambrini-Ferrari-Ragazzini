@@ -3,6 +3,7 @@ package it.unibo.wastemaster.core.models;
 import java.time.LocalDate;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.NotNull;
 
 @Entity
@@ -10,9 +11,12 @@ import jakarta.validation.constraints.NotNull;
 public class RecurringSchedule extends Schedule {
 
     @Enumerated(EnumType.STRING)
+    @NotNull(message = "Frequency cannot be null")
     private Frequency frequency;
     
-    @NotNull 
+    @NotNull(message = "Start Date cannot be null")
+    @Column(nullable = false)
+    @FutureOrPresent(message = "Start Date must be today or in the future")
     private LocalDate startDate;
 
     private LocalDate nextCollectionDate;

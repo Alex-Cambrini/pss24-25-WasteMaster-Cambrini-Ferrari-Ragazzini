@@ -9,6 +9,9 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.Temporal;
+import jakarta.persistence.TemporalType;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import jakarta.persistence.Column;
 
@@ -24,25 +27,30 @@ public abstract class Schedule {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     protected int id;
 
+    @NotNull
     @ManyToOne
     @JoinColumn(name = "customer_id", nullable = false)
     @NotNull(message = "Customer cannot be null")
     private Customer customer;
 
+    @NotNull
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     @NotNull(message = "WasteType cannot be null")
     private Waste.WasteType wasteType;
 
+    @NotNull
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     @NotNull(message = "Status cannot be null")
     private ScheduleStatus status;
 
+    @NotNull
     @Column(nullable = false)
     @NotNull(message = "CreationDate cannot be null")
     private LocalDate creationDate;
 
+    @Valid
     @OneToMany(mappedBy = "schedule")
     private List<Collection> collections;
 
@@ -100,7 +108,7 @@ public abstract class Schedule {
         this.creationDate = creationDate;
     }
 
-    public List<Collection> getCollections() { 
+    public List<Collection> getCollections() {
         return collections;
     }
 
