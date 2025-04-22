@@ -2,7 +2,6 @@ package it.unibo.wastemaster.core.models;
 
 import java.time.LocalDate;
 
-import it.unibo.wastemaster.core.utils.ValidateUtils;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Inheritance;
@@ -24,7 +23,6 @@ public class OneTimeSchedule extends Schedule {
 
     public OneTimeSchedule(Customer customer, Waste.WasteType wasteType, ScheduleStatus status, LocalDate pickupDate) {
         super(customer, wasteType, status);
-        ValidateUtils.validateNotNull(pickupDate, "pickupDate must not be null");
         this.pickupDate = pickupDate;
     }
 
@@ -33,7 +31,6 @@ public class OneTimeSchedule extends Schedule {
     }
 
     public void setPickupDate(LocalDate pickupDate) {
-        ValidateUtils.validateNotNull(pickupDate, "pickupDate must not be null");
         this.pickupDate = pickupDate;
     }
 }
