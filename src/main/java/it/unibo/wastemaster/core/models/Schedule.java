@@ -16,11 +16,9 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.persistence.Column;
 
 import java.time.LocalDate;
-import java.util.Date;
 import java.util.List;
 
 import it.unibo.wastemaster.core.utils.DateUtils;
-import it.unibo.wastemaster.core.utils.ValidateUtils;
 
 @Entity
 public abstract class Schedule {
@@ -32,20 +30,24 @@ public abstract class Schedule {
     @NotNull
     @ManyToOne
     @JoinColumn(name = "customer_id", nullable = false)
+    @NotNull(message = "Customer cannot be null")
     private Customer customer;
 
     @NotNull
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
+    @NotNull(message = "WasteType cannot be null")
     private Waste.WasteType wasteType;
 
     @NotNull
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
+    @NotNull(message = "Status cannot be null")
     private ScheduleStatus status;
 
     @NotNull
     @Column(nullable = false)
+    @NotNull(message = "CreationDate cannot be null")
     private LocalDate creationDate;
 
     @Valid
@@ -79,7 +81,6 @@ public abstract class Schedule {
     }
 
     public void setCustomer(Customer customer) {
-        ValidateUtils.validateNotNull(customer, "Customer cannot be null");
         this.customer = customer;
     }
 
@@ -88,7 +89,6 @@ public abstract class Schedule {
     }
 
     public void setWasteType(Waste.WasteType wasteType) {
-        ValidateUtils.validateNotNull(wasteType, "WasteType cannot be null");
         this.wasteType = wasteType;
     }
 
@@ -97,7 +97,6 @@ public abstract class Schedule {
     }
 
     public void setStatus(ScheduleStatus status) {
-        ValidateUtils.validateNotNull(status, "Status cannot be null");
         this.status = status;
     }
 
@@ -106,7 +105,6 @@ public abstract class Schedule {
     }
 
     public void setCreationDate(LocalDate creationDate) {
-        ValidateUtils.validateNotNull(creationDate, "CreationDate cannot be null");
         this.creationDate = creationDate;
     }
 
