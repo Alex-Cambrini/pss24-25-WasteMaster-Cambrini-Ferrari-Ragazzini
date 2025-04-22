@@ -1,5 +1,6 @@
 package it.unibo.wastemaster.core.models;
 
+import it.unibo.wastemaster.core.AbstractDatabaseTest;
 import it.unibo.wastemaster.core.utils.ValidateUtils;
 import jakarta.validation.ConstraintViolation;
 import org.junit.jupiter.api.BeforeEach;
@@ -9,12 +10,13 @@ import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class LocationTest {
+public class LocationTest extends AbstractDatabaseTest {
 
     private Location location;
 
     @BeforeEach
     public void setUp() {
+        super.setUp();
         location = new Location("Via Roma", "10", "Milano", "20100");
     }
 
@@ -60,4 +62,24 @@ public class LocationTest {
         assertTrue(violations.isEmpty(), "Expected no validation errors for a valid Location");
     }
 
+    @Test
+    public void testPersistence() {
+        em.getTransaction().begin();
+        em.persist(location);
+        em.getTransaction().commit();
+
+        Location found = em.find(Location.class, location.getId());
+        assertNotNull(found);
+        assertEquals(location.getStreet(), found.getStreet());
+        assertEquals(location.getCivicNumber(), found.getCivicNumber());
+        assertEquals(location.getCity(), found.getCity());
+        assertEquals(location.getPostalCode(), found.getPostalCode());
+
+        em.getTransaction().begin();
+        em.remove(found);
+        em.getTransaction().commit();
+
+        Location deleted = em.find(Location.class, location.getId());
+        assertNull(deleted);
+    }
 }
