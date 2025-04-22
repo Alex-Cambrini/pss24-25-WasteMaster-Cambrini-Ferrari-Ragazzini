@@ -1,9 +1,16 @@
 package it.unibo.wastemaster.core.models;
 
-import jakarta.persistence.*;
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.Min;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.validation.constraints.NotNull;
+import java.time.DayOfWeek;
 
 @Entity
 public class WasteSchedule {
@@ -17,33 +24,28 @@ public class WasteSchedule {
     @NotNull(message = "Waste must not be null")
     private Waste waste;
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    @Min(value = 1, message = "dayOfWeek must be between 1 (Sunday) and 7 (Saturday)")
-	@Max(value = 7, message = "dayOfWeek must be between 1 (Sunday) and 7 (Saturday)")
-    private int dayOfWeek;
+    @NotNull(message = "dayOfWeek must not be null")
+    private DayOfWeek dayOfWeek;
 
-    /*
-     * 1 = Domenica
-     * 
-     * 2 = Lunedì
-     * 
-     * 3 = Martedì
-     * 
-     * 4 = Mercoledì
-     * 
-     * 5 = Giovedì
-     * 
-     * 6 = Venerdì
-     * 
-     * 7 = Sabato
-     */
+    
+    // DayOfWeek enum (java.time.DayOfWeek) mapping:
+     
+    // monday    -> 1
+    // tuesday   -> 2
+    // wednesday -> 3
+    // thursday  -> 4
+    // friday    -> 5
+    // saturday  -> 6
+    // sunday    -> 7
+    
+
 
     public WasteSchedule() {
     }
 
-    public WasteSchedule(Waste waste, int dayOfWeek) {
-        validateDayOfWeek(dayOfWeek);
-
+    public WasteSchedule(Waste waste, DayOfWeek dayOfWeek) {
         this.waste = waste;
         this.dayOfWeek = dayOfWeek;
     }
@@ -60,26 +62,19 @@ public class WasteSchedule {
         this.waste = waste;
     }
 
-    public int getDayOfWeek() {
+    public DayOfWeek getDayOfWeek() {
         return dayOfWeek;
     }
 
-    public void setDayOfWeek(int dayOfWeek) {
-        validateDayOfWeek(dayOfWeek);
+    public void setDayOfWeek(DayOfWeek dayOfWeek) {
         this.dayOfWeek = dayOfWeek;
-    }
-
-    private void validateDayOfWeek(int dayOfWeek) {
-        if (dayOfWeek < 1 || dayOfWeek > 7) {
-            throw new IllegalArgumentException("dayOfWeek must be between 1 (Sunday) and 7 (Saturday)");
-        }
     }
 
     @Override
     public String toString() {
         return "WasteSchedule{" +
                 "scheduleId=" + scheduleId +
-                ", dayOfWeek=" + dayOfWeek +
+                ", dayOfWeek=" + (dayOfWeek != null ? dayOfWeek.name() : "N/A") +
                 ", waste=" + (waste != null ? waste.toString() : "N/A") +
                 '}';
     }
