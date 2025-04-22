@@ -51,4 +51,13 @@ public class LocationTest {
         assertTrue(violations.stream().anyMatch(v -> v.getPropertyPath().toString().equals("city")));
         assertTrue(violations.stream().anyMatch(v -> v.getPropertyPath().toString().equals("postalCode")));
     }
+
+    @Test
+    public void testValidLocation() {
+        Location valid = new Location("Via Garibaldi", "15", "Torino", "10100");
+
+        Set<ConstraintViolation<Location>> violations = ValidateUtils.VALIDATOR.validate(valid);
+        assertTrue(violations.isEmpty(), "Expected no validation errors for a valid Location");
+    }
+
 }
