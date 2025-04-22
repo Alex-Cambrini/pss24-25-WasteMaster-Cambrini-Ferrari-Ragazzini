@@ -43,8 +43,8 @@ public class Collection {
     private int cancelLimitDays;
     
     @ManyToOne
-    @JoinColumn(name = "schedule_id")
-    @Column(nullable = false)
+    @JoinColumn(name = "schedule_id", nullable = false)
+    @NotNull(message = "Schedule cannot be null")
     private Schedule schedule;
     
     @Enumerated(EnumType.STRING)
