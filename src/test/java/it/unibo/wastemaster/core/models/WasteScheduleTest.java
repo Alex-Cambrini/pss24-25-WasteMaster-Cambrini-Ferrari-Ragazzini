@@ -54,6 +54,26 @@ class WasteScheduleTest extends AbstractDatabaseTest {
 	}
 
 	@Test
+	public void testPersistence() {
+		em.getTransaction().begin();
+		em.persist(waste);
+		em.persist(schedule);
+		em.getTransaction().commit();
+
+		WasteSchedule found = em.find(WasteSchedule.class, schedule.getScheduleId());
+		assertNotNull(found);
+		assertEquals(waste.getType(), found.getWaste().getType());
+		assertEquals(schedule.getDayOfWeek(), found.getDayOfWeek());
+
+		em.getTransaction().begin();
+		em.remove(found);
+		em.getTransaction().commit();
+
+		WasteSchedule deleted = em.find(WasteSchedule.class, schedule.getScheduleId());
+		assertNull(deleted);
+	}
+
+	@Test
 	public void testToString() {
 		String str = schedule.toString();
 		assertTrue(str.contains("dayOfWeek=5"));
