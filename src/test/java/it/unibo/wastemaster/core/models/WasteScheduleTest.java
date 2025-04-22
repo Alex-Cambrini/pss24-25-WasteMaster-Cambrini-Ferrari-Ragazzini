@@ -3,17 +3,22 @@ package it.unibo.wastemaster.core.models;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import it.unibo.wastemaster.core.AbstractDatabaseTest;
+
 import static org.junit.jupiter.api.Assertions.*;
 
-class WasteScheduleTest {
+import java.time.DayOfWeek;
+
+class WasteScheduleTest extends AbstractDatabaseTest {
 
 	private Waste waste;
 	private WasteSchedule schedule;
 
 	@BeforeEach
 	public void setUp() {
+		super.setUp();
 		waste = new Waste(Waste.WasteType.PLASTIC, true, false);
-		schedule = new WasteSchedule(waste, 5);
+		schedule = new WasteSchedule(waste, DayOfWeek.FRIDAY);
 	}
 
 	@Test
