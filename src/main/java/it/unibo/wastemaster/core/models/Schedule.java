@@ -25,25 +25,21 @@ public abstract class Schedule {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     protected int id;
 
-    @NotNull
     @ManyToOne
     @JoinColumn(name = "customer_id", nullable = false)
     @NotNull(message = "Customer cannot be null")
     private Customer customer;
 
-    @NotNull
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     @NotNull(message = "WasteType cannot be null")
     private Waste.WasteType wasteType;
 
-    @NotNull
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     @NotNull(message = "Status cannot be null")
     private ScheduleStatus status;
 
-    @NotNull
     @Column(nullable = false)
     @NotNull(message = "CreationDate cannot be null")
     private LocalDate creationDate;
