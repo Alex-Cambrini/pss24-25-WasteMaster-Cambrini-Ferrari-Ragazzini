@@ -1,5 +1,6 @@
 package it.unibo.wastemaster.core.services;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -42,7 +43,7 @@ public class RecurringScheduleManager {
         Waste.WasteType wasteType = schedule.getWasteType();
         RecurringSchedule.Frequency frequency = schedule.getFrequency();
         WasteSchedule scheduleData = wasteScheduleManager.getWasteScheduleForWaste(wasteType);
-        int scheduledDay = scheduleData.getDayOfWeek();
+        DayOfWeek scheduledDay = scheduleData.getDayOfWeek();
         
         LocalDate today = DateUtils.getCurrentDate();
         LocalDate existingNext = schedule.getNextCollectionDate();
@@ -72,8 +73,8 @@ public class RecurringScheduleManager {
         return nextDate;
     }
 
-    private LocalDate alignToScheduledDay(LocalDate date, int scheduledDay) {
-        while (date.getDayOfWeek().getValue() != scheduledDay) {
+    private LocalDate alignToScheduledDay(LocalDate date, DayOfWeek scheduledDay) {
+        while (date.getDayOfWeek() != scheduledDay) {
             date = date.plusDays(1);
         }
         return date;
