@@ -12,6 +12,7 @@ public class RecurringSchedule extends Schedule {
 
     @Enumerated(EnumType.STRING)
     @NotNull(message = "Frequency cannot be null")
+    @Column(nullable = false)
     private Frequency frequency;
     
     @NotNull(message = "Start Date cannot be null")
