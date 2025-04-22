@@ -1,6 +1,5 @@
 package it.unibo.wastemaster.core.models;
 
-import it.unibo.wastemaster.core.utils.ValidateUtils;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -14,17 +13,19 @@ import jakarta.validation.constraints.NotNull;
 @Entity
 @Table(name = "employee")
 public class Employee extends Person {
+    
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int employeeId;
 
-    @NotNull
+    @NotNull (message = "Role cannot be null")
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Role role;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
+    @NotNull(message = "Licence type cannot be null")
 	private LicenceType licenceType;
 
     public enum LicenceType {
