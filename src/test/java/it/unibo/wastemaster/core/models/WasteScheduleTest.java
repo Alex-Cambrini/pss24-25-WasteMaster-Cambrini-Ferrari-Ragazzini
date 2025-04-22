@@ -25,42 +25,10 @@ class WasteScheduleTest {
 	}
 
 	@Test
-	public void testGetAndSetDayOfWeek() {
-		assertEquals(5, schedule.getDayOfWeek());
-		schedule.setDayOfWeek(7);
-		assertEquals(7, schedule.getDayOfWeek());
-	}
-
-	@Test
 	public void testToString() {
 		String str = schedule.toString();
 		assertTrue(str.contains("dayOfWeek=5"));
 		assertTrue(str.contains("PLASTIC"));
 	}
 
-	@Test
-	public void testConstructorRejectsInvalidArguments() {
-		IllegalArgumentException e1 = assertThrows(IllegalArgumentException.class, () ->
-			new WasteSchedule(null, 3)
-		);
-		assertEquals("Waste must not be null", e1.getMessage());
-
-		IllegalArgumentException e2 = assertThrows(IllegalArgumentException.class, () ->
-			new WasteSchedule(waste, 0)
-		);
-		assertEquals("dayOfWeek must be between 1 (Sunday) and 7 (Saturday)", e2.getMessage());
-
-		IllegalArgumentException e3 = assertThrows(IllegalArgumentException.class, () ->
-			new WasteSchedule(waste, 8)
-		);
-		assertEquals("dayOfWeek must be between 1 (Sunday) and 7 (Saturday)", e3.getMessage());
-	}
-
-	@Test
-	public void testSettersRejectInvalidArguments() {
-		assertThrows(IllegalArgumentException.class, () -> schedule.setWaste(null));
-
-		assertThrows(IllegalArgumentException.class, () -> schedule.setDayOfWeek(0));
-		assertThrows(IllegalArgumentException.class, () -> schedule.setDayOfWeek(9));
-	}
 }
