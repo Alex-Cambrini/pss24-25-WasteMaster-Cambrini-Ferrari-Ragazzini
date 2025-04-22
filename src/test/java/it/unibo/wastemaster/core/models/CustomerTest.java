@@ -4,8 +4,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import it.unibo.wastemaster.core.AbstractDatabaseTest;
-import it.unibo.wastemaster.core.models.Schedule.ScheduleStatus;
-import it.unibo.wastemaster.core.utils.DateUtils;
 
 import static org.junit.jupiter.api.Assertions.*;
 
