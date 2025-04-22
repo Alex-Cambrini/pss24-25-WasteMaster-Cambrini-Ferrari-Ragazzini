@@ -18,15 +18,11 @@ public class Customer extends Person {
         super(name, surname, address, email, phone); 
     }
 
-    public Customer() {}
+    public Customer() {}    
 
     public Integer getCustomerId() {
         return customerId;
     }
-
-    public void setCustomerId(int customerId) {
-        this.customerId = customerId;
-    }    
 
     @Override
     public String getInfo() {
