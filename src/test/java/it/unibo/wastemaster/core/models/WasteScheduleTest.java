@@ -22,11 +22,16 @@ class WasteScheduleTest extends AbstractDatabaseTest {
 	}
 
 	@Test
-	public void testGetAndSetWaste() {
+	public void testGetterAndSetter() {
 		assertEquals(waste, schedule.getWaste());
+		assertEquals(DayOfWeek.FRIDAY, schedule.getDayOfWeek());
+
 		Waste newWaste = new Waste(Waste.WasteType.GLASS, false, false);
 		schedule.setWaste(newWaste);
 		assertEquals(newWaste, schedule.getWaste());
+
+		schedule.setDayOfWeek(DayOfWeek.SUNDAY);
+		assertEquals(DayOfWeek.SUNDAY, schedule.getDayOfWeek());
 	}
 
 	@Test
