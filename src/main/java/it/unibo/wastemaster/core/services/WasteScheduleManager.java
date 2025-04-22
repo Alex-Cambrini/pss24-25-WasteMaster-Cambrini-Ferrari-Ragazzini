@@ -1,5 +1,7 @@
 package it.unibo.wastemaster.core.services;
 
+import java.time.DayOfWeek;
+
 import it.unibo.wastemaster.core.dao.WasteScheduleDAO;
 import it.unibo.wastemaster.core.models.Waste;
 import it.unibo.wastemaster.core.models.WasteSchedule;
@@ -11,13 +13,13 @@ public class WasteScheduleManager {
         this.wasteScheduleDAO = wasteScheduleDAO;
     }
 
-    public WasteSchedule setupCollectionRoutine(Waste waste, int dayOfWeek) {
+    public WasteSchedule setupCollectionRoutine(Waste waste, DayOfWeek dayOfWeek) {
         WasteSchedule wasteSchedule = new WasteSchedule(waste, dayOfWeek);
         wasteScheduleDAO.insert(wasteSchedule);
         return wasteSchedule;
     }
 
-    public WasteSchedule changeCollectionDay(WasteSchedule wasteSchedule, int newDayOfWeek) {
+    public WasteSchedule changeCollectionDay(WasteSchedule wasteSchedule, DayOfWeek newDayOfWeek) {
         wasteSchedule.setDayOfWeek(newDayOfWeek);
         wasteScheduleDAO.update(wasteSchedule);
         return wasteSchedule;
