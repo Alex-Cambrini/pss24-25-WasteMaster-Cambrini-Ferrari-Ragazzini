@@ -7,11 +7,15 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Inheritance;
 import jakarta.persistence.InheritanceType;
+import jakarta.validation.constraints.FutureOrPresent;
+import jakarta.validation.constraints.NotNull;
 
 @Entity
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 public class OneTimeSchedule extends Schedule {
 
+    @NotNull
+    @FutureOrPresent
     @Column(nullable = false)
     private LocalDate pickupDate;    
     
