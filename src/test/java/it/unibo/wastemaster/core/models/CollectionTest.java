@@ -15,10 +15,8 @@ import org.junit.jupiter.api.Test;
 import it.unibo.wastemaster.core.AbstractDatabaseTest;
 import it.unibo.wastemaster.core.models.Schedule.ScheduleStatus;
 import it.unibo.wastemaster.core.utils.DateUtils;
+import it.unibo.wastemaster.core.utils.ValidateUtils;
 import jakarta.validation.ConstraintViolation;
-import jakarta.validation.Validation;
-import jakarta.validation.Validator;
-import jakarta.validation.ValidatorFactory;
 
 class CollectionTest extends AbstractDatabaseTest {
 
@@ -111,8 +109,6 @@ class CollectionTest extends AbstractDatabaseTest {
 
     @Test
     void testCollectionValidation() {
-        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
-        Validator validator = factory.getValidator();
 
         Collection invalid = new Collection();
         invalid.setDate(date.minusDays(1));
@@ -120,7 +116,7 @@ class CollectionTest extends AbstractDatabaseTest {
         invalid.setCancelLimitDays(-1);
         invalid.setSchedule(null);
 
-        Set<ConstraintViolation<Collection>> violations = validator.validate(invalid);
+        Set<ConstraintViolation<Collection>> violations = ValidateUtils.VALIDATOR.validate(invalid);
         assertFalse(violations.isEmpty());
         assertTrue(
                 violations.stream().anyMatch(v -> v.getMessage().contains("The date must be today or in the future")));
