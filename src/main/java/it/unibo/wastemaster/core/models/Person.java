@@ -9,36 +9,40 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
+import jakarta.persistence.JoinColumn;
 
 @MappedSuperclass
 public abstract class Person {
-    @NotNull
-    @NotBlank
+    @NotNull (message = "name cannot be null")
+    @NotBlank (message = "name must not be blank")
     @Column(nullable = false)
     protected String name;
 
-    @NotNull
-    @NotBlank
+    @NotNull (message = "surname cannot be null")
+    @NotBlank (message = "surname must not be blank")
     @Column(nullable = false)
     protected String surname;
 
     @Valid
     @ManyToOne(cascade = CascadeType.PERSIST)
+    @NotNull (message = "address cannot be null")
+    @JoinColumn(nullable = false)
     private Location address;
 
-    @NotNull
-    @NotBlank
-    @Email
+    @NotNull (message = "email cannot be null")
+    @NotBlank (message = "email must not be blank")
+    @Pattern(regexp = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$", message = "Email format is invalid")
+    @Email 
     @Column(nullable = false)
     protected String email;
 
-    @NotNull
-    @NotBlank
+    @NotNull (message = "phone cannot be null")
+    @NotBlank (message = "phone must not be blank")
     @Pattern(regexp = "^[+]?[0-9]{10,15}$")
     @Column(nullable = false)
     protected String phone;
 
-    @NotNull
+    @NotNull (message = "isDeleted cannot be null")
     @Column(nullable = false)
     protected boolean isDeleted = false;
 
