@@ -4,10 +4,13 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import it.unibo.wastemaster.core.AbstractDatabaseTest;
+import it.unibo.wastemaster.core.utils.ValidateUtils;
+import jakarta.validation.ConstraintViolation;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.time.DayOfWeek;
+import java.util.Set;
 
 class WasteScheduleTest extends AbstractDatabaseTest {
 
@@ -32,6 +35,22 @@ class WasteScheduleTest extends AbstractDatabaseTest {
 
 		schedule.setDayOfWeek(DayOfWeek.SUNDAY);
 		assertEquals(DayOfWeek.SUNDAY, schedule.getDayOfWeek());
+	}
+
+	@Test
+	public void testInvalidWasteSchedule() {
+		WasteSchedule invalid = new WasteSchedule();
+		Set<ConstraintViolation<WasteSchedule>> violations = ValidateUtils.VALIDATOR.validate(invalid);
+
+		assertFalse(violations.isEmpty());
+		assertTrue(violations.stream().anyMatch(v -> v.getPropertyPath().toString().equals("waste")));
+		assertTrue(violations.stream().anyMatch(v -> v.getPropertyPath().toString().equals("dayOfWeek")));
+	}
+
+	@Test
+	public void testValidWasteSchedule() {
+		Set<ConstraintViolation<WasteSchedule>> violations = ValidateUtils.VALIDATOR.validate(schedule);
+		assertTrue(violations.isEmpty(), "Expected no validation errors for a valid WasteSchedule");
 	}
 
 	@Test
