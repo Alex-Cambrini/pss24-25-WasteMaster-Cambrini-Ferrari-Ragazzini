@@ -7,6 +7,8 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 @Entity
 @Table(name = "location")
@@ -15,27 +17,31 @@ public class Location {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
-
+    
+    @NotNull
+    @NotBlank
     @Column(nullable = false)
     private String street;
-
+    
+    @NotNull
+    @NotBlank
     @Column(nullable = false)
     private String civicNumber;
-
+    
+    @NotNull
+    @NotBlank
     @Column(nullable = false)
     private String city;
-
+    
+    @NotNull
+    @NotBlank
     @Column(nullable = false)
-    private String postalCode;
+    private String postalCode;  
 
     //Default constructor for JPA
     public Location() {};
 
     public Location(String street, String civicNumber, String city, String postalCode) {
-        ValidateUtils.validateString(street, "Street cannot be null or empty");
-        ValidateUtils.validateString(civicNumber, "CivicNumber cannot be null or empty");
-        ValidateUtils.validateString(city, "City cannot be null or empty");
-        ValidateUtils.validateString(postalCode, "PostalCode cannot be null or empty");
         this.street = street;
         this.civicNumber = civicNumber;
         this.city = city;
