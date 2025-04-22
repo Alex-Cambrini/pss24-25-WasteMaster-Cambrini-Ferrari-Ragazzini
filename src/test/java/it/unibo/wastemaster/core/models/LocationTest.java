@@ -1,7 +1,12 @@
 package it.unibo.wastemaster.core.models;
 
+import it.unibo.wastemaster.core.utils.ValidateUtils;
+import jakarta.validation.ConstraintViolation;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import java.util.Set;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 public class LocationTest {
@@ -35,37 +40,15 @@ public class LocationTest {
     }
 
     @Test
-    public void testLocationValidation() {
-        assertThrows(IllegalArgumentException.class, () -> {
-            new Location(null, "10", "Milano", "20100");
-        });
+    public void testInvalidLocation() {
+        Location invalid = new Location("", "", "", "");
 
-        assertThrows(IllegalArgumentException.class, () -> {
-            new Location("", "10", "Milano", "20100");
-        });
+        Set<ConstraintViolation<Location>> violations = ValidateUtils.VALIDATOR.validate(invalid);
+        assertFalse(violations.isEmpty());
 
-        assertThrows(IllegalArgumentException.class, () -> {
-            new Location("Via Roma", null, "Milano", "20100");
-        });
-
-        assertThrows(IllegalArgumentException.class, () -> {
-            new Location("Via Roma", "", "Milano", "20100");
-        });
-
-        assertThrows(IllegalArgumentException.class, () -> {
-            new Location("Via Roma", "10", null, "20100");
-        });
-
-        assertThrows(IllegalArgumentException.class, () -> {
-            new Location("Via Roma", "10", "", "20100");
-        });
-
-        assertThrows(IllegalArgumentException.class, () -> {
-            new Location("Via Roma", "10", "Milano", null);
-        });
-
-        assertThrows(IllegalArgumentException.class, () -> {
-            new Location("Via Roma", "10", "Milano", "");
-        });
-}
+        assertTrue(violations.stream().anyMatch(v -> v.getPropertyPath().toString().equals("street")));
+        assertTrue(violations.stream().anyMatch(v -> v.getPropertyPath().toString().equals("civicNumber")));
+        assertTrue(violations.stream().anyMatch(v -> v.getPropertyPath().toString().equals("city")));
+        assertTrue(violations.stream().anyMatch(v -> v.getPropertyPath().toString().equals("postalCode")));
+    }
 }
