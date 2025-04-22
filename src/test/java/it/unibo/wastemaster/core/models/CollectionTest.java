@@ -3,9 +3,11 @@ package it.unibo.wastemaster.core.models;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.LocalDate;
+import java.util.Set;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -13,6 +15,7 @@ import org.junit.jupiter.api.Test;
 import it.unibo.wastemaster.core.AbstractDatabaseTest;
 import it.unibo.wastemaster.core.models.Schedule.ScheduleStatus;
 import it.unibo.wastemaster.core.utils.DateUtils;
+import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import jakarta.validation.ValidatorFactory;
@@ -29,11 +32,10 @@ class CollectionTest extends AbstractDatabaseTest {
     private Collection collection;
 
     @BeforeEach
-
     public void setUp() {
         super.setUp();
         location = new Location("Via Roma", "10", "Bologna", "40100");
-        customer = new Customer("Mario", "Rossi", location, "mario.rossi@example.com", "1234567890");        
+        customer = new Customer("Mario", "Rossi", location, "mario.rossi@example.com", "1234567890");
 
         date = DateUtils.getCurrentDate();
         wasteType = Waste.WasteType.PLASTIC;
@@ -62,6 +64,16 @@ class CollectionTest extends AbstractDatabaseTest {
         assertEquals(status, collection.getCollectionStatus());
         assertEquals(scheduleCategory, collection.getScheduleCategory());
         assertEquals(Collection.CANCEL_LIMIT_DAYS, collection.getCancelLimitDays());
+        assertTrue(collection.isExtra());
+
+        collection.setExtra(false);
+        assertFalse(collection.isExtra());
+
+        collection.setCollectionStatus(Collection.CollectionStatus.IN_PROGRESS);
+        assertEquals(Collection.CollectionStatus.IN_PROGRESS, collection.getCollectionStatus());
+
+        collection.setCancelLimitDays(5);
+        assertEquals(5, collection.getCancelLimitDays());
     }
 
     @Test
@@ -78,7 +90,6 @@ class CollectionTest extends AbstractDatabaseTest {
 
     @Test
     void testPersistence() {
-
         em.getTransaction().begin();
         em.persist(location);
         em.persist(customer);
@@ -89,6 +100,13 @@ class CollectionTest extends AbstractDatabaseTest {
         Collection found = em.find(Collection.class, collection.getCollectionId());
         assertNotNull(found);
         assertEquals(customer.getName(), found.getCustomer().getName());
+
+        em.getTransaction().begin();
+        em.remove(collection);
+        em.getTransaction().commit();
+
+        Collection deleted = em.find(Collection.class, collection.getCollectionId());
+        assertNull(deleted);
     }
 
     @Test
@@ -96,25 +114,18 @@ class CollectionTest extends AbstractDatabaseTest {
         ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
         Validator validator = factory.getValidator();
 
-        Collection invalidCollection = new Collection();
+        Collection invalid = new Collection();
+        invalid.setDate(date.minusDays(1));
+        invalid.setCustomer(null);
+        invalid.setCancelLimitDays(-1);
+        invalid.setSchedule(null);
 
-        invalidCollection.setDate(date.minusDays(1));
-        invalidCollection.setCustomer(null);
-        invalidCollection.setCancelLimitDays(-1);
-
-        var violations = validator.validate(invalidCollection);
-
-        assertFalse(violations.isEmpty(), "The collection is not valid, there should be violations");
-
-        assertTrue(violations.stream().anyMatch(v -> v.getMessage().contains("The date must be today or in the future")),
-                "Error in date validation");
-        
-        assertTrue(violations.stream().anyMatch(v -> v.getMessage().contains("The customer cannot be null")),
-                "Error in customer validation");
-        
+        Set<ConstraintViolation<Collection>> violations = validator.validate(invalid);
+        assertFalse(violations.isEmpty());
         assertTrue(
-                violations.stream()
-                        .anyMatch(v -> v.getMessage().contains("Cancellation days must be >= 0")),
-                "Error in cancellation days validation");        
+                violations.stream().anyMatch(v -> v.getMessage().contains("The date must be today or in the future")));
+        assertTrue(violations.stream().anyMatch(v -> v.getMessage().contains("The customer cannot be null")));
+        assertTrue(violations.stream().anyMatch(v -> v.getMessage().contains("Cancellation days must be >= 0")));
+        assertTrue(violations.stream().anyMatch(v -> v.getMessage().contains("Schedule cannot be null")));
     }
 }
