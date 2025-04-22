@@ -17,34 +17,40 @@ public class Collection {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int collectionId;
-
+    
     @ManyToOne(cascade = CascadeType.PERSIST)
-    @JoinColumn(name = "customer_id")
+    @JoinColumn(name = "customer_id", nullable = false)
     @NotNull(message = "The customer cannot be null")
     private Customer customer;
     
     @FutureOrPresent(message = "The date must be today or in the future")
     @NotNull(message = "The date cannot be null")
+    @Column(nullable = false)
     private LocalDate date;
     
     @Enumerated(EnumType.STRING)
     @NotNull(message = "The waste type cannot be null")
+    @Column(nullable = false)
     private Waste.WasteType waste;
     
     @Enumerated(EnumType.STRING)
     @NotNull(message = "The collection status cannot be null")
+    @Column(nullable = false)
     private CollectionStatus collectionStatus;
     
     @Min(value = 0, message = "Cancellation days must be >= 0")
+    @Column(nullable = false)
     private int cancelLimitDays;
     
     @ManyToOne
     @JoinColumn(name = "schedule_id")
+    @Column(nullable = false)
     private Schedule schedule;
-
+    
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private ScheduleCategory scheduleCategory;
-
+    
     @Column(nullable = false)
     private boolean isExtra;
 
