@@ -14,8 +14,8 @@ import jakarta.validation.constraints.NotNull;
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 public class OneTimeSchedule extends Schedule {
 
-    @NotNull
-    @FutureOrPresent
+    @NotNull (message = "Pickup date must not be null")
+    @FutureOrPresent (message = "Pickup date must be today or in the future")
     @Column(nullable = false)
     private LocalDate pickupDate;    
     
