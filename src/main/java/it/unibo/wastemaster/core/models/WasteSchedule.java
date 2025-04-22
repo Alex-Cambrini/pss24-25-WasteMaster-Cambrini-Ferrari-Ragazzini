@@ -1,7 +1,9 @@
 package it.unibo.wastemaster.core.models;
 
-import it.unibo.wastemaster.core.utils.ValidateUtils;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
 
 @Entity
 public class WasteSchedule {
@@ -12,9 +14,12 @@ public class WasteSchedule {
 
     @ManyToOne
     @JoinColumn(name = "waste_id", nullable = false)
+    @NotNull(message = "Waste must not be null")
     private Waste waste;
 
     @Column(nullable = false)
+    @Min(value = 1, message = "dayOfWeek must be between 1 (Sunday) and 7 (Saturday)")
+	@Max(value = 7, message = "dayOfWeek must be between 1 (Sunday) and 7 (Saturday)")
     private int dayOfWeek;
 
     /*
@@ -37,7 +42,6 @@ public class WasteSchedule {
     }
 
     public WasteSchedule(Waste waste, int dayOfWeek) {
-        ValidateUtils.validateNotNull(waste, "Waste must not be null");
         validateDayOfWeek(dayOfWeek);
 
         this.waste = waste;
@@ -53,7 +57,6 @@ public class WasteSchedule {
     }
 
     public void setWaste(Waste waste) {
-        ValidateUtils.validateNotNull(waste, "Waste must not be null");
         this.waste = waste;
     }
 
