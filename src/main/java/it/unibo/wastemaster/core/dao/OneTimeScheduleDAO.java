@@ -10,10 +10,10 @@ public class OneTimeScheduleDAO extends GenericDAO<OneTimeSchedule> {
         super(entityManager, OneTimeSchedule.class);
     }
 
-    public Collection findCollectionByScheduleId(int scheduleId) {
-        return entityManager.createQuery(
-            "SELECT c FROM Collection c WHERE c.schedule.id = :scheduleId", Collection.class)
-            .setParameter("scheduleId", scheduleId)
-            .getSingleResult();
-    }
+    // public Collection findCollectionByScheduleId(int scheduleId) {
+    //     return entityManager.createQuery(
+    //         "SELECT c FROM Collection c WHERE c.schedule.id = :scheduleId", Collection.class)
+    //         .setParameter("scheduleId", scheduleId)
+    //         .getSingleResult();
+    // }
 }
