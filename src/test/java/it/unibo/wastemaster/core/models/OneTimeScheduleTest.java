@@ -25,7 +25,7 @@ public class OneTimeScheduleTest extends AbstractDatabaseTest {
 		Location location = new Location("Via Dante", "5", "Roma", "00100");
 		customer = new Customer("Luca", "Verdi", location, "luca@example.com", "3456789012");
 		pickupDate = DateUtils.getCurrentDate();
-		schedule = new OneTimeSchedule(customer, Waste.WasteType.ORGANIC, Schedule.ScheduleStatus.ACTIVE, pickupDate);
+		schedule = new OneTimeSchedule(customer, Waste.WasteType.ORGANIC, pickupDate);
 	}
 
 	@Test
@@ -65,7 +65,7 @@ public class OneTimeScheduleTest extends AbstractDatabaseTest {
 		em.persist(schedule);
 		em.getTransaction().commit();
 
-		OneTimeSchedule found = em.find(OneTimeSchedule.class, schedule.getId());
+		OneTimeSchedule found = em.find(OneTimeSchedule.class, schedule.getScheduleId());
 		assertNotNull(found);
 		assertEquals(pickupDate, found.getPickupDate());
 		assertEquals(customer.getEmail(), found.getCustomer().getEmail());
@@ -74,7 +74,7 @@ public class OneTimeScheduleTest extends AbstractDatabaseTest {
 		em.remove(found);
 		em.getTransaction().commit();
 
-		OneTimeSchedule deleted = em.find(OneTimeSchedule.class, schedule.getId());
+		OneTimeSchedule deleted = em.find(OneTimeSchedule.class, schedule.getScheduleId());
 		assertNull(deleted);
 	}
 }
