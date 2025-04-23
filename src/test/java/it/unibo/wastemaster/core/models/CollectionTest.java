@@ -13,7 +13,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import it.unibo.wastemaster.core.AbstractDatabaseTest;
-import it.unibo.wastemaster.core.models.Schedule.ScheduleStatus;
 import it.unibo.wastemaster.core.utils.DateUtils;
 import it.unibo.wastemaster.core.utils.ValidateUtils;
 import jakarta.validation.ConstraintViolation;
@@ -24,10 +23,8 @@ class CollectionTest extends AbstractDatabaseTest {
     private Customer customer;
     private LocalDate date;
     private Waste.WasteType wasteType;
-    private Collection.CollectionStatus status;
-    private Collection.ScheduleCategory scheduleCategory;
-    private OneTimeSchedule schedule;
     private Collection collection;
+    private Schedule schedule;
 
     @BeforeEach
     public void setUp() {
@@ -37,41 +34,24 @@ class CollectionTest extends AbstractDatabaseTest {
 
         date = DateUtils.getCurrentDate();
         wasteType = Waste.WasteType.PLASTIC;
-        status = Collection.CollectionStatus.COMPLETED;
-        scheduleCategory = Collection.ScheduleCategory.ONE_TIME;
 
-        schedule = new OneTimeSchedule(customer, wasteType, ScheduleStatus.SCHEDULED, date);
-        collection = new Collection(customer, date, wasteType, status, schedule, scheduleCategory);
+        schedule = new OneTimeSchedule(customer, wasteType, date);
+        collection = new Collection(schedule);
     }
 
     @Test
     void testCollectionGettersAndSetters() {
-        collection = new Collection();
-        collection.setCustomer(customer);
-        collection.setDate(date);
-        collection.setWaste(wasteType);
-        collection.setCollectionStatus(status);
-        collection.setSchedule(schedule);
-        collection.setScheduleCategory(scheduleCategory);
-        collection.setCancelLimitDays(Collection.CANCEL_LIMIT_DAYS);
-        collection.setExtra(true);
+        collection = new Collection(schedule);
+        collection.setCollectionDate(date);
+        collection.setCollectionStatus(Collection.CollectionStatus.COMPLETED);
+        collection.setCancelLimitDays(5);
 
         assertEquals(customer, collection.getCustomer());
-        assertEquals(date, collection.getDate());
+        assertEquals(date, collection.getCollectionDate());
         assertEquals(wasteType, collection.getWaste());
-        assertEquals(status, collection.getCollectionStatus());
-        assertEquals(scheduleCategory, collection.getScheduleCategory());
-        assertEquals(Collection.CANCEL_LIMIT_DAYS, collection.getCancelLimitDays());
-        assertTrue(collection.isExtra());
-
-        collection.setExtra(false);
-        assertFalse(collection.isExtra());
-
-        collection.setCollectionStatus(Collection.CollectionStatus.IN_PROGRESS);
-        assertEquals(Collection.CollectionStatus.IN_PROGRESS, collection.getCollectionStatus());
-
-        collection.setCancelLimitDays(5);
+        assertEquals(Collection.CollectionStatus.COMPLETED, collection.getCollectionStatus());
         assertEquals(5, collection.getCancelLimitDays());
+        assertEquals(schedule, collection.getSchedule());
     }
 
     @Test
@@ -79,10 +59,10 @@ class CollectionTest extends AbstractDatabaseTest {
         String toStringOutput = collection.toString();
         assertNotNull(toStringOutput);
         assertTrue(toStringOutput.contains("Collection"));
-        assertTrue(toStringOutput.contains(customer.getName()));
-        assertTrue(toStringOutput.contains(wasteType.name()));
-        assertTrue(toStringOutput.contains(status.name()));
-        assertTrue(toStringOutput.contains(scheduleCategory.name()));
+        assertTrue(toStringOutput.contains(collection.getCustomer().getName()));
+        assertTrue(toStringOutput.contains(collection.getWaste().name()));
+        assertTrue(toStringOutput.contains(collection.getCollectionStatus().name()));
+        assertTrue(toStringOutput.contains(collection.getSchedule().getScheduleCategory().name()));
         assertTrue(toStringOutput.contains(String.valueOf(Collection.CANCEL_LIMIT_DAYS)));
     }
 
@@ -99,29 +79,31 @@ class CollectionTest extends AbstractDatabaseTest {
         assertNotNull(found);
         assertEquals(customer.getName(), found.getCustomer().getName());
 
+        int foundId = found.getCollectionId();
+
         em.getTransaction().begin();
         em.remove(collection);
         em.getTransaction().commit();
 
-        Collection deleted = em.find(Collection.class, collection.getCollectionId());
+        Collection deleted = em.find(Collection.class, foundId);
         assertNull(deleted);
     }
 
     @Test
     void testCollectionValidation() {
-
-        Collection invalid = new Collection();
-        invalid.setDate(date.minusDays(1));
-        invalid.setCustomer(null);
+        schedule = new OneTimeSchedule(null, null, null);
+        Collection invalid = new Collection(null);
+        invalid.setCollectionDate(date.minusDays(1));
         invalid.setCancelLimitDays(-1);
-        invalid.setSchedule(null);
+        invalid.setCollectionStatus(null);
 
         Set<ConstraintViolation<Collection>> violations = ValidateUtils.VALIDATOR.validate(invalid);
         assertFalse(violations.isEmpty());
-        assertTrue(
-                violations.stream().anyMatch(v -> v.getMessage().contains("The date must be today or in the future")));
+        assertTrue(violations.stream().anyMatch(v -> v.getMessage().contains("The date must be today or in the future")));
         assertTrue(violations.stream().anyMatch(v -> v.getMessage().contains("The customer cannot be null")));
         assertTrue(violations.stream().anyMatch(v -> v.getMessage().contains("Cancellation days must be >= 0")));
         assertTrue(violations.stream().anyMatch(v -> v.getMessage().contains("Schedule cannot be null")));
+        assertTrue(violations.stream().anyMatch(v -> v.getMessage().contains("The waste type cannot be null")));
+        assertTrue(violations.stream().anyMatch(v -> v.getMessage().contains("The collection status cannot be null")));
     }
 }
