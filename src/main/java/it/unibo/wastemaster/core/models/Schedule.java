@@ -19,6 +19,10 @@ import java.util.List;
 import it.unibo.wastemaster.core.utils.DateUtils;
 
 @Entity
+
+@jakarta.persistence.Inheritance(strategy = jakarta.persistence.InheritanceType.SINGLE_TABLE)
+@jakarta.persistence.DiscriminatorColumn(name = "schedule_type", discriminatorType = jakarta.persistence.DiscriminatorType.STRING)
+
 public abstract class Schedule {
 
     @Id
@@ -47,6 +51,15 @@ public abstract class Schedule {
     @Valid
     @OneToMany(mappedBy = "schedule")
     private List<Collection> collections;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private ScheduleCategory scheduleCategory;
+
+    public enum ScheduleCategory {
+        ONE_TIME,
+        RECURRING
+    }
 
     public enum ScheduleStatus {
         SCHEDULED,
@@ -108,6 +121,14 @@ public abstract class Schedule {
 
     public void setCollections(List<Collection> collections) {
         this.collections = collections;
+    }
+
+    public ScheduleCategory getScheduleCategory() {
+        return scheduleCategory;
+    }
+
+    public void setScheduleCategory(ScheduleCategory scheduleCategory) {
+        this.scheduleCategory = scheduleCategory;
     }
 
     @Override
