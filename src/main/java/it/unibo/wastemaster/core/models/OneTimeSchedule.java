@@ -2,14 +2,13 @@ package it.unibo.wastemaster.core.models;
 
 import java.time.LocalDate;
 
+import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
-import jakarta.persistence.Inheritance;
-import jakarta.persistence.InheritanceType;
 import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.NotNull;
 
 @Entity
-@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@DiscriminatorValue("ONE_TIME")
 public class OneTimeSchedule extends Schedule {
 
     @NotNull (message = "Pickup date must not be null")
@@ -19,8 +18,9 @@ public class OneTimeSchedule extends Schedule {
     // No-args constructor required by JPA
     public OneTimeSchedule() {}
 
-    public OneTimeSchedule(Customer customer, Waste.WasteType wasteType, ScheduleStatus status, LocalDate pickupDate) {
+    public OneTimeSchedule(ScheduleCategory scheduleCategory,Customer customer, Waste.WasteType wasteType, ScheduleStatus status, LocalDate pickupDate) {
         super(customer, wasteType, status);
+        this.setScheduleCategory(ScheduleCategory.ONE_TIME);
         this.pickupDate = pickupDate;
     }
 

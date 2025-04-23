@@ -7,7 +7,7 @@ import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.NotNull;
 
 @Entity
-@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@DiscriminatorValue("RECURRING")
 public class RecurringSchedule extends Schedule {
 
     @Enumerated(EnumType.STRING)
@@ -32,9 +32,11 @@ public class RecurringSchedule extends Schedule {
     public RecurringSchedule(Customer customer, Waste.WasteType wasteType, ScheduleStatus status, LocalDate startDate,
             Frequency frequency) {
         super(customer, wasteType, status);
-        this.frequency = frequency;
         this.startDate = startDate;
+        this.frequency = frequency;
+        this.setScheduleCategory(ScheduleCategory.RECURRING);
         this.nextCollectionDate = null;
+
     }
 
     public LocalDate getStartDate() {
