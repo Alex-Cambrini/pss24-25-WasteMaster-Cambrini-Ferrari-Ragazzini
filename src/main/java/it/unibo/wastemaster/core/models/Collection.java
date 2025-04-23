@@ -49,16 +49,8 @@ public class Collection {
     
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private ScheduleCategory scheduleCategory;
+    private Schedule.ScheduleCategory scheduleCategory;
     
-    @Column(nullable = false)
-    private boolean isExtra;
-
-    public enum ScheduleCategory {
-        ONE_TIME,
-        RECURRING
-    }
-
     public enum CollectionStatus {
         PENDING,
         IN_PROGRESS,
@@ -69,31 +61,20 @@ public class Collection {
     public Collection() {
     }
 
-    public Collection(Customer customer, LocalDate date, CollectionStatus collectionStatus,
-            Schedule schedule, ScheduleCategory scheduleCategory) {
-        this.customer = customer;
+    public Collection(LocalDate date, CollectionStatus collectionStatus,
+            Schedule schedule) {  
         this.date = date;
-        this.waste = schedule.getWasteType();
         this.collectionStatus = collectionStatus;
-        this.cancelLimitDays = CANCEL_LIMIT_DAYS;
         this.schedule = schedule;
-        this.scheduleCategory = scheduleCategory;
-    }
+
+        this.cancelLimitDays = CANCEL_LIMIT_DAYS;
+        this.waste = schedule.getWasteType();
+        this.customer = schedule.getCustomer();
+        this.scheduleCategory = schedule.getScheduleCategory();
+        }
 
     public int getCollectionId() {
         return collectionId;
-    }
-
-    public void setCollectionId(int collectionId) {
-        this.collectionId = collectionId;
-    }
-
-    public Customer getCustomer() {
-        return customer;
-    }
-
-    public void setCustomer(Customer customer) {
-        this.customer = customer;
     }
 
     public LocalDate getDate() {
@@ -102,14 +83,6 @@ public class Collection {
 
     public void setDate(LocalDate date) {
         this.date = date;
-    }
-
-    public Waste.WasteType getWaste() {
-        return waste;
-    }
-
-    public void setWaste(Waste.WasteType waste) {
-        this.waste = waste;
     }
 
     public CollectionStatus getCollectionStatus() {
@@ -136,20 +109,8 @@ public class Collection {
         this.schedule = schedule;
     }
 
-    public ScheduleCategory getScheduleCategory() {
+    public Schedule.ScheduleCategory getScheduleCategory() {
         return scheduleCategory;
-    }
-
-    public void setScheduleCategory(ScheduleCategory scheduleCategory) {
-        this.scheduleCategory = scheduleCategory;
-    }
-
-    public boolean isExtra() {
-        return isExtra;
-    }
-
-    public void setExtra(boolean isExtra) {
-        this.isExtra = isExtra;
     }
 
     @Override
