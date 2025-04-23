@@ -7,7 +7,6 @@ import jakarta.validation.constraints.Min;
 
 import java.time.LocalDate;
 
-
 @Entity
 @Table(name = "collections")
 public class Collection {
@@ -17,40 +16,36 @@ public class Collection {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int collectionId;
-    
+
     @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "customer_id", nullable = false)
     @NotNull(message = "The customer cannot be null")
     private Customer customer;
-    
+
     @FutureOrPresent(message = "The date must be today or in the future")
     @NotNull(message = "The date cannot be null")
     @Column(nullable = false)
     private LocalDate date;
-    
+
     @Enumerated(EnumType.STRING)
     @NotNull(message = "The waste type cannot be null")
     @Column(nullable = false)
     private Waste.WasteType waste;
-    
+
     @Enumerated(EnumType.STRING)
     @NotNull(message = "The collection status cannot be null")
     @Column(nullable = false)
     private CollectionStatus collectionStatus;
-    
+
     @Min(value = 0, message = "Cancellation days must be >= 0")
     @Column(nullable = false)
     private int cancelLimitDays;
-    
+
     @ManyToOne
     @JoinColumn(name = "schedule_id", nullable = false)
     @NotNull(message = "Schedule cannot be null")
     private Schedule schedule;
-    
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private Schedule.ScheduleCategory scheduleCategory;
-    
+
     public enum CollectionStatus {
         PENDING,
         IN_PROGRESS,
@@ -61,56 +56,55 @@ public class Collection {
     public Collection() {
     }
 
-    public Collection(LocalDate date, CollectionStatus collectionStatus,
-            Schedule schedule) {  
-        this.date = date;
-        this.collectionStatus = collectionStatus;
-        this.schedule = schedule;
-
-        this.cancelLimitDays = CANCEL_LIMIT_DAYS;
-        this.waste = schedule.getWasteType();
-        this.customer = schedule.getCustomer();
-        this.scheduleCategory = schedule.getScheduleCategory();
-        }
+    public Collection(Schedule schedule) {
+    this.schedule = schedule;
+    if (schedule != null) {
+        this.date       = schedule.getCollectionDate();
+        this.waste      = schedule.getWasteType();
+        this.customer   = schedule.getCustomer();
+    }
+    this.collectionStatus = CollectionStatus.PENDING;
+    this.cancelLimitDays  = CANCEL_LIMIT_DAYS;
+    }
 
     public int getCollectionId() {
         return collectionId;
     }
 
-    public LocalDate getDate() {
+    public LocalDate getCollectionDate() {
         return date;
     }
 
-    public void setDate(LocalDate date) {
-        this.date = date;
+    public Customer getCustomer() {
+        return customer;
+    }
+
+    public Waste.WasteType getWaste() {
+        return waste;
     }
 
     public CollectionStatus getCollectionStatus() {
         return collectionStatus;
     }
 
-    public void setCollectionStatus(CollectionStatus collectionStatus) {
-        this.collectionStatus = collectionStatus;
-    }
-
     public int getCancelLimitDays() {
         return cancelLimitDays;
-    }
-
-    public void setCancelLimitDays(int cancelLimitDays) {
-        this.cancelLimitDays = cancelLimitDays;
     }
 
     public Schedule getSchedule() {
         return schedule;
     }
 
-    public void setSchedule(Schedule schedule) {
-        this.schedule = schedule;
+    public void setCollectionDate(LocalDate date) {
+        this.date = date;
     }
 
-    public Schedule.ScheduleCategory getScheduleCategory() {
-        return scheduleCategory;
+    public void setCollectionStatus(CollectionStatus collectionStatus) {
+        this.collectionStatus = collectionStatus;
+    }
+
+    public void setCancelLimitDays(int cancelLimitDays) {
+        this.cancelLimitDays = cancelLimitDays;
     }
 
     @Override
@@ -118,12 +112,12 @@ public class Collection {
         return String.format(
                 "Collection {ID: %d, Customer: %s, Date: %s, Waste: %s, Status: %s, Cancel Limit Days: %d, Schedule ID: %s, Schedule Category: %s}",
                 collectionId,
-                customer != null ? customer.getName() : "N/A",
-                date != null ? date.toString() : "N/A",
+                customer.getName(),
+                date,
                 waste,
                 collectionStatus,
                 cancelLimitDays,
-                schedule,
-                scheduleCategory);
+                schedule.getScheduleId(),
+                schedule.getScheduleCategory());
     }
 }
