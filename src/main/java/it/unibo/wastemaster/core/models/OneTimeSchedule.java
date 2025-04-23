@@ -18,10 +18,10 @@ public class OneTimeSchedule extends Schedule {
     // No-args constructor required by JPA
     public OneTimeSchedule() {}
 
-    public OneTimeSchedule(ScheduleCategory scheduleCategory,Customer customer, Waste.WasteType wasteType, ScheduleStatus status, LocalDate pickupDate) {
+    public OneTimeSchedule(Customer customer, Waste.WasteType wasteType, ScheduleStatus status, LocalDate pickupDate) {
         super(customer, wasteType, status);
-        this.setScheduleCategory(ScheduleCategory.ONE_TIME);
         this.pickupDate = pickupDate;
+        this.setScheduleCategory(ScheduleCategory.ONE_TIME);
     }
 
     public LocalDate getPickupDate() {
