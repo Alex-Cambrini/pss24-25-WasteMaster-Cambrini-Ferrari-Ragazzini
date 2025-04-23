@@ -69,11 +69,11 @@ public class Collection {
     public Collection() {
     }
 
-    public Collection(Customer customer, LocalDate date, Waste.WasteType waste, CollectionStatus collectionStatus,
+    public Collection(Customer customer, LocalDate date, CollectionStatus collectionStatus,
             Schedule schedule, ScheduleCategory scheduleCategory) {
         this.customer = customer;
         this.date = date;
-        this.waste = waste;
+        this.waste = schedule.getWasteType();
         this.collectionStatus = collectionStatus;
         this.cancelLimitDays = CANCEL_LIMIT_DAYS;
         this.schedule = schedule;
