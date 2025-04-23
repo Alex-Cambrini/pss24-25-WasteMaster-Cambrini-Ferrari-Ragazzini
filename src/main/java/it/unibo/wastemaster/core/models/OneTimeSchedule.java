@@ -18,8 +18,8 @@ public class OneTimeSchedule extends Schedule {
     // No-args constructor required by JPA
     public OneTimeSchedule() {}
 
-    public OneTimeSchedule(Customer customer, Waste.WasteType wasteType, ScheduleStatus status, LocalDate pickupDate) {
-        super(customer, wasteType, status);
+    public OneTimeSchedule(Customer customer, Waste.WasteType wasteType, LocalDate pickupDate) {
+        super(customer, wasteType);
         this.pickupDate = pickupDate;
         this.setScheduleCategory(ScheduleCategory.ONE_TIME);
     }
@@ -30,5 +30,10 @@ public class OneTimeSchedule extends Schedule {
 
     public void setPickupDate(LocalDate pickupDate) {
         this.pickupDate = pickupDate;
+    }
+
+    @Override
+    public LocalDate getCollectionDate() {
+        return this.getPickupDate();
     }
 }
