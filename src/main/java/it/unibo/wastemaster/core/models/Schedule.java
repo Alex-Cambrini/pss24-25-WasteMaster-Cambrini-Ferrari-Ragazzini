@@ -79,7 +79,9 @@ public abstract class Schedule {
         this.creationDate = DateUtils.getCurrentDate();
     }
 
-    public int getId() {
+    public abstract LocalDate getCollectionDate();
+
+    public int getScheduleId() {
         return id;
     }
 
