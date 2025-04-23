@@ -29,14 +29,13 @@ public class RecurringSchedule extends Schedule {
     public RecurringSchedule() {
     }
 
-    public RecurringSchedule(Customer customer, Waste.WasteType wasteType, ScheduleStatus status, LocalDate startDate,
+    public RecurringSchedule(Customer customer, Waste.WasteType wasteType, LocalDate startDate,
             Frequency frequency) {
-        super(customer, wasteType, status);
+        super(customer, wasteType);
         this.startDate = startDate;
         this.frequency = frequency;
         this.setScheduleCategory(ScheduleCategory.RECURRING);
         this.nextCollectionDate = null;
-
     }
 
     public LocalDate getStartDate() {
@@ -61,5 +60,10 @@ public class RecurringSchedule extends Schedule {
 
     public void setNextCollectionDate(LocalDate nextCollectionDate) {
         this.nextCollectionDate = nextCollectionDate;
+    }
+
+    @Override
+    public LocalDate getCollectionDate() {
+        return this.getNextCollectionDate();
     }
 }
