@@ -53,6 +53,7 @@ public abstract class Schedule {
     private List<Collection> collections;
 
     @Enumerated(EnumType.STRING)
+    @NotNull(message = "Schedule category cannot be null")
     @Column(nullable = false)
     private ScheduleCategory scheduleCategory;
 
@@ -72,10 +73,10 @@ public abstract class Schedule {
     public Schedule() {
     }
 
-    public Schedule(Customer customer, Waste.WasteType wasteType, ScheduleStatus status) {
+    public Schedule(Customer customer, Waste.WasteType wasteType) {
         this.customer = customer;
         this.wasteType = wasteType;
-        this.status = status;
+        this.status = ScheduleStatus.SCHEDULED;
         this.creationDate = DateUtils.getCurrentDate();
     }
 
