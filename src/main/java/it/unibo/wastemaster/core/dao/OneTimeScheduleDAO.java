@@ -12,7 +12,7 @@ public class OneTimeScheduleDAO extends GenericDAO<OneTimeSchedule> {
 
     public Collection findCollectionByScheduleId(int scheduleId) {
         return entityManager.createQuery(
-            "SELECT c FROM Collection c WHERE c.schedule.scheduleId = :scheduleId", Collection.class)
+            "SELECT c FROM Collection c WHERE c.schedule.id = :scheduleId", Collection.class)
             .setParameter("scheduleId", scheduleId)
             .getSingleResult();
     }
