@@ -7,9 +7,11 @@ import org.junit.jupiter.api.BeforeEach;
 
 import it.unibo.wastemaster.core.dao.CollectionDAO;
 import it.unibo.wastemaster.core.dao.CustomerDAO;
+import it.unibo.wastemaster.core.dao.GenericDAO;
 import it.unibo.wastemaster.core.dao.OneTimeScheduleDAO;
 import it.unibo.wastemaster.core.dao.RecurringScheduleDAO;
 import it.unibo.wastemaster.core.dao.WasteScheduleDAO;
+import it.unibo.wastemaster.core.models.Location;
 import it.unibo.wastemaster.core.services.CollectionManager;
 import it.unibo.wastemaster.core.services.CustomerManager;
 import it.unibo.wastemaster.core.services.RecurringScheduleManager;
@@ -23,6 +25,7 @@ public abstract class AbstractDatabaseTest {
     protected static EntityManagerFactory emf;
     protected EntityManager em;
 
+    protected GenericDAO<Location> locationDAO;
     protected CollectionDAO collectionDAO;
     protected CustomerDAO customerDAO;
     protected OneTimeScheduleDAO oneTimeScheduleDAO;
@@ -46,6 +49,7 @@ public abstract class AbstractDatabaseTest {
     public void setUp() {
         em = emf.createEntityManager();
 
+        locationDAO = new GenericDAO<Location>(em, Location.class);
         customerDAO = new CustomerDAO(em);
         customerManager = new CustomerManager(customerDAO);
 
