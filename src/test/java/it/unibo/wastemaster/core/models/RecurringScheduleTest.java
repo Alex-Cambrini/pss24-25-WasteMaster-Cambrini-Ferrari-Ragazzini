@@ -80,24 +80,16 @@ class RecurringScheduleTest extends AbstractDatabaseTest {
     
     @Test
     void testRecurringSchedulePersistence() {
-        em.getTransaction().begin();
-        em.persist(location);
-        em.persist(customer);
-        em.persist(schedule);
-
-        em.getTransaction().commit();
-
-        RecurringSchedule found = em.find(RecurringSchedule.class, schedule.getScheduleId());
+        customerDAO.insert(customer);
+        recurringScheduleDAO.insert(schedule);
+        int scheduleId = schedule.getScheduleId();
+        RecurringSchedule found = recurringScheduleDAO.findById(scheduleId);
         assertNotNull(found);
         assertEquals(schedule.getFrequency(), found.getFrequency());
         assertEquals(schedule.getStartDate(), found.getStartDate());
 
-        em.getTransaction().begin();
-        em.remove(found);
-        em.getTransaction().commit();
-
-        RecurringSchedule deleted = em.find(RecurringSchedule.class, schedule.getScheduleId());
+        recurringScheduleDAO.delete(found);
+        RecurringSchedule deleted = recurringScheduleDAO.findById(scheduleId);
         assertNull(deleted);
     }
-
 }

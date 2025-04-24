@@ -64,22 +64,18 @@ public class LocationTest extends AbstractDatabaseTest {
 
     @Test
     public void testPersistence() {
-        em.getTransaction().begin();
-        em.persist(location);
-        em.getTransaction().commit();
+        locationDAO.insert(location);
 
-        Location found = em.find(Location.class, location.getId());
+        int locationId = location.getId();
+        Location found = locationDAO.findById(locationId);
         assertNotNull(found);
         assertEquals(location.getStreet(), found.getStreet());
         assertEquals(location.getCivicNumber(), found.getCivicNumber());
         assertEquals(location.getCity(), found.getCity());
         assertEquals(location.getPostalCode(), found.getPostalCode());
 
-        em.getTransaction().begin();
-        em.remove(found);
-        em.getTransaction().commit();
-
-        Location deleted = em.find(Location.class, location.getId());
+        locationDAO.delete(found);
+        Location deleted = locationDAO.findById(locationId);
         assertNull(deleted);
     }
 }

@@ -1,6 +1,7 @@
 package it.unibo.wastemaster.core.models;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Set;
@@ -146,13 +147,15 @@ public class EmployeeTest extends AbstractDatabaseTest {
 
     @Test
     public void testEmployeePersistence() {
-        em.getTransaction().begin();
-        em.persist(employee);
-        em.getTransaction().commit();
-
-        Employee found = em.find(Employee.class, employee.getEmployeeId());
+        employeeDAO.insert(employee);
+        int employeeId = employee.getEmployeeId();
+        Employee found = employeeDAO.findById(employeeId);;
         assertEquals(employee.getName(), found.getName());
         assertEquals(employee.getEmail(), found.getEmail());
+
+        employeeDAO.delete(employee);
+        Employee deleted = employeeDAO.findById(employeeId);
+        assertNull(deleted);
     }
 
     @Test
