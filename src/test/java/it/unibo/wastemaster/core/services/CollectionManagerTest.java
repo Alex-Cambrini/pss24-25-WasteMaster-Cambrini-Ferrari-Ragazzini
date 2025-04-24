@@ -62,4 +62,25 @@ public class CollectionManagerTest extends AbstractDatabaseTest {
         assertEquals(CollectionStatus.PENDING, pending.get(0).getCollectionStatus());
     }
 
+    @Test
+    public void testGenerateCollection() {
+        LocalDate futureDate = DateUtils.getCurrentDate().plusDays(5);
+        OneTimeSchedule futureSchedule = new OneTimeSchedule(customer, Waste.WasteType.PAPER, futureDate);
+        futureSchedule.setStatus(Schedule.ScheduleStatus.SCHEDULED);
+
+        em.getTransaction().begin();
+        oneTimeScheduleDAO.insert(futureSchedule);
+        em.getTransaction().commit();
+
+        collectionManager.generateCollection(futureSchedule);
+
+        LocalDate pastDate = DateUtils.getCurrentDate().minusDays(2);
+        OneTimeSchedule pastSchedule = new OneTimeSchedule(customer, Waste.WasteType.GLASS, pastDate);
+        pastSchedule.setStatus(Schedule.ScheduleStatus.SCHEDULED);
+
+        collectionManager.generateCollection(pastSchedule);
+
+        List<Collection> all = collectionDAO.findAll();
+        assertEquals(3, all.size());
+    }
 }
