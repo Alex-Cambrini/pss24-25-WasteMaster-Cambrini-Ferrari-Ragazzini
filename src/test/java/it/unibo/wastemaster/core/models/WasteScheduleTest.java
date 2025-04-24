@@ -55,21 +55,16 @@ class WasteScheduleTest extends AbstractDatabaseTest {
 
 	@Test
 	public void testPersistence() {
-		em.getTransaction().begin();
-		em.persist(waste);
-		em.persist(schedule);
-		em.getTransaction().commit();
-
-		WasteSchedule found = em.find(WasteSchedule.class, schedule.getScheduleId());
+		wasteDAO.insert(waste);
+		wasteScheduleDAO.insert(schedule);
+		int ScheduleId = schedule.getScheduleId();
+		WasteSchedule found = wasteScheduleDAO.findById(ScheduleId);
 		assertNotNull(found);
 		assertEquals(waste.getType(), found.getWaste().getType());
 		assertEquals(schedule.getDayOfWeek(), found.getDayOfWeek());
 
-		em.getTransaction().begin();
-		em.remove(found);
-		em.getTransaction().commit();
-
-		WasteSchedule deleted = em.find(WasteSchedule.class, schedule.getScheduleId());
+		wasteScheduleDAO.delete(found);
+		WasteSchedule deleted = wasteScheduleDAO.findById(ScheduleId);
 		assertNull(deleted);
 	}
 

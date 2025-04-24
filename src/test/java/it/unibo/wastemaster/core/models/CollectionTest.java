@@ -24,7 +24,7 @@ class CollectionTest extends AbstractDatabaseTest {
     private LocalDate date;
     private Waste.WasteType wasteType;
     private Collection collection;
-    private Schedule schedule;
+    private OneTimeSchedule schedule;
 
     @BeforeEach
     public void setUp() {
@@ -69,11 +69,9 @@ class CollectionTest extends AbstractDatabaseTest {
     @Test
     void testPersistence() {
         em.getTransaction().begin();
-        em.persist(location);
-        em.persist(customer);
-        em.persist(schedule);
-        em.persist(collection);
-        em.getTransaction().commit();
+        customerDAO.insert(customer);
+        oneTimeScheduleDAO.insert(schedule);
+        collectionDAO.insert(collection);
 
         Collection found = em.find(Collection.class, collection.getCollectionId());
         assertNotNull(found);
@@ -81,9 +79,7 @@ class CollectionTest extends AbstractDatabaseTest {
 
         int foundId = found.getCollectionId();
 
-        em.getTransaction().begin();
-        em.remove(collection);
-        em.getTransaction().commit();
+        collectionDAO.delete(collection);
 
         Collection deleted = em.find(Collection.class, foundId);
         assertNull(deleted);
