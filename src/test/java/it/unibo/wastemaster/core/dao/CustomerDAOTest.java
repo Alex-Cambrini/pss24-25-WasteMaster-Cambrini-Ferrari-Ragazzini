@@ -13,7 +13,6 @@ import it.unibo.wastemaster.core.models.Location;
 public class CustomerDAOTest extends AbstractDatabaseTest {
 
     private Location location;
-    private GenericDAO<Location> locationDAO;
 
     @BeforeEach
     public void setUp() {
@@ -30,7 +29,6 @@ public class CustomerDAOTest extends AbstractDatabaseTest {
 
         Customer customer = new Customer("Giulia", "Neri", location, existingEmail, "1234567890");
 
-        locationDAO.insert(location);
         customerDAO.insert(customer);
         assertTrue(customerDAO.existsByEmail(existingEmail), "Should return true for existing email");
         assertFalse(customerDAO.existsByEmail(nonExistingEmail), "Should return false for non-existing email");
