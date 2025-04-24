@@ -27,7 +27,7 @@ public class CollectionManagerTest extends AbstractDatabaseTest {
     @BeforeEach
     public void setUp() {
         super.setUp();
-        
+
         Location location = new Location("Via Roma", "10", "Bologna", "40100");
         customer = new Customer("Mario", "Rossi", location, "mario.rossi@example.com", "1234567890");
         LocalDate futureDate = DateUtils.getCurrentDate().plusDays(3);
@@ -82,13 +82,38 @@ public class CollectionManagerTest extends AbstractDatabaseTest {
         OneTimeSchedule futureSchedule = new OneTimeSchedule(customer, Waste.WasteType.PAPER, futureDate);
         futureSchedule.setStatus(Schedule.ScheduleStatus.SCHEDULED);
 
-
         oneTimeScheduleDAO.insert(futureSchedule);
-
 
         collectionManager.generateOneTimeCollection(futureSchedule);
 
         List<Collection> all = collectionDAO.findAll();
         assertEquals(2, all.size());
     }
+
+    @Test
+    public void testGenerateRecurringCollections() {
+        recurringScheduleDAO.insert(recurringSchedule);
+
+        assertEquals(1, recurringScheduleManager.getRecurringSchedulesWithoutCollections().size());
+
+        collectionManager.generateRecurringCollections();
+
+        List<Collection> collections = collectionDAO.findAll();
+        assertEquals(2, collections.size());
+        assertEquals(Waste.WasteType.GLASS, collections.get(1).getSchedule().getWasteType());
+    }
+
+    @Test
+    public void testUpdateCollection() {
+        Collection collection = collectionDAO.findAll().get(0);
+        assertEquals(CollectionStatus.PENDING, collection.getCollectionStatus());
+
+        collection.setCollectionStatus(CollectionStatus.COMPLETED);
+
+        collectionManager.updateCollection(collection);
+
+        Collection updated = collectionDAO.findById(collection.getCollectionId());
+        assertEquals(CollectionStatus.COMPLETED, updated.getCollectionStatus());
+    }
+
 }
