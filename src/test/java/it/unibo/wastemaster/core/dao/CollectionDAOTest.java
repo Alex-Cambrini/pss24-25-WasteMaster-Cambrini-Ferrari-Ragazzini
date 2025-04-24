@@ -1,9 +1,6 @@
 package it.unibo.wastemaster.core.dao;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.LocalDate;
 
@@ -47,7 +44,6 @@ public class CollectionDAOTest extends AbstractDatabaseTest {
         customer = new Customer("Mario", "Rossi", location, "mario.rossi@example.com", "1234567890");
         oneTimeSchedule = new OneTimeSchedule(customer, wasteType, date);
         recurringSchedule = new RecurringSchedule(customer, wasteType, date, RecurringSchedule.Frequency.WEEKLY);
-        locationDAO.insert(location);
         customerDAO.insert(customer);
         oneTimeScheduleDAO.insert(oneTimeSchedule);
         recurringScheduleDAO.insert(recurringSchedule);
