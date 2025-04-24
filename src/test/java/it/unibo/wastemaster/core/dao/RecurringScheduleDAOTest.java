@@ -8,17 +8,16 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.time.LocalDate;
 import java.util.List;
 
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import it.unibo.wastemaster.core.AbstractDatabaseTest;
+import it.unibo.wastemaster.core.models.Collection;
 import it.unibo.wastemaster.core.models.Customer;
 import it.unibo.wastemaster.core.models.Location;
 import it.unibo.wastemaster.core.models.RecurringSchedule;
 import it.unibo.wastemaster.core.models.Waste;
 import it.unibo.wastemaster.core.utils.DateUtils;
-
 
 public class RecurringScheduleDAOTest extends AbstractDatabaseTest {
 
@@ -43,7 +42,6 @@ public class RecurringScheduleDAOTest extends AbstractDatabaseTest {
         location2 = new Location("Via Milano", "32", "Torino", "80700");
         customer1 = new Customer("Mario", "Rossi", location1, "mario.rossi@example.com", "1234567890");
         customer2 = new Customer("Luca", "Verdi", location2, "luca.verdi@example.com", "1234567890");
-
 
         em.getTransaction().begin();
 
@@ -78,6 +76,31 @@ public class RecurringScheduleDAOTest extends AbstractDatabaseTest {
     }
 
     @Test
+    void testFindActiveSchedulesWithoutFutureCollections() {
+        LocalDate now = DateUtils.getCurrentDate();
+
+        Collection c1 = new Collection(recurringSchedule1);
+        c1.setCollectionDate(now.plusDays(2));
+        collectionDAO.insert(c1);
+
+        Collection c2 = new Collection(recurringSchedule2);
+        c2.setCollectionDate(now.plusDays(3));
+        collectionDAO.insert(c2);
+
+        recurringSchedule4.setNextCollectionDate(now.plusDays(4));
+        recurringScheduleDAO.update(recurringSchedule4);
+
+        List<RecurringSchedule> result = recurringScheduleDAO.findActiveSchedulesWithoutFutureCollections();
+
+        assertNotNull(result);
+        assertEquals(1, result.size());
+        assertTrue(result.contains(recurringSchedule4));
+        assertFalse(result.contains(recurringSchedule1));
+        assertFalse(result.contains(recurringSchedule2));
+        assertFalse(result.contains(recurringSchedule3));
+    }
+
+    @Test
     void testFindActiveSchedulesWithNextDateBeforeToday() {
         List<RecurringSchedule> result = recurringScheduleDAO.findActiveSchedulesWithNextDateBeforeToday();
 
@@ -90,7 +113,7 @@ public class RecurringScheduleDAOTest extends AbstractDatabaseTest {
         assertFalse(result.contains(recurringSchedule1));
         assertFalse(result.contains(recurringSchedule3));
     }
-    
+
     @Test
     void testFindScheduleByCustomer() {
         List<RecurringSchedule> result1 = recurringScheduleDAO.findScheduleByCustomer(customer1);
