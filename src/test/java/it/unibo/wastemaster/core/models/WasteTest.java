@@ -46,21 +46,16 @@ class WasteTest extends AbstractDatabaseTest {
 
 	    @Test
     void testPersistence() {
-        em.getTransaction().begin();
-        em.persist(waste);
-        em.getTransaction().commit();
-
-        Waste found = em.find(Waste.class, waste.getWasteId());
+        wasteDAO.insert(waste);
+		int wasteId = waste.getWasteId();
+        Waste found = wasteDAO.findById(wasteId);
         assertNotNull(found);
         assertEquals(waste.getType(), found.getType());
         assertEquals(waste.getIsRecyclable(), found.getIsRecyclable());
         assertEquals(waste.getIsDangerous(), found.getIsDangerous());
 
-        em.getTransaction().begin();
-        em.remove(waste);
-        em.getTransaction().commit();
-
-        Waste deleted = em.find(Waste.class, waste.getWasteId());
+		wasteDAO.delete(found);
+        Waste deleted = wasteDAO.findById(wasteId);
         assertNull(deleted);
 	}
 

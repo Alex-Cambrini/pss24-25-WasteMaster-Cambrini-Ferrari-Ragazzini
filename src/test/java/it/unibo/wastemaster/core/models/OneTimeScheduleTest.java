@@ -59,22 +59,16 @@ public class OneTimeScheduleTest extends AbstractDatabaseTest {
 
 	@Test
 	public void testPersistence() {
-		em.getTransaction().begin();
-		em.persist(customer.getAddress());
-		em.persist(customer);
-		em.persist(schedule);
-		em.getTransaction().commit();
-
-		OneTimeSchedule found = em.find(OneTimeSchedule.class, schedule.getScheduleId());
+		customerDAO.insert(customer);
+		oneTimeScheduleDAO.insert(schedule);
+		int scheduleId = schedule.getScheduleId();
+		OneTimeSchedule found = oneTimeScheduleDAO.findById(scheduleId);
 		assertNotNull(found);
 		assertEquals(pickupDate, found.getPickupDate());
 		assertEquals(customer.getEmail(), found.getCustomer().getEmail());
 
-		em.getTransaction().begin();
-		em.remove(found);
-		em.getTransaction().commit();
-
-		OneTimeSchedule deleted = em.find(OneTimeSchedule.class, schedule.getScheduleId());
+		oneTimeScheduleDAO.delete(found);
+		OneTimeSchedule deleted = oneTimeScheduleDAO.findById(scheduleId);
 		assertNull(deleted);
 	}
 }

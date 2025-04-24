@@ -21,29 +21,18 @@ public class CustomerTest extends AbstractDatabaseTest {
 
     @Test
     void testPersistenceAndGetter() {
-        em.getTransaction().begin();
-        em.persist(location);
-        em.persist(customer);
-        em.getTransaction().commit();
-
-        Customer found = em.find(Customer.class, customer.getCustomerId());
+        customerDAO.insert(customer);
+        int customerId = customer.getCustomerId();
+        Customer found = customerDAO.findById(customerId);
         assertNotNull(found);
         assertEquals(customer.getName(), found.getName());
-
-        em.getTransaction().begin();
-        em.remove(found);
-        em.getTransaction().commit();
-
-        Customer deleted = em.find(Customer.class, customer.getCustomerId());
+        customerDAO.delete(customer);
+        Customer deleted = customerDAO.findById(customerId);
         assertNull(deleted);
     }
 
     @Test
     public void testGetInfo() {
-        em.getTransaction().begin();
-        em.persist(location);
-        em.persist(customer);
-        em.getTransaction().commit();
         String expectedInfo = String.format(
             "Name: %s, Surname: %s, Address: %s, Email: %s, Phone: %s, CustomerId: %d",
             "Mario", 
