@@ -25,8 +25,9 @@ class RecurringScheduleTest extends AbstractDatabaseTest {
         location = new Location("Via Roma", "1", "Milano", "Italy");
         customer = new Customer("Mario", "Rossi", location, "mario@rossi.com", "1234567890");
         startDate = LocalDate.now();
-        schedule = new RecurringSchedule(customer, Waste.WasteType.PLASTIC, Schedule.ScheduleStatus.ACTIVE, startDate,
+        schedule = new RecurringSchedule(customer, Waste.WasteType.PLASTIC, startDate,
                 RecurringSchedule.Frequency.WEEKLY);
+        schedule.setStatus(RecurringSchedule.ScheduleStatus.ACTIVE);
     }
 
     @Test
@@ -86,7 +87,7 @@ class RecurringScheduleTest extends AbstractDatabaseTest {
 
         em.getTransaction().commit();
 
-        RecurringSchedule found = em.find(RecurringSchedule.class, schedule.getId());
+        RecurringSchedule found = em.find(RecurringSchedule.class, schedule.getScheduleId());
         assertNotNull(found);
         assertEquals(schedule.getFrequency(), found.getFrequency());
         assertEquals(schedule.getStartDate(), found.getStartDate());
@@ -95,7 +96,7 @@ class RecurringScheduleTest extends AbstractDatabaseTest {
         em.remove(found);
         em.getTransaction().commit();
 
-        RecurringSchedule deleted = em.find(RecurringSchedule.class, schedule.getId());
+        RecurringSchedule deleted = em.find(RecurringSchedule.class, schedule.getScheduleId());
         assertNull(deleted);
     }
 
