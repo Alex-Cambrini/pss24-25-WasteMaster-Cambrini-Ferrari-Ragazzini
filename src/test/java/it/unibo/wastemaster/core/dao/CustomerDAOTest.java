@@ -18,7 +18,6 @@ public class CustomerDAOTest extends AbstractDatabaseTest {
     public void setUp() {
         super.setUp();
         location = new Location("Via Test", "1", "Roma", "00100");
-        locationDAO = new GenericDAO<>(em, Location.class);
     }
 
     @Test
