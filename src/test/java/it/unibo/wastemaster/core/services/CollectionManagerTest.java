@@ -27,27 +27,21 @@ public class CollectionManagerTest extends AbstractDatabaseTest {
     @BeforeEach
     public void setUp() {
         super.setUp();
-
+        
         Location location = new Location("Via Roma", "10", "Bologna", "40100");
         customer = new Customer("Mario", "Rossi", location, "mario.rossi@example.com", "1234567890");
         LocalDate futureDate = DateUtils.getCurrentDate().plusDays(3);
 
         em.getTransaction().begin();
-        locationDAO.insert(location);
         customerDAO.insert(customer);
-        em.getTransaction().commit();
 
         oneTimeSchedule = new OneTimeSchedule(customer, Waste.WasteType.PLASTIC, futureDate);
         oneTimeSchedule.setStatus(Schedule.ScheduleStatus.SCHEDULED);
 
-        em.getTransaction().begin();
         oneTimeScheduleDAO.insert(oneTimeSchedule);
-        em.getTransaction().commit();
 
         Collection collection = new Collection(oneTimeSchedule);
-        em.getTransaction().begin();
         collectionDAO.insert(collection);
-        em.getTransaction().commit();
 
         recurringSchedule = new RecurringSchedule(customer, Waste.WasteType.GLASS, futureDate,
                 RecurringSchedule.Frequency.WEEKLY);
@@ -64,13 +58,12 @@ public class CollectionManagerTest extends AbstractDatabaseTest {
 
     @Test
     public void testGenerateCollection() {
+
         LocalDate futureDate = DateUtils.getCurrentDate().plusDays(5);
         OneTimeSchedule futureSchedule = new OneTimeSchedule(customer, Waste.WasteType.PAPER, futureDate);
         futureSchedule.setStatus(Schedule.ScheduleStatus.SCHEDULED);
 
-        em.getTransaction().begin();
         oneTimeScheduleDAO.insert(futureSchedule);
-        em.getTransaction().commit();
 
         collectionManager.generateCollection(futureSchedule);
 
@@ -79,8 +72,23 @@ public class CollectionManagerTest extends AbstractDatabaseTest {
         pastSchedule.setStatus(Schedule.ScheduleStatus.SCHEDULED);
 
         collectionManager.generateCollection(pastSchedule);
+        List<Collection> all = collectionDAO.findAll();
+        assertEquals(2, all.size());
+    }
+
+    @Test
+    public void testGenerateOneTimeCollection() {
+        LocalDate futureDate = DateUtils.getCurrentDate().plusDays(7);
+        OneTimeSchedule futureSchedule = new OneTimeSchedule(customer, Waste.WasteType.PAPER, futureDate);
+        futureSchedule.setStatus(Schedule.ScheduleStatus.SCHEDULED);
+
+
+        oneTimeScheduleDAO.insert(futureSchedule);
+
+
+        collectionManager.generateOneTimeCollection(futureSchedule);
 
         List<Collection> all = collectionDAO.findAll();
-        assertEquals(3, all.size());
+        assertEquals(2, all.size());
     }
 }
