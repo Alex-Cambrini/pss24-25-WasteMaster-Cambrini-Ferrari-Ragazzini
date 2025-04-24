@@ -79,25 +79,29 @@ public class RecurringScheduleDAOTest extends AbstractDatabaseTest {
     void testFindActiveSchedulesWithoutFutureCollections() {
         LocalDate now = DateUtils.getCurrentDate();
 
+        recurringSchedule1.setNextCollectionDate(now.plusDays(2));
+        recurringScheduleDAO.update(recurringSchedule1);
         Collection c1 = new Collection(recurringSchedule1);
         c1.setCollectionDate(now.plusDays(2));
         collectionDAO.insert(c1);
 
+        recurringSchedule2.setNextCollectionDate(now.plusDays(1));
         Collection c2 = new Collection(recurringSchedule2);
-        c2.setCollectionDate(now.plusDays(3));
+        c2.setCollectionDate(now);
         collectionDAO.insert(c2);
 
-        recurringSchedule4.setNextCollectionDate(now.plusDays(4));
+        recurringSchedule4.setNextCollectionDate(now.plusDays(3));
         recurringScheduleDAO.update(recurringSchedule4);
 
         List<RecurringSchedule> result = recurringScheduleDAO.findActiveSchedulesWithoutFutureCollections();
 
         assertNotNull(result);
-        assertEquals(1, result.size());
-        assertTrue(result.contains(recurringSchedule4));
-        assertFalse(result.contains(recurringSchedule1));
-        assertFalse(result.contains(recurringSchedule2));
-        assertFalse(result.contains(recurringSchedule3));
+        assertEquals(2, result.size());
+
+        assertFalse(result.contains(recurringSchedule1)); // EXCLUDED: has a future collection
+        assertTrue(result.contains(recurringSchedule2));  // INCLUDED: has only a past collection
+        assertFalse(result.contains(recurringSchedule3)); // EXCLUDED: is cancelled
+        assertTrue(result.contains(recurringSchedule4));  // INCLUDED: no future collections        
     }
 
     @Test
