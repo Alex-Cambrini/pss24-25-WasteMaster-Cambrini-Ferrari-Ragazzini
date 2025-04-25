@@ -88,4 +88,18 @@ class CustomerManagerTest extends AbstractDatabaseTest {
                         "1234567890", "Via", "", "Roma", "00100"));
     }
 
+    @Test
+    void testAddCustomerDuplicateEmail() {
+        customerManager.addCustomer("Test", "Dup", "dup@example.com", "1234567890", "Via", "1", "Roma", "00100");
+
+        Assertions.assertThrows(IllegalArgumentException.class, () -> customerManager.addCustomer("Altro", "Dup",
+                "dup@example.com", "0987654321", "Via", "1", "Roma", "00100"));
+    }
+
+    @Test
+    void testGetCustomerInvalidId() {
+        Assertions.assertNull(customerManager.getCustomerById(-5));
+        Assertions.assertNull(customerManager.getCustomerById(0));
+        Assertions.assertNull(customerManager.getCustomerById(99999));
+    }
 }
