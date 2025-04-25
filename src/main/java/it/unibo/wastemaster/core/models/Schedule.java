@@ -68,7 +68,7 @@ public abstract class Schedule {
         CANCELLED,
         STOPPED
     }
-
+    
     // No-args constructor required by JPA
     public Schedule() {
     }
@@ -77,7 +77,7 @@ public abstract class Schedule {
         this.customer = customer;
         this.wasteType = wasteType;
         this.status = ScheduleStatus.SCHEDULED;
-        this.creationDate = DateUtils.getCurrentDate();
+        this.creationDate = new DateUtils().getCurrentDate();
     }
 
     public abstract LocalDate getCollectionDate();

@@ -17,7 +17,6 @@ import it.unibo.wastemaster.core.models.OneTimeSchedule;
 import it.unibo.wastemaster.core.models.RecurringSchedule;
 import it.unibo.wastemaster.core.models.Schedule;
 import it.unibo.wastemaster.core.models.Waste;
-import it.unibo.wastemaster.core.utils.DateUtils;
 
 public class CollectionManagerTest extends AbstractDatabaseTest {
     private Customer customer;
@@ -30,7 +29,7 @@ public class CollectionManagerTest extends AbstractDatabaseTest {
 
         Location location = new Location("Via Roma", "10", "Bologna", "40100");
         customer = new Customer("Mario", "Rossi", location, "mario.rossi@example.com", "1234567890");
-        LocalDate futureDate = DateUtils.getCurrentDate().plusDays(3);
+        LocalDate futureDate = dateUtils.getCurrentDate().plusDays(3);
 
         em.getTransaction().begin();
         customerDAO.insert(customer);
@@ -59,7 +58,7 @@ public class CollectionManagerTest extends AbstractDatabaseTest {
     @Test
     public void testGenerateCollection() {
 
-        LocalDate futureDate = DateUtils.getCurrentDate().plusDays(5);
+        LocalDate futureDate = dateUtils.getCurrentDate().plusDays(5);
         OneTimeSchedule futureSchedule = new OneTimeSchedule(customer, Waste.WasteType.PAPER, futureDate);
         futureSchedule.setStatus(Schedule.ScheduleStatus.SCHEDULED);
 
@@ -67,7 +66,7 @@ public class CollectionManagerTest extends AbstractDatabaseTest {
 
         collectionManager.generateCollection(futureSchedule);
 
-        LocalDate pastDate = DateUtils.getCurrentDate().minusDays(2);
+        LocalDate pastDate = dateUtils.getCurrentDate().minusDays(2);
         OneTimeSchedule pastSchedule = new OneTimeSchedule(customer, Waste.WasteType.GLASS, pastDate);
         pastSchedule.setStatus(Schedule.ScheduleStatus.SCHEDULED);
 
@@ -78,7 +77,7 @@ public class CollectionManagerTest extends AbstractDatabaseTest {
 
     @Test
     public void testGenerateOneTimeCollection() {
-        LocalDate futureDate = DateUtils.getCurrentDate().plusDays(7);
+        LocalDate futureDate = dateUtils.getCurrentDate().plusDays(7);
         OneTimeSchedule futureSchedule = new OneTimeSchedule(customer, Waste.WasteType.PAPER, futureDate);
         futureSchedule.setStatus(Schedule.ScheduleStatus.SCHEDULED);
 

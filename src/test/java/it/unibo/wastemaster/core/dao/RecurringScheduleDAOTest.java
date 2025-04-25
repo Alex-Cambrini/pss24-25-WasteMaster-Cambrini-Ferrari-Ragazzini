@@ -17,7 +17,7 @@ import it.unibo.wastemaster.core.models.Customer;
 import it.unibo.wastemaster.core.models.Location;
 import it.unibo.wastemaster.core.models.RecurringSchedule;
 import it.unibo.wastemaster.core.models.Waste;
-import it.unibo.wastemaster.core.utils.DateUtils;
+
 
 public class RecurringScheduleDAOTest extends AbstractDatabaseTest {
 
@@ -35,7 +35,7 @@ public class RecurringScheduleDAOTest extends AbstractDatabaseTest {
     @BeforeEach
     public void setUp() {
         super.setUp();
-        date = DateUtils.getCurrentDate();
+        date = dateUtils.getCurrentDate();
         wasteType = Waste.WasteType.PLASTIC;
 
         location1 = new Location("Via Roma", "10", "Bologna", "40100");
@@ -77,7 +77,7 @@ public class RecurringScheduleDAOTest extends AbstractDatabaseTest {
 
     @Test
     void testFindActiveSchedulesWithoutFutureCollections() {
-        LocalDate now = DateUtils.getCurrentDate();
+        LocalDate now = dateUtils.getCurrentDate();
 
         recurringSchedule1.setNextCollectionDate(now.plusDays(2));
         recurringScheduleDAO.update(recurringSchedule1);

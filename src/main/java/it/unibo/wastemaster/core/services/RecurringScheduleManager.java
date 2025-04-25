@@ -8,7 +8,6 @@ import it.unibo.wastemaster.core.dao.RecurringScheduleDAO;
 import it.unibo.wastemaster.core.models.Customer;
 import it.unibo.wastemaster.core.models.RecurringSchedule;
 import it.unibo.wastemaster.core.models.RecurringSchedule.Frequency;
-import it.unibo.wastemaster.core.models.Schedule.ScheduleStatus;
 import it.unibo.wastemaster.core.models.Waste;
 import it.unibo.wastemaster.core.models.WasteSchedule;
 import it.unibo.wastemaster.core.utils.DateUtils;
@@ -18,6 +17,7 @@ public class RecurringScheduleManager {
     private RecurringScheduleDAO recurringScheduleDAO;
     private WasteScheduleManager wasteScheduleManager;
     private CollectionManager collectionManager;
+    private DateUtils dateUtils = new DateUtils();
 
     public RecurringScheduleManager(RecurringScheduleDAO recurringScheduleDAO,
             WasteScheduleManager wasteScheduleManager) {
@@ -27,6 +27,10 @@ public class RecurringScheduleManager {
 
     public void setCollectionManager(CollectionManager collectionManager) {
         this.collectionManager = collectionManager;
+    }
+
+    public void setDateUtils(DateUtils dateUtils) {
+        this.dateUtils = dateUtils;
     }
 
     public void createRecurringSchedule(Customer customer, Waste.WasteType wasteType, LocalDate startDate,
@@ -44,7 +48,7 @@ public class RecurringScheduleManager {
         WasteSchedule scheduleData = wasteScheduleManager.getWasteScheduleForWaste(wasteType);
         DayOfWeek scheduledDay = scheduleData.getDayOfWeek();
 
-        LocalDate today = DateUtils.getCurrentDate();
+        LocalDate today = dateUtils.getCurrentDate();
         LocalDate existingNext = schedule.getNextCollectionDate();
         LocalDate nextDate = null;
 
