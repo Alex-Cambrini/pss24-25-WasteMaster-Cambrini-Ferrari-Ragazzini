@@ -28,8 +28,27 @@ public class CustomerManager {
     }
 
     public void updateCustomer(Customer updateCustomer) {
+        if (updateCustomer == null || updateCustomer.getCustomerId() == null) {
+            throw new IllegalArgumentException("Customer or customer ID cannot be null");
+        }
+    
+        Customer existing = customerDAO.findById(updateCustomer.getCustomerId());
+        if (existing == null) {
+            throw new IllegalArgumentException("Customer not found");
+        }
+    
+        if (!existing.getEmail().equals(updateCustomer.getEmail())
+                && customerDAO.existsByEmail(updateCustomer.getEmail())) {
+            throw new IllegalArgumentException("Email already in use");
+        }
+    
+        it.unibo.wastemaster.core.utils.ValidateUtils.VALIDATOR.validate(updateCustomer).stream().findFirst().ifPresent(v -> {
+            throw new jakarta.validation.ConstraintViolationException("Validation failed", java.util.Set.of(v));
+        });
+    
         customerDAO.update(updateCustomer);
     }
+    
 
     public boolean deleteCustomer(Customer customer) {
         if (customer != null && customer.getCustomerId() != null) {
