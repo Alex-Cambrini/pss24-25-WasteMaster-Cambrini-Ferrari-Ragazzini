@@ -80,12 +80,21 @@ dependencies {
 tasks.withType<Test> {
     // Enables JUnit 5 Jupiter module
     useJUnitPlatform()
+    testLogging {
+		showStandardStreams = true
+	}
+    jvmArgs = listOf(
+		"-Djava.util.logging.config.file=${project.projectDir}/src/test/resources/logging.properties",
+		"-Dorg.slf4j.simpleLogger.defaultLogLevel=off",
+		"-Dorg.slf4j.simpleLogger.log.it.unibo.wastemaster=info"
+	)
 }
 
 application {
     // Define the main class for the application
     mainClass.set("it.unibo.wastemaster.main.App")
     applicationDefaultJvmArgs = listOf(
-        "-Djava.util.logging.config.file=src/main/resources/logging.properties"
+        "-Djava.util.logging.config.file=src/main/resources/logging.properties",
+        "-Dorg.slf4j.simpleLogger.defaultLogLevel=warn"
     )
 }
