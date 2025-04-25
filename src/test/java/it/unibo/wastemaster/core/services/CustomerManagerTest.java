@@ -61,6 +61,31 @@ class CustomerManagerTest extends AbstractDatabaseTest {
 
         Assertions.assertFalse(customerManager.deleteCustomer(null));
     }
-    
+
+    @Test
+    void testAddCustomerInvalid() {
+        Assertions.assertThrows(ConstraintViolationException.class,
+                () -> customerManager.addCustomer("Anna", "Blu", null, "1234567890", "Via", "1", "Roma", "00100"));
+
+        Assertions.assertThrows(ConstraintViolationException.class,
+                () -> customerManager.addCustomer("Anna", "Blu", "anna@example.com",
+                        "abcde123", "Via", "1", "Roma", "00100"));
+
+        Assertions.assertThrows(ConstraintViolationException.class,
+                () -> customerManager.addCustomer("", "Blu", "vuoto@example.com",
+                        "1234567890", "Via", "1", "Roma", "00100"));
+
+        Assertions.assertThrows(ConstraintViolationException.class,
+                () -> customerManager.addCustomer("Anna", "Blu", "email-sbagliato",
+                        "1234567890", "Via", "1", "Roma", "00100"));
+
+        Assertions.assertThrows(ConstraintViolationException.class,
+                () -> customerManager.addCustomer("Anna", "Blu", "posta@example.com",
+                        "1234567890", "Via", "1", "Roma", "00A00"));
+
+        Assertions.assertThrows(ConstraintViolationException.class,
+                () -> customerManager.addCustomer("Anna", "Blu", "civico@example.com",
+                        "1234567890", "Via", "", "Roma", "00100"));
+    }
 
 }
