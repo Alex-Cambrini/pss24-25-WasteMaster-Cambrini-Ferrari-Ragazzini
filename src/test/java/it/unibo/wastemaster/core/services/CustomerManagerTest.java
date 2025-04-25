@@ -102,4 +102,32 @@ class CustomerManagerTest extends AbstractDatabaseTest {
         Assertions.assertNull(customerManager.getCustomerById(0));
         Assertions.assertNull(customerManager.getCustomerById(99999));
     }
+
+    @Test
+    void testUpdateCustomerInvalid() {
+        Customer c1 = customerManager.addCustomer("A", "B", "mail1@example.com", "1234567890", "Via", "1", "City",
+                "12345");
+        Customer c2 = customerManager.addCustomer("C", "D", "mail2@example.com", "0987654321", "Via", "2", "City",
+                "54321");
+
+        Assertions.assertThrows(IllegalArgumentException.class, () -> customerManager.updateCustomer(null));
+
+        Customer notPersisted = new Customer();
+        Assertions.assertThrows(IllegalArgumentException.class, () -> customerManager.updateCustomer(notPersisted));
+
+        // Caso 3: email duplicata
+        Customer toUpdate = customerManager.getCustomerById(c2.getCustomerId());
+        toUpdate.setEmail("mail1@example.com");
+        em.detach(toUpdate);
+        System.out.println("Prima del caso 3");
+        Assertions.assertThrows(IllegalArgumentException.class, () -> customerManager.updateCustomer(toUpdate));
+        System.out.println("Dopo il caso 3");
+
+        Customer c1ToUpdate = customerManager.getCustomerById(c1.getCustomerId());
+        c1ToUpdate.setPhone("invalid");
+        System.out.println("Prima del caso 4");
+        Assertions.assertThrows(ConstraintViolationException.class, () -> customerManager.updateCustomer(c1ToUpdate));
+        System.out.println("Dopo il caso 4");
+
+    }
 }
