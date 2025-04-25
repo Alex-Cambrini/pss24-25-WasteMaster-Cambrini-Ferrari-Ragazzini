@@ -32,7 +32,7 @@ public class RecurringScheduleManager {
     public void createRecurringSchedule(Customer customer, Waste.WasteType wasteType, ScheduleStatus status,
             LocalDate startDate,
             Frequency frequency) {
-        RecurringSchedule schedule = new RecurringSchedule(customer, wasteType, status, startDate, frequency);
+        RecurringSchedule schedule = new RecurringSchedule(customer, wasteType, startDate, frequency);
         LocalDate nextCollectionDate = calculateNextDate(schedule);
         schedule.setNextCollectionDate(nextCollectionDate);
         recurringScheduleDAO.insert(schedule);
