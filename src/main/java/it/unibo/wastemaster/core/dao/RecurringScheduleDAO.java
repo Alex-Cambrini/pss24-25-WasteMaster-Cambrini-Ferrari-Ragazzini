@@ -41,7 +41,7 @@ public class RecurringScheduleDAO extends GenericDAO<RecurringSchedule> {
                             .getResultList();
     }
 
-    public List<RecurringSchedule> findScheduleByCustomer(Customer customer) {
+    public List<RecurringSchedule> findSchedulesByCustomer(Customer customer) {
         String jpql = "SELECT s FROM Schedule s WHERE s.customer = :customer";
         TypedQuery<RecurringSchedule> query = entityManager.createQuery(jpql, RecurringSchedule.class);
         query.setParameter("customer", customer);
