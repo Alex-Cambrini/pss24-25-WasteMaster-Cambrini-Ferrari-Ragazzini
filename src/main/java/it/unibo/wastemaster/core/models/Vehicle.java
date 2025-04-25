@@ -32,7 +32,7 @@ public class Vehicle {
     @NotNull(message = "model is required")
     private String model;
 
-    @Column(nullable = false)
+    @Column(name = "`year`", nullable = false)
     @NotNull(message = "year is required")
     private int year;
 
