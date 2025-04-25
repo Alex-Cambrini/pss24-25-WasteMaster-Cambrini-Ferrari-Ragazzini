@@ -1,7 +1,6 @@
 package it.unibo.wastemaster.core.models;
 
 import it.unibo.wastemaster.core.AbstractDatabaseTest;
-import it.unibo.wastemaster.core.utils.DateUtils;
 import it.unibo.wastemaster.core.utils.ValidateUtils;
 import jakarta.validation.ConstraintViolation;
 
@@ -24,7 +23,7 @@ public class OneTimeScheduleTest extends AbstractDatabaseTest {
 		super.setUp();
 		Location location = new Location("Via Dante", "5", "Roma", "00100");
 		customer = new Customer("Luca", "Verdi", location, "luca@example.com", "3456789012");
-		pickupDate = DateUtils.getCurrentDate();
+		pickupDate = dateUtils.getCurrentDate();
 		schedule = new OneTimeSchedule(customer, Waste.WasteType.ORGANIC, pickupDate);
 	}
 
@@ -40,7 +39,7 @@ public class OneTimeScheduleTest extends AbstractDatabaseTest {
 	@Test
 	public void testInvalidSchedule() {
 		OneTimeSchedule invalid = new OneTimeSchedule();
-		invalid.setPickupDate(DateUtils.getCurrentDate().minusDays(2));
+		invalid.setPickupDate(dateUtils.getCurrentDate().minusDays(2));
 
 		Set<ConstraintViolation<OneTimeSchedule>> violations = ValidateUtils.VALIDATOR.validate(invalid);
 		assertFalse(violations.isEmpty());

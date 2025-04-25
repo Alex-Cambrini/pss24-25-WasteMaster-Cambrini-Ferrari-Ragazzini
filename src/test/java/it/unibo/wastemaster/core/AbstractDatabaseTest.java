@@ -18,6 +18,7 @@ import it.unibo.wastemaster.core.services.CollectionManager;
 import it.unibo.wastemaster.core.services.CustomerManager;
 import it.unibo.wastemaster.core.services.RecurringScheduleManager;
 import it.unibo.wastemaster.core.services.WasteScheduleManager;
+import it.unibo.wastemaster.core.utils.DateUtils;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
@@ -40,6 +41,7 @@ public abstract class AbstractDatabaseTest {
     protected WasteScheduleManager wasteScheduleManager;
     protected CollectionManager collectionManager;
     protected RecurringScheduleManager recurringScheduleManager;
+    protected DateUtils dateUtils;
 
     @BeforeAll
     public static void init() {
@@ -52,6 +54,7 @@ public abstract class AbstractDatabaseTest {
     @BeforeEach
     public void setUp() {
         em = emf.createEntityManager();
+        dateUtils = new DateUtils();
 
         employeeDAO = new GenericDAO<Employee>(em, Employee.class);
         wasteDAO = new GenericDAO<Waste>(em, Waste.class);

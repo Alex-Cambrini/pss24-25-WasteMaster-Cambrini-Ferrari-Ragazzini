@@ -14,7 +14,7 @@ import it.unibo.wastemaster.core.models.Location;
 import it.unibo.wastemaster.core.models.OneTimeSchedule;
 import it.unibo.wastemaster.core.models.RecurringSchedule;
 import it.unibo.wastemaster.core.models.Waste;
-import it.unibo.wastemaster.core.utils.DateUtils;
+
 
 public class CollectionDAOTest extends AbstractDatabaseTest {
 
@@ -32,7 +32,7 @@ public class CollectionDAOTest extends AbstractDatabaseTest {
     @BeforeEach
     public void setUp() {
         super.setUp();
-        date = DateUtils.getCurrentDate();
+        date = dateUtils.getCurrentDate();
         wasteType = Waste.WasteType.PLASTIC;
 
         pending = Collection.CollectionStatus.PENDING;
@@ -68,22 +68,22 @@ public class CollectionDAOTest extends AbstractDatabaseTest {
         collectionDAO.insert(c4);
     
         Collection c5 = new Collection(recurringSchedule);
-        c5.setCollectionDate(DateUtils.getCurrentDate());
+        c5.setCollectionDate(dateUtils.getCurrentDate());
         collectionDAO.insert(c5);
     
         Collection c6 = new Collection(recurringSchedule);
         c6.setCollectionStatus(inProgress);
-        c6.setCollectionDate(DateUtils.getCurrentDate());
+        c6.setCollectionDate(dateUtils.getCurrentDate());
         collectionDAO.insert(c6);
     
         Collection c7 = new Collection(recurringSchedule);
         c7.setCollectionStatus(completed);
-        c7.setCollectionDate(DateUtils.getCurrentDate());
+        c7.setCollectionDate(dateUtils.getCurrentDate());
         collectionDAO.insert(c7);
     
         Collection c8 = new Collection(recurringSchedule);        
         c8.setCollectionStatus(cancelled);
-        c8.setCollectionDate(DateUtils.getCurrentDate());
+        c8.setCollectionDate(dateUtils.getCurrentDate());
         collectionDAO.insert(c8);
     
         assertEquals(2, collectionDAO.findCollectionByStatus(pending).size());

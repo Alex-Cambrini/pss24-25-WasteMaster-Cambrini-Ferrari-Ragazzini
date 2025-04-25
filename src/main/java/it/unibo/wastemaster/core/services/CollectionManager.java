@@ -14,6 +14,7 @@ public class CollectionManager {
 
     private RecurringScheduleManager recurringScheduleManager;
     private CollectionDAO collectionDAO;
+    private DateUtils dateUtils = new DateUtils();
 
     public CollectionManager(CollectionDAO collectionDAO, RecurringScheduleManager recurringScheduleManager) {
         this.collectionDAO = collectionDAO;
@@ -25,7 +26,7 @@ public class CollectionManager {
     }
 
     public void generateCollection(Schedule schedule) {
-        if (schedule.getCollectionDate().isAfter(DateUtils.getCurrentDate())) {
+        if (schedule.getCollectionDate().isAfter(dateUtils.getCurrentDate())) {
             Collection collection = new Collection(schedule);
             collectionDAO.insert(collection);
         }

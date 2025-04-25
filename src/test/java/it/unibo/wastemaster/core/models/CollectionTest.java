@@ -13,7 +13,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import it.unibo.wastemaster.core.AbstractDatabaseTest;
-import it.unibo.wastemaster.core.utils.DateUtils;
 import it.unibo.wastemaster.core.utils.ValidateUtils;
 import jakarta.validation.ConstraintViolation;
 
@@ -25,6 +24,7 @@ class CollectionTest extends AbstractDatabaseTest {
     private Waste.WasteType wasteType;
     private Collection collection;
     private OneTimeSchedule schedule;
+    
 
     @BeforeEach
     public void setUp() {
@@ -32,7 +32,7 @@ class CollectionTest extends AbstractDatabaseTest {
         location = new Location("Via Roma", "10", "Bologna", "40100");
         customer = new Customer("Mario", "Rossi", location, "mario.rossi@example.com", "1234567890");
 
-        date = DateUtils.getCurrentDate();
+        date = dateUtils.getCurrentDate();
         wasteType = Waste.WasteType.PLASTIC;
 
         schedule = new OneTimeSchedule(customer, wasteType, date);
