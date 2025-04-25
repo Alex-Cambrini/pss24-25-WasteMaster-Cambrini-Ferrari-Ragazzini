@@ -22,7 +22,7 @@ class RecurringScheduleTest extends AbstractDatabaseTest {
     @BeforeEach
     public void setUp() {
         super.setUp();
-        location = new Location("Via Roma", "1", "Milano", "Italy");
+        location = new Location("Via Roma", "1", "Milano", "20100");
         customer = new Customer("Mario", "Rossi", location, "mario@rossi.com", "1234567890");
         startDate = LocalDate.now();
         schedule = new RecurringSchedule(customer, Waste.WasteType.PLASTIC, startDate,
