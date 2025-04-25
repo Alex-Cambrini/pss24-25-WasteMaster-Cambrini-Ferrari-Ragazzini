@@ -35,6 +35,32 @@ class CustomerManagerTest extends AbstractDatabaseTest {
         Assertions.assertNull(notFound);
     }
 
+    @Test
+    void testUpdateCustomer() {
+        Customer customer = customerManager.addCustomer("Giulia", "Bianchi", "giulia@example.com", "4445556667",
+                "Via Torino", "5", "Torino", "10100");
+        customer.setPhone("0000000000");
+
+        customerManager.updateCustomer(customer);
+
+        Customer updated = customerManager.getCustomerById(customer.getCustomerId());
+        Assertions.assertEquals("0000000000", updated.getPhone());
+    }
+
+    @Test
+    void testDeleteCustomer() {
+        Customer customer = customerManager.addCustomer("Elena", "Neri", "elena@example.com", "8889997776",
+                "Via Napoli", "8", "Napoli", "80100");
+        int id = customer.getCustomerId();
+
+        boolean deleted = customerManager.deleteCustomer(customer);
+        Assertions.assertTrue(deleted);
+
+        Customer afterDelete = customerManager.getCustomerById(id);
+        Assertions.assertNull(afterDelete);
+
+        Assertions.assertFalse(customerManager.deleteCustomer(null));
+    }
     
 
 }
