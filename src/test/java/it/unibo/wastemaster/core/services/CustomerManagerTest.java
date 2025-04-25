@@ -130,4 +130,14 @@ class CustomerManagerTest extends AbstractDatabaseTest {
         System.out.println("Dopo il caso 4");
 
     }
+
+    @Test
+    void testUpdateCustomerNoChange() {
+        Customer customer = customerManager.addCustomer("Marco", "Verdi", "marco@example.com", "3333333333", "Via", "3",
+                "City", "11111");
+        customer.setPhone("4444444444");
+
+        Assertions.assertDoesNotThrow(() -> customerManager.updateCustomer(customer));
+    }
+
 }
