@@ -21,4 +21,20 @@ class CustomerManagerTest extends AbstractDatabaseTest {
         });
     }
 
+    @Test
+    void testGetCustomerById() {
+        Customer customer = customerManager.addCustomer("Luca", "Verdi", "luca@example.com", "1112223333",
+                "Via Milano", "15", "Milano", "20100");
+        int id = customer.getCustomerId();
+
+        Customer found = customerManager.getCustomerById(id);
+        Assertions.assertNotNull(found);
+        Assertions.assertEquals("luca@example.com", found.getEmail());
+
+        Customer notFound = customerManager.getCustomerById(9999);
+        Assertions.assertNull(notFound);
+    }
+
+    
+
 }
