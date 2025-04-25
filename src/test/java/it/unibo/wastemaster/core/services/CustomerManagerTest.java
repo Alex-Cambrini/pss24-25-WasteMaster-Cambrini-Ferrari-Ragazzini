@@ -2,7 +2,6 @@ package it.unibo.wastemaster.core.services;
 
 import it.unibo.wastemaster.core.AbstractDatabaseTest;
 import it.unibo.wastemaster.core.models.Customer;
-import it.unibo.wastemaster.core.models.Location;
 import jakarta.validation.ConstraintViolationException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -115,7 +114,6 @@ class CustomerManagerTest extends AbstractDatabaseTest {
         Customer notPersisted = new Customer();
         Assertions.assertThrows(IllegalArgumentException.class, () -> customerManager.updateCustomer(notPersisted));
 
-        // Caso 3: email duplicata
         Customer toUpdate = customerManager.getCustomerById(c2.getCustomerId());
         toUpdate.setEmail("mail1@example.com");
         em.detach(toUpdate);
@@ -140,4 +138,13 @@ class CustomerManagerTest extends AbstractDatabaseTest {
         Assertions.assertDoesNotThrow(() -> customerManager.updateCustomer(customer));
     }
 
+    @Test
+    void testDeleteCustomerNotFound() {
+        Customer customer = customerManager.addCustomer("Lara", "Grey", "lara@example.com", "1111222233", "Via", "4",
+                "City", "22222");
+        em.remove(customerManager.getCustomerById(customer.getCustomerId()));
+
+        boolean result = customerManager.deleteCustomer(customer);
+        Assertions.assertFalse(result);
+    }
 }
