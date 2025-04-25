@@ -18,10 +18,13 @@ public class ValidateUtils {
             throw new IllegalArgumentException(errorMessage);
         }
     }
-
-    public static void validateNotNull(Object toValidate, String errorMessage) {
-        if (toValidate == null) {
-            throw new IllegalArgumentException(errorMessage);
-        }
+    
+    public static void requireArgNotNull(Object toValidate, String errorMessage) {
+        if (toValidate==null) throw new IllegalArgumentException(errorMessage);
     }
+    
+    public static void requireStateNotNull(Object toValidate, String errorMessage) {
+        if (toValidate==null) throw new IllegalStateException(errorMessage);
+    }
+    
 }

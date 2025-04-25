@@ -5,6 +5,7 @@ import java.time.DayOfWeek;
 import it.unibo.wastemaster.core.dao.WasteScheduleDAO;
 import it.unibo.wastemaster.core.models.Waste;
 import it.unibo.wastemaster.core.models.WasteSchedule;
+import it.unibo.wastemaster.core.utils.ValidateUtils;
 
 public class WasteScheduleManager {
     private final WasteScheduleDAO wasteScheduleDAO;
@@ -26,6 +27,9 @@ public class WasteScheduleManager {
     }
 
     public WasteSchedule getWasteScheduleForWaste(Waste.WasteType wasteType) {
-        return wasteScheduleDAO.findByWasteType(wasteType);
-    }
+        ValidateUtils.requireArgNotNull(wasteType, "WasteType cannot be null");
+        WasteSchedule schedule = wasteScheduleDAO.findByWasteType(wasteType);
+        ValidateUtils.requireStateNotNull(schedule, "No WasteSchedule found for waste type: " + wasteType);
+        return schedule;
+    }    
 }
