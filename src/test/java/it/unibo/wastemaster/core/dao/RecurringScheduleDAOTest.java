@@ -120,8 +120,8 @@ public class RecurringScheduleDAOTest extends AbstractDatabaseTest {
 
     @Test
     void testFindScheduleByCustomer() {
-        List<RecurringSchedule> result1 = recurringScheduleDAO.findScheduleByCustomer(customer1);
-        List<RecurringSchedule> result2 = recurringScheduleDAO.findScheduleByCustomer(customer2);
+        List<RecurringSchedule> result1 = recurringScheduleDAO.findSchedulesByCustomer(customer1);
+        List<RecurringSchedule> result2 = recurringScheduleDAO.findSchedulesByCustomer(customer2);
 
         assertNotNull(result1);
         assertEquals(3, result1.size());
