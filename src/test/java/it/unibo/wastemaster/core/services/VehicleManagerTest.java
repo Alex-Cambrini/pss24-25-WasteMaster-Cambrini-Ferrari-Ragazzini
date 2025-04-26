@@ -97,4 +97,30 @@ public class VehicleManagerTest extends AbstractDatabaseTest {
         assertEquals(Vehicle.VehicleStatus.IN_SERVICE, updated.getVehicleStatus());
         assertEquals(LocalDate.now(), updated.getLastMaintenanceDate());
     }
+
+    @Test
+    public void testAddVehicleInvalidPlate() {
+        assertThrows(IllegalArgumentException.class, () -> {
+            vehicleManager.addVehicle(null, "Brand", "Model", 2024, Vehicle.LicenceType.C1,
+                    Vehicle.VehicleStatus.IN_SERVICE);
+        });
+
+        assertThrows(IllegalArgumentException.class, () -> {
+            vehicleManager.addVehicle("", "Brand", "Model", 2024, Vehicle.LicenceType.C1,
+                    Vehicle.VehicleStatus.IN_SERVICE);
+        });
+    }
+
+    @Test
+    public void testUpdateStatusNull() {
+        assertThrows(IllegalArgumentException.class, () -> {
+            vehicleManager.updateStatus("DD444DD", null);
+        });
+    }
+
+    @Test
+    public void testCompleteMaintenancePlateNotFound() {
+        vehicleManager.completeMaintenance("ZZ999ZZ");
+    }
+
 }
