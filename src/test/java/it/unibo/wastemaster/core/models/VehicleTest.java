@@ -1,13 +1,17 @@
 package it.unibo.wastemaster.core.models;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.LocalDate;
+import java.util.Set;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import it.unibo.wastemaster.core.AbstractDatabaseTest;
+import it.unibo.wastemaster.core.utils.ValidateUtils;
+import jakarta.validation.ConstraintViolation;
 
 public class VehicleTest extends AbstractDatabaseTest {
 
@@ -35,7 +39,36 @@ public class VehicleTest extends AbstractDatabaseTest {
 		assertEquals(Vehicle.LicenceType.C, vehicle.getLicenceType());
 		assertEquals(Vehicle.VehicleStatus.IN_MAINTENANCE, vehicle.getVehicleStatus());
 		assertEquals(newDate, vehicle.getLastMaintenanceDate());
-		assertEquals(2, vehicle.getCapacity()); // perché C -> 2
+		assertEquals(2, vehicle.getCapacity());
+	}
+
+    @Test
+	public void testValidVehicle() {
+		Set<ConstraintViolation<Vehicle>> violations = ValidateUtils.VALIDATOR.validate(vehicle);
+		assertTrue(violations.isEmpty());
+	}
+
+	@Test
+	public void testVehicleValidation() {
+		Set<ConstraintViolation<Vehicle>> violations;
+
+		violations = ValidateUtils.VALIDATOR.validate(new Vehicle(null, "Iveco", "Daily", 2020, Vehicle.LicenceType.C1, Vehicle.VehicleStatus.IN_SERVICE));
+		assertTrue(violations.size() > 0);
+
+		violations = ValidateUtils.VALIDATOR.validate(new Vehicle("", "Iveco", "Daily", 2020, Vehicle.LicenceType.C1, Vehicle.VehicleStatus.IN_SERVICE));
+		assertTrue(violations.size() > 0);
+
+		violations = ValidateUtils.VALIDATOR.validate(new Vehicle("AB123CD", null, "Daily", 2020, Vehicle.LicenceType.C1, Vehicle.VehicleStatus.IN_SERVICE));
+		assertTrue(violations.size() > 0);
+
+		violations = ValidateUtils.VALIDATOR.validate(new Vehicle("AB123CD", "", "Daily", 2020, Vehicle.LicenceType.C1, Vehicle.VehicleStatus.IN_SERVICE));
+		assertTrue(violations.size() > 0);
+
+		violations = ValidateUtils.VALIDATOR.validate(new Vehicle("AB123CD", "Iveco", null, 2020, Vehicle.LicenceType.C1, Vehicle.VehicleStatus.IN_SERVICE));
+		assertTrue(violations.size() > 0);
+
+		violations = ValidateUtils.VALIDATOR.validate(new Vehicle("AB123CD", "Iveco", "", 2020, Vehicle.LicenceType.C1, Vehicle.VehicleStatus.IN_SERVICE));
+		assertTrue(violations.size() > 0);
 	}
 
 }
