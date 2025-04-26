@@ -1,6 +1,8 @@
 package it.unibo.wastemaster.core.models;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.LocalDate;
@@ -71,4 +73,36 @@ public class VehicleTest extends AbstractDatabaseTest {
 		assertTrue(violations.size() > 0);
 	}
 
+    @Test
+	public void testVehiclePersistence() {
+		vehicleDAO.insert(vehicle);
+
+		Vehicle found = vehicleDAO.findByPlate(vehicle.getPlate());
+		assertNotNull(found);
+		assertEquals(vehicle.getBrand(), found.getBrand());
+		assertEquals(vehicle.getModel(), found.getModel());
+		assertEquals(vehicle.getLicenceType(), found.getLicenceType());
+
+		vehicleDAO.delete(vehicle);
+
+		Vehicle deleted = vehicleDAO.findByPlate(vehicle.getPlate());
+		assertNull(deleted);
+	}
+
+	@Test
+	public void testGetInfo() {
+		String expectedInfo = String.format(
+			"Vehicle Info: Brand: %s, Model: %s, Registration year: %d, Plate: %s, Licence: %s, Capacity: %d persons, Status: %s, Last Maintenance: %s",
+			"Iveco",
+			"Daily",
+			2020,
+			"AB123CD",
+			Vehicle.LicenceType.C1,
+			3,
+			Vehicle.VehicleStatus.IN_SERVICE,
+			vehicle.getLastMaintenanceDate()
+		);
+
+		assertEquals(expectedInfo, vehicle.getInfo());
+	}
 }
