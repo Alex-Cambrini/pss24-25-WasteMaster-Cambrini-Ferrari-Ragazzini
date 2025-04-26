@@ -1,8 +1,12 @@
 package it.unibo.wastemaster.core.services;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -59,5 +63,14 @@ public class VehicleManagerTest extends AbstractDatabaseTest {
 		assertThrows(IllegalArgumentException.class, () -> {
 			vehicleManager.updateStatus("ZZ999ZZ", Vehicle.VehicleStatus.IN_SERVICE);
 		});
+	}
+
+    @Test
+	public void testCanOperateVehicle() {
+		List<Vehicle.LicenceType> licences = List.of(Vehicle.LicenceType.C1, Vehicle.LicenceType.C);
+
+		assertTrue(vehicleManager.canOperateVehicle(v1, licences));
+		assertTrue(vehicleManager.canOperateVehicle(v2, List.of(Vehicle.LicenceType.C)));
+		assertFalse(vehicleManager.canOperateVehicle(v2, List.of(Vehicle.LicenceType.C1)));
 	}
 }
