@@ -1,5 +1,8 @@
 package it.unibo.wastemaster.core.services;
 
+import java.time.LocalDate;
+import java.util.List;
+
 import it.unibo.wastemaster.core.dao.VehicleDAO;
 import it.unibo.wastemaster.core.models.Vehicle;
 import jakarta.validation.ConstraintViolationException;
@@ -44,4 +47,25 @@ public class VehicleManager {
 		vehicle.setVehicleStatus(newStatus);
 		vehicleDAO.update(vehicle);
 	}
+
+	public boolean canOperateVehicle(Vehicle vehicle, List<Vehicle.LicenceType> driverLicences) {
+		if (vehicle == null || driverLicences == null || driverLicences.isEmpty()) {
+			throw new IllegalArgumentException("Vehicle and driver licences must not be null or empty");
+		}
+
+		Vehicle.LicenceType required = vehicle.getLicenceType();
+
+		for (Vehicle.LicenceType licence : driverLicences) {
+			if (required == Vehicle.LicenceType.C1
+					&& (licence == Vehicle.LicenceType.C1 || licence == Vehicle.LicenceType.C)) {
+				return true;
+			}
+			if (required == Vehicle.LicenceType.C && licence == Vehicle.LicenceType.C) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
 }
