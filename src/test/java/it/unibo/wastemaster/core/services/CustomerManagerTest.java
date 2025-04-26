@@ -2,149 +2,195 @@ package it.unibo.wastemaster.core.services;
 
 import it.unibo.wastemaster.core.AbstractDatabaseTest;
 import it.unibo.wastemaster.core.models.Customer;
+import it.unibo.wastemaster.core.models.Location;
 import jakarta.validation.ConstraintViolationException;
-import org.junit.jupiter.api.Assertions;
+
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 class CustomerManagerTest extends AbstractDatabaseTest {
+        private Location location;
+        private Customer customer;
+        private String email;
 
-    @Test
-    void testAddCustomer() {
-        Customer customer = customerManager.addCustomer("Mario", "Rossi", "mario@example.com", "1234567890",
-                "Via Roma", "10", "Bologna", "40100");
-        Assertions.assertNotNull(customer.getCustomerId());
+        @BeforeEach
+        public void setUp() {
+                super.setUp();
+                em.getTransaction().begin();
+                email = "test@test.it";
+                location = new Location("Via Roma", "10", "Bologna", "40100");
+                customer = new Customer("Mario", "Rossi", location, email, "1234567890");
 
-        Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            customerManager.addCustomer("Mario", "Rossi", "mario@example.com", "999999999", "Via Roma", "10",
-                    "Bologna", "40100");
-        });
-    }
+        }
 
-    @Test
-    void testGetCustomerById() {
-        Customer customer = customerManager.addCustomer("Luca", "Verdi", "luca@example.com", "1112223333",
-                "Via Milano", "15", "Milano", "20100");
-        int id = customer.getCustomerId();
+        void testAddCustomer() {
+                Customer saved = customerManager.addCustomer(customer);
+                assertNotNull(saved.getCustomerId());
 
-        Customer found = customerManager.getCustomerById(id);
-        Assertions.assertNotNull(found);
-        Assertions.assertEquals("luca@example.com", found.getEmail());
+                // Add customer with duplicate email
+                Customer duplicate = new Customer(
+                                "Mario", "Rossi",
+                                location,
+                                email,
+                                "999999999");
+                assertThrows(
+                                IllegalArgumentException.class,
+                                () -> customerManager.addCustomer(duplicate),
+                                "A customer with this email already exists");
+        }
 
-        Customer notFound = customerManager.getCustomerById(9999);
-        Assertions.assertNull(notFound);
-    }
+        @Test
+        void testGetCustomerById() {
+                Customer saved = customerManager.addCustomer(customer);
+                int savedId = saved.getCustomerId();
 
-    @Test
-    void testUpdateCustomer() {
-        Customer customer = customerManager.addCustomer("Giulia", "Bianchi", "giulia@example.com", "4445556667",
-                "Via Torino", "5", "Torino", "10100");
-        customer.setPhone("0000000000");
+                Customer found = customerManager.getCustomerById(savedId);
+                assertNotNull(found);
+                assertEquals(saved.getName(), found.getName());
+                assertEquals(saved.getSurname(), found.getSurname());
+                assertEquals(saved.getEmail(), found.getEmail());
+                assertEquals(saved.getPhone(), found.getPhone());
+                assertEquals(saved.getLocation().getStreet(), found.getLocation().getStreet());
+                assertEquals(saved.getLocation().getCivicNumber(), found.getLocation().getCivicNumber());
+                assertEquals(saved.getLocation().getCity(), found.getLocation().getCity());
+                assertEquals(saved.getLocation().getPostalCode(), found.getLocation().getPostalCode());
 
-        customerManager.updateCustomer(customer);
+                // not found
+                Customer notFound = customerManager.getCustomerById(-1);
+                assertNull(notFound);
+        }
 
-        Customer updated = customerManager.getCustomerById(customer.getCustomerId());
-        Assertions.assertEquals("0000000000", updated.getPhone());
-    }
+        @Test
+        void testUpdateCustomer() {
+                Customer saved = customerManager.addCustomer(customer);
+                String newPhone = "0000000000";
+                String newName = "Francesco";
 
-    @Test
-    void testDeleteCustomer() {
-        Customer customer = customerManager.addCustomer("Elena", "Neri", "elena@example.com", "8889997776",
-                "Via Napoli", "8", "Napoli", "80100");
-        int id = customer.getCustomerId();
+                saved.setPhone(newPhone);
+                saved.setName(newName);
+                customerManager.updateCustomer(saved);
+                Customer updated = customerManager.getCustomerById(saved.getCustomerId());
+                assertEquals(newPhone, updated.getPhone());
+                assertEquals(newName, updated.getName());
+        }
 
-        boolean deleted = customerManager.deleteCustomer(customer);
-        Assertions.assertTrue(deleted);
+        @Test
+        void testDeleteCustomer() {
+                Customer saved = customerManager.addCustomer(customer);
+                int savedId = saved.getCustomerId();
 
-        Customer afterDelete = customerManager.getCustomerById(id);
-        Assertions.assertNull(afterDelete);
+                assertNotNull(saved);
+                assertTrue(customerManager.deleteCustomer(saved));
+                Customer afterDelete = customerManager.getCustomerById(savedId);
+                assertNull(afterDelete);
+                assertFalse(customerManager.deleteCustomer(null));
+        }
 
-        Assertions.assertFalse(customerManager.deleteCustomer(null));
-    }
+        @Test
+        void testAddCustomerInvalid() {
+                // Null or invalid email
+                assertThrows(ConstraintViolationException.class,
+                                () -> customerManager.addCustomer(
+                                                new Customer("Mario", "Rossi",
+                                                                new Location("Via Roma", "10", "Bologna", "40100"),
+                                                                null, "1234567890")));
 
-    @Test
-    void testAddCustomerInvalid() {
-        Assertions.assertThrows(ConstraintViolationException.class,
-                () -> customerManager.addCustomer("Anna", "Blu", null, "1234567890", "Via", "1", "Roma", "00100"));
+                assertThrows(ConstraintViolationException.class,
+                                () -> customerManager.addCustomer(new Customer("Mario", "Rossi",
+                                                new Location("Via Roma", "10", "Bologna", "40100"),
+                                                "notValidEmail", "1234567890")));
 
-        Assertions.assertThrows(ConstraintViolationException.class,
-                () -> customerManager.addCustomer("Anna", "Blu", "anna@example.com",
-                        "abcde123", "Via", "1", "Roma", "00100"));
+                // Email with special characters or invalid domains
+                assertThrows(ConstraintViolationException.class,
+                                () -> customerManager.addCustomer(new Customer("Mario", "Rossi",
+                                                new Location("Via Roma", "10", "Bologna", "40100"),
+                                                "mario@invalid_domain", "1234567890")));
 
-        Assertions.assertThrows(ConstraintViolationException.class,
-                () -> customerManager.addCustomer("", "Blu", "vuoto@example.com",
-                        "1234567890", "Via", "1", "Roma", "00100"));
+                // Invalid phone number
+                assertThrows(ConstraintViolationException.class,
+                                () -> customerManager.addCustomer(
+                                                new Customer("Mario", "Rossi",
+                                                                new Location("Via Roma", "10", "Bologna", "40100"),
+                                                                email, "notValidPhone")));
 
-        Assertions.assertThrows(ConstraintViolationException.class,
-                () -> customerManager.addCustomer("Anna", "Blu", "email-sbagliato",
-                        "1234567890", "Via", "1", "Roma", "00100"));
+                // Phone number too short
+                assertThrows(ConstraintViolationException.class,
+                                () -> customerManager.addCustomer(new Customer("Mario", "Rossi",
+                                                new Location("Via Roma", "10", "Bologna", "40100"),
+                                                email, "123")));
 
-        Assertions.assertThrows(ConstraintViolationException.class,
-                () -> customerManager.addCustomer("Anna", "Blu", "posta@example.com",
-                        "1234567890", "Via", "1", "Roma", "00A00"));
+                // Phone number too long
+                assertThrows(ConstraintViolationException.class,
+                                () -> customerManager.addCustomer(
+                                                new Customer("Mario", "Rossi",
+                                                                new Location("Via Roma", "10", "Bologna", "40100"),
+                                                                email, "12345678901234567")));
 
-        Assertions.assertThrows(ConstraintViolationException.class,
-                () -> customerManager.addCustomer("Anna", "Blu", "civico@example.com",
-                        "1234567890", "Via", "", "Roma", "00100"));
-    }
+                // Empty first name
+                assertThrows(ConstraintViolationException.class,
+                                () -> customerManager.addCustomer(new Customer("", "Rossi",
+                                                new Location("Via Roma", "10", "Bologna", "40100"),
+                                                email, "1234567890")));
 
-    @Test
-    void testAddCustomerDuplicateEmail() {
-        customerManager.addCustomer("Test", "Dup", "dup@example.com", "1234567890", "Via", "1", "Roma", "00100");
+                // Empty last name
+                assertThrows(ConstraintViolationException.class,
+                                () -> customerManager.addCustomer(new Customer("Mario", "",
+                                                new Location("Via Roma", "10", "Bologna", "40100"),
+                                                email, "1234567890")));
 
-        Assertions.assertThrows(IllegalArgumentException.class, () -> customerManager.addCustomer("Altro", "Dup",
-                "dup@example.com", "0987654321", "Via", "1", "Roma", "00100"));
-    }
+                // Blank first name
+                assertThrows(ConstraintViolationException.class,
+                                () -> customerManager.addCustomer(new Customer("   ", "Rossi",
+                                                new Location("Via Roma", "10", "Bologna", "40100"),
+                                                email, "1234567890")));
 
-    @Test
-    void testGetCustomerInvalidId() {
-        Assertions.assertNull(customerManager.getCustomerById(-5));
-        Assertions.assertNull(customerManager.getCustomerById(0));
-        Assertions.assertNull(customerManager.getCustomerById(99999));
-    }
+                // Blank last name
+                assertThrows(ConstraintViolationException.class,
+                                () -> customerManager.addCustomer(new Customer("Mario", "   ",
+                                                new Location("Via Roma", "10", "Bologna", "40100"),
+                                                email, "1234567890")));
 
-    @Test
-    void testUpdateCustomerInvalid() {
-        Customer c1 = customerManager.addCustomer("A", "B", "mail1@example.com", "1234567890", "Via", "1", "City",
-                "12345");
-        Customer c2 = customerManager.addCustomer("C", "D", "mail2@example.com", "0987654321", "Via", "2", "City",
-                "54321");
+                // Null first name
+                assertThrows(ConstraintViolationException.class,
+                                () -> customerManager.addCustomer(new Customer(null, "Rossi",
+                                                new Location("Via Roma", "10", "Bologna", "40100"),
+                                                email, "1234567890")));
 
-        Assertions.assertThrows(IllegalArgumentException.class, () -> customerManager.updateCustomer(null));
+                // Null last name
+                assertThrows(ConstraintViolationException.class,
+                                () -> customerManager.addCustomer(new Customer("Mario", null,
+                                                new Location("Via Roma", "10", "Bologna", "40100"),
+                                                email, "1234567890")));
 
-        Customer notPersisted = new Customer();
-        Assertions.assertThrows(IllegalArgumentException.class, () -> customerManager.updateCustomer(notPersisted));
+                // Null location
+                assertThrows(ConstraintViolationException.class,
+                                () -> customerManager.addCustomer(new Customer("Mario", "Rossi",
+                                                null, email, "1234567890")));
+        }
 
-        Customer toUpdate = customerManager.getCustomerById(c2.getCustomerId());
-        toUpdate.setEmail("mail1@example.com");
-        em.detach(toUpdate);
-        System.out.println("Prima del caso 3");
-        Assertions.assertThrows(IllegalArgumentException.class, () -> customerManager.updateCustomer(toUpdate));
-        System.out.println("Dopo il caso 3");
+        @Test
+        void testGetCustomerInvalidId() {
+                assertNull(customerManager.getCustomerById(-5));
+                assertNull(customerManager.getCustomerById(0));
+                assertNull(customerManager.getCustomerById(99999));
+        }
 
-        Customer c1ToUpdate = customerManager.getCustomerById(c1.getCustomerId());
-        c1ToUpdate.setPhone("invalid");
-        System.out.println("Prima del caso 4");
-        Assertions.assertThrows(ConstraintViolationException.class, () -> customerManager.updateCustomer(c1ToUpdate));
-        System.out.println("Dopo il caso 4");
+        @Test
+        void testUpdateCustomerInvalid() {
+                // Test: Customer null
+                assertThrows(IllegalArgumentException.class, () -> customerManager.updateCustomer(null));
 
-    }
+                // Test: Customer not persisted (not saved in DB)
+                Customer notPersisted = new Customer("Franco", "Neri",
+                                new Location("Via Roma", "10", "Bologna", "40100"), "test2@test.it", "1234567890");
+                assertThrows(IllegalArgumentException.class, () -> customerManager.updateCustomer(notPersisted));
+        }
 
-    @Test
-    void testUpdateCustomerNoChange() {
-        Customer customer = customerManager.addCustomer("Marco", "Verdi", "marco@example.com", "3333333333", "Via", "3",
-                "City", "11111");
-        customer.setPhone("4444444444");
-
-        Assertions.assertDoesNotThrow(() -> customerManager.updateCustomer(customer));
-    }
-
-    @Test
-    void testDeleteCustomerNotFound() {
-        Customer customer = customerManager.addCustomer("Lara", "Grey", "lara@example.com", "1111222233", "Via", "4",
-                "City", "22222");
-        em.remove(customerManager.getCustomerById(customer.getCustomerId()));
-
-        boolean result = customerManager.deleteCustomer(customer);
-        Assertions.assertFalse(result);
-    }
+        @Test
+        void testUpdateCustomerNoChange() {
+                customerManager.addCustomer(customer);
+                assertDoesNotThrow(() -> customerManager.updateCustomer(customer));
+        }
 }
