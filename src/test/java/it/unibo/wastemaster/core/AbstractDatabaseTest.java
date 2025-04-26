@@ -10,6 +10,7 @@ import it.unibo.wastemaster.core.dao.CustomerDAO;
 import it.unibo.wastemaster.core.dao.GenericDAO;
 import it.unibo.wastemaster.core.dao.OneTimeScheduleDAO;
 import it.unibo.wastemaster.core.dao.RecurringScheduleDAO;
+import it.unibo.wastemaster.core.dao.VehicleDAO;
 import it.unibo.wastemaster.core.dao.WasteScheduleDAO;
 import it.unibo.wastemaster.core.models.Employee;
 import it.unibo.wastemaster.core.models.Location;
@@ -36,6 +37,7 @@ public abstract class AbstractDatabaseTest {
     protected OneTimeScheduleDAO oneTimeScheduleDAO;
     protected RecurringScheduleDAO recurringScheduleDAO;
     protected WasteScheduleDAO wasteScheduleDAO;
+    protected VehicleDAO vehicleDAO;
 
     protected CustomerManager customerManager;
     protected WasteScheduleManager wasteScheduleManager;
@@ -74,6 +76,8 @@ public abstract class AbstractDatabaseTest {
         recurringScheduleManager.setCollectionManager(collectionManager);
 
         oneTimeScheduleDAO = new OneTimeScheduleDAO(em);
+
+        vehicleDAO = new VehicleDAO(em);
     }
 
     @AfterEach
