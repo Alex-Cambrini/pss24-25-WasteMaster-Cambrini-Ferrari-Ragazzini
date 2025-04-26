@@ -1,6 +1,11 @@
 package it.unibo.wastemaster.core.services;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import it.unibo.wastemaster.core.AbstractDatabaseTest;
 import it.unibo.wastemaster.core.models.Vehicle;
@@ -27,4 +32,18 @@ public class VehicleManagerTest extends AbstractDatabaseTest {
 		vehicleDAO.insert(v3);
 	}
 
+    @Test
+	public void testAddVehicleSuccess() {
+		Vehicle newVehicle = vehicleManager.addVehicle("GG777GG", "Volkswagen", "Crafter", 2024,
+				Vehicle.LicenceType.C1, Vehicle.VehicleStatus.IN_SERVICE);
+		assertNotNull(newVehicle);
+		assertEquals("Volkswagen", newVehicle.getBrand());
+	}
+
+	@Test
+	public void testAddVehicleDuplicatePlate() {
+		assertThrows(IllegalArgumentException.class, () -> {
+			vehicleManager.addVehicle("DD444DD", "Fake", "Fake", 2023, Vehicle.LicenceType.C1, Vehicle.VehicleStatus.IN_SERVICE);
+		});
+	}
 }
