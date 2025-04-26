@@ -27,7 +27,7 @@ public abstract class Person {
     @ManyToOne(cascade = CascadeType.PERSIST)
     @NotNull (message = "address cannot be null")
     @JoinColumn(nullable = false)
-    private Location address;
+    private Location location;
 
     @NotNull (message = "email cannot be null")
     @NotBlank (message = "email must not be blank")
@@ -46,10 +46,10 @@ public abstract class Person {
     @Column(nullable = false)
     protected boolean isDeleted = false;
 
-    public Person(String name, String surname, Location address, String email, String phone) {
+    public Person(String name, String surname, Location location, String email, String phone) {
         this.name = name;
         this.surname = surname;
-        this.address = address;
+        this.location = location;
         this.email = email;
         this.phone = phone;
     }
@@ -65,8 +65,8 @@ public abstract class Person {
         return surname;
     }
 
-    public Location getAddress() {
-        return address;
+    public Location getLocation() {
+        return location;
     }
 
     public String getEmail() {
@@ -97,8 +97,8 @@ public abstract class Person {
         this.surname = surname;
     }
 
-    public void setAddress(Location address) {
-        this.address = address;
+    public void setLocation(Location location) {
+        this.location = location;
     }
 
     public void setEmail(String email) {
@@ -110,7 +110,7 @@ public abstract class Person {
     }
 
     public String getInfo() {
-        return String.format("Name: %s, Surname: %s, Address: %s, Email: %s, Phone: %s", name, surname, address, email,
+        return String.format("Name: %s, Surname: %s, Address: %s, Email: %s, Phone: %s", name, surname, location, email,
                 phone);
     }
 }

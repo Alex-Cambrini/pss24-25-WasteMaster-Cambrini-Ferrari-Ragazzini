@@ -14,8 +14,8 @@ public class Customer extends Person {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer customerId;
 
-    public Customer(String name, String surname, Location address, String email, String phone) {
-        super(name, surname, address, email, phone); 
+    public Customer(String name, String surname, Location location, String email, String phone) {
+        super(name, surname, location, email, phone); 
     }
 
     public Customer() {}    
