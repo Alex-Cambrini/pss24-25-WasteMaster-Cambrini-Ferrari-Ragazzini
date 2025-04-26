@@ -5,22 +5,16 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
-import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
 @Entity
 public class Vehicle {
-    
+
     @Id
     @Column(length = 10, nullable = false)
     @NotBlank(message = "Plate must not be blank")
     private String plate;
-
-    @Column(nullable = false)
-    @Min(value = 1, message = "Capacity must be greater than 0")
-    @NotNull(message = "capacity is required")
-    private int capacity;
 
     @Column(nullable = false)
     @NotBlank(message = "Brand must not be blank")
@@ -32,23 +26,33 @@ public class Vehicle {
     @NotNull(message = "model is required")
     private String model;
 
-    @Column(name = "`year`", nullable = false)
-    @NotNull(message = "year is required")
-    private int year;
+    @Column(nullable = false)
+    @NotNull(message = "Registration year is required")
+    private int registrationYear;
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     @NotNull(message = "Licence type is required")
     private LicenceType licenceType;
-    
+
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     @NotNull(message = "Vehicle status is required")
     private VehicleStatus vehicleStatus;
 
     public enum LicenceType {
-        C1, // Fino a 3.5 t
-        C, // Oltre 3.5 t
+        C1(3),
+        C(2);
+
+        private final int capacity;
+
+        LicenceType(int capacity) {
+            this.capacity = capacity;
+        }
+
+        public int getCapacity() {
+            return capacity;
+        }
     }
 
     public enum VehicleStatus {
@@ -60,23 +64,18 @@ public class Vehicle {
     public Vehicle() {
     }
 
-    public Vehicle(String plate, int capacity, String brand, String model, int year, LicenceType licenceType,
-            VehicleStatus vehicleStatus) {
+    public Vehicle(String plate, String brand, String model, int registrationYear,
+            LicenceType licenceType, VehicleStatus vehicleStatus) {
         this.plate = plate;
-        this.capacity = capacity;
         this.brand = brand;
         this.model = model;
-        this.year = year;
+        this.registrationYear = registrationYear;
         this.licenceType = licenceType;
         this.vehicleStatus = vehicleStatus;
     }
 
     public String getPlate() {
         return plate;
-    }
-
-    public int getCapacity() {
-        return capacity;
     }
 
     public String getBrand() {
@@ -87,8 +86,8 @@ public class Vehicle {
         return model;
     }
 
-    public int getYear() {
-        return year;
+    public int getRegistrationYear() {
+        return registrationYear;
     }
 
     public LicenceType getLicenceType() {
@@ -99,8 +98,8 @@ public class Vehicle {
         return vehicleStatus;
     }
 
-    public void setCapacity(int capacity) {
-        this.capacity = capacity;
+    public int getCapacity() {
+        return licenceType.getCapacity();
     }
 
     public void setBrand(String brand) {
@@ -111,8 +110,8 @@ public class Vehicle {
         this.model = model;
     }
 
-    public void setYear(int year) {
-        this.year = year;
+    public void setRegistrationYear(int registrationYear) {
+        this.registrationYear = registrationYear;
     }
 
     public void setLicenceType(LicenceType licenceType) {
@@ -129,7 +128,7 @@ public class Vehicle {
 
     public String getInfo() {
         return String.format(
-                "Vehicle Info: Brand: %s, Model: %s, Year: %d, Plate: %s, Licence: %s, Status: %s",
-                brand, model, year, plate, licenceType, vehicleStatus);
+                "Vehicle Info: Brand: %s, Model: %s, Registration year: %d, Plate: %s, Licence: %s, Capacity: %d persons, Status: %s",
+                brand, model, registrationYear, plate, licenceType, getCapacity(), vehicleStatus);
     }
 }
