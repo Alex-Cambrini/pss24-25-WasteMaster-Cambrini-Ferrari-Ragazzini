@@ -97,6 +97,20 @@ public class VehicleTest extends AbstractDatabaseTest {
     }
 
     @Test
+    public void testUpdateStatus() {
+        vehicle.updateStatus(Vehicle.VehicleStatus.IN_MAINTENANCE);
+        assertEquals(Vehicle.VehicleStatus.IN_MAINTENANCE, vehicle.getVehicleStatus());
+    }
+
+    @Test
+    public void testLastMaintenanceDateDefault() {
+        Vehicle newVehicle = new Vehicle("CD456EF", "Mercedes", "Sprinter", 2021, Vehicle.LicenceType.C,
+                Vehicle.VehicleStatus.IN_SERVICE);
+        LocalDate today = LocalDate.now();
+        assertEquals(today, newVehicle.getLastMaintenanceDate());
+    }
+
+    @Test
     public void testGetInfo() {
         String expectedInfo = String.format(
                 "Vehicle Info: Brand: %s, Model: %s, Registration year: %d, Plate: %s, Licence: %s, Capacity: %d persons, Status: %s, Last Maintenance: %s",
