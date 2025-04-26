@@ -2,6 +2,7 @@ package it.unibo.wastemaster.core.dao;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
@@ -49,18 +50,27 @@ public class VehicleDAOTest extends AbstractDatabaseTest {
     }
 
     @Test
+    public void testFindByPlateNotFound() {
+        Vehicle found = vehicleDAO.findByPlate("ZZ999ZZ");
+        assertNull(found);
+    }
+
+    @Test
     public void testFindByStatus() {
         List<Vehicle> inService = vehicleDAO.findByStatus(Vehicle.VehicleStatus.IN_SERVICE);
         assertEquals(1, inService.size());
         assertEquals("AA111AA", inService.get(0).getPlate());
+        assertEquals(Vehicle.VehicleStatus.IN_SERVICE, inService.get(0).getVehicleStatus());
 
         List<Vehicle> inMaintenance = vehicleDAO.findByStatus(Vehicle.VehicleStatus.IN_MAINTENANCE);
         assertEquals(1, inMaintenance.size());
         assertEquals("BB222BB", inMaintenance.get(0).getPlate());
+        assertEquals(Vehicle.VehicleStatus.IN_MAINTENANCE, inMaintenance.get(0).getVehicleStatus());
 
         List<Vehicle> outOfService = vehicleDAO.findByStatus(Vehicle.VehicleStatus.OUT_OF_SERVICE);
         assertEquals(1, outOfService.size());
         assertEquals("CC333CC", outOfService.get(0).getPlate());
+        assertEquals(Vehicle.VehicleStatus.OUT_OF_SERVICE, outOfService.get(0).getVehicleStatus());
     }
 
     @Test
