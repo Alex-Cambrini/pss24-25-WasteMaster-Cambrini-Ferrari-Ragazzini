@@ -8,6 +8,8 @@ import jakarta.persistence.Id;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
+import java.time.LocalDate;
+
 @Entity
 public class Vehicle {
 
@@ -18,12 +20,12 @@ public class Vehicle {
 
     @Column(nullable = false)
     @NotBlank(message = "Brand must not be blank")
-    @NotNull(message = "brand is required")
+    @NotNull(message = "Brand is required")
     private String brand;
 
     @Column(nullable = false)
     @NotBlank(message = "Model must not be blank")
-    @NotNull(message = "model is required")
+    @NotNull(message = "Model is required")
     private String model;
 
     @Column(nullable = false)
@@ -39,6 +41,10 @@ public class Vehicle {
     @Enumerated(EnumType.STRING)
     @NotNull(message = "Vehicle status is required")
     private VehicleStatus vehicleStatus;
+
+    @Column(nullable = false)
+    @NotNull(message = "Last maintenance date is required")
+    private LocalDate lastMaintenanceDate;
 
     public enum LicenceType {
         C1(3),
@@ -72,6 +78,7 @@ public class Vehicle {
         this.registrationYear = registrationYear;
         this.licenceType = licenceType;
         this.vehicleStatus = vehicleStatus;
+        this.lastMaintenanceDate = LocalDate.now();
     }
 
     public String getPlate() {
@@ -102,6 +109,10 @@ public class Vehicle {
         return licenceType.getCapacity();
     }
 
+    public LocalDate getLastMaintenanceDate() {
+        return lastMaintenanceDate;
+    }
+
     public void setBrand(String brand) {
         this.brand = brand;
     }
@@ -122,13 +133,17 @@ public class Vehicle {
         this.vehicleStatus = vehicleStatus;
     }
 
+    public void setLastMaintenanceDate(LocalDate lastMaintenanceDate) {
+        this.lastMaintenanceDate = lastMaintenanceDate;
+    }
+
     public void updateStatus(VehicleStatus vehicleStatus) {
         this.vehicleStatus = vehicleStatus;
     }
 
     public String getInfo() {
         return String.format(
-                "Vehicle Info: Brand: %s, Model: %s, Registration year: %d, Plate: %s, Licence: %s, Capacity: %d persons, Status: %s",
-                brand, model, registrationYear, plate, licenceType, getCapacity(), vehicleStatus);
+                "Vehicle Info: Brand: %s, Model: %s, Registration year: %d, Plate: %s, Licence: %s, Capacity: %d persons, Status: %s, Last Maintenance: %s",
+                brand, model, registrationYear, plate, licenceType, getCapacity(), vehicleStatus, lastMaintenanceDate);
     }
 }
