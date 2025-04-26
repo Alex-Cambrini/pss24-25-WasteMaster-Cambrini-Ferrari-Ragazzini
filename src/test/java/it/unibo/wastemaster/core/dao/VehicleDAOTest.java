@@ -2,6 +2,7 @@ package it.unibo.wastemaster.core.dao;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
 
@@ -60,5 +61,14 @@ public class VehicleDAOTest extends AbstractDatabaseTest {
         List<Vehicle> outOfService = vehicleDAO.findByStatus(Vehicle.VehicleStatus.OUT_OF_SERVICE);
         assertEquals(1, outOfService.size());
         assertEquals("CC333CC", outOfService.get(0).getPlate());
+    }
+
+    @Test
+    public void testGetAllVehicles() {
+        List<Vehicle> allVehicles = vehicleDAO.getAllVehicles();
+        assertEquals(3, allVehicles.size());
+        assertTrue(allVehicles.stream().anyMatch(v -> v.getPlate().equals("AA111AA")));
+        assertTrue(allVehicles.stream().anyMatch(v -> v.getPlate().equals("BB222BB")));
+        assertTrue(allVehicles.stream().anyMatch(v -> v.getPlate().equals("CC333CC")));
     }
 }
