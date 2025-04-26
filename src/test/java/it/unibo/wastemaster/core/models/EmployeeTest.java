@@ -32,13 +32,13 @@ public class EmployeeTest extends AbstractDatabaseTest {
         employee.setName("Luigi");
         employee.setSurname("Verdi");
         Location newLocation = new Location("Via Milano", "20", "Modena", "41100");
-        employee.setAddress(newLocation);
+        employee.setLocation(newLocation);
         employee.setEmail("luigi.verdi@example.com");
         employee.setPhone("0987654321");
 
         assertEquals("Luigi", employee.getName());
         assertEquals("Verdi", employee.getSurname());
-        assertEquals(newLocation, employee.getAddress());
+        assertEquals(newLocation, employee.getLocation());
         assertEquals("luigi.verdi@example.com", employee.getEmail());
         assertEquals("0987654321", employee.getPhone());
     }
@@ -119,7 +119,7 @@ public class EmployeeTest extends AbstractDatabaseTest {
 
         emptyEmployee.setName("Giovanni");
         emptyEmployee.setSurname("Bianchi");
-        emptyEmployee.setAddress(location);
+        emptyEmployee.setLocation(location);
         emptyEmployee.setEmail("giovanni.bianchi@example.com");
         emptyEmployee.setPhone("0987654321");
         emptyEmployee.setRole(Role.OPERATOR);
@@ -127,7 +127,7 @@ public class EmployeeTest extends AbstractDatabaseTest {
 
         assertEquals("Giovanni", emptyEmployee.getName());
         assertEquals("Bianchi", emptyEmployee.getSurname());
-        assertEquals(location, emptyEmployee.getAddress());
+        assertEquals(location, emptyEmployee.getLocation());
         assertEquals("giovanni.bianchi@example.com", emptyEmployee.getEmail());
         assertEquals("0987654321", emptyEmployee.getPhone());
         assertEquals(Role.OPERATOR, emptyEmployee.getRole());
