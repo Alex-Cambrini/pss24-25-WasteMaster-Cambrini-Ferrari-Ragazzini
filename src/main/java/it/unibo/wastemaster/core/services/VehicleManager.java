@@ -1,55 +1,27 @@
 package it.unibo.wastemaster.core.services;
 
-import java.util.List;
-
-import it.unibo.wastemaster.core.dao.GenericDAO;
+import it.unibo.wastemaster.core.dao.VehicleDAO;
 import it.unibo.wastemaster.core.models.Vehicle;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.EntityManagerFactory;
 
 public class VehicleManager {
-    private final EntityManager em;
-	private final GenericDAO<Vehicle> vehicleDAO;
+	private final VehicleDAO vehicleDAO;
 
-	public VehicleManager(EntityManagerFactory emf) {
-		this.em = emf.createEntityManager();
-		this.vehicleDAO = new GenericDAO<>(em, Vehicle.class);
+	public VehicleManager(VehicleDAO vehicleDAO) {
+		this.vehicleDAO = vehicleDAO;
 	}
 
-    public Vehicle addVehicle(String plate, int capacity, String brand, String model, int year,
-							  Vehicle.LicenceType licenceType, Vehicle.VehicleStatus status) {
-		Vehicle vehicle = new Vehicle(plate, capacity, brand, model, year, licenceType, status);
+	public Vehicle addVehicle(String plate, String brand, String model, int registrationYear,
+			Vehicle.LicenceType licenceType, Vehicle.VehicleStatus status) {
+		Vehicle vehicle = new Vehicle(plate, brand, model, registrationYear, licenceType, status);
 		vehicleDAO.insert(vehicle);
 		return vehicle;
 	}
 
-    public Vehicle getVehicleByPlate(String plate) {
-		return em.find(Vehicle.class, plate);
-	}
-
-    public void updateVehicle(Vehicle vehicle) {
-		vehicleDAO.update(vehicle);
-	}
-
-	public void deleteVehicle(Vehicle vehicle) {
-		vehicleDAO.delete(vehicle);
-	}
-
-    public void updateStatus(String plate, Vehicle.VehicleStatus newStatus) {
-		Vehicle vehicle = getVehicleByPlate(plate);
+	public void updateStatus(String plate, Vehicle.VehicleStatus newStatus) {
+		Vehicle vehicle = vehicleDAO.findByPlate(plate);
 		if (vehicle != null) {
 			vehicle.setVehicleStatus(newStatus);
-			updateVehicle(vehicle);
+			vehicleDAO.update(vehicle);
 		}
-	}
-
-    public List<Vehicle> getAllVehicles() {
-		return em.createQuery("SELECT v FROM Vehicle v", Vehicle.class).getResultList();
-	}
-
-	public List<Vehicle> getVehiclesByStatus(Vehicle.VehicleStatus status) {
-		return em.createQuery("SELECT v FROM Vehicle v WHERE v.vehicleStatus = :status", Vehicle.class)
-				.setParameter("status", status)
-				.getResultList();
 	}
 }
