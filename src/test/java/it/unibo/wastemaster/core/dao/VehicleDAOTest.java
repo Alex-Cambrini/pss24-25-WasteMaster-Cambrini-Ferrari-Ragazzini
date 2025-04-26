@@ -3,6 +3,8 @@ package it.unibo.wastemaster.core.dao;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
+import java.util.List;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -18,6 +20,8 @@ public class VehicleDAOTest extends AbstractDatabaseTest {
     @BeforeEach
     public void setUp() {
         super.setUp();
+
+        em.getTransaction().begin();
 
         v1 = new Vehicle("AA111AA", "Iveco", "Daily", 2020, Vehicle.LicenceType.C1, Vehicle.VehicleStatus.IN_SERVICE);
         v2 = new Vehicle("BB222BB", "Mercedes", "Sprinter", 2021, Vehicle.LicenceType.C,
@@ -43,4 +47,18 @@ public class VehicleDAOTest extends AbstractDatabaseTest {
         assertEquals(Vehicle.LicenceType.C, found2.getLicenceType());
     }
 
+    @Test
+    public void testFindByStatus() {
+        List<Vehicle> inService = vehicleDAO.findByStatus(Vehicle.VehicleStatus.IN_SERVICE);
+        assertEquals(1, inService.size());
+        assertEquals("AA111AA", inService.get(0).getPlate());
+
+        List<Vehicle> inMaintenance = vehicleDAO.findByStatus(Vehicle.VehicleStatus.IN_MAINTENANCE);
+        assertEquals(1, inMaintenance.size());
+        assertEquals("BB222BB", inMaintenance.get(0).getPlate());
+
+        List<Vehicle> outOfService = vehicleDAO.findByStatus(Vehicle.VehicleStatus.OUT_OF_SERVICE);
+        assertEquals(1, outOfService.size());
+        assertEquals("CC333CC", outOfService.get(0).getPlate());
+    }
 }
