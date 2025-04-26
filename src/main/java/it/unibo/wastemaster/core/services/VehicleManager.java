@@ -68,4 +68,29 @@ public class VehicleManager {
 		return false;
 	}
 
+	public void scheduleMaintenance() {
+		List<Vehicle> vehicles = vehicleDAO.findAll();
+		LocalDate today = LocalDate.now();
+
+		for (Vehicle vehicle : vehicles) {
+			if (vehicle.getLastMaintenanceDate().plusYears(1).isBefore(today)
+					|| vehicle.getLastMaintenanceDate().plusYears(1).isEqual(today)) {
+				vehicle.setVehicleStatus(Vehicle.VehicleStatus.IN_MAINTENANCE);
+				vehicleDAO.update(vehicle);
+			}
+		}
+	}
+
+	public void completeMaintenance(String plate) {
+		if (plate == null || plate.isBlank()) {
+			throw new IllegalArgumentException("Plate cannot be null or blank");
+		}
+
+		Vehicle vehicle = vehicleDAO.findByPlate(plate);
+		if (vehicle != null && vehicle.getVehicleStatus() == Vehicle.VehicleStatus.IN_MAINTENANCE) {
+			vehicle.setVehicleStatus(Vehicle.VehicleStatus.IN_SERVICE);
+			vehicle.setLastMaintenanceDate(LocalDate.now());
+			vehicleDAO.update(vehicle);
+		}
+	}
 }
