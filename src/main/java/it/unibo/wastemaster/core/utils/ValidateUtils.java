@@ -1,5 +1,8 @@
 package it.unibo.wastemaster.core.utils;
 
+import java.util.Set;
+
+import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import jakarta.validation.ValidatorFactory;
@@ -26,5 +29,13 @@ public class ValidateUtils {
     public static void requireStateNotNull(Object toValidate, String errorMessage) {
         if (toValidate==null) throw new IllegalStateException(errorMessage);
     }
-    
+
+    public static <T> void validateEntity(T entity) {
+        Set<ConstraintViolation<T>> violations = VALIDATOR.validate(entity);
+        if (!violations.isEmpty()) {
+            for (ConstraintViolation<T> violation : violations) {
+                throw new IllegalArgumentException(violation.getMessage());
+            }
+        }
+    }
 }
