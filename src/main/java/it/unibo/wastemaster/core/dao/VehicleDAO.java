@@ -1,5 +1,28 @@
 package it.unibo.wastemaster.core.dao;
 
-public class VehicleDAO {
-    
+import it.unibo.wastemaster.core.models.Vehicle;
+import jakarta.persistence.EntityManager;
+import java.util.List;
+
+public class VehicleDAO extends GenericDAO<Vehicle> {
+
+    public VehicleDAO(EntityManager entityManager) {
+        super(entityManager, Vehicle.class);
+    }
+
+    public Vehicle findByPlate(String plate) {
+        return entityManager.find(Vehicle.class, plate);
+    }
+
+    public List<Vehicle> findByStatus(Vehicle.VehicleStatus status) {
+        return entityManager.createQuery(
+                "SELECT v FROM Vehicle v WHERE v.vehicleStatus = :status", Vehicle.class)
+                .setParameter("status", status)
+                .getResultList();
+    }
+
+    public List<Vehicle> getAllVehicles() {
+        return entityManager.createQuery("SELECT v FROM Vehicle v", Vehicle.class)
+                .getResultList();
+    }
 }
