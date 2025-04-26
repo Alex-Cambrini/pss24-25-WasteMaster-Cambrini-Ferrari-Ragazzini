@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -72,5 +73,25 @@ public class VehicleManagerTest extends AbstractDatabaseTest {
 		assertTrue(vehicleManager.canOperateVehicle(v1, licences));
 		assertTrue(vehicleManager.canOperateVehicle(v2, List.of(Vehicle.LicenceType.C)));
 		assertFalse(vehicleManager.canOperateVehicle(v2, List.of(Vehicle.LicenceType.C1)));
+	}
+
+    @Test
+	public void testScheduleMaintenance() {
+		v1.setLastMaintenanceDate(LocalDate.now().minusYears(2));
+		vehicleDAO.update(v1);
+
+		vehicleManager.scheduleMaintenance();
+
+		Vehicle updated = vehicleDAO.findByPlate("DD444DD");
+		assertEquals(Vehicle.VehicleStatus.IN_MAINTENANCE, updated.getVehicleStatus());
+	}
+
+    @Test
+	public void testCompleteMaintenance() {
+		vehicleManager.completeMaintenance("EE555EE");
+
+		Vehicle updated = vehicleDAO.findByPlate("EE555EE");
+		assertEquals(Vehicle.VehicleStatus.IN_SERVICE, updated.getVehicleStatus());
+		assertEquals(LocalDate.now(), updated.getLastMaintenanceDate());
 	}
 }
