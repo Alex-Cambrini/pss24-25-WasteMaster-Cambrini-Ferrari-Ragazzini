@@ -36,6 +36,22 @@ public class Route {
         this.stops = stops;
     }
 
+    public Vehicle getTruck() {
+        return truck;
+    }
+
+    public void setTruck(Vehicle truck) {
+        this.truck = truck;
+    }
+
+    public RouteType getType() {
+        return type;
+    }
+
+    public void setType(RouteType type) {
+        this.type = type;
+    }
+
 }
 
 
