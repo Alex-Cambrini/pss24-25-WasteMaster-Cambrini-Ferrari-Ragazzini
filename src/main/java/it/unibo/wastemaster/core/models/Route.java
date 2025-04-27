@@ -6,23 +6,24 @@ import java.util.List;
 
 
 public class Route {
-
     private int id;
-    private Date departureDate;
     private List<Location> stops;
-    private double estimatedDuration;
-    private String status;
-    private Schedule schedule;  
+    private Vehicle truck; 
+    private RouteType type;
 
-    public Route(int id, Date departureDate, List<Location> stops, double estimatedDuration, Schedule schedule) {
-        this.id = id;
-        this.departureDate = departureDate;
-        this.stops = stops;
-        this.estimatedDuration = estimatedDuration;
-        this.status = "In Progress";
-        this.schedule = schedule;
+    public enum RouteType {
+        ONE_TIME,
+        RECURRING
     }
 
+    public Route(int id, List<Location> stops, Vehicle truck, RouteType type) {
+        this.id = id;
+        this.stops = stops;
+        this.truck = truck;
+        this.type = type;
+    }
 }
+
+
   
 
