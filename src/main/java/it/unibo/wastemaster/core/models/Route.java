@@ -22,6 +22,20 @@ public class Route {
         this.truck = truck;
         this.type = type;
     }
+
+    
+    public int getId() {
+        return id;
+    }
+
+    public List<Location> getStops() {
+        return stops;
+    }
+
+    public void setStops(List<Location> stops) {
+        this.stops = stops;
+    }
+
 }
 
 
