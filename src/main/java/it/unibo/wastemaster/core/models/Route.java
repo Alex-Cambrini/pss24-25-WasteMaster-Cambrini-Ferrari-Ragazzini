@@ -6,23 +6,54 @@ import java.util.List;
 
 
 public class Route {
-
     private int id;
-    private Date departureDate;
     private List<Location> stops;
-    private double estimatedDuration;
-    private String status;
-    private Schedule schedule;  
+    private Vehicle truck; 
+    private RouteType type;
 
-    public Route(int id, Date departureDate, List<Location> stops, double estimatedDuration, Schedule schedule) {
+    public enum RouteType {
+        ONE_TIME,
+        RECURRING
+    }
+
+    public Route(int id, List<Location> stops, Vehicle truck, RouteType type) {
         this.id = id;
-        this.departureDate = departureDate;
         this.stops = stops;
-        this.estimatedDuration = estimatedDuration;
-        this.status = "In Progress";
-        this.schedule = schedule;
+        this.truck = truck;
+        this.type = type;
+    }
+
+    
+    public int getId() {
+        return id;
+    }
+
+    public List<Location> getStops() {
+        return stops;
+    }
+
+    public void setStops(List<Location> stops) {
+        this.stops = stops;
+    }
+
+    public Vehicle getTruck() {
+        return truck;
+    }
+
+    public void setTruck(Vehicle truck) {
+        this.truck = truck;
+    }
+
+    public RouteType getType() {
+        return type;
+    }
+
+    public void setType(RouteType type) {
+        this.type = type;
     }
 
 }
+
+
   
 
