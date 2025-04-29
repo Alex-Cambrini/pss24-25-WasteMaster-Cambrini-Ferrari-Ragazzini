@@ -24,7 +24,6 @@ class CollectionTest extends AbstractDatabaseTest {
     private Waste.WasteType wasteType;
     private Collection collection;
     private OneTimeSchedule schedule;
-    
 
     @BeforeEach
     public void setUp() {
@@ -45,10 +44,11 @@ class CollectionTest extends AbstractDatabaseTest {
         collection.setCollectionDate(date);
         collection.setCollectionStatus(Collection.CollectionStatus.COMPLETED);
         collection.setCancelLimitDays(5);
+        collection.setWaste(Waste.WasteType.GLASS);
 
         assertEquals(customer, collection.getCustomer());
         assertEquals(date, collection.getCollectionDate());
-        assertEquals(wasteType, collection.getWaste());
+        assertEquals(Waste.WasteType.GLASS, collection.getWaste());
         assertEquals(Collection.CollectionStatus.COMPLETED, collection.getCollectionStatus());
         assertEquals(5, collection.getCancelLimitDays());
         assertEquals(schedule, collection.getSchedule());
@@ -95,7 +95,8 @@ class CollectionTest extends AbstractDatabaseTest {
 
         Set<ConstraintViolation<Collection>> violations = ValidateUtils.VALIDATOR.validate(invalid);
         assertFalse(violations.isEmpty());
-        assertTrue(violations.stream().anyMatch(v -> v.getMessage().contains("The date must be today or in the future")));
+        assertTrue(
+                violations.stream().anyMatch(v -> v.getMessage().contains("The date must be today or in the future")));
         assertTrue(violations.stream().anyMatch(v -> v.getMessage().contains("The customer cannot be null")));
         assertTrue(violations.stream().anyMatch(v -> v.getMessage().contains("Cancellation days must be >= 0")));
         assertTrue(violations.stream().anyMatch(v -> v.getMessage().contains("Schedule cannot be null")));
