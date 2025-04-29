@@ -4,6 +4,7 @@ import it.unibo.wastemaster.core.models.RecurringSchedule;
 import it.unibo.wastemaster.core.models.RecurringSchedule.Frequency;
 import it.unibo.wastemaster.core.models.Waste.WasteType;
 import it.unibo.wastemaster.core.utils.DateUtils;
+import it.unibo.wastemaster.core.utils.ValidateUtils;
 import it.unibo.wastemaster.core.AbstractDatabaseTest;
 import it.unibo.wastemaster.core.models.Customer;
 import it.unibo.wastemaster.core.models.Location;
@@ -59,74 +60,54 @@ class RecurringScheduleManagerTest extends AbstractDatabaseTest {
 
     @Test
     void testCalculateNextDate_FirstCollection() {
-        // Impostiamo la data di inizio
-        LocalDate startDate = LocalDate.of(2025, 4, 24); // Ad esempio, 24 aprile 2025
+        LocalDate startDate = LocalDate.of(2025, 4, 24);
 
-        // Creiamo una nuova pianificazione ricorrente con frequenza settimanale
         RecurringSchedule schedule = new RecurringSchedule(customer, WasteType.GLASS,
                 startDate, Frequency.WEEKLY);
 
-        // Calcoliamo la data del prossimo ritiro
         LocalDate nextDate = recurringScheduleManager.calculateNextDate(schedule);
 
-        // La data successiva dovrebbe essere 2 giorni dopo la startDate (27 aprile
-        // 2025, poiché il giorno di raccolta è lunedì)
         LocalDate expectedDate = LocalDate.of(2025, 4, 28);
         assertEquals(expectedDate, nextDate);
     }
 
     @Test
     void testCalculateNextDate_MonthlyCollection() {
-        // Data di inizio
         LocalDate startDate = LocalDate.of(2025, 4, 24);
 
-        // Creiamo una pianificazione mensile
         RecurringSchedule schedule = new RecurringSchedule(customer, WasteType.GLASS, startDate, Frequency.MONTHLY);
 
-        // Impostiamo la data del primo ritiro (28 aprile 2025, lunedì)
         schedule.setNextCollectionDate(LocalDate.of(2025, 4, 28));
 
-        // La data del prossimo ritiro dovrebbe essere 1 mese dopo, ovvero il lunedì
-        // successivo al 28 maggio 2025
         LocalDate nextDate = recurringScheduleManager.calculateNextDate(schedule);
 
-        // La data prevista sarà 2 giugno 2025 (lunedì)
-        LocalDate expectedDate = LocalDate.of(2025, 6, 2); // 2 giugno 2025, lunedì
+        LocalDate expectedDate = LocalDate.of(2025, 6, 2);
         assertEquals(expectedDate, nextDate);
     }
 
     @Test
     void testCalculateNextDate_InThePast() {
-        // === MOCK DI DateUtils per restituire una data finta ===
         DateUtils mockDateUtils = new DateUtils() {
             @Override
             public LocalDate getCurrentDate() {
-                return LocalDate.of(2025, 5, 1); // Data "finta" che simula "oggi"
+                return LocalDate.of(2025, 5, 1);
             }
         };
 
         recurringScheduleManager.setDateUtils(mockDateUtils);
 
-        LocalDate startDate = LocalDate.of(2025, 4, 1); // 1 aprile 2025
+        LocalDate startDate = LocalDate.of(2025, 4, 1);
 
-        // Creiamo una pianificazione settimanale
         RecurringSchedule schedule = new RecurringSchedule(customer, WasteType.GLASS, startDate, Frequency.WEEKLY);
 
-        // Simuliamo una data successiva nel passato
         schedule.setNextCollectionDate(LocalDate.of(2025, 4, 10));
 
-        // Impostiamo la data di oggi come l'1 maggio 2025 ( non serve )
-        
-
-        // La data del prossimo ritiro dovrebbe essere dopo oggi, allineata al lunedì
-        // successivo
         LocalDate nextDate = recurringScheduleManager.calculateNextDate(schedule);
 
-        // La data attesa è il prossimo lunedì, ovvero il 5 maggio 2025
-        LocalDate expectedDate = LocalDate.of(2025, 5, 5); // 5 maggio, primo lunedì dopo il 1 maggio
+        LocalDate expectedDate = LocalDate.of(2025, 5, 5);
 
-        assertTrue(nextDate.isAfter(LocalDate.of(2025, 5, 1))); // Assicuriamoci che la data calcolata sia nel futuro
-        assertEquals(expectedDate, nextDate); // Assicuriamoci che la data corrisponda al prossimo lunedì
+        assertTrue(nextDate.isAfter(LocalDate.of(2025, 5, 1)));
+        assertEquals(expectedDate, nextDate);
     }
 
     @Test
@@ -145,5 +126,27 @@ class RecurringScheduleManagerTest extends AbstractDatabaseTest {
         expectedDate = LocalDate.of(2025, 5, 5);
 
         assertEquals(expectedDate, nextDate);
+    }
+
+    @Test
+    void testUpdateNextDates() {
+        LocalDate today = dateUtils.getCurrentDate();
+        LocalDate startDate = today;
+        LocalDate oldNextDate = today.minusDays(2);
+
+        wasteDAO.insert(waste);
+        wasteScheduleDAO.insert(new WasteSchedule(waste, DayOfWeek.MONDAY));
+
+        RecurringSchedule schedule = new RecurringSchedule(customer, WasteType.GLASS, startDate, Frequency.WEEKLY);
+        schedule.setNextCollectionDate(oldNextDate);
+        schedule.setStatus(RecurringSchedule.ScheduleStatus.ACTIVE);
+
+        ValidateUtils.validateEntity(schedule);
+        recurringScheduleDAO.insert(schedule);
+
+        recurringScheduleManager.updateNextDates();
+
+        RecurringSchedule updated = recurringScheduleDAO.findSchedulesByCustomer(customer).get(0);
+        assertTrue(updated.getNextCollectionDate().isAfter(oldNextDate));
     }
 }
