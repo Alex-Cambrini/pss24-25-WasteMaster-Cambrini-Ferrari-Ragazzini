@@ -99,6 +99,10 @@ public class Collection {
         this.date = date;
     }
 
+    public void setWaste(Waste.WasteType waste) {
+        this.waste = waste;
+    }    
+
     public void setCollectionStatus(CollectionStatus collectionStatus) {
         this.collectionStatus = collectionStatus;
     }
