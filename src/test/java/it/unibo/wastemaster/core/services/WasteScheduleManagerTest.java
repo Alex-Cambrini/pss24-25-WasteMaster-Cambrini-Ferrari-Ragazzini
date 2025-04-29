@@ -57,5 +57,29 @@ class WasteScheduleManagerTest extends AbstractDatabaseTest {
         assertEquals(DayOfWeek.FRIDAY, found.getDayOfWeek());
     }
 
-    
+    @Test
+    void testGetWasteScheduleForWaste() {
+        wasteScheduleManager.setupCollectionRoutine(waste, DayOfWeek.TUESDAY);
+
+        WasteSchedule found = wasteScheduleManager.getWasteScheduleForWaste(Waste.WasteType.PLASTIC);
+
+        assertNotNull(found);
+        assertEquals(DayOfWeek.TUESDAY, found.getDayOfWeek());
+    }
+
+    @Test
+    void testGetWasteScheduleForWaste_NullInput() {
+        Exception ex = assertThrows(IllegalArgumentException.class, () -> {
+            wasteScheduleManager.getWasteScheduleForWaste(null);
+        });
+        assertTrue(ex.getMessage().contains("WasteType cannot be null"));
+    }
+
+    @Test
+    void testGetWasteScheduleForWaste_NotFound() {
+        Exception ex = assertThrows(IllegalStateException.class, () -> {
+            wasteScheduleManager.getWasteScheduleForWaste(Waste.WasteType.GLASS);
+        });
+        assertTrue(ex.getMessage().contains("No WasteSchedule found for waste type"));
+    }
 }
