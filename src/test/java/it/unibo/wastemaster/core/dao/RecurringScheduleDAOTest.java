@@ -18,7 +18,6 @@ import it.unibo.wastemaster.core.models.Location;
 import it.unibo.wastemaster.core.models.RecurringSchedule;
 import it.unibo.wastemaster.core.models.Waste;
 
-
 public class RecurringScheduleDAOTest extends AbstractDatabaseTest {
 
     private Location location1;
@@ -99,9 +98,9 @@ public class RecurringScheduleDAOTest extends AbstractDatabaseTest {
         assertEquals(2, result.size());
 
         assertFalse(result.contains(recurringSchedule1)); // EXCLUDED: has a future collection
-        assertTrue(result.contains(recurringSchedule2));  // INCLUDED: has only a past collection
+        assertTrue(result.contains(recurringSchedule2)); // INCLUDED: has only a past collection
         assertFalse(result.contains(recurringSchedule3)); // EXCLUDED: is cancelled
-        assertTrue(result.contains(recurringSchedule4));  // INCLUDED: no future collections        
+        assertTrue(result.contains(recurringSchedule4)); // INCLUDED: no future collections
     }
 
     @Test
@@ -132,5 +131,28 @@ public class RecurringScheduleDAOTest extends AbstractDatabaseTest {
         assertNotNull(result2);
         assertEquals(1, result2.size());
         assertEquals(customer2, result2.get(0).getCustomer());
+    }
+
+    @Test
+    void testNoResult() {
+        recurringSchedule1.setStatus(RecurringSchedule.ScheduleStatus.CANCELLED);
+        recurringSchedule2.setStatus(RecurringSchedule.ScheduleStatus.CANCELLED);
+        recurringSchedule4.setStatus(RecurringSchedule.ScheduleStatus.CANCELLED);
+
+        recurringScheduleDAO.update(recurringSchedule1);
+        recurringScheduleDAO.update(recurringSchedule2);
+        recurringScheduleDAO.update(recurringSchedule4);
+
+        List<RecurringSchedule> result = recurringScheduleDAO.findActiveSchedulesWithoutFutureCollections();
+
+        assertNotNull(result);
+        assertTrue(result.isEmpty());
+    }
+
+    @Test
+    void testNullCustomer() {
+        List<RecurringSchedule> result = recurringScheduleDAO.findSchedulesByCustomer(null);
+        assertNotNull(result);
+        assertTrue(result.isEmpty());
     }
 }
