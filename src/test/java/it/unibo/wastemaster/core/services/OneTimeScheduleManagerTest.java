@@ -18,8 +18,6 @@ import java.time.LocalDate;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-
-
 class OneTimeScheduleManagerTest extends AbstractDatabaseTest {
 
 	private OneTimeScheduleManager oneTimeScheduleManager;
@@ -42,6 +40,7 @@ class OneTimeScheduleManagerTest extends AbstractDatabaseTest {
 
 		oneTimeScheduleManager = new OneTimeScheduleManager(oneTimeScheduleDAO, collectionManager);
 	}
+
 	@Test
 	void testCreateOneTimeSchedule() {
 		LocalDate pickupDate = dateUtils.getCurrentDate().plusDays(5);
@@ -105,6 +104,36 @@ class OneTimeScheduleManagerTest extends AbstractDatabaseTest {
 		collectionManager.generateOneTimeCollection(schedule);
 
 		boolean result = oneTimeScheduleManager.updateDateOneTimeSchedule(schedule, newDate);
+		assertFalse(result);
+	}
+
+	@Test
+	void testCancelOneTimeSchedule() {
+		LocalDate date = dateUtils.getCurrentDate().plusDays(5);
+
+		OneTimeSchedule schedule = new OneTimeSchedule(customer, Waste.WasteType.PLASTIC, date);
+		ValidateUtils.validateEntity(schedule);
+		oneTimeScheduleDAO.insert(schedule);
+		collectionManager.generateOneTimeCollection(schedule);
+
+		boolean result = oneTimeScheduleManager.cancelOneTimeSchedule(schedule);
+		assertTrue(result);
+
+		Collection updated = collectionDAO.findAll().get(0);
+		assertEquals(Collection.CollectionStatus.CANCELLED, updated.getCollectionStatus());
+		assertEquals(ScheduleStatus.CANCELLED, schedule.getStatus());
+	}
+
+	@Test
+	void testCancelFail() {
+		LocalDate date = dateUtils.getCurrentDate().plusDays(1);
+
+		OneTimeSchedule schedule = new OneTimeSchedule(customer, Waste.WasteType.PLASTIC, date);
+		ValidateUtils.validateEntity(schedule);
+		oneTimeScheduleDAO.insert(schedule);
+		collectionManager.generateOneTimeCollection(schedule);
+
+		boolean result = oneTimeScheduleManager.cancelOneTimeSchedule(schedule);
 		assertFalse(result);
 	}
 }
