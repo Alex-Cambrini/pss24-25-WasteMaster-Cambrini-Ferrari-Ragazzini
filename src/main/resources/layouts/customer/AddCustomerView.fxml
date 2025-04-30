@@ -11,7 +11,8 @@
 <?import javafx.scene.layout.VBox?>
 
 
-<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1">
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1"
+fx:controller="it.unibo.wastemaster.controller.customer.AddCustomerController">
    <children>
       <GridPane prefHeight="374.0" prefWidth="600.0">
         <columnConstraints>
@@ -26,49 +27,62 @@
           <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
         </rowConstraints>
          <children>
-            <Label text="Email" GridPane.rowIndex="3" />
-            <TextField GridPane.columnIndex="1" GridPane.rowIndex="3" />
-            <Label text="Name" />
-            <TextField GridPane.columnIndex="1" />
-            <Label text="Surname" GridPane.rowIndex="1" />
-            <Label GridPane.rowIndex="2" />
-            <Label text="Phone" GridPane.rowIndex="4" />
-            <Label text="Adress" GridPane.rowIndex="2" />
-            <TextField GridPane.columnIndex="1" GridPane.rowIndex="1" />
-            <TextField GridPane.columnIndex="1" GridPane.rowIndex="4" />
-            <HBox prefHeight="100.0" prefWidth="200.0" spacing="20.0" GridPane.columnIndex="1" GridPane.rowIndex="2">
-               <children>
-                  <VBox alignment="TOP_CENTER" prefHeight="200.0" prefWidth="100.0">
-                     <children>
-                        <Label text="Street" />
-                        <TextField />
-                     </children>
-                  </VBox>
-                  <VBox alignment="TOP_CENTER" prefHeight="200.0" prefWidth="100.0">
-                     <children>
-                        <Label text="Civic n" />
-                        <TextField />
-                     </children>
-                  </VBox>
-                  <VBox alignment="TOP_CENTER" prefHeight="200.0" prefWidth="100.0">
-                     <children>
-                        <Label text="City" />
-                        <TextField />
-                     </children>
-                  </VBox>
-                  <VBox alignment="TOP_CENTER" prefHeight="200.0" prefWidth="100.0">
-                     <children>
-                        <Label text="PostalCode" />
-                        <TextField />
-                     </children>
-                  </VBox>
-               </children>
-            </HBox>
-         </children>
+
+    
+      <Label text="Name" GridPane.columnIndex="0" GridPane.rowIndex="0" fx:id="nameLabel"/>
+      <TextField fx:id="nameField" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+
+      <Label text="Surname" GridPane.columnIndex="0" GridPane.rowIndex="1" fx:id="surnameLabel"/>
+      <TextField fx:id="surnameField" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+
+      <Label text="Address" GridPane.columnIndex="0" GridPane.rowIndex="2" fx:id="addressLabel"/>
+
+
+      <Label text="Email" GridPane.columnIndex="0" GridPane.rowIndex="3" fx:id="emailLabel"/>
+      <TextField fx:id="emailField" GridPane.columnIndex="1" GridPane.rowIndex="3"/>
+
+      <Label text="Phone" GridPane.columnIndex="0" GridPane.rowIndex="4" fx:id="phoneLabel"/>
+      <TextField fx:id="phoneField" GridPane.columnIndex="1" GridPane.rowIndex="4"/>
+
+    
+    
+    
+    
+    
+    <HBox prefHeight="100.0" prefWidth="200.0" spacing="20.0" GridPane.columnIndex="1" GridPane.rowIndex="2">
+        <children>
+            <VBox alignment="TOP_CENTER" prefHeight="200.0" prefWidth="100.0">
+                <children>
+                    <Label text="Street" fx:id="streetLabel"/>
+                    <TextField fx:id="streetField"/>
+                </children>
+            </VBox>
+            <VBox alignment="TOP_CENTER" prefHeight="200.0" prefWidth="100.0">
+                <children>
+                    <Label text="Civic n" fx:id="civicLabel"/>
+                    <TextField fx:id="civicField"/>
+                </children>
+            </VBox>
+            <VBox alignment="TOP_CENTER" prefHeight="200.0" prefWidth="100.0">
+                <children>
+                    <Label text="City" fx:id="cityLabel"/>
+                    <TextField fx:id="cityField"/>
+                </children>
+            </VBox>
+            <VBox alignment="TOP_CENTER" prefHeight="200.0" prefWidth="100.0">
+                <children>
+                    <Label text="PostalCode" fx:id="postalCodeLabel"/>
+                    <TextField fx:id="postalCodeField"/>
+                </children>
+            </VBox>
+        </children>
+    </HBox>
+</children>
+
       </GridPane>
       <HBox alignment="TOP_RIGHT" prefHeight="100.0" prefWidth="200.0" spacing="10.0">
          <children>
-            <Button mnemonicParsing="false" text="Modifica" />
+            <Button mnemonicParsing="false" text="Save" onAction="#handleSaveCustomer"/>
             <Button mnemonicParsing="false" text="Elimina" />
          </children>
          <padding>
