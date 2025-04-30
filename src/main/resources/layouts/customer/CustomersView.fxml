@@ -24,11 +24,16 @@ fx:controller="it.unibo.wastemaster.controller.customer.CustomersController">
             <Insets left="20.0" right="20.0" top="20.0" />
          </padding>
       </HBox>
-      <TableView prefHeight="200.0" prefWidth="200.0">
-        <columns>
-          <TableColumn prefWidth="75.0" text="C1" />
-          <TableColumn prefWidth="75.0" text="C2" />
-        </columns>
+      <TableView fx:id="customerTable" prefHeight="200.0" prefWidth="600.0">
+	      <columns>
+            <TableColumn fx:id="nameColumn" text="Name" prefWidth="100" />
+            <TableColumn fx:id="surnameColumn" text="Surname" prefWidth="100" />
+            <TableColumn fx:id="emailColumn" text="Email" prefWidth="150" />
+            <TableColumn fx:id="streetColumn" text="Street" prefWidth="100" />
+            <TableColumn fx:id="civicColumn" text="Civic n." prefWidth="60" />
+            <TableColumn fx:id="cityColumn" text="City" prefWidth="100" />
+            <TableColumn fx:id="postalColumn" text="Postal Code" prefWidth="90" />
+         </columns>
       </TableView>
       <HBox alignment="TOP_RIGHT" prefHeight="100.0" prefWidth="200.0" spacing="10.0">
          <children>
