@@ -9,18 +9,15 @@ public class Route {
     private int id;
     private List<Location> stops;
     private Vehicle truck; 
-    private RouteType type;
+    private Schedule schedule;
 
-    public enum RouteType {
-        ONE_TIME,
-        RECURRING
-    }
+   
 
-    public Route(int id, List<Location> stops, Vehicle truck, RouteType type) {
+    public Route(int id, List<Location> stops, Vehicle truck, Schedule schedule) {
         this.id = id;
         this.stops = stops;
         this.truck = truck;
-        this.type = type;
+        this.schedule = schedule;
     }
 
     
@@ -44,12 +41,12 @@ public class Route {
         this.truck = truck;
     }
 
-    public RouteType getType() {
-        return type;
+    public Schedule getSchedule() {
+        return schedule;
     }
 
-    public void setType(RouteType type) {
-        this.type = type;
+    public void setSchedule(Schedule schedule) {
+        this.schedule = schedule;
     }
 
 }
