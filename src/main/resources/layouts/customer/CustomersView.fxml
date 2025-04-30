@@ -10,11 +10,12 @@
 <?import javafx.scene.layout.VBox?>
 
 
-<VBox alignment="TOP_CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1">
+<VBox alignment="TOP_CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1"
+fx:controller="it.unibo.wastemaster.controller.customer.CustomersController">
    <children>
       <HBox prefHeight="100.0" prefWidth="200.0" spacing="10.0">
          <children>
-            <Button mnemonicParsing="false" text="Aggiungi Cliente" />
+            <Button fx:id="addClientButton" mnemonicParsing="false" text="Aggiungi Cliente" onAction="#handleAddClient" />
             <Region prefHeight="200.0" prefWidth="0.0" HBox.hgrow="ALWAYS" />
             <TextField />
             <Button mnemonicParsing="false" text="Cerca" />
