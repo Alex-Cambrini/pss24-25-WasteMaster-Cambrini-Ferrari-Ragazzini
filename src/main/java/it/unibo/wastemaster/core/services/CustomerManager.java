@@ -4,7 +4,6 @@ import it.unibo.wastemaster.core.dao.CustomerDAO;
 import it.unibo.wastemaster.core.models.Customer;
 import it.unibo.wastemaster.core.utils.ValidateUtils;
 
-
 public class CustomerManager {
     private CustomerDAO customerDAO;
 
@@ -32,7 +31,7 @@ public class CustomerManager {
     }
 
     public void updateCustomer(Customer toUpdateCustomer) {
-        ValidateUtils.validateEntity(toUpdateCustomer);   
+        ValidateUtils.validateEntity(toUpdateCustomer);
         ValidateUtils.requireArgNotNull(toUpdateCustomer, "Customer o ID non possono essere null");
         ValidateUtils.requireArgNotNull(toUpdateCustomer.getCustomerId(), "Customer ID non può essere null");
         customerDAO.update(toUpdateCustomer);

@@ -2,10 +2,14 @@ package it.unibo.wastemaster.core.utils;
 
 import java.util.Set;
 
+import it.unibo.wastemaster.core.context.AppContext;
+import it.unibo.wastemaster.core.models.Customer;
+import it.unibo.wastemaster.core.models.Location;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import jakarta.validation.ValidatorFactory;
+import java.util.LinkedHashSet;
 
 public class ValidateUtils {
 
@@ -21,21 +25,45 @@ public class ValidateUtils {
             throw new IllegalArgumentException(errorMessage);
         }
     }
-    
+
     public static void requireArgNotNull(Object toValidate, String errorMessage) {
-        if (toValidate==null) throw new IllegalArgumentException(errorMessage);
+        if (toValidate == null)
+            throw new IllegalArgumentException(errorMessage);
     }
-    
+
     public static void requireStateNotNull(Object toValidate, String errorMessage) {
-        if (toValidate==null) throw new IllegalStateException(errorMessage);
+        if (toValidate == null)
+            throw new IllegalStateException(errorMessage);
     }
 
     public static <T> void validateEntity(T entity) {
         Set<ConstraintViolation<T>> violations = VALIDATOR.validate(entity);
         if (!violations.isEmpty()) {
+            StringBuilder sb = new StringBuilder();
             for (ConstraintViolation<T> violation : violations) {
-                throw new IllegalArgumentException(violation.getMessage());
+                sb.append("- ").append(violation.getMessage()).append("\n");
             }
+            throw new IllegalArgumentException(sb.toString().trim());
         }
+    }
+
+    public static String validateAll(Customer customer, Location location) {
+        LinkedHashSet<String> errorMessages = new LinkedHashSet<>();
+
+        Set<ConstraintViolation<Customer>> customerViolations = VALIDATOR.validate(customer);
+        Set<ConstraintViolation<Location>> locationViolations = VALIDATOR.validate(location);
+
+        for (ConstraintViolation<?> violation : customerViolations) {
+            errorMessages.add("- " + violation.getMessage());
+        }
+        for (ConstraintViolation<?> violation : locationViolations) {
+            errorMessages.add("- " + violation.getMessage());
+        }
+
+        if (AppContext.customerDAO.existsByEmail(customer.getEmail())) {
+            errorMessages.add("- Email is already in use");
+        }
+
+        return String.join("\n", errorMessages);
     }
 }
