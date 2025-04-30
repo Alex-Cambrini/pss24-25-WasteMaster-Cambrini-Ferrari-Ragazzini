@@ -10,6 +10,12 @@ public class RoutePlanner {
     private List<OneTimeSchedule> oneTimeSchedules;
     private List<RecurringSchedule> recurringSchedules;
 
-
+    public RoutePlanner() {
+        this.routes = new HashMap<>();
+        this.oneTimeSchedules = new ArrayList<>();
+        this.recurringSchedules = new ArrayList<>();
+    }
   
+    
+
 }
