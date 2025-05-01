@@ -55,4 +55,20 @@ public class RoutePlanner {
     public List<RecurringSchedule> getRecurringSchedules() {
         return new ArrayList<>(recurringSchedules);
     }
+
+    public void updateRecurringSchedule(Long id, RecurringSchedule updatedSchedule) {
+        for (int i = 0; i < recurringSchedules.size(); i++) {
+            if (recurringSchedules.get(i).getId().equals(id)) {
+                recurringSchedules.set(i, updatedSchedule);
+                return;
+            }
+        }
+    }
+
+
+
+
+
+
+
 }
