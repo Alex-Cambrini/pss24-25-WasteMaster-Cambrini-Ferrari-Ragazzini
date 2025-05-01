@@ -63,6 +63,12 @@ public class RoutePlanner {
                 return;
             }
         }
+
+    public void removeOneTimeSchedule(int id) {
+            oneTimeSchedules.removeIf(schedule -> schedule.getId().equals(id));
+    }
+
+
     }
 
 
