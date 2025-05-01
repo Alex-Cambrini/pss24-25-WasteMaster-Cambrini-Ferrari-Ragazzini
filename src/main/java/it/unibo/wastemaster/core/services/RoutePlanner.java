@@ -10,7 +10,7 @@ import java.util.*;
 
 public class RoutePlanner {
 
-    private Map<Long, Route> routes; 
+    private Map<Integer, Route> routes; 
     private List<OneTimeSchedule> oneTimeSchedules;
     private List<RecurringSchedule> recurringSchedules;
 
@@ -28,7 +28,7 @@ public class RoutePlanner {
         routes.put(route.getId(), route);
     }
 
-    public Route getRoute(Long id) {
+    public Route getRoute(int id) {
         return routes.get(id);
     }
 
@@ -36,7 +36,7 @@ public class RoutePlanner {
         return routes.values();
     }
 
-    public void removeRoute(Long id) {
+    public void removeRoute(int id) {
         routes.remove(id);
     }
 
@@ -56,7 +56,7 @@ public class RoutePlanner {
         return new ArrayList<>(recurringSchedules);
     }
 
-    public void updateRecurringSchedule(Long id, RecurringSchedule updatedSchedule) {
+    public void updateRecurringSchedule(int id, RecurringSchedule updatedSchedule) {
         for (int i = 0; i < recurringSchedules.size(); i++) {
             if (recurringSchedules.get(i).getId().equals(id)) {
                 recurringSchedules.set(i, updatedSchedule);
