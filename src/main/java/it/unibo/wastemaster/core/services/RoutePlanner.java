@@ -1,5 +1,9 @@
-package it.unibo.wastemaster.core.models;
+package it.unibo.wastemaster.core.services;
 
+
+import it.unibo.wastemaster.core.models.Route;
+import it.unibo.wastemaster.core.models.OneTimeSchedule;
+import it.unibo.wastemaster.core.models.RecurringSchedule;
 
 import java.util.*;
 
