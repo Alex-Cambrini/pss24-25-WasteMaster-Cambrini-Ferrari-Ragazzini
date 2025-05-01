@@ -40,4 +40,19 @@ public class RoutePlanner {
         routes.remove(id);
     }
 
+    public void addOneTimeSchedule(OneTimeSchedule schedule) {
+        oneTimeSchedules.add(schedule);
+    }
+
+    public void addRecurringSchedule(RecurringSchedule schedule) {
+        recurringSchedules.add(schedule);
+    }
+
+    public List<OneTimeSchedule> getOneTimeSchedules() {
+        return new ArrayList<>(oneTimeSchedules);
+    }
+
+    public List<RecurringSchedule> getRecurringSchedules() {
+        return new ArrayList<>(recurringSchedules);
+    }
 }
