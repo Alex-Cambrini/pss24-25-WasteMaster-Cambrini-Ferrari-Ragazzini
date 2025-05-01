@@ -21,5 +21,11 @@ public class RoutePlanner {
     }
   
     
+    public void planRoute(Route route) {
+        if (routes.containsKey(route.getId())) {
+            throw new IllegalArgumentException("Route with this ID already exists.");
+        }
+        routes.put(route.getId(), route);
+    }
 
 }
