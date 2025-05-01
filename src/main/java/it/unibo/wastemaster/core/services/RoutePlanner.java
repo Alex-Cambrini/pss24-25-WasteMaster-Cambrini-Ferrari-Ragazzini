@@ -28,4 +28,16 @@ public class RoutePlanner {
         routes.put(route.getId(), route);
     }
 
+    public Route getRoute(Long id) {
+        return routes.get(id);
+    }
+
+    public Collection<Route> getAllRoutes() {
+        return routes.values();
+    }
+
+    public void removeRoute(Long id) {
+        routes.remove(id);
+    }
+
 }
