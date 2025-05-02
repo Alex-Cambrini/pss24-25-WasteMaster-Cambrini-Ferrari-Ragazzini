@@ -4,9 +4,15 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreUpdate;
+import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 
 import java.time.LocalDate;
 
@@ -14,18 +20,20 @@ import java.time.LocalDate;
 public class Vehicle {
 
     @Id
-    @Column(length = 10, nullable = false)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private int vehicleId;
+
+    @Column(length = 10, nullable = false, unique = true)
     @NotBlank(message = "Plate must not be blank")
+    @Pattern(regexp = "^[a-zA-Z0-9\\-\\s]{5,10}$", message = "Plate must contain 5 to 10 alphanumeric characters (letters, digits, dashes or spaces)")
     private String plate;
 
     @Column(nullable = false)
     @NotBlank(message = "Brand must not be blank")
-    @NotNull(message = "Brand is required")
     private String brand;
 
     @Column(nullable = false)
     @NotBlank(message = "Model must not be blank")
-    @NotNull(message = "Model is required")
     private String model;
 
     @Column(nullable = false)
@@ -45,6 +53,11 @@ public class Vehicle {
     @Column(nullable = false)
     @NotNull(message = "Last maintenance date is required")
     private LocalDate lastMaintenanceDate;
+
+    @Column(nullable = false)
+    @NotNull(message = "Next maintenance date is required")
+    @FutureOrPresent(message = "Next maintenance date cannot be in the past")
+    private LocalDate nextMaintenanceDate;
 
     public enum LicenceType {
         C1(3),
@@ -72,6 +85,9 @@ public class Vehicle {
 
     public Vehicle(String plate, String brand, String model, int registrationYear,
             LicenceType licenceType, VehicleStatus vehicleStatus) {
+        if (plate == null) {
+            throw new IllegalArgumentException("Plate must not be null");
+        }
         this.plate = plate;
         this.brand = brand;
         this.model = model;
@@ -79,6 +95,19 @@ public class Vehicle {
         this.licenceType = licenceType;
         this.vehicleStatus = vehicleStatus;
         this.lastMaintenanceDate = LocalDate.now();
+        this.nextMaintenanceDate = lastMaintenanceDate.plusYears(1);
+    }
+
+    @PrePersist
+    @PreUpdate
+    private void normalizePlate() {
+        if (plate != null) {
+            plate = plate.toUpperCase().trim();
+        }
+    }
+
+    public int getVehicleId() {
+        return vehicleId;
     }
 
     public String getPlate() {
@@ -113,6 +142,14 @@ public class Vehicle {
         return lastMaintenanceDate;
     }
 
+    public LocalDate getNextMaintenanceDate() {
+        return nextMaintenanceDate;
+    }
+
+    public void setPlate(String plate) {
+        this.plate = plate;
+    }
+
     public void setBrand(String brand) {
         this.brand = brand;
     }
@@ -137,13 +174,18 @@ public class Vehicle {
         this.lastMaintenanceDate = lastMaintenanceDate;
     }
 
+    public void setNextMaintenanceDate(LocalDate nextMaintenanceDate) {
+        this.nextMaintenanceDate = nextMaintenanceDate;
+    }
+
     public void updateStatus(VehicleStatus vehicleStatus) {
         this.vehicleStatus = vehicleStatus;
     }
 
     public String getInfo() {
         return String.format(
-                "Vehicle Info: Brand: %s, Model: %s, Registration year: %d, Plate: %s, Licence: %s, Capacity: %d persons, Status: %s, Last Maintenance: %s",
-                brand, model, registrationYear, plate, licenceType, getCapacity(), vehicleStatus, lastMaintenanceDate);
+                "Vehicle Info: Brand: %s, Model: %s, Registration year: %d, Plate: %s, Licence: %s, Capacity: %d persons, Status: %s, Last Maintenance: %s, Next Maintenance: %s",
+                brand, model, registrationYear, plate, licenceType, getCapacity(), vehicleStatus, lastMaintenanceDate,
+                nextMaintenanceDate);
     }
 }

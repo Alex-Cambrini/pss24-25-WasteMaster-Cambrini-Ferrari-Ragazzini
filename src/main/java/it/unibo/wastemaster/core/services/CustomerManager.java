@@ -32,8 +32,7 @@ public class CustomerManager {
 
     public void updateCustomer(Customer toUpdateCustomer) {
         ValidateUtils.validateEntity(toUpdateCustomer);
-        ValidateUtils.requireArgNotNull(toUpdateCustomer, "Customer o ID non possono essere null");
-        ValidateUtils.requireArgNotNull(toUpdateCustomer.getCustomerId(), "Customer ID non può essere null");
+        ValidateUtils.requireArgNotNull(toUpdateCustomer.getCustomerId(), "Customer ID cannot be null");
         customerDAO.update(toUpdateCustomer);
     }
 
@@ -42,6 +41,18 @@ public class CustomerManager {
             Customer managed = customerDAO.findById(customer.getCustomerId());
             if (managed != null) {
                 customerDAO.delete(managed);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean softDeleteCustomer(Customer customer) {
+        if (customer != null && customer.getCustomerId() != null) {
+            Customer managed = customerDAO.findById(customer.getCustomerId());
+            if (managed != null) {
+                managed.delete();
+                customerDAO.update(managed);
                 return true;
             }
         }

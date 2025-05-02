@@ -1,9 +1,6 @@
 package it.unibo.wastemaster.core.models;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.time.LocalDate;
 import java.util.Set;
@@ -34,7 +31,10 @@ public class VehicleTest extends AbstractDatabaseTest {
         vehicle.setLicenceType(Vehicle.LicenceType.C);
         vehicle.setVehicleStatus(Vehicle.VehicleStatus.IN_MAINTENANCE);
         LocalDate newDate = LocalDate.of(2024, 1, 1);
+        LocalDate nextMaintaDate = LocalDate.of(2025, 1, 1);
+
         vehicle.setLastMaintenanceDate(newDate);
+        vehicle.setNextMaintenanceDate(nextMaintaDate);
 
         assertEquals("Mercedes", vehicle.getBrand());
         assertEquals("Sprinter", vehicle.getModel());
@@ -42,6 +42,7 @@ public class VehicleTest extends AbstractDatabaseTest {
         assertEquals(Vehicle.LicenceType.C, vehicle.getLicenceType());
         assertEquals(Vehicle.VehicleStatus.IN_MAINTENANCE, vehicle.getVehicleStatus());
         assertEquals(newDate, vehicle.getLastMaintenanceDate());
+        assertEquals(nextMaintaDate, vehicle.getNextMaintenanceDate());
         assertEquals(2, vehicle.getCapacity());
     }
 
@@ -53,48 +54,52 @@ public class VehicleTest extends AbstractDatabaseTest {
 
     @Test
     public void testVehicleValidation() {
-        Set<ConstraintViolation<Vehicle>> violations;
+        IllegalArgumentException ex = assertThrows(IllegalArgumentException.class, () -> {
+            new Vehicle(null, "Iveco", "Daily", 2020, Vehicle.LicenceType.C1, Vehicle.VehicleStatus.IN_SERVICE);
+        });
+        assertEquals("Plate must not be null", ex.getMessage());
 
-        violations = ValidateUtils.VALIDATOR.validate(
-                new Vehicle(null, "Iveco", "Daily", 2020, Vehicle.LicenceType.C1, Vehicle.VehicleStatus.IN_SERVICE));
-        assertTrue(violations.size() > 0);
-
-        violations = ValidateUtils.VALIDATOR.validate(
+        Set<ConstraintViolation<Vehicle>> violations = ValidateUtils.VALIDATOR.validate(
                 new Vehicle("", "Iveco", "Daily", 2020, Vehicle.LicenceType.C1, Vehicle.VehicleStatus.IN_SERVICE));
-        assertTrue(violations.size() > 0);
+        assertFalse(violations.isEmpty());
 
         violations = ValidateUtils.VALIDATOR.validate(
                 new Vehicle("AB123CD", null, "Daily", 2020, Vehicle.LicenceType.C1, Vehicle.VehicleStatus.IN_SERVICE));
-        assertTrue(violations.size() > 0);
+        assertFalse(violations.isEmpty());
 
         violations = ValidateUtils.VALIDATOR.validate(
                 new Vehicle("AB123CD", "", "Daily", 2020, Vehicle.LicenceType.C1, Vehicle.VehicleStatus.IN_SERVICE));
-        assertTrue(violations.size() > 0);
+        assertFalse(violations.isEmpty());
 
         violations = ValidateUtils.VALIDATOR.validate(
                 new Vehicle("AB123CD", "Iveco", null, 2020, Vehicle.LicenceType.C1, Vehicle.VehicleStatus.IN_SERVICE));
-        assertTrue(violations.size() > 0);
+        assertFalse(violations.isEmpty());
 
         violations = ValidateUtils.VALIDATOR.validate(
                 new Vehicle("AB123CD", "Iveco", "", 2020, Vehicle.LicenceType.C1, Vehicle.VehicleStatus.IN_SERVICE));
-        assertTrue(violations.size() > 0);
+        assertFalse(violations.isEmpty());
     }
 
     @Test
     public void testVehiclePersistence() {
         vehicleDAO.insert(vehicle);
-
+        
         Vehicle found = vehicleDAO.findByPlate(vehicle.getPlate());
+        int foundID = found.getVehicleId(); 
+        
         assertNotNull(found);
+    
         assertEquals(vehicle.getBrand(), found.getBrand());
         assertEquals(vehicle.getModel(), found.getModel());
         assertEquals(vehicle.getLicenceType(), found.getLicenceType());
-
-        vehicleDAO.delete(vehicle);
-
-        Vehicle deleted = vehicleDAO.findByPlate(vehicle.getPlate());
+        assertEquals(vehicle.getLastMaintenanceDate(), found.getLastMaintenanceDate());
+        assertEquals(vehicle.getNextMaintenanceDate(), found.getNextMaintenanceDate());
+    
+        vehicleDAO.delete(found);
+    
+        Vehicle deleted = vehicleDAO.findById(foundID);
         assertNull(deleted);
-    }
+    }   
 
     @Test
     public void testUpdateStatus() {
@@ -111,9 +116,17 @@ public class VehicleTest extends AbstractDatabaseTest {
     }
 
     @Test
+    public void testNextMaintenanceDateDefault() {
+        Vehicle newVehicle = new Vehicle("CD456EF", "Mercedes", "Sprinter", 2021, Vehicle.LicenceType.C,
+                Vehicle.VehicleStatus.IN_SERVICE);
+        LocalDate expected = LocalDate.now().plusYears(1);
+        assertEquals(expected, newVehicle.getNextMaintenanceDate());
+    }
+
+    @Test
     public void testGetInfo() {
         String expectedInfo = String.format(
-                "Vehicle Info: Brand: %s, Model: %s, Registration year: %d, Plate: %s, Licence: %s, Capacity: %d persons, Status: %s, Last Maintenance: %s",
+                "Vehicle Info: Brand: %s, Model: %s, Registration year: %d, Plate: %s, Licence: %s, Capacity: %d persons, Status: %s, Last Maintenance: %s, Next Maintenance: %s",
                 "Iveco",
                 "Daily",
                 2020,
@@ -121,8 +134,8 @@ public class VehicleTest extends AbstractDatabaseTest {
                 Vehicle.LicenceType.C1,
                 3,
                 Vehicle.VehicleStatus.IN_SERVICE,
-                vehicle.getLastMaintenanceDate());
-
+                vehicle.getLastMaintenanceDate(),
+                vehicle.getNextMaintenanceDate());
         assertEquals(expectedInfo, vehicle.getInfo());
     }
 }
