@@ -4,7 +4,11 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreUpdate;
 import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -16,7 +20,10 @@ import java.time.LocalDate;
 public class Vehicle {
 
     @Id
-    @Column(length = 10, nullable = false)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private int vehicleId;
+
+    @Column(length = 10, nullable = false, unique = true)
     @NotBlank(message = "Plate must not be blank")
     @Pattern(regexp = "^[a-zA-Z0-9\\-\\s]{5,10}$", message = "Plate must contain 5 to 10 alphanumeric characters (letters, digits, dashes or spaces)")
     private String plate;
@@ -81,7 +88,7 @@ public class Vehicle {
         if (plate == null) {
             throw new IllegalArgumentException("Plate must not be null");
         }
-        this.plate = plate.trim().toUpperCase();
+        this.plate = plate;
         this.brand = brand;
         this.model = model;
         this.registrationYear = registrationYear;
@@ -89,6 +96,18 @@ public class Vehicle {
         this.vehicleStatus = vehicleStatus;
         this.lastMaintenanceDate = LocalDate.now();
         this.nextMaintenanceDate = lastMaintenanceDate.plusYears(1);
+    }
+
+    @PrePersist
+    @PreUpdate
+    private void normalizePlate() {
+        if (plate != null) {
+            plate = plate.toUpperCase().trim();
+        }
+    }
+
+    public int getVehicleId() {
+        return vehicleId;
     }
 
     public String getPlate() {
@@ -125,6 +144,10 @@ public class Vehicle {
 
     public LocalDate getNextMaintenanceDate() {
         return nextMaintenanceDate;
+    }
+
+    public void setPlate(String plate) {
+        this.plate = plate;
     }
 
     public void setBrand(String brand) {
