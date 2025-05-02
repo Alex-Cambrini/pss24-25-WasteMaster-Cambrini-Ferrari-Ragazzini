@@ -13,7 +13,7 @@ public class VehicleManager {
 	public VehicleManager(VehicleDAO vehicleDAO) {
 		this.vehicleDAO = vehicleDAO;
 	}
-
+	
 	public Vehicle addVehicle(Vehicle vehicle) {
 		ValidateUtils.validateEntity(vehicle);
 
@@ -21,13 +21,20 @@ public class VehicleManager {
 			throw new IllegalArgumentException(
 					String.format("Cannot add vehicle: the plate '%s' is already registered.", vehicle.getPlate()));
 		}
-
 		vehicleDAO.insert(vehicle);
 		return vehicle;
 	}
 
+	public Vehicle findVehicleByPlate(String plate) {
+		if (plate == null) {
+            throw new IllegalArgumentException("Plate cannot be null");
+        }
+		plate = plate.toUpperCase().trim();
+        return vehicleDAO.findByPlate(plate);
+    }
+
 	private boolean isPlateRegistered(String plate) {
-		Vehicle vehicle = vehicleDAO.findByPlate(plate);
+		Vehicle vehicle = findVehicleByPlate(plate);
 		return vehicle != null;
 	}
 
