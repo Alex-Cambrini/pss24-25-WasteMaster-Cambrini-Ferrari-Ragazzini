@@ -15,12 +15,13 @@ public class VehicleManager {
 	}
 
 	public Vehicle addVehicle(Vehicle vehicle) {
+		ValidateUtils.validateEntity(vehicle);
+
 		if (isPlateRegistered(vehicle.getPlate())) {
 			throw new IllegalArgumentException(
-				String.format("Cannot add vehicle: the plate '%s' is already registered.", 
-				vehicle.getPlate())
-			);
+					String.format("Cannot add vehicle: the plate '%s' is already registered.", vehicle.getPlate()));
 		}
+
 		vehicleDAO.insert(vehicle);
 		return vehicle;
 	}
@@ -30,11 +31,10 @@ public class VehicleManager {
 		return vehicle != null;
 	}
 
-	public void updateVehicle(Vehicle toUpdateVehicle) {
-		ValidateUtils.validateEntity(toUpdateVehicle);
-		ValidateUtils.requireArgNotNull(toUpdateVehicle.getPlate(), "Vehicle plate must not be null");
-		vehicleDAO.update(toUpdateVehicle);
-	}	
+	public void updateVehicle(Vehicle vehicle) {
+		ValidateUtils.validateEntity(vehicle);
+		vehicleDAO.update(vehicle);
+	}
 
 	public boolean canOperateVehicle(Vehicle vehicle, List<Vehicle.LicenceType> driverLicences) {
 		if (vehicle == null || driverLicences == null || driverLicences.isEmpty()) {
@@ -65,5 +65,5 @@ public class VehicleManager {
 		} else {
 			throw new IllegalArgumentException("The vehicle is not in maintenance status.");
 		}
-	}	
+	}
 }
