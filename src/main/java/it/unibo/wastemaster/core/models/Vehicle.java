@@ -156,7 +156,7 @@ public class Vehicle {
 
     public String getInfo() {
         return String.format(
-                "Vehicle Info: Brand: %s, Model: %s, Registration year: %d, Plate: %s, Licence: %s, Capacity: %d persons, Status: %s, Last Maintenance: %s",
-                brand, model, registrationYear, plate, licenceType, getCapacity(), vehicleStatus, lastMaintenanceDate);
+                "Vehicle Info: Brand: %s, Model: %s, Registration year: %d, Plate: %s, Licence: %s, Capacity: %d persons, Status: %s, Last Maintenance: %s, Next Maintenance: %s",
+                brand, model, registrationYear, plate, licenceType, getCapacity(), vehicleStatus, lastMaintenanceDate, nextMaintenanceDate);
     }
 }
