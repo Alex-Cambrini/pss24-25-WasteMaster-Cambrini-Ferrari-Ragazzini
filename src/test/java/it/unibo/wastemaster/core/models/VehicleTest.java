@@ -34,7 +34,10 @@ public class VehicleTest extends AbstractDatabaseTest {
         vehicle.setLicenceType(Vehicle.LicenceType.C);
         vehicle.setVehicleStatus(Vehicle.VehicleStatus.IN_MAINTENANCE);
         LocalDate newDate = LocalDate.of(2024, 1, 1);
+        LocalDate nextMaintaDate = LocalDate.of(2025, 1, 1);
+        
         vehicle.setLastMaintenanceDate(newDate);
+        vehicle.setNextMaintenanceDate(nextMaintaDate);
 
         assertEquals("Mercedes", vehicle.getBrand());
         assertEquals("Sprinter", vehicle.getModel());
@@ -43,6 +46,7 @@ public class VehicleTest extends AbstractDatabaseTest {
         assertEquals(Vehicle.VehicleStatus.IN_MAINTENANCE, vehicle.getVehicleStatus());
         assertEquals(newDate, vehicle.getLastMaintenanceDate());
         assertEquals(2, vehicle.getCapacity());
+        assertEquals(newDate.plusYears(1), vehicle.getNextMaintenanceDate());
     }
 
     @Test
@@ -89,10 +93,13 @@ public class VehicleTest extends AbstractDatabaseTest {
         assertEquals(vehicle.getBrand(), found.getBrand());
         assertEquals(vehicle.getModel(), found.getModel());
         assertEquals(vehicle.getLicenceType(), found.getLicenceType());
+        assertEquals(vehicle.getLastMaintenanceDate(), found.getLastMaintenanceDate());
+        assertEquals(vehicle.getNextMaintenanceDate(), found.getNextMaintenanceDate());
 
-        vehicleDAO.delete(vehicle);
+        String plate = found.getPlate();
+        vehicleDAO.delete(found);
 
-        Vehicle deleted = vehicleDAO.findByPlate(vehicle.getPlate());
+        Vehicle deleted  = vehicleDAO.findById(plate);
         assertNull(deleted);
     }
 
@@ -111,9 +118,17 @@ public class VehicleTest extends AbstractDatabaseTest {
     }
 
     @Test
+    public void testNextMaintenanceDateDefault() {
+        Vehicle newVehicle = new Vehicle("CD456EF", "Mercedes", "Sprinter", 2021, Vehicle.LicenceType.C,
+                Vehicle.VehicleStatus.IN_SERVICE);
+        LocalDate nextMaintenance = LocalDate.now().plusYears(1);
+        assertEquals(nextMaintenance, newVehicle.getNextMaintenanceDate());
+    }
+
+    @Test
     public void testGetInfo() {
         String expectedInfo = String.format(
-                "Vehicle Info: Brand: %s, Model: %s, Registration year: %d, Plate: %s, Licence: %s, Capacity: %d persons, Status: %s, Last Maintenance: %s",
+                "Vehicle Info: Brand: %s, Model: %s, Registration year: %d, Plate: %s, Licence: %s, Capacity: %d persons, Status: %s, Last Maintenance: %s, Next Maintenance: %s",
                 "Iveco",
                 "Daily",
                 2020,
@@ -121,8 +136,8 @@ public class VehicleTest extends AbstractDatabaseTest {
                 Vehicle.LicenceType.C1,
                 3,
                 Vehicle.VehicleStatus.IN_SERVICE,
-                vehicle.getLastMaintenanceDate());
-
+                vehicle.getLastMaintenanceDate(),
+                vehicle.getNextMaintenanceDate());
         assertEquals(expectedInfo, vehicle.getInfo());
     }
 }
