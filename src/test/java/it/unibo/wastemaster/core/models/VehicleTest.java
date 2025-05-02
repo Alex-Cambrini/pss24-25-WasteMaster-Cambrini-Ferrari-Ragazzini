@@ -83,21 +83,23 @@ public class VehicleTest extends AbstractDatabaseTest {
     @Test
     public void testVehiclePersistence() {
         vehicleDAO.insert(vehicle);
-
+        
         Vehicle found = vehicleDAO.findByPlate(vehicle.getPlate());
+        int foundID = found.getVehicleId(); 
+        
         assertNotNull(found);
+    
         assertEquals(vehicle.getBrand(), found.getBrand());
         assertEquals(vehicle.getModel(), found.getModel());
         assertEquals(vehicle.getLicenceType(), found.getLicenceType());
         assertEquals(vehicle.getLastMaintenanceDate(), found.getLastMaintenanceDate());
         assertEquals(vehicle.getNextMaintenanceDate(), found.getNextMaintenanceDate());
-
-        String plate = found.getPlate();
+    
         vehicleDAO.delete(found);
-
-        Vehicle deleted = vehicleDAO.findByPlate(plate);
+    
+        Vehicle deleted = vehicleDAO.findById(foundID);
         assertNull(deleted);
-    }
+    }   
 
     @Test
     public void testUpdateStatus() {
