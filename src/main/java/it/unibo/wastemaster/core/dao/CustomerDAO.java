@@ -17,4 +17,12 @@ public class CustomerDAO extends GenericDAO<Customer> {
         return count > 0;
     }
 
+    public Customer findByEmail(String email) {
+        return entityManager.createQuery(
+            "SELECT c FROM Customer c WHERE c.email = :email", Customer.class)
+            .setParameter("email", email)
+            .getResultStream()
+            .findFirst()
+            .orElse(null);
+    }
 }
