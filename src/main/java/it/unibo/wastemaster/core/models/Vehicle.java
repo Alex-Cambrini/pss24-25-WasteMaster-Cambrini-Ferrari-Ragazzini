@@ -5,8 +5,10 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
+import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 
 import java.time.LocalDate;
 
@@ -16,16 +18,15 @@ public class Vehicle {
     @Id
     @Column(length = 10, nullable = false)
     @NotBlank(message = "Plate must not be blank")
+    @Pattern(regexp = "^[a-zA-Z0-9\\-\\s]{5,10}$", message = "Plate must contain 5 to 10 alphanumeric characters (letters, digits, dashes or spaces)")
     private String plate;
 
     @Column(nullable = false)
     @NotBlank(message = "Brand must not be blank")
-    @NotNull(message = "Brand is required")
     private String brand;
 
     @Column(nullable = false)
     @NotBlank(message = "Model must not be blank")
-    @NotNull(message = "Model is required")
     private String model;
 
     @Column(nullable = false)
@@ -47,7 +48,8 @@ public class Vehicle {
     private LocalDate lastMaintenanceDate;
 
     @Column(nullable = false)
-    @NotNull(message = "Last maintenance date is required")
+    @NotNull(message = "Next maintenance date is required")
+    @FutureOrPresent(message = "Next maintenance date cannot be in the past")
     private LocalDate nextMaintenanceDate;
 
     public enum LicenceType {
@@ -76,14 +78,17 @@ public class Vehicle {
 
     public Vehicle(String plate, String brand, String model, int registrationYear,
             LicenceType licenceType, VehicleStatus vehicleStatus) {
-        this.plate = plate;
+        if (plate == null) {
+            throw new IllegalArgumentException("Plate must not be null");
+        }
+        this.plate = plate.trim().toUpperCase();
         this.brand = brand;
         this.model = model;
         this.registrationYear = registrationYear;
         this.licenceType = licenceType;
         this.vehicleStatus = vehicleStatus;
         this.lastMaintenanceDate = LocalDate.now();
-        this.nextMaintenanceDate =  lastMaintenanceDate.plusYears(1);
+        this.nextMaintenanceDate = lastMaintenanceDate.plusYears(1);
     }
 
     public String getPlate() {
@@ -157,6 +162,7 @@ public class Vehicle {
     public String getInfo() {
         return String.format(
                 "Vehicle Info: Brand: %s, Model: %s, Registration year: %d, Plate: %s, Licence: %s, Capacity: %d persons, Status: %s, Last Maintenance: %s, Next Maintenance: %s",
-                brand, model, registrationYear, plate, licenceType, getCapacity(), vehicleStatus, lastMaintenanceDate, nextMaintenanceDate);
+                brand, model, registrationYear, plate, licenceType, getCapacity(), vehicleStatus, lastMaintenanceDate,
+                nextMaintenanceDate);
     }
 }
