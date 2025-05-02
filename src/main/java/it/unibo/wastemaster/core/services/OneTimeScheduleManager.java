@@ -25,7 +25,7 @@ public class OneTimeScheduleManager {
             LocalDate pickupDate) {
         if (!isDateValid(pickupDate, Collection.CANCEL_LIMIT_DAYS)) {
             throw new IllegalArgumentException(
-                    "La data di ritiro deve essere almeno tra " + Collection.CANCEL_LIMIT_DAYS + " giorni.");
+                    "The pickup date must be at least " + Collection.CANCEL_LIMIT_DAYS + " days from now.");
         }
 
         OneTimeSchedule schedule = new OneTimeSchedule(customer, wasteType, pickupDate);
