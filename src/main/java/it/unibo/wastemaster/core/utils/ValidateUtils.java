@@ -31,6 +31,7 @@ public class ValidateUtils {
     }
 
     public static <T> void validateEntity(T entity) {
+        requireArgNotNull(entity, "Entity must not be null");
         Set<ConstraintViolation<T>> violations = VALIDATOR.validate(entity);
         if (!violations.isEmpty()) {
             for (ConstraintViolation<T> violation : violations) {
