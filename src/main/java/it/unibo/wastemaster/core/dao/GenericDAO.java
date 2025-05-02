@@ -28,7 +28,7 @@ public class GenericDAO<T> {
         });
     }
 
-    public <K> T findById(K id) {
+    public T findById(int id) {
         return entityManager.find(entityClass, id);
     }
 
