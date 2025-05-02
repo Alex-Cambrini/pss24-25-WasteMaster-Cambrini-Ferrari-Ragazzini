@@ -89,6 +89,30 @@ class CustomerManagerTest extends AbstractDatabaseTest {
         }
 
         @Test
+        void testSoftDeleteCustomer() {
+                Customer saved = customerManager.addCustomer(customer);
+                int savedId = saved.getCustomerId();
+
+                assertNotNull(saved);
+                assertFalse(saved.isDeleted());
+
+                boolean result = customerManager.softDeleteCustomer(saved);
+                assertTrue(result);
+
+                Customer deletedCustomer = customerManager.getCustomerById(savedId);
+                assertNotNull(deletedCustomer);
+                assertTrue(deletedCustomer.isDeleted());
+
+                assertEquals(savedId, deletedCustomer.getCustomerId());
+
+                assertFalse(customerManager.softDeleteCustomer(null));
+
+                Customer nonExistentCustomer = new Customer("Non", "Existent", location, "nonexistent@test.it",
+                                "1234567890");
+                assertFalse(customerManager.softDeleteCustomer(nonExistentCustomer));
+        }
+
+        @Test
         void testAddCustomerInvalid() {
                 // Null or invalid email
                 assertThrows(ConstraintViolationException.class,
