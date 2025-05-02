@@ -48,4 +48,16 @@ public class CustomerManager {
         return false;
     }
 
+    public boolean softDeleteCustomer(Customer customer) {
+        if (customer != null && customer.getCustomerId() != null) {
+            Customer managed = customerDAO.findById(customer.getCustomerId());
+            if (managed != null) {
+                managed.delete();
+                customerDAO.update(managed);
+                return true;
+            }
+        }
+        return false;
+    }
+
 }
