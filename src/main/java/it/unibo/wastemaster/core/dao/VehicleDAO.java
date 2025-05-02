@@ -11,7 +11,10 @@ public class VehicleDAO extends GenericDAO<Vehicle> {
     }
 
     public Vehicle findByPlate(String plate) {
-        return entityManager.find(Vehicle.class, plate);
+        if (plate == null) {
+            throw new IllegalArgumentException("Plate cannot be null");
+        }
+        return entityManager.find(Vehicle.class, plate.trim().toUpperCase());
     }
 
     public List<Vehicle> findByStatus(Vehicle.VehicleStatus status) {
