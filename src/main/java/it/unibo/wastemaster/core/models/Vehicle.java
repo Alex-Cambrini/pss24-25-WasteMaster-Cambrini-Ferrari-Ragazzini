@@ -46,6 +46,10 @@ public class Vehicle {
     @NotNull(message = "Last maintenance date is required")
     private LocalDate lastMaintenanceDate;
 
+    @Column(nullable = false)
+    @NotNull(message = "Last maintenance date is required")
+    private LocalDate nextMaintenanceDate;
+
     public enum LicenceType {
         C1(3),
         C(2);
@@ -79,6 +83,7 @@ public class Vehicle {
         this.licenceType = licenceType;
         this.vehicleStatus = vehicleStatus;
         this.lastMaintenanceDate = LocalDate.now();
+        this.nextMaintenanceDate =  lastMaintenanceDate.plusYears(1);
     }
 
     public String getPlate() {
@@ -113,6 +118,10 @@ public class Vehicle {
         return lastMaintenanceDate;
     }
 
+    public LocalDate getNextMaintenanceDate() {
+        return nextMaintenanceDate;
+    }
+
     public void setBrand(String brand) {
         this.brand = brand;
     }
@@ -135,6 +144,10 @@ public class Vehicle {
 
     public void setLastMaintenanceDate(LocalDate lastMaintenanceDate) {
         this.lastMaintenanceDate = lastMaintenanceDate;
+    }
+
+    public void setNextMaintenanceDate(LocalDate nextMaintenanceDate) {
+        this.nextMaintenanceDate = nextMaintenanceDate;
     }
 
     public void updateStatus(VehicleStatus vehicleStatus) {
