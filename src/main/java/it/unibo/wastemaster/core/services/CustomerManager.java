@@ -33,8 +33,8 @@ public class CustomerManager {
 
     public void updateCustomer(Customer toUpdateCustomer) {
         ValidateUtils.validateEntity(toUpdateCustomer);   
-        ValidateUtils.requireArgNotNull(toUpdateCustomer, "Customer o ID non possono essere null");
-        ValidateUtils.requireArgNotNull(toUpdateCustomer.getCustomerId(), "Customer ID non può essere null");
+        ValidateUtils.requireArgNotNull(toUpdateCustomer, "Customer or ID cannot be null");
+	    ValidateUtils.requireArgNotNull(toUpdateCustomer.getCustomerId(), "Customer ID cannot be null");
         customerDAO.update(toUpdateCustomer);
     }
 
