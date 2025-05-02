@@ -12,14 +12,22 @@ import javafx.scene.control.TextField;
 
 public class AddCustomerController {
 
-	@FXML private TextField emailField;
-	@FXML private TextField nameField;
-	@FXML private TextField surnameField;
-	@FXML private TextField phoneField;
-	@FXML private TextField streetField;
-	@FXML private TextField civicField;
-	@FXML private TextField cityField;
-	@FXML private TextField postalCodeField;
+	@FXML
+	private TextField emailField;
+	@FXML
+	private TextField nameField;
+	@FXML
+	private TextField surnameField;
+	@FXML
+	private TextField phoneField;
+	@FXML
+	private TextField streetField;
+	@FXML
+	private TextField civicField;
+	@FXML
+	private TextField cityField;
+	@FXML
+	private TextField postalCodeField;
 
 	@FXML
 	private void handleSaveCustomer() {
@@ -36,10 +44,10 @@ public class AddCustomerController {
 			Location location = new Location(street, civic, city, postalCode);
 			Customer customer = new Customer(name, surname, location, email, phone);
 
-			String errors = ValidateUtils.validateAll(customer, location);
+			ValidateUtils.validateAll(customer, location);
 
-			if (!errors.isEmpty()) {
-				throw new IllegalArgumentException(errors);
+			if (AppContext.customerDAO.existsByEmail(email)) {
+				throw new IllegalArgumentException("- Email is already in use");
 			}
 
 			AppContext.customerManager.addCustomer(customer);

@@ -2,9 +2,6 @@ package it.unibo.wastemaster.core.utils;
 
 import java.util.Set;
 
-import it.unibo.wastemaster.core.context.AppContext;
-import it.unibo.wastemaster.core.models.Customer;
-import it.unibo.wastemaster.core.models.Location;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
@@ -47,23 +44,19 @@ public class ValidateUtils {
         }
     }
 
-    public static String validateAll(Customer customer, Location location) {
+    public static void validateAll(Object... entities) {
         LinkedHashSet<String> errorMessages = new LinkedHashSet<>();
 
-        Set<ConstraintViolation<Customer>> customerViolations = VALIDATOR.validate(customer);
-        Set<ConstraintViolation<Location>> locationViolations = VALIDATOR.validate(location);
-
-        for (ConstraintViolation<?> violation : customerViolations) {
-            errorMessages.add("- " + violation.getMessage());
-        }
-        for (ConstraintViolation<?> violation : locationViolations) {
-            errorMessages.add("- " + violation.getMessage());
+        for (Object entity : entities) {
+            Set<ConstraintViolation<Object>> violations = VALIDATOR.validate(entity);
+            for (ConstraintViolation<?> violation : violations) {
+                errorMessages.add("- " + violation.getMessage());
+            }
         }
 
-        if (AppContext.customerDAO.existsByEmail(customer.getEmail())) {
-            errorMessages.add("- Email is already in use");
+        if (!errorMessages.isEmpty()) {
+            throw new IllegalArgumentException(String.join("\n", errorMessages));
         }
-
-        return String.join("\n", errorMessages);
     }
+
 }
