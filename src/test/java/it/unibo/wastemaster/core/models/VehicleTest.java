@@ -95,7 +95,7 @@ public class VehicleTest extends AbstractDatabaseTest {
         String plate = found.getPlate();
         vehicleDAO.delete(found);
 
-        Vehicle deleted = vehicleDAO.findById(plate);
+        Vehicle deleted = vehicleDAO.findByPlate(plate);
         assertNull(deleted);
     }
 
