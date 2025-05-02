@@ -1,6 +1,9 @@
 package it.unibo.wastemaster.controller.customer;
 
 import it.unibo.wastemaster.core.context.AppContext;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
+import javafx.util.Duration;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -12,6 +15,7 @@ import javafx.scene.control.Button;
 import java.util.List;
 
 import it.unibo.wastemaster.controller.main.MainLayoutController;
+import it.unibo.wastemaster.controller.utils.DialogUtils;
 import it.unibo.wastemaster.viewmodels.CustomerRow;
 
 public class CustomersController {
@@ -47,7 +51,16 @@ public class CustomersController {
         postalColumn.setCellValueFactory(new PropertyValueFactory<>("postalCode"));
 
         loadCustomers();
+        startAutoRefresh();
     }
+
+    private void startAutoRefresh() {
+        Timeline refreshTimeline = new Timeline(
+                new KeyFrame(Duration.seconds(5), event -> loadCustomers()));
+        refreshTimeline.setCycleCount(Timeline.INDEFINITE);
+        refreshTimeline.play();
+    }
+
 
     private void loadCustomers() {
         List<Object[]> rawData = AppContext.customerDAO.findCustomerDetails();
@@ -73,5 +86,29 @@ public class CustomersController {
         MainLayoutController
                 .getInstance()
                 .loadCenter("/layouts/customer/AddCustomerView.fxml");
+    }
+
+    @FXML
+    private void handleDelete() {
+        CustomerRow selected = customerTable.getSelectionModel().getSelectedItem();
+        if (selected == null) {
+            DialogUtils.showError("No Selection", "Please select a customer to delete.");
+            return;
+        }
+
+        var customer = AppContext.customerDAO.findByEmail(selected.getEmail());
+
+        if (customer == null) {
+            DialogUtils.showError("Not Found", "The selected customer could not be found.");
+            return;
+        }
+
+        boolean success = AppContext.customerManager.softDeleteCustomer(customer);
+        if (success) {
+            DialogUtils.showSuccess("Customer deleted successfully.");
+            loadCustomers();
+        } else {
+            DialogUtils.showError("Deletion Failed", "Unable to delete the selected customer.");
+        }
     }
 }
