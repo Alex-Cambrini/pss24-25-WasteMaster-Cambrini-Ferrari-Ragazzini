@@ -82,8 +82,8 @@ fx:controller="it.unibo.wastemaster.controller.customer.AddCustomerController">
       </GridPane>
       <HBox alignment="TOP_RIGHT" prefHeight="100.0" prefWidth="200.0" spacing="10.0">
          <children>
+            <Button mnemonicParsing="false" text="Cancel" onAction="#handleCancelCustomer"/>
             <Button mnemonicParsing="false" text="Save" onAction="#handleSaveCustomer"/>
-            <Button mnemonicParsing="false" text="Elimina" />
          </children>
          <padding>
             <Insets right="20.0" top="10.0" />

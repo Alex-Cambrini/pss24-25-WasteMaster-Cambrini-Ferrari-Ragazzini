@@ -40,4 +40,9 @@ public class MainLayoutController {
     private void handleCustomers() {
         MainLayoutController.getInstance().loadCenter("/layouts/customer/CustomersView.fxml");
     }
+
+    public void setCenter(javafx.scene.Node node) {
+        rootPane.setCenter(node);
+    }
+    
 }
