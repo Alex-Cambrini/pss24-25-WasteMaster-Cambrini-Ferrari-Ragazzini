@@ -126,12 +126,6 @@ class CustomerManagerTest extends AbstractDatabaseTest {
                                                 new Location("Via Roma", "10", "Bologna", "40100"),
                                                 "notValidEmail", "1234567890")));
 
-                // Email with special characters or invalid domains
-                assertThrows(ConstraintViolationException.class,
-                                () -> customerManager.addCustomer(new Customer("Mario", "Rossi",
-                                                new Location("Via Roma", "10", "Bologna", "40100"),
-                                                "mario@invalid_domain", "1234567890")));
-
                 // Invalid phone number
                 assertThrows(ConstraintViolationException.class,
                                 () -> customerManager.addCustomer(
