@@ -85,7 +85,7 @@
             <Insets right="20.0" top="10.0" />
          </padding>
          <children>
-            <Button mnemonicParsing="false" text="Cancel" onAction="#handleCancelEdit"/>
+            <Button mnemonicParsing="false" text="Cancel" onAction="#handleAbortCustomerEdit"/>
             <Button mnemonicParsing="false" text="Update" onAction="#handleUpdateCustomer"/>
          </children>
       </HBox>
