@@ -37,7 +37,7 @@ fx:controller="it.unibo.wastemaster.controller.customer.CustomersController">
       </TableView>
       <HBox alignment="TOP_RIGHT" prefHeight="100.0" prefWidth="200.0" spacing="10.0">
          <children>
-            <Button mnemonicParsing="false" text="Edit" />
+            <Button mnemonicParsing="false" text="Edit" onAction="#handleEditCustomer" />
             <Button mnemonicParsing="false" text="Delete" onAction="#handleDelete"/>
          </children>
          <padding>
