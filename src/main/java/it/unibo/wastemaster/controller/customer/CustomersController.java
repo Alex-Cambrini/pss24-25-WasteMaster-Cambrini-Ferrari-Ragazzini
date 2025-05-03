@@ -20,6 +20,8 @@ import it.unibo.wastemaster.viewmodels.CustomerRow;
 
 public class CustomersController {
 
+    private Timeline refreshTimeline;
+
     @FXML
     private Button addClientButton;
 
@@ -55,10 +57,16 @@ public class CustomersController {
     }
 
     private void startAutoRefresh() {
-        Timeline refreshTimeline = new Timeline(
-                new KeyFrame(Duration.seconds(5), event -> loadCustomers()));
+        refreshTimeline = new Timeline(
+            new KeyFrame(Duration.seconds(30), event -> loadCustomers()));
         refreshTimeline.setCycleCount(Timeline.INDEFINITE);
         refreshTimeline.play();
+    }
+    
+    public void stopAutoRefresh() {
+        if (refreshTimeline != null) {
+            refreshTimeline.stop();
+        }
     }
 
 
