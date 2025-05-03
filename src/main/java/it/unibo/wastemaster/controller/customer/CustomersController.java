@@ -7,11 +7,9 @@ import javafx.util.Duration;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.Parent;
 import javafx.scene.control.Button;
 
 import java.util.List;
@@ -91,14 +89,20 @@ public class CustomersController {
     }
 
     @FXML
-    private void handleAddClient() {
-        MainLayoutController
-                .getInstance()
-                .loadCenter("/layouts/customer/AddCustomerView.fxml");
+    private void handleAddCustomer() {
+        try {
+            MainLayoutController.getInstance().setPageTitle("Add Customer");
+            AddCustomerController controller = MainLayoutController.getInstance()
+                .loadCenterWithController("/layouts/customer/AddCustomerView.fxml");
+            controller.setCustomerController(this);
+        } catch (Exception e) {
+            DialogUtils.showError("Navigation error", "Could not load Add Customer view.");
+            e.printStackTrace();
+        }
     }
 
     @FXML
-    private void handleDelete() {
+    private void handleDeleteCustomer() {
         CustomerRow selected = customerTable.getSelectionModel().getSelectedItem();
         if (selected == null) {
             DialogUtils.showError("No Selection", "Please select a customer to delete.");
@@ -136,13 +140,22 @@ public class CustomersController {
         }
 
         try {
-            var loader = new FXMLLoader(getClass().getResource("/layouts/customer/EditCustomerView.fxml"));
-            Parent root = loader.load();
-            EditCustomerController controller = loader.getController();
+            MainLayoutController.getInstance().setPageTitle("Edit Customer");
+            EditCustomerController controller = MainLayoutController.getInstance()
+                .loadCenterWithController("/layouts/customer/EditCustomerView.fxml");
             controller.setCustomerToEdit(customer);
-            MainLayoutController.getInstance().setCenter(root);
+            controller.setCustomerController(this);
         } catch (Exception e) {
             DialogUtils.showError("Navigation error", "Could not load Edit view.");
+        }
+    }
+
+    public void returnToCustomerView() {
+        try {
+            MainLayoutController.getInstance().restorePreviousTitle();
+            MainLayoutController.getInstance().loadCenter("/layouts/customer/CustomersView.fxml");
+        } catch (Exception e) {
+            DialogUtils.showError("Navigation error", "Failed to load customer view.");
         }
     }
 
