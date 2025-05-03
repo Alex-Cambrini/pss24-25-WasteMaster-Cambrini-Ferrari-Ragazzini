@@ -11,16 +11,15 @@ public class CustomerManager {
         this.customerDAO = customerDAO;
     }
 
-    public Customer addCustomer(Customer customer) {      
+    public Customer addCustomer(Customer customer) {
         if (isEmailRegistered(customer.getEmail())) {
             throw new IllegalArgumentException(
-                String.format("Cannot add customer: the email address '%s' is already in use.", 
-                              customer.getEmail())
-            );
+                    String.format("Cannot add customer: the email address '%s' is already in use.",
+                            customer.getEmail()));
         }
         customerDAO.insert(customer);
         return customer;
-    }    
+    }
 
     private boolean isEmailRegistered(String email) {
         return customerDAO.existsByEmail(email);
@@ -33,6 +32,10 @@ public class CustomerManager {
     public void updateCustomer(Customer toUpdateCustomer) {
         ValidateUtils.validateEntity(toUpdateCustomer);
         ValidateUtils.requireArgNotNull(toUpdateCustomer.getCustomerId(), "Customer ID cannot be null");
+        Customer existing = customerDAO.findByEmail(toUpdateCustomer.getEmail());
+        if (existing != null && !existing.getCustomerId().equals(toUpdateCustomer.getCustomerId())) {
+            throw new IllegalArgumentException("Email is already used by another customer.");
+        }
         customerDAO.update(toUpdateCustomer);
     }
 

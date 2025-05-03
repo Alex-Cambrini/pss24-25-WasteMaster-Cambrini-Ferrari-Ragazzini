@@ -24,7 +24,7 @@ class CustomerManagerTest extends AbstractDatabaseTest {
                 customer = new Customer("Mario", "Rossi", location, email, "1234567890");
 
         }
-
+        @Test
         void testAddCustomer() {
                 Customer saved = customerManager.addCustomer(customer);
                 assertNotNull(saved.getCustomerId());
