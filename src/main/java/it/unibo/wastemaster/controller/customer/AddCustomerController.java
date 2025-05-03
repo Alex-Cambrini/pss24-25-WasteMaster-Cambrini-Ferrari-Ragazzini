@@ -7,6 +7,7 @@ import it.unibo.wastemaster.core.utils.ValidateUtils;
 
 import static it.unibo.wastemaster.controller.utils.DialogUtils.*;
 
+import it.unibo.wastemaster.controller.main.MainLayoutController;
 import javafx.fxml.FXML;
 import javafx.scene.control.TextField;
 
@@ -57,4 +58,12 @@ public class AddCustomerController {
 			showError("Validation error", e.getMessage());
 		}
 	}
+
+	@FXML
+	private void handleCancel() {
+		MainLayoutController
+				.getInstance()
+				.loadCenter("/layouts/customer/CustomersView.fxml");
+	}
+
 }
