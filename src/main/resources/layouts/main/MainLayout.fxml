@@ -43,12 +43,13 @@
 <?import javafx.scene.text.Font?>
 
 
-<BorderPane fx:id="rootPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="656.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1"
+<BorderPane fx:id="rootPane"
+xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1"
 fx:controller="it.unibo.wastemaster.controller.main.MainLayoutController">
    <left>
       <VBox prefHeight="200.0" prefWidth="100.0" spacing="10.0" BorderPane.alignment="CENTER">
          <children>
-            <Hyperlink fx:id="dashboardLink" text="Dashboard"/>
+            <Hyperlink fx:id="dashboardLink" text="Dashboard" onAction="#handleDashboard"/>
             <Hyperlink fx:id="clientiLink" text="Customers" onAction="#handleCustomers" />
             <Hyperlink fx:id="raccolteLink" text="Raccolte" />
             <Hyperlink fx:id="pianificazioniLink" text="Pianificazioni" />
@@ -60,7 +61,7 @@ fx:controller="it.unibo.wastemaster.controller.main.MainLayoutController">
       </VBox>
    </left>
    <top>
-      <VBox alignment="TOP_CENTER" prefHeight="52.0" prefWidth="656.0" BorderPane.alignment="CENTER">
+      <VBox alignment="TOP_CENTER" BorderPane.alignment="CENTER">
          <children>
             <MenuBar>
               <menus>
@@ -81,7 +82,7 @@ fx:controller="it.unibo.wastemaster.controller.main.MainLayoutController">
                 </Menu>
               </menus>
             </MenuBar>
-            <Label alignment="CENTER" text="TITOLO_PAGINA" textAlignment="CENTER">
+            <Label fx:id="pageTitleLabel" alignment="CENTER" text="TITOLO_PAGINA" textAlignment="CENTER">
                <font>
                   <Font size="16.0" />
                </font>
