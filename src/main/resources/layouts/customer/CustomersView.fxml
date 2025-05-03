@@ -15,7 +15,7 @@ fx:controller="it.unibo.wastemaster.controller.customer.CustomersController">
    <children>
       <HBox prefHeight="100.0" prefWidth="200.0" spacing="10.0">
          <children>
-            <Button fx:id="addClientButton" mnemonicParsing="false" text="Aggiungi Cliente" onAction="#handleAddClient" />
+            <Button fx:id="addClientButton" mnemonicParsing="false" text="Aggiungi Cliente" onAction="#handleAddCustomer" />
             <Region prefHeight="200.0" prefWidth="0.0" HBox.hgrow="ALWAYS" />
             <TextField />
             <Button mnemonicParsing="false" text="Cerca" />
@@ -38,7 +38,7 @@ fx:controller="it.unibo.wastemaster.controller.customer.CustomersController">
       <HBox alignment="TOP_RIGHT" prefHeight="100.0" prefWidth="200.0" spacing="10.0">
          <children>
             <Button mnemonicParsing="false" text="Edit" onAction="#handleEditCustomer" />
-            <Button mnemonicParsing="false" text="Delete" onAction="#handleDelete"/>
+            <Button mnemonicParsing="false" text="Delete" onAction="#handleDeleteCustomer"/>
          </children>
          <padding>
             <Insets right="20.0" top="10.0" />
