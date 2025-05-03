@@ -3,15 +3,14 @@ package it.unibo.wastemaster.controller.customer;
 import it.unibo.wastemaster.core.context.AppContext;
 import it.unibo.wastemaster.core.models.Customer;
 import it.unibo.wastemaster.core.models.Location;
-import it.unibo.wastemaster.controller.main.MainLayoutController;
 import it.unibo.wastemaster.controller.utils.DialogUtils;
 import javafx.fxml.FXML;
-import javafx.scene.Parent;
 import javafx.scene.control.TextField;
 
 public class EditCustomerController {
 
-    private Customer customer;
+    private Customer customer;    
+	private CustomersController customerController;
 
     @FXML
     private TextField nameField;
@@ -29,6 +28,11 @@ public class EditCustomerController {
     private TextField cityField;
     @FXML
     private TextField postalCodeField;
+
+	public void setCustomerController(CustomersController controller) {
+		this.customerController = controller;
+	}
+
 
     public void setCustomerToEdit(Customer customer) {
         this.customer = customer;
@@ -78,7 +82,7 @@ public class EditCustomerController {
 
             AppContext.customerManager.updateCustomer(customer);
             DialogUtils.showSuccess("Customer updated successfully.");
-            returnToCustomerView();
+            customerController.returnToCustomerView();
 
         } catch (IllegalArgumentException e) {
             DialogUtils.showError("Validation error", e.getMessage());
@@ -86,17 +90,7 @@ public class EditCustomerController {
     }
 
     @FXML
-    private void handleCancelEdit() {
-        returnToCustomerView();
-    }
-
-    private void returnToCustomerView() {
-        try {
-            var loader = new javafx.fxml.FXMLLoader(getClass().getResource("/layouts/customer/CustomersView.fxml"));
-            Parent root = loader.load();
-            MainLayoutController.getInstance().setCenter(root);
-        } catch (Exception e) {
-            DialogUtils.showError("Navigation error", "Failed to load customer view.");
-        }
+    private void handleAbortCustomerEdit() {
+        customerController.returnToCustomerView();
     }
 }
