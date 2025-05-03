@@ -66,7 +66,6 @@ public class VehicleManagerTest extends AbstractDatabaseTest {
 
                 Vehicle reloaded = vehicleManager.findVehicleByPlate("CC333CC");
                 assertNotNull(reloaded);
-                System.out.println(vehicle.getPlate());
                 assertEquals("CC333CC", reloaded.getPlate());
         }
 

@@ -31,8 +31,7 @@ public abstract class Person {
 
     @NotNull (message = "email cannot be null")
     @NotBlank (message = "email must not be blank")
-    @Pattern(regexp = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$", message = "Email format is invalid")
-    @Email 
+    @Email(message = "Invalid email. Incorrect format.")
     @Column(nullable = false)
     protected String email;
 
