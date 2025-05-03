@@ -7,12 +7,11 @@ import it.unibo.wastemaster.core.utils.ValidateUtils;
 
 import static it.unibo.wastemaster.controller.utils.DialogUtils.*;
 
-import it.unibo.wastemaster.controller.main.MainLayoutController;
 import javafx.fxml.FXML;
 import javafx.scene.control.TextField;
 
 public class AddCustomerController {
-
+	
 	@FXML
 	private TextField emailField;
 	@FXML
@@ -30,8 +29,15 @@ public class AddCustomerController {
 	@FXML
 	private TextField postalCodeField;
 
+	private CustomersController customerController;
+
+	public void setCustomerController(CustomersController controller) {
+		this.customerController = controller;
+	}
+
 	@FXML
 	private void handleSaveCustomer() {
+
 		try {
 			String email = emailField.getText();
 			String name = nameField.getText();
@@ -53,6 +59,7 @@ public class AddCustomerController {
 
 			AppContext.customerManager.addCustomer(customer);
 			showSuccess("Customer saved successfully.");
+			customerController.returnToCustomerView();
 
 		} catch (IllegalArgumentException e) {
 			showError("Validation error", e.getMessage());
@@ -60,10 +67,7 @@ public class AddCustomerController {
 	}
 
 	@FXML
-	private void handleCancel() {
-		MainLayoutController
-				.getInstance()
-				.loadCenter("/layouts/customer/CustomersView.fxml");
+	private void handleAbortCustomerCreation() {
+			customerController.returnToCustomerView();
 	}
-
 }
