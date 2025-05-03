@@ -9,6 +9,7 @@ import javafx.stage.Stage;
 import java.io.IOException;
 
 import it.unibo.wastemaster.core.context.AppContext;
+
 public class JavaFXApp extends Application {
 
 	@Override
@@ -21,6 +22,13 @@ public class JavaFXApp extends Application {
 			Scene scene = new Scene(root);
 			primaryStage.setScene(scene);
 			primaryStage.setTitle("WasteMaster");
+
+			primaryStage.setWidth(800);
+			primaryStage.setHeight(600);
+
+			primaryStage.setMinWidth(800);
+			primaryStage.setMinHeight(600);
+
 			primaryStage.show();
 		} catch (IOException e) {
 			e.printStackTrace();
