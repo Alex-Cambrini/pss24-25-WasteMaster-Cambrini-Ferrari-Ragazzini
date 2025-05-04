@@ -25,7 +25,7 @@ public class JavaFXApp extends Application {
 		primaryStage.setWidth(800);
 		primaryStage.setHeight(600);
 		primaryStage.setMinWidth(800);
-		primaryStage.setMinHeight(600);
+		primaryStage.setMinHeight(200);
 		primaryStage.show();
 
 	} catch (Exception e) {
