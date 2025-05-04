@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox alignment="TOP_CENTER" prefWidth="640.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <HBox alignment="TOP_CENTER" minHeight="40" prefHeight="60" prefWidth="600.0" spacing="10.0">
+         <children>
+            <Button fx:id="addVehicleButton" mnemonicParsing="false" onAction="#handleAddVehicle" text="Add Vehicle" />
+            <Region prefHeight="20.0" prefWidth="0.0" HBox.hgrow="ALWAYS" />
+            <TextField />
+            <Button mnemonicParsing="false" text="Search" />
+         </children>
+
+      </HBox>
+      <TableView fx:id="VehicleTable" prefHeight="300.0" prefWidth="600.0" VBox.vgrow="ALWAYS">
+	      <columns>
+            <TableColumn fx:id="plateColumn" maxWidth="50.0" minWidth="50.0" prefWidth="50.0" text="Plate" />
+            <TableColumn fx:id="brandColumn" maxWidth="200.0" minWidth="50.0" prefWidth="50.0" text="Brand" />
+            <TableColumn fx:id="modelColumn" maxWidth="2000.0" minWidth="50.0" prefWidth="50.0" text="Model" />
+            <TableColumn fx:id="yearColumn" maxWidth="50.0" minWidth="50.0" prefWidth="50.0" text="Year" />
+            <TableColumn fx:id="licenceTypeColumn" maxWidth="50.0" minWidth="50.0" prefWidth="50.0" text="Required Licence" />
+            <TableColumn fx:id="vehicleStatusColumn" maxWidth="200.0" minWidth="50.0" prefWidth="50.0" text="Status" />
+            <TableColumn fx:id="lastMaintenanceDateColumn" maxWidth="200.0" minWidth="50.0" prefWidth="50.0" text="Last Maintenance" />
+            <TableColumn fx:id="nextMaintenanceDateColumn" maxWidth="200.0" minWidth="50.0" prefWidth="50.0" text="Next Maintenance" />
+         </columns>
+      </TableView>
+      <HBox alignment="TOP_RIGHT" minHeight="50.0" prefHeight="100.0" prefWidth="600.0" spacing="10.0">
+         <children>
+            <Button mnemonicParsing="false" onAction="#handleEditVehicle" text="Edit" />
+            <Button mnemonicParsing="false" onAction="#handleDeleteVehicle" text="Delete" />
+         </children>
+         <padding>
+            <Insets right="20.0" top="10.0" />
+         </padding>
+      </HBox>
+   </children>
+      <padding>
+      <Insets left="20.0" right="20.0" />
+   </padding>
+</VBox>
