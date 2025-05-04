@@ -1,37 +1,35 @@
 package it.unibo.wastemaster.main;
 
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
-import java.io.IOException;
-
+import it.unibo.wastemaster.controller.utils.DialogUtils;
 import it.unibo.wastemaster.core.context.AppContext;
 
 public class JavaFXApp extends Application {
 
 	@Override
 	public void start(Stage primaryStage) {
+	try {
 		AppContext.init();
-		try {
-			FXMLLoader loader = new FXMLLoader(getClass().getResource("/layouts/main/MainLayout.fxml"));
-			Parent root = loader.load();
+		FXMLLoader loader = new FXMLLoader(getClass().getResource("/layouts/main/MainLayout.fxml"));
+		Parent root = loader.load();
 
-			Scene scene = new Scene(root);
-			primaryStage.setScene(scene);
-			primaryStage.setTitle("WasteMaster");
+		Scene scene = new Scene(root);
+		primaryStage.setScene(scene);
+		primaryStage.setTitle("WasteMaster");
+		primaryStage.setWidth(800);
+		primaryStage.setHeight(600);
+		primaryStage.setMinWidth(800);
+		primaryStage.setMinHeight(600);
+		primaryStage.show();
 
-			primaryStage.setWidth(800);
-			primaryStage.setHeight(600);
-
-			primaryStage.setMinWidth(800);
-			primaryStage.setMinHeight(600);
-
-			primaryStage.show();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+	} catch (Exception e) {
+		DialogUtils.showError("Critical Error", "Error connecting to the database:\n" + e.getMessage());
+		Platform.exit();
 	}
-}
+}}
