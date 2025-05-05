@@ -42,7 +42,26 @@ public class RouteTest {
 
     }
 
-   
+    @Test
+    public void testRouteFieldUpdates() {
+
+        Route route = new Route(100, null, null, null);
+        route.setId(200);
+
+        Vehicle truck = new Vehicle("TRUCK-001", "Brand", "Model", 2020, Vehicle.LicenceType.C1, Vehicle.VehicleStatus.IN_SERVICE);
+
+        truck.setPlate("TRUCK-200");
+        route.setTruck(truck);
+
+        Location stop = new Location();
+        route.setStops(List.of(stop));
+ 
+
+        assertEquals(200, route.getId());
+        assertEquals("TRUCK-200", route.getTruck().getPlate());
+       
+        assertEquals(1, route.getStops().size());
+    }
 
     
         
