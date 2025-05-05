@@ -17,7 +17,7 @@
     <class>it.unibo.wastemaster.core.models.Vehicle</class>
     <class>it.unibo.wastemaster.core.models.Waste</class>
     <class>it.unibo.wastemaster.core.models.WasteSchedule</class>
-
+    <class>it.unibo.wastemaster.core.models.Route</class>
 
 
 
