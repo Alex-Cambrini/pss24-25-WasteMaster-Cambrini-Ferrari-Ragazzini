@@ -18,7 +18,10 @@ public class Route {
         this.schedule = schedule;
     }
 
-    
+    public void setId(int id) {
+        this.id = id;
+    }
+
     public int getId() {
         return id;
     }
