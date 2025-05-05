@@ -7,6 +7,9 @@ import it.unibo.wastemaster.core.models.OneTimeSchedule;
 import it.unibo.wastemaster.core.models.Vehicle;
 import it.unibo.wastemaster.core.models.Customer;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+
 import java.time.LocalDate;
 import java.util.List;
 
@@ -26,7 +29,31 @@ public class RouteTest {
         );
        
 
-      
+        Location stop1 = new Location();
+        Location stop2 = new Location();
+        List<Location> stops = List.of(stop1, stop2);
+        
+        Route route = new Route(100, stops, truck, schedule);
+
+        assertEquals(100, route.getId());
+        assertEquals(stops, route.getStops());
+        assertEquals(truck, route.getTruck());
+        assertEquals(schedule, route.getSchedule());
+
     }
+
+   
+
+    
+        
+   
+ 
+
+
+
+
+
+
+
 
 }
