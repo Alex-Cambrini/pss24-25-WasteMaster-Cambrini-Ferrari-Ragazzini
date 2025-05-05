@@ -1,12 +1,6 @@
 package it.unibo.wastemaster.core.models;
 
 
-import it.unibo.wastemaster.core.models.Route;
-import it.unibo.wastemaster.core.models.Location;
-import it.unibo.wastemaster.core.models.OneTimeSchedule;
-import it.unibo.wastemaster.core.models.Vehicle;
-import it.unibo.wastemaster.core.models.Customer;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
@@ -111,9 +105,6 @@ public class RouteTest {
         route.setStops(List.of(stop1, stop2));
         assertEquals(2, route.getStops().size());
     }
-
-
-
 
 
 
