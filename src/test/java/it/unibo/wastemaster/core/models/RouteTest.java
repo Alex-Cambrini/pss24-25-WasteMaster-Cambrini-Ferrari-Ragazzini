@@ -65,7 +65,36 @@ public class RouteTest {
 
     
         
-   
+    @Test
+    public void testEmptyConstructorAndSetters() {
+    Route route = new Route();
+
+    assert(route.getId()==0);
+    assertNull(route.getTruck());
+    assertNull(route.getSchedule());
+    assertNull(route.getStops());
+
+    Vehicle truck = new Vehicle("TRUCK-001", "Brand", "Model", 2020, Vehicle.LicenceType.C1, Vehicle.VehicleStatus.IN_SERVICE);
+    truck.setPlate("TRUCK-200");
+
+    OneTimeSchedule schedule = new OneTimeSchedule(
+            new Customer("Customer1", "Address1", null, null, null),
+            Waste.WasteType.UNSORTED,
+            LocalDate.of(2023, 10, 15)
+    );
+
+    Location stop = new Location();
+
+    route.setId(123);
+    route.setTruck(truck);
+    route.setSchedule(schedule);
+    route.setStops(List.of(stop));
+
+    assertEquals(123, route.getId());
+    assertEquals("TRUCK-200", route.getTruck().getPlate());
+    assertEquals(0, route.getSchedule().getScheduleId());
+    assertEquals(1, route.getStops().size());
+}
  
 
 
