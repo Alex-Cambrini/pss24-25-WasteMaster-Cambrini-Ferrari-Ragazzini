@@ -39,7 +39,7 @@ public class MainLayoutController {
             FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
             Pane view = loader.load();
             setAlignmentTopCenter(view);
-    
+
             rootPane.setCenter(view);
         } catch (IOException e) {
             e.printStackTrace();
@@ -58,7 +58,6 @@ public class MainLayoutController {
             return null;
         }
     }
-    
 
     @FXML
     private void handleCustomers() {
@@ -70,6 +69,12 @@ public class MainLayoutController {
     private void handleDashboard() {
         setPageTitle("Dashboard");
         rootPane.setCenter(null);
+    }
+
+    @FXML
+    private void handleVehicle() {
+        setPageTitle("Vehicle Management");
+        MainLayoutController.getInstance().loadCenter("/layouts/vehicle/VehicleView.fxml");
     }
 
     public void setPageTitle(String title) {
