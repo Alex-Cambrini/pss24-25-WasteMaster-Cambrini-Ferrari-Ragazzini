@@ -34,4 +34,13 @@ public class VehicleDAO extends GenericDAO<Vehicle> {
         return entityManager.createQuery("SELECT v FROM Vehicle v", Vehicle.class)
                 .getResultList();
     }
+
+    public List<Object[]> findVehicleDetails() {
+        return entityManager.createQuery("""
+                    SELECT v.plate, v.brand, v.model, v.registrationYear,
+                           v.licenceType, v.vehicleStatus,
+                           v.lastMaintenanceDate, v.nextMaintenanceDate
+                    FROM Vehicle v
+                """, Object[].class).getResultList();
+    }
 }
