@@ -58,7 +58,7 @@ fx:controller="it.unibo.wastemaster.controller.main.MainLayoutController"
                   <Hyperlink fx:id="clientiLink" onAction="#handleCustomers" text="Customers" />
                   <Hyperlink fx:id="raccolteLink" text="Raccolte" />
                   <Hyperlink fx:id="pianificazioniLink" text="Pianificazioni" />
-                  <Hyperlink fx:id="veicoliLink" text="Veicoli" />
+                  <Hyperlink fx:id="veicoliLink" onAction="#handleVehicle" text="Vehicle" />
                </children>
                <padding>
                   <Insets left="10.0" right="10.0" />
