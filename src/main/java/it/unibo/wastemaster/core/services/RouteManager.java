@@ -8,13 +8,13 @@ import it.unibo.wastemaster.core.models.RecurringSchedule;
 import java.util.*;
 
 
-public class RoutePlanner {
+public class RouteManager {
 
     private Map<Integer, Route> routes; 
     private List<OneTimeSchedule> oneTimeSchedules;
     private List<RecurringSchedule> recurringSchedules;
 
-    public RoutePlanner() {
+    public RouteManager() {
         this.routes = new HashMap<>();
         this.oneTimeSchedules = new ArrayList<>();
         this.recurringSchedules = new ArrayList<>();
@@ -58,23 +58,24 @@ public class RoutePlanner {
 
     public void updateRecurringSchedule(int id, RecurringSchedule updatedSchedule) {
         for (int i = 0; i < recurringSchedules.size(); i++) {
-            if (recurringSchedules.get(i).getId().equals(id)) {
+            if (recurringSchedules.get(i).getScheduleId()==(id)) {
                 recurringSchedules.set(i, updatedSchedule);
                 return;
             }
         }
+    }
 
     public void removeOneTimeSchedule(int id) {
-            oneTimeSchedules.removeIf(schedule -> schedule.getId().equals(id));
+            oneTimeSchedules.removeIf(schedule -> schedule.getScheduleId()==(id));
     }
-
-
-    }
-
-
-
-
-
 
 
 }
+
+
+
+
+
+
+
+

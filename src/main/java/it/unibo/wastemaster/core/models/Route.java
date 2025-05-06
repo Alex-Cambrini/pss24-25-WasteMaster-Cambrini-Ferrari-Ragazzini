@@ -9,7 +9,8 @@ public class Route {
     private Vehicle truck; 
     private Schedule schedule;
 
-   
+    public Route() {
+    }
 
     public Route(int id, List<Location> stops, Vehicle truck, Schedule schedule) {
         this.id = id;
@@ -18,7 +19,10 @@ public class Route {
         this.schedule = schedule;
     }
 
-    
+    public void setId(int id) {
+        this.id = id;
+    }
+
     public int getId() {
         return id;
     }
