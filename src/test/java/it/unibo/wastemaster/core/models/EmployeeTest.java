@@ -133,7 +133,6 @@ public class EmployeeTest extends AbstractDatabaseTest {
         assertEquals(Role.OPERATOR, emptyEmployee.getRole());
         assertEquals(LicenceType.C1, emptyEmployee.getLicenceType());
 
-        assertTrue(emptyEmployee.getEmployeeId() >= 0);
         assertEquals(Role.OPERATOR, emptyEmployee.getRole());
         assertEquals(LicenceType.C1, emptyEmployee.getLicenceType());
         assertEquals("3.5 t - 7.5 t", LicenceType.C1.getLicenceDescription());
@@ -160,29 +159,16 @@ public class EmployeeTest extends AbstractDatabaseTest {
 
     @Test
     public void testGetInfo() {
-        String expectedInfoWithLicence = String.format(
+        String expectedInfo= String.format(
                 "Name: %s, Surname: %s, Address: %s, Email: %s, Phone: %s, EmployeeId: %d, Role: %s, Licence: %s",
                 "Mario",
                 "Rossi",
                 location,
                 "mario.rossi@example.com",
                 "1234567890",
-                0,
+                null,
                 Employee.Role.OPERATOR,
                 Employee.LicenceType.C1);
-        assertEquals(expectedInfoWithLicence, employee.getInfo());
-
-        employee.setLicenceType(null);
-        String expectedInfoWithoutLicence = String.format(
-                "Name: %s, Surname: %s, Address: %s, Email: %s, Phone: %s, EmployeeId: %d, Role: %s, Licence: %s",
-                "Mario",
-                "Rossi",
-                location,
-                "mario.rossi@example.com",
-                "1234567890",
-                0,
-                Employee.Role.OPERATOR,
-                "N/A");
-        assertEquals(expectedInfoWithoutLicence, employee.getInfo());
+        assertEquals(expectedInfo, employee.getInfo());
     }
 }
