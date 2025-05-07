@@ -24,6 +24,24 @@ public class TripManager {
         return trips.removeIf(trip -> trip.getTripId() == tripId);
     }
 
+    public Optional<Trip> getTripById(int tripId) {
+        return trips.stream()
+                .filter(trip -> trip.getTripId() == tripId)
+                .findFirst();
+    }
+
+    public List<Trip> getAllTrips() {
+        return new ArrayList<>(trips);
+    }
+
+    public List<Trip> getTripsByStatus(Trip.TripStatus status) {
+        return trips.stream()
+                .filter(trip -> trip.getStatus() == status)
+                .collect(Collectors.toList());
+    }
+
+
+
 }
 
 
