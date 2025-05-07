@@ -29,6 +29,7 @@ public class AppContext {
     public static WasteScheduleManager wasteScheduleManager;
     public static RecurringScheduleManager recurringScheduleManager;
     public static CollectionManager collectionManager;
+    public static VehicleManager vehicleManager;
 
 
     public static void init() {
@@ -50,6 +51,8 @@ public class AppContext {
         wasteScheduleManager = new WasteScheduleManager(wasteScheduleDAO);
         recurringScheduleManager = new RecurringScheduleManager(recurringScheduleDAO, wasteScheduleManager);
         collectionManager = new CollectionManager(collectionDAO, recurringScheduleManager);
+        vehicleManager = new VehicleManager(vehicleDAO);
+
         
         // Collegamento
         recurringScheduleManager.setCollectionManager(collectionManager);
