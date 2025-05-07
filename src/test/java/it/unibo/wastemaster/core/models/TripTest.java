@@ -23,4 +23,24 @@ class TripTest {
     private LocalDateTime returnTime;
 
    
+    @BeforeEach
+    void setUp() {
+        
+        vehicle = new Vehicle("ABC123", "Truck", null, 5000, null, null);
+
+        
+        Employee operator1 = new Employee("Mario", "Rossi", null, "mario@waste.it", "1234567890", Role.OPERATOR, LicenceType.C);
+        Employee operator2 = new Employee("Luigi", "Verdi", null, "luigi@waste.it", "0987654321", Role.OPERATOR, LicenceType.C);
+
+        operators = Arrays.asList(operator1, operator2);
+        postalCodes = Arrays.asList("40121", "40122");
+
+        departure = LocalDateTime.of(2025, 5, 10, 8, 0);
+        returnTime = LocalDateTime.of(2025, 5, 10, 12, 0);
+
+        trip = new Trip(1, postalCodes, vehicle, operators, departure, returnTime, Trip.TripStatus.PENDING);
+    }
+
+   
+
 }
