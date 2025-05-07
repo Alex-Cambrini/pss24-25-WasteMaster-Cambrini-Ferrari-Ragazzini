@@ -34,12 +34,20 @@ public class TripManager {
         return new ArrayList<>(trips);
     }
 
-    public List<Trip> getTripsByStatus(Trip.TripStatus status) {
-        return trips.stream()
-                .filter(trip -> trip.getStatus() == status)
-                .collect(Collectors.toList());
+    public boolean updateTripStatus(int tripId, Trip.TripStatus newStatus) {
+        Optional<Trip> optionalTrip = getTripById(tripId);
+        if (optionalTrip.isPresent()) {
+            optionalTrip.get().setStatus(newStatus);
+            return true;
+        }
+        return false;
     }
 
+    public List<Trip> getTripsByPostalCode(String postalCode) {
+        return trips.stream()
+                .filter(trip -> trip.getPostalCodes().contains(postalCode))
+                .collect(Collectors.toList());
+    }
 
 
 }
