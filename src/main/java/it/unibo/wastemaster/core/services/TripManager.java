@@ -1,38 +1,38 @@
 package it.unibo.wastemaster.core.services;
 
 
-import it.unibo.wastemaster.core.models.Route;
+import it.unibo.wastemaster.core.models.Trip;
 import it.unibo.wastemaster.core.models.OneTimeSchedule;
 import it.unibo.wastemaster.core.models.RecurringSchedule;
 
 import java.util.*;
 
 
-public class RouteManager {
+public class TripManager {
 
-    private Map<Integer, Route> routes; 
+    private Map<Integer, Trip> routes; 
     private List<OneTimeSchedule> oneTimeSchedules;
     private List<RecurringSchedule> recurringSchedules;
 
-    public RouteManager() {
+    public TripManager() {
         this.routes = new HashMap<>();
         this.oneTimeSchedules = new ArrayList<>();
         this.recurringSchedules = new ArrayList<>();
     }
   
     
-    public void planRoute(Route route) {
+    public void planRoute(Trip route) {
         if (routes.containsKey(route.getId())) {
             throw new IllegalArgumentException("Route with this ID already exists.");
         }
         routes.put(route.getId(), route);
     }
 
-    public Route getRoute(int id) {
+    public Trip getRoute(int id) {
         return routes.get(id);
     }
 
-    public Collection<Route> getAllRoutes() {
+    public Collection<Trip> getAllRoutes() {
         return routes.values();
     }
 
