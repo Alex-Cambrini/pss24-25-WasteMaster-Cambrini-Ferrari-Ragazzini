@@ -32,7 +32,7 @@ public class EmployeManager {
 
     public void updateEmployee(Employee toUpdateEmployee) {
         ValidateUtils.validateEntity(toUpdateEmployee);
-        ValidateUtils.requireArgNotNull(toUpdateEmployee.getEmployeeId(), "Customer ID cannot be null");
+        ValidateUtils.requireArgNotNull(toUpdateEmployee.getEmployeeId(), "Employee ID cannot be null");
         Employee existing = employeeDAO.findByEmail(toUpdateEmployee.getEmail());
         if (existing != null && !existing.getEmployeeId().equals(toUpdateEmployee.getEmployeeId())) {
             throw new IllegalArgumentException("Email is already used by another employee.");
@@ -40,7 +40,7 @@ public class EmployeManager {
         employeeDAO.update(toUpdateEmployee);
     }
 
-    public boolean softDeleteCustomer(Employee employee) {
+    public boolean softDeleteEmployee(Employee employee) {
         try {
             ValidateUtils.requireArgNotNull(employee, "Employee cannot be null");
             ValidateUtils.requireArgNotNull(employee.getEmployeeId(), "Employee ID cannot be null");
