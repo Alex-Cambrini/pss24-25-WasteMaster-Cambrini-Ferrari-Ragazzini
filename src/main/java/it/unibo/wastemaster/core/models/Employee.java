@@ -16,7 +16,7 @@ public class Employee extends Person {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int employeeId;
+    private Integer employeeId;
 
     @NotNull (message = "Role cannot be null")
     @Enumerated(EnumType.STRING)
