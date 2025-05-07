@@ -29,6 +29,7 @@ public class Employee extends Person {
 	private LicenceType licenceType;
 
     public enum LicenceType {
+        NONE("None"),
         B("Fino a 3.5 t"),
         C1("3.5 t - 7.5 t"),
         C("Oltre 7.5 t");
