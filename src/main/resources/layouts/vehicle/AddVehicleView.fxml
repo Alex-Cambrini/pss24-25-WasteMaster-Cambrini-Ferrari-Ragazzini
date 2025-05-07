@@ -6,7 +6,8 @@
       prefHeight="400.0"
       prefWidth="600.0"
       xmlns="http://javafx.com/javafx/23.0.1"
-      xmlns:fx="http://javafx.com/fxml/1">
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="it.unibo.wastemaster.controller.vehicle.AddVehicleController">
     <children>
         <GridPane prefHeight="374.0" prefWidth="600.0">
             <columnConstraints>
@@ -44,8 +45,8 @@
         </GridPane>
         <HBox alignment="TOP_RIGHT" prefHeight="100.0" prefWidth="200.0" spacing="10.0">
             <children>
-                <Button mnemonicParsing="false" text="Cancel" onAction="#handleAbortCustomerCreation" />
-                <Button mnemonicParsing="false" text="Save" onAction="#handleSaveCustomer" />
+                <Button mnemonicParsing="false" text="Cancel" onAction="#handleAbortVehicleCreation" />
+                <Button mnemonicParsing="false" text="Save" onAction="#handleSaveVehicle" />
             </children>
             <padding>
                 <Insets right="20.0" top="10.0" />
