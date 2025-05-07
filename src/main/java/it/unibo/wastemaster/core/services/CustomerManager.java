@@ -20,7 +20,7 @@ public class CustomerManager {
         customerDAO.insert(customer);
         return customer;
     }
-    
+
     private boolean isEmailRegistered(String email) {
         return customerDAO.existsByEmail(email);
     }
@@ -40,15 +40,14 @@ public class CustomerManager {
     }
 
     public boolean softDeleteCustomer(Customer customer) {
-        if (customer != null && customer.getCustomerId() != null) {
-            Customer managed = customerDAO.findById(customer.getCustomerId());
-            if (managed != null) {
-                managed.delete();
-                customerDAO.update(managed);
-                return true;
-            }
+        try {
+            ValidateUtils.requireArgNotNull(customer, "Customer cannot be null");
+            ValidateUtils.requireArgNotNull(customer.getCustomerId(), "Customer ID cannot be null");
+            customer.delete();
+            updateCustomer(customer);
+            return true;
+        } catch (IllegalArgumentException e) {
+            return false;
         }
-        return false;
     }
-
 }
