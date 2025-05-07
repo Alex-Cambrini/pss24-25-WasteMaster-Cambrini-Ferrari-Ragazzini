@@ -35,7 +35,7 @@
       <HBox alignment="TOP_RIGHT" minHeight="50.0" prefHeight="100.0" prefWidth="600.0" spacing="10.0">
          <children>
             <Button mnemonicParsing="false" text="Edit" />
-            <Button mnemonicParsing="false" text="Delete" />
+            <Button mnemonicParsing="false" text="Delete" onAction="#handleDeleteVehicle" />
          </children>
          <padding>
             <Insets right="20.0" top="10.0" />
