@@ -39,27 +39,15 @@ public class CustomerManager {
         customerDAO.update(toUpdateCustomer);
     }
 
-    public boolean deleteCustomer(Customer customer) {
-        if (customer != null && customer.getCustomerId() != null) {
-            Customer managed = customerDAO.findById(customer.getCustomerId());
-            if (managed != null) {
-                customerDAO.delete(managed);
-                return true;
-            }
-        }
-        return false;
-    }
-
     public boolean softDeleteCustomer(Customer customer) {
-        if (customer != null && customer.getCustomerId() != null) {
-            Customer managed = customerDAO.findById(customer.getCustomerId());
-            if (managed != null) {
-                managed.delete();
-                customerDAO.update(managed);
-                return true;
-            }
+        try {
+            ValidateUtils.requireArgNotNull(customer, "Customer cannot be null");
+            ValidateUtils.requireArgNotNull(customer.getCustomerId(), "Customer ID cannot be null");
+            customer.delete();
+            updateCustomer(customer);
+            return true;
+        } catch (IllegalArgumentException e) {
+            return false;
         }
-        return false;
     }
-
 }
