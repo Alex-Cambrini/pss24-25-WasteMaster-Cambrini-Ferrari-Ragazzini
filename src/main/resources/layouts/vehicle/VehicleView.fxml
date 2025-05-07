@@ -13,7 +13,7 @@
    <children>
       <HBox alignment="TOP_CENTER" minHeight="40" prefHeight="60" prefWidth="600.0" spacing="10.0">
          <children>
-            <Button fx:id="addVehicleButton" mnemonicParsing="false" text="Add Vehicle" />
+            <Button fx:id="addVehicleButton" mnemonicParsing="false" onAction="#handleAddVehicle" text="Add Vehicle" />
             <Region prefHeight="20.0" prefWidth="0.0" HBox.hgrow="ALWAYS" />
             <TextField />
             <Button mnemonicParsing="false" text="Search" />
