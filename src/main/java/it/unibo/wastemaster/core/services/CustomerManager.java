@@ -20,7 +20,7 @@ public class CustomerManager {
         customerDAO.insert(customer);
         return customer;
     }
-
+    
     private boolean isEmailRegistered(String email) {
         return customerDAO.existsByEmail(email);
     }
@@ -37,17 +37,6 @@ public class CustomerManager {
             throw new IllegalArgumentException("Email is already used by another customer.");
         }
         customerDAO.update(toUpdateCustomer);
-    }
-
-    public boolean deleteCustomer(Customer customer) {
-        if (customer != null && customer.getCustomerId() != null) {
-            Customer managed = customerDAO.findById(customer.getCustomerId());
-            if (managed != null) {
-                customerDAO.delete(managed);
-                return true;
-            }
-        }
-        return false;
     }
 
     public boolean softDeleteCustomer(Customer customer) {
