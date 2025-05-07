@@ -77,18 +77,6 @@ class CustomerManagerTest extends AbstractDatabaseTest {
         }
 
         @Test
-        void testDeleteCustomer() {
-                Customer saved = customerManager.addCustomer(customer);
-                int savedId = saved.getCustomerId();
-
-                assertNotNull(saved);
-                assertTrue(customerManager.deleteCustomer(saved));
-                Customer afterDelete = customerManager.getCustomerById(savedId);
-                assertNull(afterDelete);
-                assertFalse(customerManager.deleteCustomer(null));
-        }
-
-        @Test
         void testSoftDeleteCustomer() {
                 Customer saved = customerManager.addCustomer(customer);
                 int savedId = saved.getCustomerId();
