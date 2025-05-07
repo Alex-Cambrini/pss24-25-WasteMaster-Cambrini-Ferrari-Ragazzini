@@ -17,6 +17,7 @@ import it.unibo.wastemaster.core.models.Location;
 import it.unibo.wastemaster.core.models.Waste;
 import it.unibo.wastemaster.core.services.CollectionManager;
 import it.unibo.wastemaster.core.services.CustomerManager;
+import it.unibo.wastemaster.core.services.EmployeeManager;
 import it.unibo.wastemaster.core.services.RecurringScheduleManager;
 import it.unibo.wastemaster.core.services.WasteScheduleManager;
 import it.unibo.wastemaster.core.utils.DateUtils;
@@ -41,6 +42,7 @@ public abstract class AbstractDatabaseTest {
 
 
     protected CustomerManager customerManager;
+    protected EmployeeManager employeeManager;
     protected WasteScheduleManager wasteScheduleManager;
     protected CollectionManager collectionManager;
     protected RecurringScheduleManager recurringScheduleManager;
@@ -61,10 +63,13 @@ public abstract class AbstractDatabaseTest {
 
         wasteDAO = new GenericDAO<Waste>(em, Waste.class);
         locationDAO = new GenericDAO<Location>(em, Location.class);
+
         customerDAO = new CustomerDAO(em);
         customerManager = new CustomerManager(customerDAO);
 
         employeeDAO = new EmployeeDAO(em);
+        employeeManager = new EmployeeManager(employeeDAO);
+
         wasteScheduleDAO = new WasteScheduleDAO(em);
         wasteScheduleManager = new WasteScheduleManager(wasteScheduleDAO);
 
