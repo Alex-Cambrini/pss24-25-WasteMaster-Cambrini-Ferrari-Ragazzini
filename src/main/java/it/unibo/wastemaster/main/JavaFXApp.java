@@ -29,7 +29,7 @@ public class JavaFXApp extends Application {
 		primaryStage.show();
 
 	} catch (Exception e) {
-		DialogUtils.showError("Critical Error", "Error connecting to the database:\n" + e.getMessage());
+		DialogUtils.showError("Critical Error:\n", e.getMessage());
 		Platform.exit();
 	}
 }}
