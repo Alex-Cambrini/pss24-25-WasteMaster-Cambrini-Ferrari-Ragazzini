@@ -61,7 +61,7 @@ public class Employee extends Person {
         super();
     }
 
-    public int getEmployeeId() {
+    public Integer getEmployeeId() {
         return employeeId;
     }
 
