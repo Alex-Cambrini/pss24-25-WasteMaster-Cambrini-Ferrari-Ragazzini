@@ -136,6 +136,31 @@ public class VehicleController {
 		}
 	}
 
+	@FXML
+	private void handleEditVehicle() {
+		VehicleRow selected = VehicleTable.getSelectionModel().getSelectedItem();
+		if (selected == null) {
+			DialogUtils.showError("No Selection", "Please select a vehicle to edit.");
+			return;
+		}
+
+		Vehicle vehicle = AppContext.vehicleManager.findVehicleByPlate(selected.getPlate());
+		if (vehicle == null) {
+			DialogUtils.showError("Not Found", "Vehicle not found.");
+			return;
+		}
+
+		try {
+			MainLayoutController.getInstance().setPageTitle("Edit Vehicle");
+			EditVehicleController controller = MainLayoutController.getInstance()
+					.loadCenterWithController("/layouts/vehicle/EditVehicleView.fxml");
+			controller.setVehicleToEdit(vehicle);
+			controller.setVehicleController(this);
+		} catch (Exception e) {
+			DialogUtils.showError("Navigation error", "Could not load Edit view.");
+		}
+	}
+
 	public void returnToVehicleView() {
 		try {
 			MainLayoutController.getInstance().restorePreviousTitle();
