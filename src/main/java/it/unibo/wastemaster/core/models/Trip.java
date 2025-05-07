@@ -30,7 +30,61 @@ public class Trip {
         this.status = status;
     }
 
-    
+    public int getTripId() {
+        return tripId;
+    }
+
+    public void setTripId(int tripId) {
+        this.tripId = tripId;
+    }
+
+    public List<String> getPostalCodes() {
+        return postalCodes;
+    }
+
+    public void setPostalCodes(List<String> postalCodes) {
+        this.postalCodes = postalCodes;
+    }
+
+    public Vehicle getAssignedVehicle() {
+        return assignedVehicle;
+    }
+
+    public void setAssignedVehicle(Vehicle assignedVehicle) {
+        this.assignedVehicle = assignedVehicle;
+    }
+
+    public List<Employee> getOperators() {
+        return operators;
+    }
+
+    public void setOperators(List<Employee> operators) {
+        this.operators = operators;
+    }
+
+    public LocalDateTime getDepartureTime() {
+        return departureTime;
+    }
+
+    public void setDepartureTime(LocalDateTime departureTime) {
+        this.departureTime = departureTime;
+    }
+
+    public LocalDateTime getExpectedReturnTime() {
+        return expectedReturnTime;
+    }
+
+    public void setExpectedReturnTime(LocalDateTime expectedReturnTime) {
+        this.expectedReturnTime = expectedReturnTime;
+    }
+
+    public TripStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(TripStatus status) {
+        this.status = status;
+    }
     
 }
 
