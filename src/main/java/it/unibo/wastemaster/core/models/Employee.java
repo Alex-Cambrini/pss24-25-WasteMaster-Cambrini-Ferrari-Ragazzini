@@ -88,7 +88,7 @@ public class Employee extends Person {
             super.getInfo(),
             employeeId,
             role,
-            licenceType != null ? licenceType : "N/A"
+            licenceType.toString()
         );
     }
 }
