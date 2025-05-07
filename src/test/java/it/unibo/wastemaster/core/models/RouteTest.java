@@ -27,7 +27,7 @@ public class RouteTest {
         Location stop2 = new Location();
         List<Location> stops = List.of(stop1, stop2);
         
-        Route route = new Route(100, stops, truck, schedule);
+        Trip route = new Trip(100, stops, truck, schedule);
 
         assertEquals(100, route.getId());
         assertEquals(stops, route.getStops());
@@ -39,7 +39,7 @@ public class RouteTest {
     @Test
     public void testRouteFieldUpdates() {
 
-        Route route = new Route(100, null, null, null);
+        Trip route = new Trip(100, null, null, null);
         route.setId(200);
 
         Vehicle truck = new Vehicle("TRUCK-001", "Brand", "Model", 2020, Vehicle.LicenceType.C1, Vehicle.VehicleStatus.IN_SERVICE);
@@ -61,7 +61,7 @@ public class RouteTest {
         
     @Test
     public void testEmptyConstructorAndSetters() {
-        Route route = new Route();
+        Trip route = new Trip();
 
         assert(route.getId()==0);
         assertNull(route.getTruck());
@@ -94,7 +94,7 @@ public class RouteTest {
 
     @Test
     public void testUpdateStopsList() {
-        Route route = new Route(100, null, null, null);
+        Trip route = new Trip(100, null, null, null);
 
         Location stop1 = new Location();
         Location stop2 = new Location();
