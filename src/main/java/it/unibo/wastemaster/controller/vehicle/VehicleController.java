@@ -3,6 +3,7 @@ package it.unibo.wastemaster.controller.vehicle;
 import it.unibo.wastemaster.controller.main.MainLayoutController;
 import it.unibo.wastemaster.controller.utils.DialogUtils;
 import it.unibo.wastemaster.core.context.AppContext;
+import it.unibo.wastemaster.core.models.Vehicle;
 import it.unibo.wastemaster.viewmodels.VehicleRow;
 
 import javafx.animation.KeyFrame;
@@ -110,6 +111,31 @@ public class VehicleController {
 		return Character.toUpperCase(lower.charAt(0)) + lower.substring(1);
 	}
 
+	@FXML
+	private void handleDeleteVehicle() {
+		VehicleRow selected = VehicleTable.getSelectionModel().getSelectedItem();
+		if (selected == null) {
+			DialogUtils.showError("No Selection", "Please select a vehicle to delete.");
+			return;
+		}
+
+		Vehicle vehicle = AppContext.vehicleManager.findVehicleByPlate(selected.getPlate());
+
+		if (vehicle == null) {
+			DialogUtils.showError("Not Found", "The selected vehicle could not be found.");
+			return;
+		}
+
+		boolean success = AppContext.vehicleManager.deleteVehicle(vehicle);
+
+		if (success) {
+			DialogUtils.showSuccess("Vehicle deleted successfully.");
+			loadVehicles();
+		} else {
+			DialogUtils.showError("Deletion Failed", "Unable to delete the selected vehicle.");
+		}
+	}
+
 	public void returnToVehicleView() {
 		try {
 			MainLayoutController.getInstance().restorePreviousTitle();
@@ -118,5 +144,5 @@ public class VehicleController {
 			DialogUtils.showError("Navigation error", "Failed to load vehicle view.");
 		}
 	}
-	
+
 }
