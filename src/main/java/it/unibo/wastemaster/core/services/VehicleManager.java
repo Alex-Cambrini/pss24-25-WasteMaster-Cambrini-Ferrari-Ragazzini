@@ -13,7 +13,7 @@ public class VehicleManager {
 	public VehicleManager(VehicleDAO vehicleDAO) {
 		this.vehicleDAO = vehicleDAO;
 	}
-	
+
 	public Vehicle addVehicle(Vehicle vehicle) {
 		ValidateUtils.validateEntity(vehicle);
 
@@ -27,11 +27,11 @@ public class VehicleManager {
 
 	public Vehicle findVehicleByPlate(String plate) {
 		if (plate == null) {
-            throw new IllegalArgumentException("Plate cannot be null");
-        }
+			throw new IllegalArgumentException("Plate cannot be null");
+		}
 		plate = plate.toUpperCase().trim();
-        return vehicleDAO.findByPlate(plate);
-    }
+		return vehicleDAO.findByPlate(plate);
+	}
 
 	private boolean isPlateRegistered(String plate) {
 		Vehicle vehicle = findVehicleByPlate(plate);
@@ -71,6 +71,17 @@ public class VehicleManager {
 			updateVehicle(vehicle);
 		} else {
 			throw new IllegalArgumentException("The vehicle is not in maintenance status.");
+		}
+	}
+
+	public boolean deleteVehicle(Vehicle vehicle) {
+		try {
+			ValidateUtils.requireArgNotNull(vehicle, "Vehicle cannot be null");
+			ValidateUtils.requireArgNotNull(vehicle.getPlate(), "Vehicle plate cannot be null");
+			vehicleDAO.delete(vehicle);
+			return true;
+		} catch (IllegalArgumentException e) {
+			return false;
 		}
 	}
 }
