@@ -1,28 +1,50 @@
 package it.unibo.wastemaster.core.models;
 
+import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import java.util.List;
 
+@Entity
+@Table(name = "trip")
 public class Trip {
-    private int tripId;                
-    private Location postalCodes;  
-    private Vehicle assignedVehicle;   
-    private List<Employee> operators;  
-    private LocalDateTime departureTime;  
-    private LocalDateTime expectedReturnTime; 
-    private TripStatus status;         
-    private List<Collection> collections;
-    
+
     public enum TripStatus {
         PENDING, IN_PROGRESS, COMPLETED, CANCELED
     }
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer tripId;
+
+    @Column(nullable = false)
+    private String postalCode;  
+
+    @ManyToOne
+    private Vehicle assignedVehicle;
+
+    @ManyToMany
+    private List<Employee> operators;
+
+    @NotNull
+    private LocalDateTime departureTime;
+
+    @NotNull
+    private LocalDateTime expectedReturnTime;
+
+    @Enumerated(EnumType.STRING)
+    @NotNull
+    @Column(nullable = false)
+    private TripStatus status;
+
+    @OneToMany(mappedBy = "trip", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Collection> collections;
     
-    public Trip(int tripId, Location postalCodes, Vehicle assignedVehicle, 
+    public Trip(int tripId, String postalCode, Vehicle assignedVehicle, 
                 List<Employee> operators, LocalDateTime departureTime, 
                 LocalDateTime expectedReturnTime, TripStatus status,List<Collection> collections) {
         this.tripId = tripId;
-        this.postalCodes = postalCodes;
+        this.postalCode = postalCode;
         this.assignedVehicle = assignedVehicle;
         this.operators = operators;
         this.departureTime = departureTime;
@@ -39,12 +61,12 @@ public class Trip {
         this.tripId = tripId;
     }
 
-    public Location getPostalCodes() {
-        return postalCodes;
+    public String getPostalCodes() {
+        return postalCode;
     }
 
-    public void setPostalCodes(Location postalCodes) {
-        this.postalCodes = postalCodes;
+    public void setPostalCodes(String postalCodes) {
+        this.postalCode = postalCodes;
     }
 
     public Vehicle getAssignedVehicle() {
