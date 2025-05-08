@@ -27,9 +27,11 @@ public class Trip {
     private List<Employee> operators;
 
     @NotNull
+    @Column(nullable = false)
     private LocalDateTime departureTime;
 
     @NotNull
+    @Column(nullable = false)
     private LocalDateTime expectedReturnTime;
 
     @Enumerated(EnumType.STRING)
