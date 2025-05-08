@@ -11,7 +11,7 @@ public class Trip {
     private LocalDateTime departureTime;  
     private LocalDateTime expectedReturnTime; 
     private TripStatus status;         
-
+    private List<Collection> collections;
     
     public enum TripStatus {
         PENDING, IN_PROGRESS, COMPLETED, CANCELED
@@ -20,7 +20,7 @@ public class Trip {
     
     public Trip(int tripId, Location postalCodes, Vehicle assignedVehicle, 
                 List<Employee> operators, LocalDateTime departureTime, 
-                LocalDateTime expectedReturnTime, TripStatus status) {
+                LocalDateTime expectedReturnTime, TripStatus status,List<Collection> collections) {
         this.tripId = tripId;
         this.postalCodes = postalCodes;
         this.assignedVehicle = assignedVehicle;
@@ -28,6 +28,7 @@ public class Trip {
         this.departureTime = departureTime;
         this.expectedReturnTime = expectedReturnTime;
         this.status = status;
+        this.collections = collections;
     }
 
     public int getTripId() {
@@ -84,6 +85,14 @@ public class Trip {
 
     public void setStatus(TripStatus status) {
         this.status = status;
+    }
+    
+    public List<Collection> getCollections() {
+        return collections;
+    }
+    
+    public void setCollections(List<Collection> collections) {
+        this.collections = collections;
     }
     
 }
