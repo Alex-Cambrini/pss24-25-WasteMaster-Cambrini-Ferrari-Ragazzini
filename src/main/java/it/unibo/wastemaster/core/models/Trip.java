@@ -39,7 +39,7 @@ public class Trip {
     @Column(nullable = false)
     private TripStatus status;
 
-    @OneToMany(mappedBy = "trip", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "trip")
     private List<Collection> collections;
     
     public Trip(int tripId, String postalCode, Vehicle assignedVehicle, 
