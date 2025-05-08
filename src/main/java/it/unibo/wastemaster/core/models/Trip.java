@@ -5,7 +5,7 @@ import java.util.List;
 
 public class Trip {
     private int tripId;                
-    private List<String> postalCodes;  // Lista di CAP 
+    private Location postalCodes;  
     private Vehicle assignedVehicle;   
     private List<Employee> operators;  
     private LocalDateTime departureTime;  
@@ -18,7 +18,7 @@ public class Trip {
     }
 
     
-    public Trip(int tripId, List<String> postalCodes, Vehicle assignedVehicle, 
+    public Trip(int tripId, Location postalCodes, Vehicle assignedVehicle, 
                 List<Employee> operators, LocalDateTime departureTime, 
                 LocalDateTime expectedReturnTime, TripStatus status) {
         this.tripId = tripId;
@@ -38,11 +38,11 @@ public class Trip {
         this.tripId = tripId;
     }
 
-    public List<String> getPostalCodes() {
+    public Location getPostalCodes() {
         return postalCodes;
     }
 
-    public void setPostalCodes(List<String> postalCodes) {
+    public void setPostalCodes(Location postalCodes) {
         this.postalCodes = postalCodes;
     }
 
