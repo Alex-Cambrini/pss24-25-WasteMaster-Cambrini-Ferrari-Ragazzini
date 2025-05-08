@@ -57,9 +57,7 @@ public class Trip {
         return tripId;
     }
 
-    public void setTripId(int tripId) {
-        this.tripId = tripId;
-    }
+    
 
     public String getPostalCodes() {
         return postalCode;
