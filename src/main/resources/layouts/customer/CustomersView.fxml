@@ -13,8 +13,9 @@
             <children>
                 <Button fx:id="addClientButton" mnemonicParsing="false" onAction="#handleAddCustomer" text="Add Customer" />
                 <Region prefHeight="20" prefWidth="0.0" HBox.hgrow="ALWAYS" />
-                <TextField />
-                <Button mnemonicParsing="false" text="Search" />
+                <Button fx:id="filterButton" text="Filter ▼" onMouseClicked="#showFilterMenu" />
+                <TextField fx:id="searchField" promptText="Cerca..." />
+                <Button mnemonicParsing="false" text="Reset" onAction="#handleResetSearch" />
             </children>
         </HBox>
         <TableView fx:id="customerTable" prefHeight="300.0" prefWidth="600.0" VBox.vgrow="ALWAYS">
