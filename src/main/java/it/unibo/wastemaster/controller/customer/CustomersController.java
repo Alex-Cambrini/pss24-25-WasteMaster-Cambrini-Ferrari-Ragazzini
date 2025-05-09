@@ -11,6 +11,8 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.Button;
+import javafx.scene.control.ContextMenu;
+import javafx.scene.control.CustomMenuItem;
 
 import java.util.List;
 
@@ -21,9 +23,19 @@ import it.unibo.wastemaster.viewmodels.CustomerRow;
 public class CustomersController {
 
     private Timeline refreshTimeline;
+    private ObservableList<CustomerRow> allCustomers = FXCollections.observableArrayList();
+
+    private final ObservableList<String> activeFilters = FXCollections.observableArrayList(
+            "name", "surname", "email", "street", "civic", "city", "postal");
+
+    @FXML
+    private Button filterButton;
 
     @FXML
     private Button addClientButton;
+
+    @FXML
+    private javafx.scene.control.TextField searchField;
 
     @FXML
     private TableView<CustomerRow> customerTable;
@@ -54,6 +66,7 @@ public class CustomersController {
 
         loadCustomers();
         startAutoRefresh();
+        searchField.textProperty().addListener((obs, oldText, newText) -> handleSearch());
     }
 
     private void startAutoRefresh() {
@@ -71,21 +84,24 @@ public class CustomersController {
 
     private void loadCustomers() {
         List<Object[]> rawData = AppContext.customerDAO.findCustomerDetails();
-        ObservableList<CustomerRow> rows = FXCollections.observableArrayList();
+        allCustomers.clear();
 
         for (Object[] row : rawData) {
-            rows.add(new CustomerRow(
-                    (String) row[0], // name
-                    (String) row[1], // surname
-                    (String) row[2], // email
-                    (String) row[3], // street
-                    (String) row[4], // civicNumber
-                    (String) row[5], // city
-                    (String) row[6] // postalCode
-            ));
+            allCustomers.add(new CustomerRow(
+                    (String) row[0],
+                    (String) row[1],
+                    (String) row[2],
+                    (String) row[3],
+                    (String) row[4],
+                    (String) row[5],
+                    (String) row[6]));
         }
 
-        customerTable.setItems(rows);
+        customerTable.setItems(FXCollections.observableArrayList(allCustomers));
+
+        if (!searchField.getText().isBlank()) {
+            handleSearch();
+        }
     }
 
     @FXML
@@ -93,7 +109,7 @@ public class CustomersController {
         try {
             MainLayoutController.getInstance().setPageTitle("Add Customer");
             AddCustomerController controller = MainLayoutController.getInstance()
-                .loadCenterWithController("/layouts/customer/AddCustomerView.fxml");
+                    .loadCenterWithController("/layouts/customer/AddCustomerView.fxml");
             controller.setCustomerController(this);
         } catch (Exception e) {
             DialogUtils.showError("Navigation error", "Could not load Add Customer view.");
@@ -142,12 +158,77 @@ public class CustomersController {
         try {
             MainLayoutController.getInstance().setPageTitle("Edit Customer");
             EditCustomerController controller = MainLayoutController.getInstance()
-                .loadCenterWithController("/layouts/customer/EditCustomerView.fxml");
+                    .loadCenterWithController("/layouts/customer/EditCustomerView.fxml");
             controller.setCustomerToEdit(customer);
             controller.setCustomerController(this);
         } catch (Exception e) {
             DialogUtils.showError("Navigation error", "Could not load Edit view.");
         }
+    }
+
+    @FXML
+    private void handleSearch() {
+        String query = searchField.getText().toLowerCase().trim();
+
+        if (query.isEmpty()) {
+            customerTable.setItems(FXCollections.observableArrayList(allCustomers));
+            return;
+        }
+
+        ObservableList<CustomerRow> filtered = FXCollections.observableArrayList();
+
+        for (CustomerRow row : allCustomers) {
+            if ((activeFilters.contains("name") && row.getName().toLowerCase().contains(query)) ||
+                    (activeFilters.contains("surname") && row.getSurname().toLowerCase().contains(query)) ||
+                    (activeFilters.contains("email") && row.getEmail().toLowerCase().contains(query)) ||
+                    (activeFilters.contains("street") && row.getStreet().toLowerCase().contains(query)) ||
+                    (activeFilters.contains("civic") && row.getCivic().toLowerCase().contains(query)) ||
+                    (activeFilters.contains("city") && row.getCity().toLowerCase().contains(query)) ||
+                    (activeFilters.contains("postal") && row.getPostalCode().toLowerCase().contains(query))) {
+                filtered.add(row);
+            }
+        }
+
+        customerTable.setItems(filtered);
+    }
+
+    @FXML
+    private void handleResetSearch() {
+        searchField.clear();
+        loadCustomers();
+    }
+
+    @FXML
+    private void showFilterMenu(javafx.scene.input.MouseEvent event) {
+        ContextMenu menu = new ContextMenu();
+
+        String[] fields = { "name", "surname", "email", "street", "civic", "city", "postal" };
+        String[] labels = { "Name", "Surname", "Email", "Street", "Civic", "City", "Postal Code" };
+
+        for (int i = 0; i < fields.length; i++) {
+            String key = fields[i];
+            String label = labels[i];
+
+            javafx.scene.control.CheckBox checkBox = new javafx.scene.control.CheckBox(label);
+            checkBox.setSelected(activeFilters.contains(key));
+
+            checkBox.selectedProperty().addListener((obs, wasSelected, isSelected) -> {
+                if (isSelected) {
+                    if (!activeFilters.contains(key)) {
+                        activeFilters.add(key);
+                    }
+                } else {
+                    activeFilters.remove(key);
+                }
+                handleSearch();
+            });
+
+            CustomMenuItem item = new CustomMenuItem(checkBox);
+            item.setHideOnClick(false);
+            menu.getItems().add(item);
+        }
+
+        menu.show(filterButton, event.getScreenX(), event.getScreenY());
     }
 
     public void returnToCustomerView() {
