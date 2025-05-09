@@ -101,11 +101,11 @@ public abstract class Schedule {
         this.wasteType = wasteType;
     }
 
-    public ScheduleStatus getStatus() {
+    public ScheduleStatus getScheduleStatus() {
         return status;
     }
 
-    public void setStatus(ScheduleStatus status) {
+    public void setScheduleStatus(ScheduleStatus status) {
         this.status = status;
     }
 
