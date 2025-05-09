@@ -17,7 +17,11 @@ import it.unibo.wastemaster.core.models.Location;
 import it.unibo.wastemaster.core.models.Waste;
 import it.unibo.wastemaster.core.services.CollectionManager;
 import it.unibo.wastemaster.core.services.CustomerManager;
+<<<<<<< Updated upstream
 import it.unibo.wastemaster.core.services.EmployeeManager;
+=======
+import it.unibo.wastemaster.core.services.OneTimeScheduleManager;
+>>>>>>> Stashed changes
 import it.unibo.wastemaster.core.services.RecurringScheduleManager;
 import it.unibo.wastemaster.core.services.WasteScheduleManager;
 import it.unibo.wastemaster.core.utils.DateUtils;
@@ -46,6 +50,7 @@ public abstract class AbstractDatabaseTest {
     protected WasteScheduleManager wasteScheduleManager;
     protected CollectionManager collectionManager;
     protected RecurringScheduleManager recurringScheduleManager;
+    protected OneTimeScheduleManager oneTimeScheduleManager;
     protected DateUtils dateUtils;
 
     @BeforeAll
@@ -72,6 +77,9 @@ public abstract class AbstractDatabaseTest {
 
         wasteScheduleDAO = new WasteScheduleDAO(em);
         wasteScheduleManager = new WasteScheduleManager(wasteScheduleDAO);
+
+        oneTimeScheduleDAO = new OneTimeScheduleDAO(em);
+        oneTimeScheduleManager = new OneTimeScheduleManager(oneTimeScheduleDAO, collectionManager);
 
         recurringScheduleDAO = new RecurringScheduleDAO(em);
         recurringScheduleManager = new RecurringScheduleManager(recurringScheduleDAO, wasteScheduleManager);
