@@ -46,6 +46,10 @@ public class Collection {
     @NotNull(message = "Schedule cannot be null")
     private Schedule schedule;
 
+    @ManyToOne
+    @JoinColumn(name = "trip_id") 
+    private Trip trip;
+
     public enum CollectionStatus {
         PENDING,
         IN_PROGRESS,
