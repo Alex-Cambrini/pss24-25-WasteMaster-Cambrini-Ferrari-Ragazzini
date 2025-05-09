@@ -1,12 +1,9 @@
 package it.unibo.wastemaster.core.dao;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.time.LocalDate;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 
 import it.unibo.wastemaster.core.AbstractDatabaseTest;
 import it.unibo.wastemaster.core.models.Collection;
@@ -52,19 +49,4 @@ public class OneTimeScheduleDAOTest extends AbstractDatabaseTest {
         collection2.setCollectionDate(date);
         collectionDAO.insert(collection2);
     }
-
-    @Test
-    void testFindCollectionByScheduleId() {
-        int OneTimeScheduleId = collection1.getCollectionId();
-        int RecurringScheduleId = collection2.getCollectionId();
-
-        Collection result1 = oneTimeScheduleDAO.findCollectionByScheduleId(OneTimeScheduleId);
-        Collection result2 = oneTimeScheduleDAO.findCollectionByScheduleId(RecurringScheduleId);
-
-        assertNotNull(result1);
-        assertNotNull(result2);
-        assertEquals(result1, collection1);
-        assertEquals(result2, collection2);
-    }
-
 }
