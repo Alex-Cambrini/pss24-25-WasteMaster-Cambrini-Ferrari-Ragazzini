@@ -50,8 +50,6 @@ public class TripManager {
         return tripDAO.findByStatus(status);
     }
 
-
-    
     public void deleteTrip(int tripId) {
         Trip trip = tripDAO.findById(tripId);
         if (trip != null) {
@@ -60,7 +58,20 @@ public class TripManager {
     }
 
     
+    public List<Trip> getTripsByPostalCode(String postalCode) {
+        return tripDAO.findByPostalCode(postalCode);
+    }
 
+    
+    public List<Trip> getTripsByOperator(Employee operator) {
+        return tripDAO.findByOperator(operator);
+    }
+
+    
+    public List<Trip> getTripsByVehicle(Vehicle vehicle) {
+        return tripDAO.findByVehicle(vehicle);
+    }
+   
 
 }
 
