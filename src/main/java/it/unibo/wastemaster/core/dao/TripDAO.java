@@ -18,6 +18,17 @@ public class TripDAO extends GenericDAO<Trip> {
         "SELECT t FROM Trip t WHERE t.status = :status", Trip.class)
         .setParameter("status", status)
         .getResultList();
-}
+    }
+
+    
+    public Trip findByPostalCode(String postalCode) {
+        return entityManager.createQuery(
+            "SELECT t FROM Trip t WHERE t.postalCode = :postalCode", Trip.class)
+            .setParameter("postalCode", postalCode)
+            .getResultStream()
+            .findFirst()
+            .orElse(null);
+    }
+
 }
 
