@@ -1,60 +1,25 @@
 package it.unibo.wastemaster.core.services;
 
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
+import it.unibo.wastemaster.core.dao.TripDAO;
 import it.unibo.wastemaster.core.models.Trip;
+import it.unibo.wastemaster.core.models.Employee;
+import it.unibo.wastemaster.core.models.Vehicle;
 
+import jakarta.persistence.EntityManager;
+import java.time.LocalDateTime;
+import java.util.List;
 public class TripManager {
 
-    private final List<Trip> trips;
+    private final TripDAO tripDAO;
 
-    public TripManager() {
-        this.trips = new ArrayList<>();
-    }
-
-    public void addTrip(Trip trip) {
-        trips.add(trip);
-    }
-
-    public boolean removeTripById(int tripId) {
-        return trips.removeIf(trip -> trip.getTripId() == tripId);
-    }
-
-    public Optional<Trip> getTripById(int tripId) {
-        return trips.stream()
-                .filter(trip -> trip.getTripId() == tripId)
-                .findFirst();
-    }
-
-    public List<Trip> getAllTrips() {
-        return new ArrayList<>(trips);
-    }
-
-    public boolean updateTripStatus(int tripId, Trip.TripStatus newStatus) {
-        Optional<Trip> optionalTrip = getTripById(tripId);
-        if (optionalTrip.isPresent()) {
-            optionalTrip.get().setStatus(newStatus);
-            return true;
-        }
-        return false;
-    }
-
-    public List<Trip> getTripsByPostalCode(String postalCode) {
-        return trips.stream()
-                .filter(trip -> trip.getPostalCodes().contains(postalCode))
-                .collect(Collectors.toList());
+    public TripManager(EntityManager entityManager) {
+        this.tripDAO = new TripDAO(entityManager);
     }
 
 
+    
 }
-
-
-
-
 
 
 
