@@ -63,10 +63,9 @@ public abstract class Schedule {
     }
 
     public enum ScheduleStatus {
-        SCHEDULED,
         ACTIVE,
         CANCELLED,
-        STOPPED
+        PAUSED
     }
     
     // No-args constructor required by JPA
@@ -76,7 +75,7 @@ public abstract class Schedule {
     public Schedule(Customer customer, Waste.WasteType wasteType) {
         this.customer = customer;
         this.wasteType = wasteType;
-        this.status = ScheduleStatus.SCHEDULED;
+        this.status = ScheduleStatus.ACTIVE;
         this.creationDate = new DateUtils().getCurrentDate();
     }
 
