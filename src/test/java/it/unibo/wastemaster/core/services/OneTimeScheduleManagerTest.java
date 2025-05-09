@@ -11,6 +11,8 @@ import it.unibo.wastemaster.core.utils.ValidateUtils;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.LocalDate;
@@ -42,20 +44,22 @@ class OneTimeScheduleManagerTest extends AbstractDatabaseTest {
 	}
 
 	@Test
-	void testCreateOneTimeSchedule() {
-		LocalDate pickupDate = dateUtils.getCurrentDate().plusDays(5);
+	public void testCreateOneTimeSchedule() {
+		LocalDate invalidDate = dateUtils.getCurrentDate().plusDays(1);
+		LocalDate validDate = dateUtils.getCurrentDate().plusDays(3);
 
-		oneTimeScheduleManager.createOneTimeSchedule(customer, Waste.WasteType.PLASTIC, ScheduleStatus.SCHEDULED,
-				pickupDate);
+		assertThrows(IllegalArgumentException.class, () -> {
+			oneTimeScheduleManager.createOneTimeSchedule(customer, Waste.WasteType.ORGANIC, invalidDate);
+		});
 
-		OneTimeSchedule schedule = oneTimeScheduleDAO.findAll().get(0);
-		assertEquals(Waste.WasteType.PLASTIC, schedule.getWasteType());
-		assertEquals(pickupDate, schedule.getPickupDate());
+		OneTimeSchedule newSchedule = oneTimeScheduleManager.createOneTimeSchedule(customer, Waste.WasteType.ORGANIC,
+				validDate);
+		assertNotNull(newSchedule);
+		assertEquals(newSchedule.getStatus(), ScheduleStatus.ACTIVE);
 
-		Collection collection = collectionDAO.findAll().get(0);
-		assertEquals(pickupDate, collection.getCollectionDate());
-		assertEquals(Waste.WasteType.PLASTIC, collection.getWaste());
-		assertEquals(customer, collection.getCustomer());
+		Collection associatedCollection = collectionManager.getActiveCollectionByOneTimeSchedule(newSchedule);
+		assertNotNull(associatedCollection);
+		assertEquals(associatedCollection.getCollectionStatus(), Collection.CollectionStatus.PENDING);
 	}
 
 	@Test
@@ -108,20 +112,38 @@ class OneTimeScheduleManagerTest extends AbstractDatabaseTest {
 	}
 
 	@Test
-	void testCancelOneTimeSchedule() {
-		LocalDate date = dateUtils.getCurrentDate().plusDays(5);
+	void testUpdateStatusOneTimeSchedule_allCases() {
+		LocalDate validDate = dateUtils.getCurrentDate().plusDays(3);
 
-		OneTimeSchedule schedule = new OneTimeSchedule(customer, Waste.WasteType.PLASTIC, date);
-		ValidateUtils.validateEntity(schedule);
-		oneTimeScheduleDAO.insert(schedule);
-		collectionManager.generateOneTimeCollection(schedule);
+		// 1) Null args
+		assertThrows(IllegalArgumentException.class, () ->
+			oneTimeScheduleManager.updateStatusOneTimeSchedule(null, ScheduleStatus.ACTIVE)
+		);
 
-		boolean result = oneTimeScheduleManager.cancelOneTimeSchedule(schedule);
-		assertTrue(result);
+		OneTimeSchedule s0 = new OneTimeSchedule(customer, Waste.WasteType.GLASS, validDate);
+		ValidateUtils.validateEntity(s0);
+		assertThrows(IllegalArgumentException.class, () ->
+			oneTimeScheduleManager.updateStatusOneTimeSchedule(s0, null)
+		);
+	
+		// 2) Already CANCELLED → false
+		OneTimeSchedule s2 = new OneTimeSchedule(customer, Waste.WasteType.PLASTIC, validDate);
+		ValidateUtils.validateEntity(s2);
+		s2.setStatus(ScheduleStatus.CANCELLED);
+		assertFalse(oneTimeScheduleManager.updateStatusOneTimeSchedule(s2, ScheduleStatus.ACTIVE));
+			
+		// 3) ACTIVE → PAUSED
+		OneTimeSchedule s3 = oneTimeScheduleManager.createOneTimeSchedule(customer, Waste.WasteType.ORGANIC, validDate);
+		assertTrue(oneTimeScheduleManager.updateStatusOneTimeSchedule(s3, ScheduleStatus.PAUSED));
 
-		Collection updated = collectionDAO.findAll().get(0);
-		assertEquals(Collection.CollectionStatus.CANCELLED, updated.getCollectionStatus());
-		assertEquals(ScheduleStatus.CANCELLED, schedule.getStatus());
+		Collection c3 = collectionManager.getCancelledCollectionsOneTimeSchedule(s3).stream().findFirst().orElse(null);		
+		assertNotNull(c3);
+		assertEquals(c3.getCollectionStatus(), Collection.CollectionStatus.CANCELLED);
+
+		// 3) PAUSED → ACTIVE
+		assertTrue(oneTimeScheduleManager.updateStatusOneTimeSchedule(s3, ScheduleStatus.ACTIVE));
+		c3 = collectionManager.getActiveCollectionByOneTimeSchedule(s3);
+		assertNotNull(c3);
 	}
 
 	@Test
@@ -133,7 +155,7 @@ class OneTimeScheduleManagerTest extends AbstractDatabaseTest {
 		oneTimeScheduleDAO.insert(schedule);
 		collectionManager.generateOneTimeCollection(schedule);
 
-		boolean result = oneTimeScheduleManager.cancelOneTimeSchedule(schedule);
+		boolean result = oneTimeScheduleManager.updateStatusOneTimeSchedule(schedule, ScheduleStatus.CANCELLED);
 		assertFalse(result);
 	}
 }
