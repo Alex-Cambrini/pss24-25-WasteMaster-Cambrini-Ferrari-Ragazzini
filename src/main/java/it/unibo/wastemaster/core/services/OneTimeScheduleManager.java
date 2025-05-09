@@ -75,23 +75,23 @@ public class OneTimeScheduleManager {
         ValidateUtils.requireArgNotNull(newStatus, "New status cannot be null");
         ValidateUtils.requireArgNotNull(schedule.getScheduleId(), "Schedule ID cannot be null");       
     
-        if (schedule.getStatus() == ScheduleStatus.CANCELLED) {
+        if (schedule.getScheduleStatus() == ScheduleStatus.CANCELLED) {
             return false;
         }
     
-        if (schedule.getStatus() == ScheduleStatus.PAUSED && newStatus == ScheduleStatus.ACTIVE) {
+        if (schedule.getScheduleStatus() == ScheduleStatus.PAUSED && newStatus == ScheduleStatus.ACTIVE) {
             collectionManager.generateOneTimeCollection(schedule);
             return true;
         }
     
-        if (schedule.getStatus() == ScheduleStatus.ACTIVE
+        if (schedule.getScheduleStatus() == ScheduleStatus.ACTIVE
             && (newStatus == ScheduleStatus.PAUSED || newStatus == ScheduleStatus.CANCELLED)) {
     
             Collection associatedCollection  = collectionManager.getActiveCollectionByOneTimeSchedule(schedule);
             ValidateUtils.requireArgNotNull(associatedCollection, "Associated collection not found");
     
             if (isDateValid(schedule.getPickupDate(), associatedCollection .getCancelLimitDays())) {
-                schedule.setStatus(newStatus);
+                schedule.setScheduleStatus(newStatus);
                 oneTimeScheduleDAO.update(schedule);
                 associatedCollection.setCollectionStatus(CollectionStatus.CANCELLED);
                 collectionManager.updateCollection(associatedCollection );

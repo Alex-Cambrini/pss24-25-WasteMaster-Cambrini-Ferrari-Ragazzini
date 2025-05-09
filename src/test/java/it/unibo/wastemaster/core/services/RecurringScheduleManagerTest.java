@@ -139,7 +139,7 @@ class RecurringScheduleManagerTest extends AbstractDatabaseTest {
 
         RecurringSchedule schedule = new RecurringSchedule(customer, WasteType.GLASS, startDate, Frequency.WEEKLY);
         schedule.setNextCollectionDate(oldNextDate);
-        schedule.setStatus(RecurringSchedule.ScheduleStatus.ACTIVE);
+        schedule.setScheduleStatus(RecurringSchedule.ScheduleStatus.ACTIVE);
 
         ValidateUtils.validateEntity(schedule);
         recurringScheduleDAO.insert(schedule);

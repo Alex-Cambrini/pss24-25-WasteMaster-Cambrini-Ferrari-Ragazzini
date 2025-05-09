@@ -49,22 +49,22 @@ public class RecurringScheduleDAOTest extends AbstractDatabaseTest {
 
         recurringSchedule1 = new RecurringSchedule(customer1, wasteType, date,
                 RecurringSchedule.Frequency.WEEKLY);
-        recurringSchedule1.setStatus(RecurringSchedule.ScheduleStatus.ACTIVE);
+        recurringSchedule1.setScheduleStatus(RecurringSchedule.ScheduleStatus.ACTIVE);
         recurringSchedule1.setNextCollectionDate(date.plusDays(1));
 
         recurringSchedule2 = new RecurringSchedule(customer1, wasteType, date.plusDays(1),
                 RecurringSchedule.Frequency.MONTHLY);
-        recurringSchedule2.setStatus(RecurringSchedule.ScheduleStatus.ACTIVE);
+        recurringSchedule2.setScheduleStatus(RecurringSchedule.ScheduleStatus.ACTIVE);
         recurringSchedule2.setNextCollectionDate(date.minusDays(1));
 
         recurringSchedule3 = new RecurringSchedule(customer1, wasteType, date.plusDays(2),
                 RecurringSchedule.Frequency.WEEKLY);
-        recurringSchedule3.setStatus(RecurringSchedule.ScheduleStatus.CANCELLED);
+        recurringSchedule3.setScheduleStatus(RecurringSchedule.ScheduleStatus.CANCELLED);
         recurringSchedule3.setNextCollectionDate(date.minusDays(2));
 
         recurringSchedule4 = new RecurringSchedule(customer2, wasteType, date.plusDays(3),
                 RecurringSchedule.Frequency.MONTHLY);
-        recurringSchedule4.setStatus(RecurringSchedule.ScheduleStatus.ACTIVE);
+        recurringSchedule4.setScheduleStatus(RecurringSchedule.ScheduleStatus.ACTIVE);
         recurringSchedule4.setNextCollectionDate(date.minusDays(5));
 
         recurringScheduleDAO.insert(recurringSchedule1);
@@ -135,9 +135,9 @@ public class RecurringScheduleDAOTest extends AbstractDatabaseTest {
 
     @Test
     void testNoResult() {
-        recurringSchedule1.setStatus(RecurringSchedule.ScheduleStatus.CANCELLED);
-        recurringSchedule2.setStatus(RecurringSchedule.ScheduleStatus.CANCELLED);
-        recurringSchedule4.setStatus(RecurringSchedule.ScheduleStatus.CANCELLED);
+        recurringSchedule1.setScheduleStatus(RecurringSchedule.ScheduleStatus.CANCELLED);
+        recurringSchedule2.setScheduleStatus(RecurringSchedule.ScheduleStatus.CANCELLED);
+        recurringSchedule4.setScheduleStatus(RecurringSchedule.ScheduleStatus.CANCELLED);
 
         recurringScheduleDAO.update(recurringSchedule1);
         recurringScheduleDAO.update(recurringSchedule2);
