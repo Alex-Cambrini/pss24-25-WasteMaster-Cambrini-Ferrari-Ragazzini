@@ -17,11 +17,8 @@ import it.unibo.wastemaster.core.models.Location;
 import it.unibo.wastemaster.core.models.Waste;
 import it.unibo.wastemaster.core.services.CollectionManager;
 import it.unibo.wastemaster.core.services.CustomerManager;
-<<<<<<< Updated upstream
 import it.unibo.wastemaster.core.services.EmployeeManager;
-=======
 import it.unibo.wastemaster.core.services.OneTimeScheduleManager;
->>>>>>> Stashed changes
 import it.unibo.wastemaster.core.services.RecurringScheduleManager;
 import it.unibo.wastemaster.core.services.WasteScheduleManager;
 import it.unibo.wastemaster.core.utils.DateUtils;
