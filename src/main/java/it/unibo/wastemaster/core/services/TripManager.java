@@ -40,7 +40,26 @@ public class TripManager {
         }
     }
 
+     
+     public Trip getTripById(int tripId) {
+        return tripDAO.findById(tripId);
+    }
 
+    
+    public List<Trip> getTripsByStatus(Trip.TripStatus status) {
+        return tripDAO.findByStatus(status);
+    }
+
+
+    
+    public void deleteTrip(int tripId) {
+        Trip trip = tripDAO.findById(tripId);
+        if (trip != null) {
+            tripDAO.delete(trip);
+        }
+    }
+
+    
 
 
 }
