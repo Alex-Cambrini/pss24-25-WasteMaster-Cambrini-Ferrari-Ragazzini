@@ -55,7 +55,7 @@ class OneTimeScheduleManagerTest extends AbstractDatabaseTest {
 		OneTimeSchedule newSchedule = oneTimeScheduleManager.createOneTimeSchedule(customer, Waste.WasteType.ORGANIC,
 				validDate);
 		assertNotNull(newSchedule);
-		assertEquals(newSchedule.getStatus(), ScheduleStatus.ACTIVE);
+		assertEquals(newSchedule.getScheduleStatus(), ScheduleStatus.ACTIVE);
 
 		Collection associatedCollection = collectionManager.getActiveCollectionByOneTimeSchedule(newSchedule);
 		assertNotNull(associatedCollection);
@@ -129,7 +129,7 @@ class OneTimeScheduleManagerTest extends AbstractDatabaseTest {
 		// 2) Already CANCELLED → false
 		OneTimeSchedule s2 = new OneTimeSchedule(customer, Waste.WasteType.PLASTIC, validDate);
 		ValidateUtils.validateEntity(s2);
-		s2.setStatus(ScheduleStatus.CANCELLED);
+		s2.setScheduleStatus(ScheduleStatus.CANCELLED);
 		assertFalse(oneTimeScheduleManager.updateStatusOneTimeSchedule(s2, ScheduleStatus.ACTIVE));
 			
 		// 3) ACTIVE → PAUSED
