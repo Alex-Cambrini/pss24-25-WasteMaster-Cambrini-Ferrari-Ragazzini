@@ -1,6 +1,7 @@
 package it.unibo.wastemaster.core.dao;
 
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import it.unibo.wastemaster.core.models.Employee;
@@ -44,5 +45,19 @@ public class TripDAO extends GenericDAO<Trip> {
                         .getResultList();
     }
     
+    public List<Trip> findByDateRange(LocalDateTime startDate, LocalDateTime endDate) {
+    return entityManager.createQuery("SELECT t FROM Trip t WHERE t.departureTime BETWEEN :startDate AND :endDate", Trip.class)
+                        .setParameter("startDate", startDate)
+                        .setParameter("endDate", endDate)
+                        .getResultList();
+    }
+
+
+    public long countByStatus(Trip.TripStatus status) {
+        return entityManager.createQuery("SELECT COUNT(t) FROM Trip t WHERE t.status = :status", Long.class)
+                            .setParameter("status", status)
+                            .getSingleResult();
+    }
+
 }
 
