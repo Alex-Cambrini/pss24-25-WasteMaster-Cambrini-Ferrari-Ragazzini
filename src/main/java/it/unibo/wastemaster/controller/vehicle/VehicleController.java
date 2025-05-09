@@ -12,6 +12,9 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.scene.control.Button;
+import javafx.scene.control.ContextMenu;
+import javafx.scene.control.CustomMenuItem;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -22,6 +25,18 @@ import java.util.List;
 public class VehicleController {
 
 	private Timeline refreshTimeline;
+
+	private ObservableList<VehicleRow> allVehicles = FXCollections.observableArrayList();
+
+	private final ObservableList<String> activeFilters = FXCollections.observableArrayList(
+			"plate", "brand", "model", "year", "licenceType", "vehicleStatus", "lastMaintenanceDate",
+			"nextMaintenanceDate");
+
+	@FXML
+	private javafx.scene.control.TextField searchField;
+
+	@FXML
+	private Button filterButton;
 
 	@FXML
 	private TableView<VehicleRow> VehicleTable;
@@ -58,6 +73,7 @@ public class VehicleController {
 
 		loadVehicles();
 		startAutoRefresh();
+		searchField.textProperty().addListener((obs, oldText, newText) -> handleSearch());
 	}
 
 	private void startAutoRefresh() {
@@ -75,22 +91,25 @@ public class VehicleController {
 
 	private void loadVehicles() {
 		List<Object[]> rawData = AppContext.vehicleDAO.findVehicleDetails();
-		ObservableList<VehicleRow> rows = FXCollections.observableArrayList();
+		allVehicles.clear();
 
 		for (Object[] row : rawData) {
-			rows.add(new VehicleRow(
-					(String) row[0], // plate
-					(String) row[1], // brand
-					(String) row[2], // model
-					(Integer) row[3], // registrationYear
-					row[4].toString(), // licenceType as string
-					row[5].toString(), // vehicleStatus as string
-					row[6].toString(), // lastMaintenanceDate
-					row[7].toString() // nextMaintenanceDate
-			));
+			allVehicles.add(new VehicleRow(
+					(String) row[0],
+					(String) row[1],
+					(String) row[2],
+					(Integer) row[3],
+					row[4].toString(),
+					row[5].toString(),
+					row[6].toString(),
+					row[7].toString()));
 		}
 
-		VehicleTable.setItems(rows);
+		VehicleTable.setItems(FXCollections.observableArrayList(allVehicles));
+		if (!searchField.getText().isBlank()) {
+			handleSearch();
+		}
+
 	}
 
 	@FXML
@@ -159,6 +178,77 @@ public class VehicleController {
 		} catch (Exception e) {
 			DialogUtils.showError("Navigation error", "Could not load Edit view.");
 		}
+	}
+
+	@FXML
+	private void handleSearch() {
+		String query = searchField.getText().toLowerCase().trim();
+
+		if (query.isEmpty()) {
+			VehicleTable.setItems(FXCollections.observableArrayList(allVehicles));
+			return;
+		}
+
+		ObservableList<VehicleRow> filtered = FXCollections.observableArrayList();
+
+		for (VehicleRow row : allVehicles) {
+			if ((activeFilters.contains("plate") && row.getPlate().toLowerCase().contains(query)) ||
+					(activeFilters.contains("brand") && row.getBrand().toLowerCase().contains(query)) ||
+					(activeFilters.contains("model") && row.getModel().toLowerCase().contains(query)) ||
+					(activeFilters.contains("year") && String.valueOf(row.getRegistrationYear()).contains(query)) ||
+					(activeFilters.contains("licenceType") && row.getLicenceType().equalsIgnoreCase(query)) ||
+					(activeFilters.contains("vehicleStatus")
+							&& formatEnum(row.getVehicleStatus()).toLowerCase().contains(query))
+					||
+					(activeFilters.contains("lastMaintenanceDate")
+							&& row.getLastMaintenanceDate().toLowerCase().contains(query))
+					||
+					(activeFilters.contains("nextMaintenanceDate")
+							&& row.getNextMaintenanceDate().toLowerCase().contains(query))) {
+				filtered.add(row);
+			}
+		}
+
+		VehicleTable.setItems(filtered);
+	}
+
+	@FXML
+	private void handleResetSearch() {
+		searchField.clear();
+		loadVehicles();
+	}
+
+	@FXML
+	private void showFilterMenu(javafx.scene.input.MouseEvent event) {
+		ContextMenu menu = new ContextMenu();
+
+		String[] fields = { "plate", "brand", "model", "year", "licenceType", "vehicleStatus", "lastMaintenanceDate",
+				"nextMaintenanceDate" };
+		String[] labels = { "Plate", "Brand", "Model", "Year", "Licence", "Status", "Last Maint.", "Next Maint." };
+
+		for (int i = 0; i < fields.length; i++) {
+			String key = fields[i];
+			String label = labels[i];
+
+			javafx.scene.control.CheckBox checkBox = new javafx.scene.control.CheckBox(label);
+			checkBox.setSelected(activeFilters.contains(key));
+
+			checkBox.selectedProperty().addListener((obs, wasSelected, isSelected) -> {
+				if (isSelected) {
+					if (!activeFilters.contains(key))
+						activeFilters.add(key);
+				} else {
+					activeFilters.remove(key);
+				}
+				handleSearch();
+			});
+
+			CustomMenuItem item = new CustomMenuItem(checkBox);
+			item.setHideOnClick(false);
+			menu.getItems().add(item);
+		}
+
+		menu.show(filterButton, event.getScreenX(), event.getScreenY());
 	}
 
 	public void returnToVehicleView() {

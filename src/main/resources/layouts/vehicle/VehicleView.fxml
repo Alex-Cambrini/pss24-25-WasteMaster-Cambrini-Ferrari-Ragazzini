@@ -15,8 +15,9 @@
          <children>
             <Button fx:id="addVehicleButton" mnemonicParsing="false" onAction="#handleAddVehicle" text="Add Vehicle" />
             <Region prefHeight="20.0" prefWidth="0.0" HBox.hgrow="ALWAYS" />
-            <TextField />
-            <Button mnemonicParsing="false" text="Search" />
+            <Button fx:id="filterButton" text="Filter ▼" onMouseClicked="#showFilterMenu" />
+            <TextField fx:id="searchField" promptText="Search..." />
+            <Button mnemonicParsing="false" text="Reset" onAction="#handleResetSearch" />
          </children>
 
       </HBox>
