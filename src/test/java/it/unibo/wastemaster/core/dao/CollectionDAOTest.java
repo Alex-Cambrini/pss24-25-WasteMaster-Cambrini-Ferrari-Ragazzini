@@ -1,6 +1,8 @@
 package it.unibo.wastemaster.core.dao;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -95,12 +97,17 @@ public class CollectionDAOTest extends AbstractDatabaseTest {
 
     @Test
     public void testFindActiveCollectionByOneTimeSchedule() {
-        Collection active = new Collection(oneTimeSchedule);
-        collectionDAO.insert(active);
+        LocalDate newDate = dateUtils.getCurrentDate().plusDays(3);
+        OneTimeSchedule schedule = oneTimeScheduleManager.createOneTimeSchedule(customer, Waste.WasteType.GLASS, newDate);
 
-        Collection result = collectionDAO.findActiveCollectionByOneTimeSchedule(oneTimeSchedule);
-        assertEquals(active.getCollectionId(), result.getCollectionId());
-        assertEquals(Collection.CollectionStatus.PENDING, result.getCollectionStatus());
+        Collection result = collectionDAO.findActiveCollectionByOneTimeSchedule(schedule);
+        assertNotNull(result);
+        assertEquals(result.getCollectionStatus(), Collection.CollectionStatus.PENDING);
+
+        result.setCollectionStatus(cancelled);
+        
+        Collection nullResult = collectionDAO.findActiveCollectionByOneTimeSchedule(schedule);
+        assertNull(nullResult);
     }
 
     @Test
@@ -108,20 +115,20 @@ public class CollectionDAOTest extends AbstractDatabaseTest {
         Collection cancelled1 = new Collection(oneTimeSchedule);
         cancelled1.setCollectionStatus(Collection.CollectionStatus.CANCELLED);
         collectionDAO.insert(cancelled1);
-    
+
         Collection cancelled2 = new Collection(oneTimeSchedule);
         cancelled2.setCollectionStatus(Collection.CollectionStatus.CANCELLED);
         collectionDAO.insert(cancelled2);
-    
+
         Collection active = new Collection(oneTimeSchedule);
         active.setCollectionStatus(Collection.CollectionStatus.PENDING);
         collectionDAO.insert(active);
-    
+
         List<Collection> resultList = collectionDAO.findCancelledCollectionsOneTimeSchedule(oneTimeSchedule);
         assertEquals(2, resultList.size());
         for (Collection c : resultList) {
             assertEquals(Collection.CollectionStatus.CANCELLED, c.getCollectionStatus());
         }
-    }   
+    }
 
 }
