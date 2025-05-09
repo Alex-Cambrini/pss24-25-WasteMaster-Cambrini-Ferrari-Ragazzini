@@ -32,6 +32,7 @@ public class CollectionDAOTest extends AbstractDatabaseTest {
     @BeforeEach
     public void setUp() {
         super.setUp();
+        em.getTransaction().begin();
         date = dateUtils.getCurrentDate();
         wasteType = Waste.WasteType.PLASTIC;
 
