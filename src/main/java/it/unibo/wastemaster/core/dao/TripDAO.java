@@ -23,14 +23,12 @@ public class TripDAO extends GenericDAO<Trip> {
         .getResultList();
     }
 
-    
-    public Trip findByPostalCode(String postalCode) {
+  
+    public List<Trip> findByPostalCode(String postalCode) {
         return entityManager.createQuery(
-            "SELECT t FROM Trip t WHERE t.postalCode = :postalCode", Trip.class)
-            .setParameter("postalCode", postalCode)
-            .getResultStream()
-            .findFirst()
-            .orElse(null);
+                "SELECT t FROM Trip t WHERE t.postalCode = :postalCode", Trip.class)
+                .setParameter("postalCode", postalCode)
+                .getResultList();  
     }
 
     public List<Trip> findByOperator(Employee operator) {
