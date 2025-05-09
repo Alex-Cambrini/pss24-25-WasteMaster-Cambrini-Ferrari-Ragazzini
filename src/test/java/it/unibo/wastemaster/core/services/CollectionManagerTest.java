@@ -35,7 +35,7 @@ public class CollectionManagerTest extends AbstractDatabaseTest {
         customerDAO.insert(customer);
 
         oneTimeSchedule = new OneTimeSchedule(customer, Waste.WasteType.PLASTIC, futureDate);
-        oneTimeSchedule.setStatus(Schedule.ScheduleStatus.SCHEDULED);
+        oneTimeSchedule.setStatus(Schedule.ScheduleStatus.PAUSED);
 
         oneTimeScheduleDAO.insert(oneTimeSchedule);
 
@@ -60,7 +60,7 @@ public class CollectionManagerTest extends AbstractDatabaseTest {
 
         LocalDate futureDate = dateUtils.getCurrentDate().plusDays(5);
         OneTimeSchedule futureSchedule = new OneTimeSchedule(customer, Waste.WasteType.PAPER, futureDate);
-        futureSchedule.setStatus(Schedule.ScheduleStatus.SCHEDULED);
+        futureSchedule.setStatus(Schedule.ScheduleStatus.ACTIVE);
 
         oneTimeScheduleDAO.insert(futureSchedule);
 
@@ -68,7 +68,7 @@ public class CollectionManagerTest extends AbstractDatabaseTest {
 
         LocalDate pastDate = dateUtils.getCurrentDate().minusDays(2);
         OneTimeSchedule pastSchedule = new OneTimeSchedule(customer, Waste.WasteType.GLASS, pastDate);
-        pastSchedule.setStatus(Schedule.ScheduleStatus.SCHEDULED);
+        pastSchedule.setStatus(Schedule.ScheduleStatus.ACTIVE);
 
         collectionManager.generateCollection(pastSchedule);
         List<Collection> all = collectionDAO.findAll();
@@ -79,7 +79,7 @@ public class CollectionManagerTest extends AbstractDatabaseTest {
     public void testGenerateOneTimeCollection() {
         LocalDate futureDate = dateUtils.getCurrentDate().plusDays(7);
         OneTimeSchedule futureSchedule = new OneTimeSchedule(customer, Waste.WasteType.PAPER, futureDate);
-        futureSchedule.setStatus(Schedule.ScheduleStatus.SCHEDULED);
+        futureSchedule.setStatus(Schedule.ScheduleStatus.ACTIVE);
 
         oneTimeScheduleDAO.insert(futureSchedule);
 
