@@ -13,5 +13,11 @@ public class TripDAO extends GenericDAO<Trip> {
     }
 
    
+   public List<Trip> findByStatus(Trip.TripStatus status) {
+    return entityManager.createQuery(
+        "SELECT t FROM Trip t WHERE t.status = :status", Trip.class)
+        .setParameter("status", status)
+        .getResultList();
+}
 }
 
