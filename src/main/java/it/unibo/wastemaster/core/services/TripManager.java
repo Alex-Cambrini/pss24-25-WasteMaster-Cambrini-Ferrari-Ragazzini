@@ -20,10 +20,28 @@ public class TripManager {
     public void createTrip(String postalCode, Vehicle assignedVehicle, List<Employee> operators, 
     LocalDateTime departureTime, LocalDateTime expectedReturnTime, 
     Trip.TripStatus status) {
-    Trip trip = new Trip(0, postalCode, assignedVehicle, operators, departureTime, 
-    expectedReturnTime, status, null);
-    tripDAO.insert(trip);
+        Trip trip = new Trip(0, postalCode, assignedVehicle, operators, departureTime, 
+        expectedReturnTime, status, null);
+        tripDAO.insert(trip);
     }
+
+    public void updateTrip(int tripId, String postalCode, Vehicle assignedVehicle, List<Employee> operators, 
+    LocalDateTime departureTime, LocalDateTime expectedReturnTime, 
+    Trip.TripStatus status) {
+        Trip trip = tripDAO.findById(tripId);
+        if (trip != null) {
+            trip.setPostalCodes(postalCode);
+            trip.setAssignedVehicle(assignedVehicle);
+            trip.setOperators(operators);
+            trip.setDepartureTime(departureTime);
+            trip.setExpectedReturnTime(expectedReturnTime);
+            trip.setStatus(status);
+            tripDAO.update(trip);
+        }
+    }
+
+
+
 
 }
 
