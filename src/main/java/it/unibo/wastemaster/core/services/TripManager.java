@@ -73,6 +73,14 @@ public class TripManager {
     }
    
 
+    public List<Trip> getTripsByDateRange(LocalDateTime startDate, LocalDateTime endDate) {
+        return tripDAO.findByDateRange(startDate, endDate);
+    }
+
+     
+         public long countTripsByStatus(Trip.TripStatus status) {
+         return tripDAO.countByStatus(status);
+     }
 }
 
 
