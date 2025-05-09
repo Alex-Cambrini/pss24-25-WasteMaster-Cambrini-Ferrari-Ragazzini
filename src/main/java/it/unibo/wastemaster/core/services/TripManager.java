@@ -17,8 +17,14 @@ public class TripManager {
         this.tripDAO = new TripDAO(entityManager);
     }
 
+    public void createTrip(String postalCode, Vehicle assignedVehicle, List<Employee> operators, 
+    LocalDateTime departureTime, LocalDateTime expectedReturnTime, 
+    Trip.TripStatus status) {
+    Trip trip = new Trip(0, postalCode, assignedVehicle, operators, departureTime, 
+    expectedReturnTime, status, null);
+    tripDAO.insert(trip);
+    }
 
-    
 }
 
 
