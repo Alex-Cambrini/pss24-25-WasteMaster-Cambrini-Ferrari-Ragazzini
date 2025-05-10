@@ -1,23 +1,23 @@
 package it.unibo.wastemaster.core.models;
 
-import jakarta.validation.*;
+import it.unibo.wastemaster.core.AbstractDatabaseTest;
+import it.unibo.wastemaster.core.utils.ValidateUtils;
+import jakarta.validation.ConstraintViolation;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.List;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
+public class TripTest extends AbstractDatabaseTest {
 
-public class TripTest {
-
-    private Validator validator;
-
-    @BeforeEach
-    public void setUp() {
-        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
-        validator = factory.getValidator();
-    }
+    private Trip trip;
+    private Vehicle vehicle;
+    private Employee operator;
+    private LocalDateTime departureTime;
+    private LocalDateTime expectedReturnTime;
 
     
 }
