@@ -53,6 +53,21 @@ public class TripTest extends AbstractDatabaseTest {
         assertEquals(1, trip.getOperators().size());
     }
 
+     
+   @Test
+    public void testToString() {
+    trip = new Trip(1, "40100", vehicle, List.of(operator), departureTime, expectedReturnTime, Trip.TripStatus.PENDING, null);
     
+    String toStringOutput = trip.toString();
+
+    assertNotNull(toStringOutput);
+    assertTrue(toStringOutput.contains("Trip")); 
+    assertTrue(toStringOutput.contains("ID: " + trip.getTripId())); 
+    assertTrue(toStringOutput.contains(trip.getPostalCodes())); 
+    assertTrue(toStringOutput.contains(vehicle != null ? vehicle.getPlate() : "N/A")); 
+    assertTrue(toStringOutput.contains(departureTime.toString())); 
+    assertTrue(toStringOutput.contains(expectedReturnTime.toString())); 
+    assertTrue(toStringOutput.contains(trip.getStatus().name())); 
+    }
 
 }
