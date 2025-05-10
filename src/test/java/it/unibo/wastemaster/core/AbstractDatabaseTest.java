@@ -11,6 +11,7 @@ import it.unibo.wastemaster.core.dao.EmployeeDAO;
 import it.unibo.wastemaster.core.dao.GenericDAO;
 import it.unibo.wastemaster.core.dao.OneTimeScheduleDAO;
 import it.unibo.wastemaster.core.dao.RecurringScheduleDAO;
+import it.unibo.wastemaster.core.dao.TripDAO;
 import it.unibo.wastemaster.core.dao.VehicleDAO;
 import it.unibo.wastemaster.core.dao.WasteScheduleDAO;
 import it.unibo.wastemaster.core.models.Location;
@@ -40,6 +41,7 @@ public abstract class AbstractDatabaseTest {
     protected RecurringScheduleDAO recurringScheduleDAO;
     protected WasteScheduleDAO wasteScheduleDAO;
     protected VehicleDAO vehicleDAO;
+    protected TripDAO tripDAO;
 
 
     protected CustomerManager customerManager;
@@ -72,6 +74,7 @@ public void setUp() {
     recurringScheduleDAO  = new RecurringScheduleDAO(em);
     collectionDAO         = new CollectionDAO(em);
     vehicleDAO            = new VehicleDAO(em);
+    tripDAO               = new TripDAO(em);
 
     customerManager       = new CustomerManager(customerDAO);
     employeeManager       = new EmployeeManager(employeeDAO);
