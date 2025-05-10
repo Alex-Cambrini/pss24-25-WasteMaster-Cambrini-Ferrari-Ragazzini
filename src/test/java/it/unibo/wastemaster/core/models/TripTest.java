@@ -1,6 +1,7 @@
 package it.unibo.wastemaster.core.models;
 
 import it.unibo.wastemaster.core.AbstractDatabaseTest;
+import it.unibo.wastemaster.core.dao.TripDAO;
 import it.unibo.wastemaster.core.utils.ValidateUtils;
 import jakarta.validation.ConstraintViolation;
 import org.junit.jupiter.api.BeforeEach;
@@ -19,6 +20,7 @@ public class TripTest extends AbstractDatabaseTest {
     private Employee operator;
     private LocalDateTime departureTime;
     private LocalDateTime expectedReturnTime;
+    // private TripDAO tripDAO;
 
     @BeforeEach
     public void setUp() {
@@ -29,7 +31,11 @@ public class TripTest extends AbstractDatabaseTest {
         expectedReturnTime = departureTime.plusHours(5);
         assertNotNull(vehicle);
         assertNotNull(operator);
+        // assertNotNull(em, "EntityManager should be initialized!");
+        // tripDAO = new TripDAO(em);
+        // assertNotNull(tripDAO, "TripDAO should be initialized!");
     }
+    
 
    
     @Test
@@ -69,5 +75,20 @@ public class TripTest extends AbstractDatabaseTest {
     assertTrue(toStringOutput.contains(expectedReturnTime.toString())); 
     assertTrue(toStringOutput.contains(trip.getStatus().name())); 
     }
+
+    // to fix
+    //  @Test
+    //     public void testPersistence() {
+    //     em.getTransaction().begin();   
+    //     tripDAO.insert(trip);  
+    //     Trip found = em.find(Trip.class, trip.getTripId());
+    //     assertNotNull(found);
+    //     assertEquals(trip.getPostalCodes(), found.getPostalCodes());
+    //     tripDAO.delete(trip);
+    //     Trip deleted = em.find(Trip.class, trip.getTripId());
+    //     assertNull(deleted);
+    //     em.getTransaction().commit();
+
+    // }
 
 }
