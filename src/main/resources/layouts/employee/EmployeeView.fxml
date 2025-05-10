@@ -17,7 +17,7 @@
               prefWidth="600.0"
               spacing="10.0">
             <children>
-                <Button fx:id="addEmployeeButton" mnemonicParsing="false" text="Add Employee"/>
+                <Button fx:id="addEmployeeButton" mnemonicParsing="false" onAction="#handleAddEmployee" text="Add Employee"/>
                 <Region prefHeight="20" prefWidth="0.0" HBox.hgrow="ALWAYS"/>
                 <Button fx:id="filterButton" text="Filter ▼"/>
                 <TextField fx:id="searchField" promptText="Search..."/>
@@ -43,7 +43,7 @@
               spacing="10.0">
             <children>
                 <Button mnemonicParsing="false" text="Edit"/>
-                <Button mnemonicParsing="false" onAction="#handleDeleteEmployee" text="Delete" />
+                <Button mnemonicParsing="false" onAction="#handleDeleteEmployee" text="Delete"/>
             </children>
             <padding>
                 <Insets right="20.0" top="10.0"/>
