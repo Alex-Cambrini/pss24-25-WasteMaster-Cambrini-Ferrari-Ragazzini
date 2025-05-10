@@ -1,5 +1,6 @@
 package it.unibo.wastemaster.controller.employee;
 
+import it.unibo.wastemaster.controller.main.MainLayoutController;
 import it.unibo.wastemaster.controller.utils.DialogUtils;
 import it.unibo.wastemaster.core.context.AppContext;
 import it.unibo.wastemaster.core.models.Employee;
@@ -57,7 +58,7 @@ public class EmployeeController {
         licenceColumn.setCellValueFactory(new PropertyValueFactory<>("licence"));
         cityColumn.setCellValueFactory(new PropertyValueFactory<>("city"));
 
-        loadEmployees();
+        loadEmployee();
         startAutoRefresh();
 
         searchField.textProperty().addListener((obs, oldText, newText) -> handleSearch());
@@ -65,7 +66,7 @@ public class EmployeeController {
 
     private void startAutoRefresh() {
         refreshTimeline = new Timeline(
-                new KeyFrame(Duration.seconds(30), event -> loadEmployees()));
+                new KeyFrame(Duration.seconds(30), event -> loadEmployee()));
         refreshTimeline.setCycleCount(Timeline.INDEFINITE);
         refreshTimeline.play();
     }
@@ -76,7 +77,7 @@ public class EmployeeController {
         }
     }
 
-    private void loadEmployees() {
+    private void loadEmployee() {
         List<Employee> employees = AppContext.employeeDAO.findAll();
         allEmployees.clear();
 
@@ -142,15 +143,40 @@ public class EmployeeController {
         boolean success = AppContext.employeeManager.softDeleteEmployee(employee);
         if (success) {
             DialogUtils.showSuccess("Employee deleted successfully.");
-            loadEmployees();
+            loadEmployee();
         } else {
             DialogUtils.showError("Deletion Failed", "Unable to delete the selected employee.");
         }
     }
 
     @FXML
+    private void handleAddEmployee() {
+        try {
+            MainLayoutController.getInstance().setPageTitle("Add Employee");
+
+            AddEmployeeController controller = MainLayoutController.getInstance()
+                    .loadCenterWithController("/layouts/employee/AddEmployeeView.fxml");
+
+            controller.setEmployeeController(this);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            DialogUtils.showError("Navigation error", "Could not load Add Employee view.");
+        }
+    }
+
+    @FXML
     private void handleResetSearch() {
         searchField.clear();
-        loadEmployees();
+        loadEmployee();
+    }
+
+    public void returnToEmployeeView() {
+        try {
+            MainLayoutController.getInstance().restorePreviousTitle();
+            MainLayoutController.getInstance().loadCenter("/layouts/employee/EmployeeView.fxml");
+        } catch (Exception e) {
+            DialogUtils.showError("Navigation error", "Failed to load employee view.");
+        }
     }
 }
