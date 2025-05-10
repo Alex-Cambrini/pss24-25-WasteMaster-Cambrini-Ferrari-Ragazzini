@@ -67,7 +67,7 @@ public abstract class Schedule {
         CANCELLED,
         PAUSED
     }
-    
+
     // No-args constructor required by JPA
     public Schedule() {
     }
@@ -136,13 +136,15 @@ public abstract class Schedule {
     @Override
     public String toString() {
         return String.format(
-                "Schedule {Customer: %s, WasteType: %s, Status: %s, CreationDate: %s, CollectionIDs: %s}",
+                "%s Schedule {Customer: %s, WasteType: %s, Status: %s, CreationDate: %s, CollectionIDs: %s}",
+                scheduleCategory != null ? scheduleCategory.name() : "Unknown",
                 customer != null ? customer.getName() : "N/A",
-                wasteType != null ? wasteType : "N/A",
-                status != null ? status : "N/A",
-                creationDate != null ? creationDate.toString() : "N/A",
-                collections != null ? collections.stream()
-                        .map(c -> String.valueOf(c.getCollectionId()))
-                        .reduce((id1, id2) -> id1 + ", " + id2).orElse("N/A") : "N/A");
+                wasteType != null ? wasteType.name() : "N/A",
+                status != null ? status.name() : "N/A",
+                creationDate != null ? creationDate : "N/A",
+                collections != null && !collections.isEmpty()
+                        ? collections.stream().map(c -> String.valueOf(c.getCollectionId()))
+                                .reduce((a, b) -> a + ", " + b).orElse("N/A")
+                        : "None");
     }
 }

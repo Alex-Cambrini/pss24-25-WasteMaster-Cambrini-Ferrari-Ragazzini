@@ -11,12 +11,13 @@ import jakarta.validation.constraints.NotNull;
 @DiscriminatorValue("ONE_TIME")
 public class OneTimeSchedule extends Schedule {
 
-    @NotNull (message = "Pickup date must not be null")
-    @FutureOrPresent (message = "Pickup date must be today or in the future")
-    private LocalDate pickupDate;    
-    
+    @NotNull(message = "Pickup date must not be null")
+    @FutureOrPresent(message = "Pickup date must be today or in the future")
+    private LocalDate pickupDate;
+
     // No-args constructor required by JPA
-    public OneTimeSchedule() {}
+    public OneTimeSchedule() {
+    }
 
     public OneTimeSchedule(Customer customer, Waste.WasteType wasteType, LocalDate pickupDate) {
         super(customer, wasteType);
@@ -35,5 +36,11 @@ public class OneTimeSchedule extends Schedule {
     @Override
     public LocalDate getCollectionDate() {
         return this.getPickupDate();
+    }
+
+    @Override
+    public String toString() {
+        return super.toString() + String.format(", PickupDate: %s",
+                pickupDate != null ? pickupDate.toString() : "N/A");
     }
 }

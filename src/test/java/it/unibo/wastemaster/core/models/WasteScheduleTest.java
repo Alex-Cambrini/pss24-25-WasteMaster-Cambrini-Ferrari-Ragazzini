@@ -72,8 +72,8 @@ class WasteScheduleTest extends AbstractDatabaseTest {
 	public void testToString() {
 		String result = schedule.toString();
 		assertNotNull(result);
-		assertTrue(result.contains("WasteSchedule{"));
-		assertTrue(result.contains("dayOfWeek=" + schedule.getDayOfWeek().name()));
-		assertTrue(result.contains("PLASTIC"));
+		assertTrue(result.contains("WasteSchedule {"));
+		assertTrue(result.contains("Day: " + schedule.getDayOfWeek().name()));
+		assertTrue(result.contains("Waste: " + waste.toString()));
 	}
 }

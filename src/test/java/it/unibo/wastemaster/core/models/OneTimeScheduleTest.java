@@ -70,4 +70,15 @@ public class OneTimeScheduleTest extends AbstractDatabaseTest {
 		OneTimeSchedule deleted = oneTimeScheduleDAO.findById(scheduleId);
 		assertNull(deleted);
 	}
+
+	@Test
+	public void testToString() {
+		String toStringOutput = schedule.toString();
+		assertNotNull(toStringOutput);
+		assertTrue(toStringOutput.contains("ONE_TIME Schedule"));
+		assertTrue(toStringOutput.contains(customer.getName()));
+		assertTrue(toStringOutput.contains(Waste.WasteType.ORGANIC.name()));
+		assertTrue(toStringOutput.contains(pickupDate.toString()));
+	}
+
 }

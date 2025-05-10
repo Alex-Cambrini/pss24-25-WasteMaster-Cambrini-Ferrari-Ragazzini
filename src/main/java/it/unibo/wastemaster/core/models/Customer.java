@@ -15,17 +15,24 @@ public class Customer extends Person {
     private Integer customerId;
 
     public Customer(String name, String surname, Location location, String email, String phone) {
-        super(name, surname, location, email, phone); 
+        super(name, surname, location, email, phone);
     }
 
-    public Customer() {}    
+    public Customer() {
+    }
 
     public Integer getCustomerId() {
         return customerId;
     }
 
     @Override
-    public String getInfo() {
-        return super.getInfo() + String.format(", CustomerId: %d", customerId);
+    public String toString() {
+        return String.format("Customer {ID: %d, Name: %s %s, Email: %s, Phone: %s, Location: %s}",
+                customerId,
+                getName(),
+                getSurname(),
+                getEmail(),
+                getPhone(),
+                getLocation() != null ? getLocation().toString() : "N/A");
     }
 }
