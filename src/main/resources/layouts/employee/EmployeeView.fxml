@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox alignment="TOP_CENTER"
+      prefWidth="640.0"
+      xmlns="http://javafx.com/javafx/23.0.1"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="it.unibo.wastemaster.controller.employee.EmployeeController">
+
+    <children>
+        <HBox alignment="TOP_CENTER"
+              minHeight="40"
+              prefHeight="60"
+              prefWidth="600.0"
+              spacing="10.0">
+            <children>
+                <Button fx:id="addEmployeeButton" mnemonicParsing="false" text="Add Employee"/>
+                <Region prefHeight="20" prefWidth="0.0" HBox.hgrow="ALWAYS"/>
+                <Button fx:id="filterButton" text="Filter ▼"/>
+                <TextField fx:id="searchField" promptText="Search..."/>
+                <Button mnemonicParsing="false" text="Reset"/>
+            </children>
+        </HBox>
+
+        <TableView fx:id="employeeTable" prefHeight="300.0" prefWidth="600.0" VBox.vgrow="ALWAYS">
+            <columns>
+                <TableColumn fx:id="nameColumn" text="Name" prefWidth="100"/>
+                <TableColumn fx:id="surnameColumn" text="Surname" prefWidth="100"/>
+                <TableColumn fx:id="emailColumn" text="Email" prefWidth="150"/>
+                <TableColumn fx:id="roleColumn" text="Role" prefWidth="100"/>
+                <TableColumn fx:id="licenceColumn" text="Licence" prefWidth="120"/>
+                <TableColumn fx:id="cityColumn" text="City" prefWidth="100"/>
+            </columns>
+        </TableView>
+
+        <HBox alignment="TOP_RIGHT"
+              minHeight="50.0"
+              prefHeight="100.0"
+              prefWidth="600.0"
+              spacing="10.0">
+            <children>
+                <Button mnemonicParsing="false" text="Edit"/>
+                <Button mnemonicParsing="false" text="Delete"/>
+            </children>
+            <padding>
+                <Insets right="20.0" top="10.0"/>
+            </padding>
+        </HBox>
+    </children>
+
+    <padding>
+        <Insets left="20.0" right="20.0"/>
+    </padding>
+</VBox>
