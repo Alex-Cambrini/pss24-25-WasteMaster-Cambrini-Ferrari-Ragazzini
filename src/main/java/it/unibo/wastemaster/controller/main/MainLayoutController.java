@@ -77,6 +77,12 @@ public class MainLayoutController {
         MainLayoutController.getInstance().loadCenter("/layouts/vehicle/VehicleView.fxml");
     }
 
+    @FXML
+    private void handleEmployee() {
+        setPageTitle("Employee Management");
+        MainLayoutController.getInstance().loadCenter("/layouts/employee/EmployeeView.fxml");
+    }
+
     public void setPageTitle(String title) {
         if (title != null) {
             previousTitle = pageTitleLabel.getText();
