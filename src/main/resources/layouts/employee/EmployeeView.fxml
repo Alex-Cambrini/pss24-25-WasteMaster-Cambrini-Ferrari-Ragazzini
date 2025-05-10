@@ -43,7 +43,7 @@
               spacing="10.0">
             <children>
                 <Button mnemonicParsing="false" text="Edit"/>
-                <Button mnemonicParsing="false" text="Delete"/>
+                <Button mnemonicParsing="false" onAction="#handleDeleteEmployee" text="Delete" />
             </children>
             <padding>
                 <Insets right="20.0" top="10.0"/>
