@@ -1,7 +1,6 @@
 package it.unibo.wastemaster.core.context;
 
 import it.unibo.wastemaster.core.dao.*;
-import it.unibo.wastemaster.core.models.Employee;
 import it.unibo.wastemaster.core.models.Waste;
 import it.unibo.wastemaster.core.services.*;
 import jakarta.persistence.EntityManager;
@@ -15,7 +14,7 @@ public class AppContext {
     private static EntityManager em;
     
     // DAOs
-    public static GenericDAO<Employee> employeeDAO;
+    public static EmployeeDAO employeeDAO;
     public static GenericDAO<Waste> wasteDAO;
     public static CustomerDAO customerDAO;
     public static WasteScheduleDAO wasteScheduleDAO;
@@ -30,6 +29,8 @@ public class AppContext {
     public static RecurringScheduleManager recurringScheduleManager;
     public static CollectionManager collectionManager;
     public static VehicleManager vehicleManager;
+    public static EmployeManager employeeManager;
+
 
 
     public static void init() {
@@ -37,7 +38,7 @@ public class AppContext {
         em = emf.createEntityManager();
         
         // Inizializzazione dei DAO
-        employeeDAO = new GenericDAO<>(em, Employee.class);
+        employeeDAO = new EmployeeDAO(em);
         wasteDAO = new GenericDAO<>(em, Waste.class);
         customerDAO = new CustomerDAO(em);
         wasteScheduleDAO = new WasteScheduleDAO(em);
@@ -52,6 +53,7 @@ public class AppContext {
         recurringScheduleManager = new RecurringScheduleManager(recurringScheduleDAO, wasteScheduleManager);
         collectionManager = new CollectionManager(collectionDAO, recurringScheduleManager);
         vehicleManager = new VehicleManager(vehicleDAO);
+        employeeManager = new EmployeManager(employeeDAO);
 
         
         // Collegamento
