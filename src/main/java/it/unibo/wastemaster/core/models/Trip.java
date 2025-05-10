@@ -18,7 +18,7 @@ public class Trip {
     private Integer tripId;
 
     @Column(nullable = false)
-    private String postalCode;  
+    private String postalCode;
 
     @ManyToOne
     private Vehicle assignedVehicle;
@@ -41,10 +41,10 @@ public class Trip {
 
     @OneToMany(mappedBy = "trip")
     private List<Collection> collections;
-    
-    public Trip(int tripId, String postalCode, Vehicle assignedVehicle, 
-                List<Employee> operators, LocalDateTime departureTime, 
-                LocalDateTime expectedReturnTime, TripStatus status,List<Collection> collections) {
+
+    public Trip(int tripId, String postalCode, Vehicle assignedVehicle,
+            List<Employee> operators, LocalDateTime departureTime,
+            LocalDateTime expectedReturnTime, TripStatus status, List<Collection> collections) {
         this.tripId = tripId;
         this.postalCode = postalCode;
         this.assignedVehicle = assignedVehicle;
@@ -58,8 +58,6 @@ public class Trip {
     public int getTripId() {
         return tripId;
     }
-
-    
 
     public String getPostalCodes() {
         return postalCode;
@@ -108,16 +106,30 @@ public class Trip {
     public void setStatus(TripStatus status) {
         this.status = status;
     }
-    
+
     public List<Collection> getCollections() {
         return collections;
     }
-    
+
     public void setCollections(List<Collection> collections) {
         this.collections = collections;
     }
-    
+
+    @Override
+    public String toString() {
+        return String.format(
+                "Trip {ID: %d, PostalCode: %s, Vehicle: %s, Operators: %s, Departure: %s, ExpectedReturn: %s, Status: %s, CollectionIDs: %s}",
+                tripId,
+                postalCode != null ? postalCode : "N/A",
+                assignedVehicle != null ? assignedVehicle.getPlate() : "N/A",
+                operators != null ? operators.stream()
+                        .map(e -> e.getName() + " " + e.getSurname())
+                        .reduce((a, b) -> a + ", " + b).orElse("None") : "N/A",
+                departureTime != null ? departureTime.toString() : "N/A",
+                expectedReturnTime != null ? expectedReturnTime.toString() : "N/A",
+                status != null ? status.name() : "N/A",
+                collections != null ? collections.stream()
+                        .map(c -> String.valueOf(c.getCollectionId()))
+                        .reduce((a, b) -> a + ", " + b).orElse("None") : "N/A");
+    }
 }
-
-  
-

@@ -76,11 +76,11 @@ public class Waste {
 
     @Override
     public String toString() {
-        return "Waste{" +
-                "wasteId=" + wasteId +
-                ", type=" + type +
-                ", isRecyclable=" + isRecyclable +
-                ", isDangerous=" + isDangerous +
-                '}';
+        return String.format(
+                "Waste {ID: %d, Type: %s, Recyclable: %s, Dangerous: %s}",
+                wasteId,
+                type != null ? type.name() : "N/A",
+                isRecyclable != null ? isRecyclable.toString() : "N/A",
+                isDangerous != null ? isDangerous.toString() : "N/A");
     }
 }

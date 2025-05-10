@@ -57,13 +57,17 @@ class CollectionTest extends AbstractDatabaseTest {
     @Test
     void testToString() {
         String toStringOutput = collection.toString();
+
         assertNotNull(toStringOutput);
         assertTrue(toStringOutput.contains("Collection"));
+        assertTrue(toStringOutput.contains("ID: " + collection.getCollectionId()));
         assertTrue(toStringOutput.contains(collection.getCustomer().getName()));
+        assertTrue(toStringOutput.contains(collection.getCollectionDate().toString()));
         assertTrue(toStringOutput.contains(collection.getWaste().name()));
         assertTrue(toStringOutput.contains(collection.getCollectionStatus().name()));
-        assertTrue(toStringOutput.contains(collection.getSchedule().getScheduleCategory().name()));
         assertTrue(toStringOutput.contains(String.valueOf(Collection.CANCEL_LIMIT_DAYS)));
+        assertTrue(toStringOutput.contains(String.valueOf(schedule.getScheduleId())));
+        assertTrue(toStringOutput.contains(schedule.getScheduleCategory().name()));
     }
 
     @Test

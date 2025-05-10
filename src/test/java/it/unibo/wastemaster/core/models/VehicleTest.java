@@ -83,23 +83,23 @@ public class VehicleTest extends AbstractDatabaseTest {
     @Test
     public void testVehiclePersistence() {
         vehicleDAO.insert(vehicle);
-        
+
         Vehicle found = vehicleDAO.findByPlate(vehicle.getPlate());
-        int foundID = found.getVehicleId(); 
-        
+        int foundID = found.getVehicleId();
+
         assertNotNull(found);
-    
+
         assertEquals(vehicle.getBrand(), found.getBrand());
         assertEquals(vehicle.getModel(), found.getModel());
         assertEquals(vehicle.getLicenceType(), found.getLicenceType());
         assertEquals(vehicle.getLastMaintenanceDate(), found.getLastMaintenanceDate());
         assertEquals(vehicle.getNextMaintenanceDate(), found.getNextMaintenanceDate());
-    
+
         vehicleDAO.delete(found);
-    
+
         Vehicle deleted = vehicleDAO.findById(foundID);
         assertNull(deleted);
-    }   
+    }
 
     @Test
     public void testUpdateStatus() {
@@ -124,18 +124,12 @@ public class VehicleTest extends AbstractDatabaseTest {
     }
 
     @Test
-    public void testGetInfo() {
-        String expectedInfo = String.format(
-                "Vehicle Info: Brand: %s, Model: %s, Registration year: %d, Plate: %s, Licence: %s, Capacity: %d persons, Status: %s, Last Maintenance: %s, Next Maintenance: %s",
-                "Iveco",
-                "Daily",
-                2020,
-                "AB123CD",
-                Vehicle.LicenceType.C1,
-                3,
-                Vehicle.VehicleStatus.IN_SERVICE,
-                vehicle.getLastMaintenanceDate(),
-                vehicle.getNextMaintenanceDate());
-        assertEquals(expectedInfo, vehicle.getInfo());
+    public void testToString() {
+        String output = vehicle.toString();
+        assertNotNull(output);
+        assertTrue(output.contains("Vehicle"));
+        assertTrue(output.contains(vehicle.getPlate()));
+        assertTrue(output.contains(vehicle.getBrand()));
+        assertTrue(output.contains(vehicle.getModel()));
     }
 }

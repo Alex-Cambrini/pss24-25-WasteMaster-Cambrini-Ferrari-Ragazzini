@@ -83,12 +83,16 @@ public class Employee extends Person {
 	}
 
     @Override
-    public String getInfo() {
-        return String.format("%s, EmployeeId: %d, Role: %s, Licence: %s",
-            super.getInfo(),
-            employeeId,
-            role,
-            licenceType.toString()
-        );
+    public String toString() {
+        return String.format(
+                "Employee {ID: %d, Name: %s %s, Email: %s, Phone: %s, Location: %s, Role: %s, Licence: %s}",
+                employeeId,
+                getName(),
+                getSurname(),
+                getEmail(),
+                getPhone(),
+                getLocation() != null ? getLocation().toString() : "N/A",
+                role,
+                licenceType);
     }
 }

@@ -72,10 +72,10 @@ public class WasteSchedule {
 
     @Override
     public String toString() {
-        return "WasteSchedule{" +
-                "scheduleId=" + scheduleId +
-                ", dayOfWeek=" + (dayOfWeek != null ? dayOfWeek.name() : "N/A") +
-                ", waste=" + (waste != null ? waste.toString() : "N/A") +
-                '}';
+        return String.format(
+                "WasteSchedule {ID: %d, Day: %s, Waste: %s}",
+                scheduleId,
+                dayOfWeek != null ? dayOfWeek.name() : "N/A",
+                waste != null ? waste.toString() : "N/A");
     }
 }

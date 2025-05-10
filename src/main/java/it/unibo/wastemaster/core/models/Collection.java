@@ -47,7 +47,7 @@ public class Collection {
     private Schedule schedule;
 
     @ManyToOne
-    @JoinColumn(name = "trip_id") 
+    @JoinColumn(name = "trip_id")
     private Trip trip;
 
     public enum CollectionStatus {
@@ -61,14 +61,14 @@ public class Collection {
     }
 
     public Collection(Schedule schedule) {
-    this.schedule = schedule;
-    if (schedule != null) {
-        this.date       = schedule.getCollectionDate();
-        this.waste      = schedule.getWasteType();
-        this.customer   = schedule.getCustomer();
-    }
-    this.collectionStatus = CollectionStatus.PENDING;
-    this.cancelLimitDays  = CANCEL_LIMIT_DAYS;
+        this.schedule = schedule;
+        if (schedule != null) {
+            this.date = schedule.getCollectionDate();
+            this.waste = schedule.getWasteType();
+            this.customer = schedule.getCustomer();
+        }
+        this.collectionStatus = CollectionStatus.PENDING;
+        this.cancelLimitDays = CANCEL_LIMIT_DAYS;
     }
 
     public int getCollectionId() {
@@ -105,7 +105,7 @@ public class Collection {
 
     public void setWaste(Waste.WasteType waste) {
         this.waste = waste;
-    }    
+    }
 
     public void setCollectionStatus(CollectionStatus collectionStatus) {
         this.collectionStatus = collectionStatus;
@@ -120,12 +120,12 @@ public class Collection {
         return String.format(
                 "Collection {ID: %d, Customer: %s, Date: %s, Waste: %s, Status: %s, Cancel Limit Days: %d, Schedule ID: %s, Schedule Category: %s}",
                 collectionId,
-                customer.getName(),
+                customer != null ? customer.getName() : "N/A",
                 date,
                 waste,
                 collectionStatus,
                 cancelLimitDays,
-                schedule.getScheduleId(),
-                schedule.getScheduleCategory());
+                schedule != null ? schedule.getScheduleId() : "N/A",
+                schedule != null ? schedule.getScheduleCategory() : "N/A");
     }
 }
