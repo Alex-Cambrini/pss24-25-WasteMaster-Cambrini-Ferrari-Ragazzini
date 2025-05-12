@@ -20,7 +20,7 @@ public class TripTest extends AbstractDatabaseTest {
     private Employee operator;
     private LocalDateTime departureTime;
     private LocalDateTime expectedReturnTime;
-    // private TripDAO tripDAO;
+    private TripDAO tripDAO;
 
     @BeforeEach
     public void setUp() {
@@ -31,9 +31,9 @@ public class TripTest extends AbstractDatabaseTest {
         expectedReturnTime = departureTime.plusHours(5);
         assertNotNull(vehicle);
         assertNotNull(operator);
-        // assertNotNull(em, "EntityManager should be initialized!");
-        // tripDAO = new TripDAO(em);
-        // assertNotNull(tripDAO, "TripDAO should be initialized!");
+        assertNotNull(em, "EntityManager should be initialized!");
+        tripDAO = new TripDAO(em);
+        assertNotNull(tripDAO, "TripDAO should be initialized!");
     }
     
 
@@ -76,19 +76,38 @@ public class TripTest extends AbstractDatabaseTest {
     assertTrue(toStringOutput.contains(trip.getStatus().name())); 
     }
 
-    // to fix
-    //  @Test
-    //     public void testPersistence() {
-    //     em.getTransaction().begin();   
-    //     tripDAO.insert(trip);  
-    //     Trip found = em.find(Trip.class, trip.getTripId());
-    //     assertNotNull(found);
-    //     assertEquals(trip.getPostalCodes(), found.getPostalCodes());
-    //     tripDAO.delete(trip);
-    //     Trip deleted = em.find(Trip.class, trip.getTripId());
-    //     assertNull(deleted);
-    //     em.getTransaction().commit();
 
-    // }
+    @Test
+    public void testPersistence() {
+    
+    Employee operator = new Employee("John", "Doe",
+            new Location("Via Roma", "10", "Bologna", "40100"),
+            "john.doe@example.com", "1234567890",
+            Employee.Role.OPERATOR, Employee.LicenceType.C1);
+
+    em.getTransaction().begin();
+    vehicleDAO.insert(vehicle);
+    employeeDAO.insert(operator);
+
+    Trip trip = new Trip(0, "40100", vehicle, List.of(operator),
+            LocalDateTime.now().plusHours(1),
+            LocalDateTime.now().plusHours(5),
+            Trip.TripStatus.PENDING, null);
+
+    tripDAO.insert(trip);
+    em.getTransaction().commit();
+
+    Trip found = em.find(Trip.class, trip.getTripId());
+    assertNotNull(found);
+    assertEquals(trip.getPostalCodes(), found.getPostalCodes());
+
+    em.getTransaction().begin();
+    tripDAO.delete(found);
+    em.getTransaction().commit();
+
+    Trip deleted = em.find(Trip.class, trip.getTripId());
+    assertNull(deleted);
+    }
+
 
 }
