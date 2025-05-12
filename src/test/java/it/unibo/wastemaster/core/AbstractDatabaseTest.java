@@ -21,6 +21,7 @@ import it.unibo.wastemaster.core.services.CustomerManager;
 import it.unibo.wastemaster.core.services.EmployeeManager;
 import it.unibo.wastemaster.core.services.OneTimeScheduleManager;
 import it.unibo.wastemaster.core.services.RecurringScheduleManager;
+import it.unibo.wastemaster.core.services.TripManager;
 import it.unibo.wastemaster.core.services.WasteScheduleManager;
 import it.unibo.wastemaster.core.utils.DateUtils;
 import jakarta.persistence.EntityManager;
@@ -50,6 +51,7 @@ public abstract class AbstractDatabaseTest {
     protected CollectionManager collectionManager;
     protected RecurringScheduleManager recurringScheduleManager;
     protected OneTimeScheduleManager oneTimeScheduleManager;
+    protected TripManager tripManager;
     protected DateUtils dateUtils;
 
     @BeforeAll
