@@ -15,6 +15,7 @@ import it.unibo.wastemaster.core.dao.TripDAO;
 import it.unibo.wastemaster.core.dao.VehicleDAO;
 import it.unibo.wastemaster.core.dao.WasteScheduleDAO;
 import it.unibo.wastemaster.core.models.Location;
+import it.unibo.wastemaster.core.models.Trip;
 import it.unibo.wastemaster.core.models.Waste;
 import it.unibo.wastemaster.core.services.CollectionManager;
 import it.unibo.wastemaster.core.services.CustomerManager;
@@ -77,6 +78,7 @@ public void setUp() {
     collectionDAO         = new CollectionDAO(em);
     vehicleDAO            = new VehicleDAO(em);
     tripDAO               = new TripDAO(em);
+    
 
     customerManager       = new CustomerManager(customerDAO);
     employeeManager       = new EmployeeManager(employeeDAO);
@@ -86,7 +88,7 @@ public void setUp() {
     collectionManager        = new CollectionManager(collectionDAO, recurringScheduleManager);
     recurringScheduleManager.setCollectionManager(collectionManager);
     oneTimeScheduleManager = new OneTimeScheduleManager(oneTimeScheduleDAO, collectionManager);
-
+    tripManager = new TripManager(tripDAO);
 }
 
     @AfterEach
