@@ -19,9 +19,9 @@
             <children>
                 <Button fx:id="addEmployeeButton" mnemonicParsing="false" onAction="#handleAddEmployee" text="Add Employee"/>
                 <Region prefHeight="20" prefWidth="0.0" HBox.hgrow="ALWAYS"/>
-                <Button fx:id="filterButton" text="Filter ▼"/>
+                <Button fx:id="filterButton" text="Filter ▼" onMouseClicked="#showFilterMenu"/>
                 <TextField fx:id="searchField" promptText="Search..."/>
-                <Button mnemonicParsing="false" text="Reset"/>
+                <Button mnemonicParsing="false" text="Reset" onAction="#handleResetSearch"/>
             </children>
         </HBox>
 

@@ -11,6 +11,7 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.CustomMenuItem;
 
@@ -23,6 +24,7 @@ import it.unibo.wastemaster.viewmodels.CustomerRow;
 public class CustomersController {
 
     private Timeline refreshTimeline;
+    private ContextMenu filterMenu;
     private ObservableList<CustomerRow> allCustomers = FXCollections.observableArrayList();
 
     private final ObservableList<String> activeFilters = FXCollections.observableArrayList(
@@ -32,7 +34,7 @@ public class CustomersController {
     private Button filterButton;
 
     @FXML
-    private Button addClientButton;
+    private Button addCustomerButton;
 
     @FXML
     private javafx.scene.control.TextField searchField;
@@ -200,7 +202,12 @@ public class CustomersController {
 
     @FXML
     private void showFilterMenu(javafx.scene.input.MouseEvent event) {
-        ContextMenu menu = new ContextMenu();
+        if (filterMenu != null && filterMenu.isShowing()) {
+            filterMenu.hide();
+            return;
+        }
+
+        filterMenu = new ContextMenu();
 
         String[] fields = { "name", "surname", "email", "street", "civic", "city", "postal" };
         String[] labels = { "Name", "Surname", "Email", "Street", "Civic", "City", "Postal Code" };
@@ -209,7 +216,7 @@ public class CustomersController {
             String key = fields[i];
             String label = labels[i];
 
-            javafx.scene.control.CheckBox checkBox = new javafx.scene.control.CheckBox(label);
+            CheckBox checkBox = new CheckBox(label);
             checkBox.setSelected(activeFilters.contains(key));
 
             checkBox.selectedProperty().addListener((obs, wasSelected, isSelected) -> {
@@ -225,10 +232,10 @@ public class CustomersController {
 
             CustomMenuItem item = new CustomMenuItem(checkBox);
             item.setHideOnClick(false);
-            menu.getItems().add(item);
+            filterMenu.getItems().add(item);
         }
 
-        menu.show(filterButton, event.getScreenX(), event.getScreenY());
+        filterMenu.show(filterButton, event.getScreenX(), event.getScreenY());
     }
 
     public void returnToCustomerView() {

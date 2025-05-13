@@ -13,6 +13,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.CustomMenuItem;
 import javafx.scene.control.TableColumn;
@@ -25,6 +26,7 @@ import java.util.List;
 public class VehicleController {
 
 	private Timeline refreshTimeline;
+	private ContextMenu filterMenu;
 
 	private ObservableList<VehicleRow> allVehicles = FXCollections.observableArrayList();
 
@@ -220,23 +222,34 @@ public class VehicleController {
 
 	@FXML
 	private void showFilterMenu(javafx.scene.input.MouseEvent event) {
-		ContextMenu menu = new ContextMenu();
+		if (filterMenu != null && filterMenu.isShowing()) {
+			filterMenu.hide();
+			return;
+		}
 
-		String[] fields = { "plate", "brand", "model", "year", "licenceType", "vehicleStatus", "lastMaintenanceDate",
-				"nextMaintenanceDate" };
-		String[] labels = { "Plate", "Brand", "Model", "Year", "Licence", "Status", "Last Maint.", "Next Maint." };
+		filterMenu = new ContextMenu();
+
+		String[] fields = {
+				"plate", "brand", "model", "year", "licenceType",
+				"vehicleStatus", "lastMaintenanceDate", "nextMaintenanceDate"
+		};
+		String[] labels = {
+				"Plate", "Brand", "Model", "Year", "Licence",
+				"Status", "Last Maint.", "Next Maint."
+		};
 
 		for (int i = 0; i < fields.length; i++) {
 			String key = fields[i];
 			String label = labels[i];
 
-			javafx.scene.control.CheckBox checkBox = new javafx.scene.control.CheckBox(label);
+			CheckBox checkBox = new CheckBox(label);
 			checkBox.setSelected(activeFilters.contains(key));
 
 			checkBox.selectedProperty().addListener((obs, wasSelected, isSelected) -> {
 				if (isSelected) {
-					if (!activeFilters.contains(key))
+					if (!activeFilters.contains(key)) {
 						activeFilters.add(key);
+					}
 				} else {
 					activeFilters.remove(key);
 				}
@@ -245,10 +258,10 @@ public class VehicleController {
 
 			CustomMenuItem item = new CustomMenuItem(checkBox);
 			item.setHideOnClick(false);
-			menu.getItems().add(item);
+			filterMenu.getItems().add(item);
 		}
 
-		menu.show(filterButton, event.getScreenX(), event.getScreenY());
+		filterMenu.show(filterButton, event.getScreenX(), event.getScreenY());
 	}
 
 	public void returnToVehicleView() {

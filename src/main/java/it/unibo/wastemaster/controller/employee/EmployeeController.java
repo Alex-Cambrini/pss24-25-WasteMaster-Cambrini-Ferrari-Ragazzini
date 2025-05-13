@@ -8,6 +8,7 @@ import it.unibo.wastemaster.viewmodels.EmployeeRow;
 
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.util.Duration;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -20,6 +21,7 @@ import java.util.List;
 public class EmployeeController {
 
     private Timeline refreshTimeline;
+    private ContextMenu filterMenu;
     private ObservableList<EmployeeRow> allEmployees = FXCollections.observableArrayList();
 
     private final ObservableList<String> activeFilters = FXCollections.observableArrayList(
@@ -54,8 +56,10 @@ public class EmployeeController {
         nameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
         surnameColumn.setCellValueFactory(new PropertyValueFactory<>("surname"));
         emailColumn.setCellValueFactory(new PropertyValueFactory<>("email"));
-        roleColumn.setCellValueFactory(new PropertyValueFactory<>("role"));
-        licenceColumn.setCellValueFactory(new PropertyValueFactory<>("licence"));
+        roleColumn.setCellValueFactory(
+                cellData -> new SimpleStringProperty(formatEnum(cellData.getValue().getRole())));
+        licenceColumn.setCellValueFactory(
+                cellData -> new SimpleStringProperty(formatEnum(cellData.getValue().getLicence())));
         cityColumn.setCellValueFactory(new PropertyValueFactory<>("city"));
 
         loadEmployee();
@@ -115,9 +119,11 @@ public class EmployeeController {
             if ((activeFilters.contains("name") && row.getName().toLowerCase().contains(query)) ||
                     (activeFilters.contains("surname") && row.getSurname().toLowerCase().contains(query)) ||
                     (activeFilters.contains("email") && row.getEmail().toLowerCase().contains(query)) ||
-                    (activeFilters.contains("role") && row.getRole().toLowerCase().contains(query)) ||
-                    (activeFilters.contains("licence") && row.getLicence().toLowerCase().contains(query)) ||
-                    (activeFilters.contains("city") && row.getCity().toLowerCase().contains(query))) {
+                    (activeFilters.contains("role") &&
+                            formatEnumOrNone(row.getRole()).toLowerCase().contains(query))
+                    || (activeFilters.contains("licence") &&
+                            formatEnumOrNone(row.getLicence()).toLowerCase().contains(query))
+                    || (activeFilters.contains("city") && row.getCity().toLowerCase().contains(query))) {
                 filtered.add(row);
             }
         }
@@ -169,6 +175,56 @@ public class EmployeeController {
     private void handleResetSearch() {
         searchField.clear();
         loadEmployee();
+    }
+
+    @FXML
+    private void showFilterMenu(javafx.scene.input.MouseEvent event) {
+        if (filterMenu != null && filterMenu.isShowing()) {
+            filterMenu.hide();
+            return;
+        }
+
+        filterMenu = new ContextMenu();
+
+        String[] fields = { "name", "surname", "email", "role", "licence", "city" };
+        String[] labels = { "Name", "Surname", "Email", "Role", "Licence", "City" };
+
+        for (int i = 0; i < fields.length; i++) {
+            String key = fields[i];
+            String label = labels[i];
+
+            CheckBox checkBox = new CheckBox(label);
+            checkBox.setSelected(activeFilters.contains(key));
+
+            checkBox.selectedProperty().addListener((obs, wasSelected, isSelected) -> {
+                if (isSelected) {
+                    if (!activeFilters.contains(key)) {
+                        activeFilters.add(key);
+                    }
+                } else {
+                    activeFilters.remove(key);
+                }
+                handleSearch();
+            });
+
+            CustomMenuItem item = new CustomMenuItem(checkBox);
+            item.setHideOnClick(false);
+            filterMenu.getItems().add(item);
+        }
+
+        filterMenu.show(filterButton, event.getScreenX(), event.getScreenY());
+    }
+
+    private String formatEnumOrNone(String raw) {
+        if (raw == null || raw.equalsIgnoreCase("none")) {
+            return "None";
+        }
+        return formatEnum(raw);
+    }
+
+    private String formatEnum(String raw) {
+        String lower = raw.toLowerCase().replace("_", " ");
+        return Character.toUpperCase(lower.charAt(0)) + lower.substring(1);
     }
 
     public void returnToEmployeeView() {
