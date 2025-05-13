@@ -1,6 +1,5 @@
 package it.unibo.wastemaster.core.dao;
 
-import it.unibo.wastemaster.core.models.Collection;
 import it.unibo.wastemaster.core.models.OneTimeSchedule;
 import jakarta.persistence.EntityManager;
 
