@@ -1,7 +1,9 @@
 package it.unibo.wastemaster.controller.schedule;
 
+import java.time.LocalDate;
 import java.util.List;
 
+import it.unibo.wastemaster.controller.utils.DialogUtils;
 import it.unibo.wastemaster.core.context.AppContext;
 import it.unibo.wastemaster.core.models.Customer;
 import it.unibo.wastemaster.core.models.RecurringSchedule.Frequency;
@@ -11,6 +13,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.ContextMenu;
+import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.RadioButton;
@@ -43,6 +46,9 @@ public class AddScheduleController {
 
     @FXML
     private Label locationField;
+
+    @FXML
+    private DatePicker datePicker;
 
     private List<Customer> allCustomers;
     private ContextMenu suggestionsMenu = new ContextMenu();
@@ -124,10 +130,41 @@ public class AddScheduleController {
 
     @FXML
     public void handleSaveSchedule(ActionEvent event) {
-        if (isRecurring) {
-            System.out.println("RECURRING");
-        } else {
-            System.out.println("ONETIME");
+        try {
+            Waste selectedWaste = wasteComboBox.getValue();
+            String customerInput = customerField.getText();
+            LocalDate selectedDate = datePicker.getValue(); // Assicurati che il DatePicker abbia fx:id="datePicker"
+
+            if (selectedWaste == null)
+                throw new IllegalArgumentException("- Please select a waste type");
+
+            if (customerInput.isBlank())
+                throw new IllegalArgumentException("- Please select a customer");
+
+            Customer selectedCustomer = allCustomers.stream()
+                    .filter(c -> (c.getName() + " " + c.getSurname()).equalsIgnoreCase(customerInput.trim()))
+                    .findFirst()
+                    .orElseThrow(() -> new IllegalArgumentException("- No matching customer found"));
+
+            if (selectedDate == null)
+                throw new IllegalArgumentException("- Please select a date");
+
+            if (isRecurring) {
+                Frequency selectedFrequency = frequencyComboBox.getValue();
+                if (selectedFrequency == null)
+                    throw new IllegalArgumentException("- Please select a frequency");
+
+                AppContext.recurringScheduleManager.createRecurringSchedule(selectedCustomer, selectedWaste,
+                        selectedDate, selectedFrequency);
+            } else {
+                AppContext.oneTimeScheduleManager.createOneTimeSchedule(selectedCustomer, selectedWaste, selectedDate);
+            }
+
+            DialogUtils.showSuccess("Schedule saved successfully.");
+            scheduleController.returnToScheduleView();
+
+        } catch (IllegalArgumentException e) {
+            DialogUtils.showError("Validation error", e.getMessage());
         }
     }
 
