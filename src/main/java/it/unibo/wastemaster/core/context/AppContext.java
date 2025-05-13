@@ -7,12 +7,11 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
 
-
 public class AppContext {
 
     private static EntityManagerFactory emf;
     private static EntityManager em;
-    
+
     // DAOs
     public static EmployeeDAO employeeDAO;
     public static GenericDAO<Waste> wasteDAO;
@@ -27,6 +26,7 @@ public class AppContext {
     public static CustomerManager customerManager;
     public static WasteScheduleManager wasteScheduleManager;
     public static RecurringScheduleManager recurringScheduleManager;
+    public static OneTimeScheduleManager oneTimeScheduleManager;
     public static CollectionManager collectionManager;
     public static VehicleManager vehicleManager;
     public static EmployeeManager employeeManager;
@@ -52,6 +52,7 @@ public class AppContext {
         wasteScheduleManager = new WasteScheduleManager(wasteScheduleDAO);
         recurringScheduleManager = new RecurringScheduleManager(recurringScheduleDAO, wasteScheduleManager);
         collectionManager = new CollectionManager(collectionDAO, recurringScheduleManager);
+        oneTimeScheduleManager = new OneTimeScheduleManager(oneTimeScheduleDAO, collectionManager);
         vehicleManager = new VehicleManager(vehicleDAO);
         employeeManager = new EmployeeManager(employeeDAO);
 
@@ -67,5 +68,4 @@ public class AppContext {
     public static EntityManagerFactory getEntityManagerFactory() {
         return emf;
     }
-
 }
