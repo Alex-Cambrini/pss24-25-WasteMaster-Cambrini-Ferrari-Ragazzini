@@ -35,19 +35,19 @@
                     </children>
                 </HBox>
                 <Label fx:id="customerLabel" text="Customer" GridPane.rowIndex="1" />
-                <TextField fx:id="nameField"
-                           maxWidth="160.0"
-                           prefHeight="25.0"
-                           prefWidth="160.0"
-                           GridPane.columnIndex="1"
-                           GridPane.rowIndex="1" />
+                <TextField fx:id="customerField"
+                    maxWidth="160.0"
+                    prefHeight="25.0"
+                    prefWidth="160.0"
+                    GridPane.columnIndex="1"
+                    GridPane.rowIndex="1" />
                 <VBox alignment="CENTER_LEFT"
                       prefHeight="200.0"
                       prefWidth="100.0"
                       GridPane.columnIndex="2"
                       GridPane.rowIndex="1">
                     <children>
-                        <Label alignment="CENTER" text="Adress Dettails:" />
+                        <Label alignment="CENTER" text="Address Details:" />
                         <Label fx:id="locationField" text="No location selected." />
                     </children>
                 </VBox>
@@ -60,7 +60,7 @@
                       GridPane.columnIndex="2"
                       GridPane.rowIndex="2">
                     <children>
-                        <Label alignment="CENTER" text="Waste Dettails:" />
+                        <Label alignment="CENTER" text="Waste Details:" />
                         <Label fx:id="wasteField" text="No Waste selected." />
                     </children>
                 </VBox>
