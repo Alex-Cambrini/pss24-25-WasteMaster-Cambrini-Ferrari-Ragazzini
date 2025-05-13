@@ -29,11 +29,11 @@ public class Waste {
     private Boolean isDangerous;
 
     public enum WasteType {
-        PLASTIC, 
-        GLASS, 
-        PAPER, 
-        ORGANIC, 
-        HAZARDOUS, 
+        PLASTIC,
+        GLASS,
+        PAPER,
+        ORGANIC,
+        HAZARDOUS,
         UNSORTED
     }
 
@@ -76,11 +76,8 @@ public class Waste {
 
     @Override
     public String toString() {
-        return String.format(
-                "Waste {ID: %d, Type: %s, Recyclable: %s, Dangerous: %s}",
-                wasteId,
-                type != null ? type.name() : "N/A",
-                isRecyclable != null ? isRecyclable.toString() : "N/A",
-                isDangerous != null ? isDangerous.toString() : "N/A");
+        return "Waste Type: " + type + "\n" +
+                "Recyclable: " + (isRecyclable ? "Yes" : "No") + "\n" +
+                "Dangerous: " + (isDangerous ? "Yes" : "No");
     }
 }
