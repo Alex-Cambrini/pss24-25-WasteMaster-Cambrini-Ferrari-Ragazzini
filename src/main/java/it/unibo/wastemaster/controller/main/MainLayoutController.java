@@ -83,6 +83,12 @@ public class MainLayoutController {
         MainLayoutController.getInstance().loadCenter("/layouts/employee/EmployeeView.fxml");
     }
 
+    @FXML
+    private void handleSchedule() {
+        setPageTitle("Schedule Management");
+        MainLayoutController.getInstance().loadCenter("/layouts/schedule/ScheduleView.fxml");
+    }
+
     public void setPageTitle(String title) {
         if (title != null) {
             previousTitle = pageTitleLabel.getText();
