@@ -10,7 +10,9 @@ import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleGroup;
@@ -37,12 +39,21 @@ public class AddScheduleController {
     private Label dateLabel;
 
     @FXML
+    private TextField customerField;
+
+    @FXML
+    private Label locationField;
+
+    private List<Customer> allCustomers;
+    private ContextMenu suggestionsMenu = new ContextMenu();
+
+    @FXML
     public void initialize() {
         frequencyComboBox.setItems(FXCollections.observableArrayList(Frequency.values()));
-
-        // TO UPDATE WITH SERVICES METHOD
         wasteComboBox.setItems(FXCollections.observableArrayList(AppContext.wasteDAO.findAll()));
+        allCustomers = AppContext.customerDAO.findAll();
 
+        // Converter per waste
         wasteComboBox.setConverter(new StringConverter<Waste>() {
             @Override
             public String toString(Waste waste) {
@@ -55,6 +66,7 @@ public class AddScheduleController {
             }
         });
 
+        // Listener per selezione waste
         wasteComboBox.valueProperty().addListener((obs, oldVal, newVal) -> {
             if (newVal != null) {
                 wasteField.setText(newVal.toString());
@@ -63,11 +75,43 @@ public class AddScheduleController {
             }
         });
 
+        // Autocomplete dinamico per customer
+        customerField.textProperty().addListener((obs, oldText, newText) -> {
+            if (newText == null || newText.isBlank()) {
+                suggestionsMenu.hide();
+                return;
+            }
+
+            List<Customer> matches = allCustomers.stream()
+                    .filter(c -> (c.getName() + " " + c.getSurname()).toLowerCase().contains(newText.toLowerCase()))
+                    .toList();
+
+            if (matches.isEmpty()) {
+                suggestionsMenu.hide();
+                return;
+            }
+
+            suggestionsMenu.getItems().clear();
+            for (Customer customer : matches) {
+                MenuItem item = new MenuItem(customer.getName() + " " + customer.getSurname());
+                item.setOnAction(e -> {
+                    customerField.setText(customer.getName() + " " + customer.getSurname());
+                    locationField.setText(customer.getLocation().toString());
+                    suggestionsMenu.hide();
+                });
+                suggestionsMenu.getItems().add(item);
+            }
+
+            if (!suggestionsMenu.isShowing()) {
+                suggestionsMenu.show(customerField, javafx.geometry.Side.BOTTOM, 0, 0);
+            }
+        });
+
+        // Gestione radio buttons per tipo di pianificazione
         scheduleGroup.selectedToggleProperty().addListener((obs, oldVal, newVal) -> {
             if (newVal != null) {
                 RadioButton selected = (RadioButton) newVal;
-                isRecurring = selected.getText().equals("Recurring");
-
+                isRecurring = selected.getText().equalsIgnoreCase("Recurring");
                 frequencyComboBox.setDisable(!isRecurring);
                 dateLabel.setText(isRecurring ? "Start Date" : "Pickup Date");
             }
