@@ -42,7 +42,7 @@
               prefWidth="600.0"
               spacing="10.0">
             <children>
-                <Button mnemonicParsing="false" text="Edit"/>
+                <Button fx:id="editEmployeeButton" mnemonicParsing="false" onAction="#handleEditEmployee" text="Edit"/>
                 <Button mnemonicParsing="false" onAction="#handleDeleteEmployee" text="Delete"/>
             </children>
             <padding>
