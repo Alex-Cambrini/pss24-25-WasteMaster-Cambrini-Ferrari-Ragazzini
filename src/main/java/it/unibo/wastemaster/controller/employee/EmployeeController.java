@@ -172,6 +172,31 @@ public class EmployeeController {
     }
 
     @FXML
+    private void handleEditEmployee() {
+        EmployeeRow selected = employeeTable.getSelectionModel().getSelectedItem();
+        if (selected == null) {
+            DialogUtils.showError("No Selection", "Please select an employee to edit.");
+            return;
+        }
+
+        var employee = AppContext.employeeDAO.findByEmail(selected.getEmail());
+        if (employee == null) {
+            DialogUtils.showError("Not Found", "Employee not found.");
+            return;
+        }
+
+        try {
+            MainLayoutController.getInstance().setPageTitle("Edit Employee");
+            EditEmployeeController controller = MainLayoutController.getInstance()
+                    .loadCenterWithController("/layouts/employee/EditEmployeeView.fxml");
+            controller.setEmployeeToEdit(employee);
+            controller.setEmployeeController(this);
+        } catch (Exception e) {
+            DialogUtils.showError("Navigation error", "Could not load Edit view.");
+        }
+    }
+
+    @FXML
     private void handleResetSearch() {
         searchField.clear();
         loadEmployee();
