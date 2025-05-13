@@ -13,19 +13,19 @@ import jakarta.persistence.JoinColumn;
 
 @MappedSuperclass
 public abstract class Person {
-    @NotNull (message = "name cannot be null")
-    @NotBlank (message = "name must not be blank")
+    @NotNull(message = "name cannot be null")
+    @NotBlank(message = "name must not be blank")
     @Column(nullable = false)
     protected String name;
 
-    @NotNull (message = "surname cannot be null")
-    @NotBlank (message = "surname must not be blank")
+    @NotNull(message = "surname cannot be null")
+    @NotBlank(message = "surname must not be blank")
     @Column(nullable = false)
     protected String surname;
 
     @Valid
     @ManyToOne(cascade = CascadeType.PERSIST)
-    @NotNull (message = "address cannot be null")
+    @NotNull(message = "address cannot be null")
     @JoinColumn(nullable = false)
     private Location location;
 
@@ -41,7 +41,7 @@ public abstract class Person {
     @Column(nullable = false)
     protected String phone;
 
-    @NotNull (message = "isDeleted cannot be null")
+    @NotNull(message = "isDeleted cannot be null")
     @Column(nullable = false)
     protected boolean isDeleted = false;
 
@@ -108,8 +108,15 @@ public abstract class Person {
         this.phone = phone;
     }
 
-    public String getInfo() {
-        return String.format("Name: %s, Surname: %s, Address: %s, Email: %s, Phone: %s", name, surname, location, email,
-                phone);
+    @Override
+    public String toString() {
+        return String.format(
+                "Person {Name: %s, Surname: %s, Address: %s, Email: %s, Phone: %s, Deleted: %s}",
+                name,
+                surname,
+                location != null ? location.toString() : "N/A",
+                email,
+                phone,
+                isDeleted ? "Yes" : "No");
     }
 }

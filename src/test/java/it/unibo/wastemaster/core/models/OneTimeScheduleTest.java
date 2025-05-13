@@ -17,14 +17,16 @@ public class OneTimeScheduleTest extends AbstractDatabaseTest {
 	private OneTimeSchedule schedule;
 	private Customer customer;
 	private LocalDate pickupDate;
+	private Waste organic;
 
 	@BeforeEach
 	public void setUp() {
 		super.setUp();
 		Location location = new Location("Via Dante", "5", "Roma", "00100");
 		customer = new Customer("Luca", "Verdi", location, "luca@example.com", "3456789012");
+		organic = new Waste("organic", true, false);
 		pickupDate = dateUtils.getCurrentDate();
-		schedule = new OneTimeSchedule(customer, Waste.WasteType.ORGANIC, pickupDate);
+		schedule = new OneTimeSchedule(customer, organic, pickupDate);
 	}
 
 	@Test
@@ -45,7 +47,7 @@ public class OneTimeScheduleTest extends AbstractDatabaseTest {
 		assertFalse(violations.isEmpty());
 
 		assertTrue(violations.stream().anyMatch(v -> v.getPropertyPath().toString().equals("customer")));
-		assertTrue(violations.stream().anyMatch(v -> v.getPropertyPath().toString().equals("wasteType")));
+		assertTrue(violations.stream().anyMatch(v -> v.getPropertyPath().toString().equals("waste")));
 		assertTrue(violations.stream().anyMatch(v -> v.getPropertyPath().toString().equals("status")));
 		assertTrue(violations.stream().anyMatch(v -> v.getPropertyPath().toString().equals("pickupDate")));
 	}
@@ -59,6 +61,7 @@ public class OneTimeScheduleTest extends AbstractDatabaseTest {
 	@Test
 	public void testPersistence() {
 		customerDAO.insert(customer);
+		wasteDAO.insert(organic);
 		oneTimeScheduleDAO.insert(schedule);
 		int scheduleId = schedule.getScheduleId();
 		OneTimeSchedule found = oneTimeScheduleDAO.findById(scheduleId);
@@ -69,5 +72,15 @@ public class OneTimeScheduleTest extends AbstractDatabaseTest {
 		oneTimeScheduleDAO.delete(found);
 		OneTimeSchedule deleted = oneTimeScheduleDAO.findById(scheduleId);
 		assertNull(deleted);
+	}
+
+	@Test
+	public void testToString() {
+		String toStringOutput = schedule.toString();
+		assertNotNull(toStringOutput);
+		assertTrue(toStringOutput.contains("ONE_TIME Schedule"));
+		assertTrue(toStringOutput.contains(customer.getName()));
+		assertTrue(toStringOutput.contains(organic.getWasteName()));
+		assertTrue(toStringOutput.contains(pickupDate.toString()));
 	}
 }

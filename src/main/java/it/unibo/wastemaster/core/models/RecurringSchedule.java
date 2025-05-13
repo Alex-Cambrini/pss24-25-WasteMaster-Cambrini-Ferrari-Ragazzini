@@ -13,7 +13,6 @@ public class RecurringSchedule extends Schedule {
     @Enumerated(EnumType.STRING)
     @NotNull(message = "Frequency cannot be null")
     private Frequency frequency;
-    
 
     @FutureOrPresent(message = "Start Date must be today or in the future")
     @NotNull(message = "Start Date cannot be null")
@@ -29,9 +28,9 @@ public class RecurringSchedule extends Schedule {
     public RecurringSchedule() {
     }
 
-    public RecurringSchedule(Customer customer, Waste.WasteType wasteType, LocalDate startDate,
+    public RecurringSchedule(Customer customer, Waste waste, LocalDate startDate,
             Frequency frequency) {
-        super(customer, wasteType);
+        super(customer, waste);
         this.startDate = startDate;
         this.frequency = frequency;
         this.setScheduleCategory(ScheduleCategory.RECURRING);
@@ -65,5 +64,13 @@ public class RecurringSchedule extends Schedule {
     @Override
     public LocalDate getCollectionDate() {
         return this.getNextCollectionDate();
+    }
+
+    @Override
+    public String toString() {
+        return super.toString() + String.format(", StartDate: %s, Frequency: %s, NextCollection: %s",
+                startDate != null ? startDate.toString() : "N/A",
+                frequency != null ? frequency.name() : "N/A",
+                nextCollectionDate != null ? nextCollectionDate.toString() : "N/A");
     }
 }

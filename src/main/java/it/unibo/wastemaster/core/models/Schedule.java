@@ -34,10 +34,10 @@ public abstract class Schedule {
     @NotNull(message = "Customer cannot be null")
     private Customer customer;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @ManyToOne
+    @JoinColumn(name = "waste_id", nullable = false)
     @NotNull(message = "WasteType cannot be null")
-    private Waste.WasteType wasteType;
+    private Waste waste;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -63,20 +63,19 @@ public abstract class Schedule {
     }
 
     public enum ScheduleStatus {
-        SCHEDULED,
         ACTIVE,
         CANCELLED,
-        STOPPED
+        PAUSED
     }
-    
+
     // No-args constructor required by JPA
     public Schedule() {
     }
 
-    public Schedule(Customer customer, Waste.WasteType wasteType) {
+    public Schedule(Customer customer, Waste waste) {
         this.customer = customer;
-        this.wasteType = wasteType;
-        this.status = ScheduleStatus.SCHEDULED;
+        this.waste = waste;
+        this.status = ScheduleStatus.ACTIVE;
         this.creationDate = new DateUtils().getCurrentDate();
     }
 
@@ -94,19 +93,19 @@ public abstract class Schedule {
         this.customer = customer;
     }
 
-    public Waste.WasteType getWasteType() {
-        return wasteType;
+    public Waste getWaste() {
+        return waste;
     }
 
-    public void setWasteType(Waste.WasteType wasteType) {
-        this.wasteType = wasteType;
+    public void setWaste(Waste waste) {
+        this.waste = waste;
     }
 
-    public ScheduleStatus getStatus() {
+    public ScheduleStatus getScheduleStatus() {
         return status;
     }
 
-    public void setStatus(ScheduleStatus status) {
+    public void setScheduleStatus(ScheduleStatus status) {
         this.status = status;
     }
 
@@ -137,13 +136,15 @@ public abstract class Schedule {
     @Override
     public String toString() {
         return String.format(
-                "Schedule {Customer: %s, WasteType: %s, Status: %s, CreationDate: %s, CollectionIDs: %s}",
+                "%s Schedule {Customer: %s, WasteType: %s, Status: %s, CreationDate: %s, CollectionIDs: %s}",
+                scheduleCategory != null ? scheduleCategory.name() : "Unknown",
                 customer != null ? customer.getName() : "N/A",
-                wasteType != null ? wasteType : "N/A",
-                status != null ? status : "N/A",
-                creationDate != null ? creationDate.toString() : "N/A",
-                collections != null ? collections.stream()
-                        .map(c -> String.valueOf(c.getCollectionId()))
-                        .reduce((id1, id2) -> id1 + ", " + id2).orElse("N/A") : "N/A");
+                waste != null ? waste.getWasteName(): "N/A",
+                status != null ? status.name() : "N/A",
+                creationDate != null ? creationDate : "N/A",
+                collections != null && !collections.isEmpty()
+                        ? collections.stream().map(c -> String.valueOf(c.getCollectionId()))
+                                .reduce((a, b) -> a + ", " + b).orElse("N/A")
+                        : "None");
     }
 }

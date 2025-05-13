@@ -26,10 +26,10 @@ public class WasteScheduleManager {
         return wasteSchedule;
     }
 
-    public WasteSchedule getWasteScheduleForWaste(Waste.WasteType wasteType) {
-        ValidateUtils.requireArgNotNull(wasteType, "WasteType cannot be null");
-        WasteSchedule schedule = wasteScheduleDAO.findByWasteType(wasteType);
-        ValidateUtils.requireStateNotNull(schedule, "No WasteSchedule found for waste type: " + wasteType);
+    public WasteSchedule getWasteScheduleByWaste(Waste waste) {
+        ValidateUtils.requireArgNotNull(waste, "WasteType cannot be null");
+        WasteSchedule schedule = wasteScheduleDAO.findSchedulebyWaste(waste);
+        ValidateUtils.requireStateNotNull(schedule, "No WasteSchedule found for waste type: " + waste);
         return schedule;
     }    
 }
