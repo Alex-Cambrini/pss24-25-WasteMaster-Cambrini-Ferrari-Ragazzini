@@ -28,9 +28,9 @@ public class RecurringSchedule extends Schedule {
     public RecurringSchedule() {
     }
 
-    public RecurringSchedule(Customer customer, Waste.WasteType wasteType, LocalDate startDate,
+    public RecurringSchedule(Customer customer, Waste waste, LocalDate startDate,
             Frequency frequency) {
-        super(customer, wasteType);
+        super(customer, waste);
         this.startDate = startDate;
         this.frequency = frequency;
         this.setScheduleCategory(ScheduleCategory.RECURRING);

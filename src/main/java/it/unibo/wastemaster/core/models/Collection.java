@@ -27,10 +27,10 @@ public class Collection {
     @Column(nullable = false)
     private LocalDate date;
 
-    @Enumerated(EnumType.STRING)
+    @ManyToOne
     @NotNull(message = "The waste type cannot be null")
-    @Column(nullable = false)
-    private Waste.WasteType waste;
+    @JoinColumn(name = "waste_id", nullable = false)
+    private Waste waste;
 
     @Enumerated(EnumType.STRING)
     @NotNull(message = "The collection status cannot be null")
@@ -64,7 +64,7 @@ public class Collection {
         this.schedule = schedule;
         if (schedule != null) {
             this.date = schedule.getCollectionDate();
-            this.waste = schedule.getWasteType();
+            this.waste = schedule.getWaste();
             this.customer = schedule.getCustomer();
         }
         this.collectionStatus = CollectionStatus.PENDING;
@@ -83,7 +83,7 @@ public class Collection {
         return customer;
     }
 
-    public Waste.WasteType getWaste() {
+    public Waste getWaste() {
         return waste;
     }
 
@@ -103,7 +103,7 @@ public class Collection {
         this.date = date;
     }
 
-    public void setWaste(Waste.WasteType waste) {
+    public void setWaste(Waste waste) {
         this.waste = waste;
     }
 
@@ -122,7 +122,7 @@ public class Collection {
                 collectionId,
                 customer != null ? customer.getName() : "N/A",
                 date,
-                waste,
+                waste != null ? waste.getWasteName() : "N/A",
                 collectionStatus,
                 cancelLimitDays,
                 schedule != null ? schedule.getScheduleId() : "N/A",

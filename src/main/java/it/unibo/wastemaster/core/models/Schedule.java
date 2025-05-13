@@ -34,10 +34,10 @@ public abstract class Schedule {
     @NotNull(message = "Customer cannot be null")
     private Customer customer;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @ManyToOne
+    @JoinColumn(name = "waste_id", nullable = false)
     @NotNull(message = "WasteType cannot be null")
-    private Waste.WasteType wasteType;
+    private Waste waste;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -72,9 +72,9 @@ public abstract class Schedule {
     public Schedule() {
     }
 
-    public Schedule(Customer customer, Waste.WasteType wasteType) {
+    public Schedule(Customer customer, Waste waste) {
         this.customer = customer;
-        this.wasteType = wasteType;
+        this.waste = waste;
         this.status = ScheduleStatus.ACTIVE;
         this.creationDate = new DateUtils().getCurrentDate();
     }
@@ -93,12 +93,12 @@ public abstract class Schedule {
         this.customer = customer;
     }
 
-    public Waste.WasteType getWasteType() {
-        return wasteType;
+    public Waste getWaste() {
+        return waste;
     }
 
-    public void setWasteType(Waste.WasteType wasteType) {
-        this.wasteType = wasteType;
+    public void setWaste(Waste waste) {
+        this.waste = waste;
     }
 
     public ScheduleStatus getScheduleStatus() {
@@ -139,7 +139,7 @@ public abstract class Schedule {
                 "%s Schedule {Customer: %s, WasteType: %s, Status: %s, CreationDate: %s, CollectionIDs: %s}",
                 scheduleCategory != null ? scheduleCategory.name() : "Unknown",
                 customer != null ? customer.getName() : "N/A",
-                wasteType != null ? wasteType.name() : "N/A",
+                waste != null ? waste.getWasteName(): "N/A",
                 status != null ? status.name() : "N/A",
                 creationDate != null ? creationDate : "N/A",
                 collections != null && !collections.isEmpty()
