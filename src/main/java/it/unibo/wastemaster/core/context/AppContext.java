@@ -29,7 +29,7 @@ public class AppContext {
     public static RecurringScheduleManager recurringScheduleManager;
     public static CollectionManager collectionManager;
     public static VehicleManager vehicleManager;
-    public static EmployeManager employeeManager;
+    public static EmployeeManager employeeManager;
 
 
 
@@ -53,7 +53,7 @@ public class AppContext {
         recurringScheduleManager = new RecurringScheduleManager(recurringScheduleDAO, wasteScheduleManager);
         collectionManager = new CollectionManager(collectionDAO, recurringScheduleManager);
         vehicleManager = new VehicleManager(vehicleDAO);
-        employeeManager = new EmployeManager(employeeDAO);
+        employeeManager = new EmployeeManager(employeeDAO);
 
         
         // Collegamento
