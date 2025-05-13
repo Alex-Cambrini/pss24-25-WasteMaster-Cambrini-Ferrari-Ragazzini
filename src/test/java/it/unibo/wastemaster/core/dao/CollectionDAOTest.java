@@ -23,7 +23,7 @@ public class CollectionDAOTest extends AbstractDatabaseTest {
     private Location location;
     private Customer customer;
     private LocalDate date;
-    private Waste.WasteType wasteType;
+    private Waste waste;
     private Collection.CollectionStatus pending;
     private Collection.CollectionStatus inProgress;
     private Collection.CollectionStatus completed;
@@ -36,7 +36,7 @@ public class CollectionDAOTest extends AbstractDatabaseTest {
         super.setUp();
         em.getTransaction().begin();
         date = dateUtils.getCurrentDate();
-        wasteType = Waste.WasteType.PLASTIC;
+        waste = new Waste("PLASTICA", true,false);
 
         pending = Collection.CollectionStatus.PENDING;
         inProgress = Collection.CollectionStatus.IN_PROGRESS;
@@ -45,9 +45,10 @@ public class CollectionDAOTest extends AbstractDatabaseTest {
 
         location = new Location("Via Roma", "10", "Bologna", "40100");
         customer = new Customer("Mario", "Rossi", location, "mario.rossi@example.com", "1234567890");
-        oneTimeSchedule = new OneTimeSchedule(customer, wasteType, date);
-        recurringSchedule = new RecurringSchedule(customer, wasteType, date, RecurringSchedule.Frequency.WEEKLY);
+        oneTimeSchedule = new OneTimeSchedule(customer, waste, date);
+        recurringSchedule = new RecurringSchedule(customer, waste, date, RecurringSchedule.Frequency.WEEKLY);
         customerDAO.insert(customer);
+        wasteDAO.insert(waste);
         oneTimeScheduleDAO.insert(oneTimeSchedule);
         recurringScheduleDAO.insert(recurringSchedule);
     }
@@ -98,7 +99,7 @@ public class CollectionDAOTest extends AbstractDatabaseTest {
     @Test
     public void testFindActiveCollectionByOneTimeSchedule() {
         LocalDate newDate = dateUtils.getCurrentDate().plusDays(3);
-        OneTimeSchedule schedule = oneTimeScheduleManager.createOneTimeSchedule(customer, Waste.WasteType.GLASS, newDate);
+        OneTimeSchedule schedule = oneTimeScheduleManager.createOneTimeSchedule(customer, waste, newDate);
 
         Collection result = collectionDAO.findActiveCollectionByOneTimeSchedule(schedule);
         assertNotNull(result);

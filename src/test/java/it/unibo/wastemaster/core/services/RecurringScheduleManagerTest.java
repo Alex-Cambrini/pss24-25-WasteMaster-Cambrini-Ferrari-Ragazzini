@@ -2,7 +2,6 @@ package it.unibo.wastemaster.core.services;
 
 import it.unibo.wastemaster.core.models.RecurringSchedule;
 import it.unibo.wastemaster.core.models.RecurringSchedule.Frequency;
-import it.unibo.wastemaster.core.models.Waste.WasteType;
 import it.unibo.wastemaster.core.utils.DateUtils;
 import it.unibo.wastemaster.core.utils.ValidateUtils;
 import it.unibo.wastemaster.core.AbstractDatabaseTest;
@@ -30,30 +29,30 @@ class RecurringScheduleManagerTest extends AbstractDatabaseTest {
         super.setUp();
         location = new Location("Via Roma", "10", "Bologna", "40100");
         customer = new Customer("Mario", "Rossi", location, "mario.rossi@example.com", "1234567890");
-        waste = new Waste(Waste.WasteType.GLASS, true, false);
+        waste = new Waste("glass", true, false);
+        wasteDAO.insert(waste);
         wasteSchedule = new WasteSchedule(waste, DayOfWeek.MONDAY);
         customerDAO.insert(customer);
-        wasteDAO.insert(waste);
         wasteScheduleDAO.insert(wasteSchedule);
     }
 
     @Test
     void testCreateRecurringSchedule() {
-        recurringScheduleManager.createRecurringSchedule(customer, WasteType.GLASS, dateUtils.getCurrentDate(),
+        recurringScheduleManager.createRecurringSchedule(customer, waste, dateUtils.getCurrentDate(),
                 Frequency.WEEKLY);
-        recurringScheduleManager.createRecurringSchedule(customer, WasteType.GLASS, dateUtils.getCurrentDate(),
+        recurringScheduleManager.createRecurringSchedule(customer, waste, dateUtils.getCurrentDate(),
                 Frequency.MONTHLY);
 
         List<RecurringSchedule> schedules = recurringScheduleDAO.findSchedulesByCustomer(customer);
         assertEquals(2, schedules.size());
 
         RecurringSchedule s1 = schedules.get(0);
-        assertEquals(WasteType.GLASS, s1.getWasteType());
+        assertEquals(waste, s1.getWaste());
         assertEquals(Frequency.WEEKLY, s1.getFrequency());
         assertNotNull(s1.getNextCollectionDate());
 
         RecurringSchedule s2 = schedules.get(1);
-        assertEquals(WasteType.GLASS, s2.getWasteType());
+        assertEquals(waste, s2.getWaste());
         assertEquals(Frequency.MONTHLY, s2.getFrequency());
         assertNotNull(s2.getNextCollectionDate());
     }
@@ -62,7 +61,7 @@ class RecurringScheduleManagerTest extends AbstractDatabaseTest {
     void testCalculateNextDate_FirstCollection() {
         LocalDate startDate = LocalDate.of(2025, 4, 24);
 
-        RecurringSchedule schedule = new RecurringSchedule(customer, WasteType.GLASS,
+        RecurringSchedule schedule = new RecurringSchedule(customer, waste,
                 startDate, Frequency.WEEKLY);
 
         LocalDate nextDate = recurringScheduleManager.calculateNextDate(schedule);
@@ -75,7 +74,7 @@ class RecurringScheduleManagerTest extends AbstractDatabaseTest {
     void testCalculateNextDate_MonthlyCollection() {
         LocalDate startDate = LocalDate.of(2025, 4, 24);
 
-        RecurringSchedule schedule = new RecurringSchedule(customer, WasteType.GLASS, startDate, Frequency.MONTHLY);
+        RecurringSchedule schedule = new RecurringSchedule(customer, waste, startDate, Frequency.MONTHLY);
 
         schedule.setNextCollectionDate(LocalDate.of(2025, 4, 28));
 
@@ -98,7 +97,7 @@ class RecurringScheduleManagerTest extends AbstractDatabaseTest {
 
         LocalDate startDate = LocalDate.of(2025, 4, 1);
 
-        RecurringSchedule schedule = new RecurringSchedule(customer, WasteType.GLASS, startDate, Frequency.WEEKLY);
+        RecurringSchedule schedule = new RecurringSchedule(customer, waste, startDate, Frequency.WEEKLY);
 
         schedule.setNextCollectionDate(LocalDate.of(2025, 4, 10));
 
@@ -113,7 +112,7 @@ class RecurringScheduleManagerTest extends AbstractDatabaseTest {
     @Test
     void testAlignToScheduledDay() {
         LocalDate startDate = LocalDate.of(2025, 4, 25);
-        RecurringSchedule schedule = new RecurringSchedule(customer, WasteType.GLASS, startDate, Frequency.WEEKLY);
+        RecurringSchedule schedule = new RecurringSchedule(customer, waste, startDate, Frequency.WEEKLY);
 
         LocalDate nextDate = recurringScheduleManager.calculateNextDate(schedule);
         LocalDate expectedDate = LocalDate.of(2025, 4, 28);
@@ -137,7 +136,7 @@ class RecurringScheduleManagerTest extends AbstractDatabaseTest {
         wasteDAO.insert(waste);
         wasteScheduleDAO.insert(new WasteSchedule(waste, DayOfWeek.MONDAY));
 
-        RecurringSchedule schedule = new RecurringSchedule(customer, WasteType.GLASS, startDate, Frequency.WEEKLY);
+        RecurringSchedule schedule = new RecurringSchedule(customer, waste, startDate, Frequency.WEEKLY);
         schedule.setNextCollectionDate(oldNextDate);
         schedule.setScheduleStatus(RecurringSchedule.ScheduleStatus.ACTIVE);
 

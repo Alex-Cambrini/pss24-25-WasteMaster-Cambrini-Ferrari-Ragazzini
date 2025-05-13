@@ -34,7 +34,7 @@ class OneTimeScheduleManagerTest extends AbstractDatabaseTest {
 
 		location = new Location("Via Milano", "22", "Modena", "41100");
 		customer = new Customer("Luca", "Verdi", location, "luca.verdi@example.com", "3334567890");
-		waste = new Waste(Waste.WasteType.PLASTIC, true, false);
+		waste = new Waste("plastic", true, false);
 
 		locationDAO.insert(location);
 		customerDAO.insert(customer);
@@ -49,10 +49,10 @@ class OneTimeScheduleManagerTest extends AbstractDatabaseTest {
 		LocalDate validDate = dateUtils.getCurrentDate().plusDays(3);
 
 		assertThrows(IllegalArgumentException.class, () -> {
-			oneTimeScheduleManager.createOneTimeSchedule(customer, Waste.WasteType.ORGANIC, invalidDate);
+			oneTimeScheduleManager.createOneTimeSchedule(customer, waste, invalidDate);
 		});
 
-		OneTimeSchedule newSchedule = oneTimeScheduleManager.createOneTimeSchedule(customer, Waste.WasteType.ORGANIC,
+		OneTimeSchedule newSchedule = oneTimeScheduleManager.createOneTimeSchedule(customer, waste,
 				validDate);
 		assertNotNull(newSchedule);
 		assertEquals(newSchedule.getScheduleStatus(), ScheduleStatus.ACTIVE);
@@ -67,7 +67,7 @@ class OneTimeScheduleManagerTest extends AbstractDatabaseTest {
 		LocalDate oldDate = dateUtils.getCurrentDate().plusDays(5);
 		LocalDate newDate = oldDate.plusDays(3);
 
-		OneTimeSchedule schedule = new OneTimeSchedule(customer, Waste.WasteType.PLASTIC, oldDate);
+		OneTimeSchedule schedule = new OneTimeSchedule(customer, waste, oldDate);
 		ValidateUtils.validateEntity(schedule);
 		oneTimeScheduleDAO.insert(schedule);
 		collectionManager.generateOneTimeCollection(schedule);
@@ -81,20 +81,21 @@ class OneTimeScheduleManagerTest extends AbstractDatabaseTest {
 	}
 
 	@Test
-	void testUpdateWasteTypeOneTimeSchedule() {
+	void testUpdateWasteOneTimeSchedule() {
 		LocalDate date = dateUtils.getCurrentDate().plusDays(5);
-
-		OneTimeSchedule schedule = new OneTimeSchedule(customer, Waste.WasteType.PLASTIC, date);
+		OneTimeSchedule schedule = new OneTimeSchedule(customer, waste, date);
 		ValidateUtils.validateEntity(schedule);
 		oneTimeScheduleDAO.insert(schedule);
+		
 		collectionManager.generateOneTimeCollection(schedule);
-
-		boolean result = oneTimeScheduleManager.updateWasteTypeOneTimeSchedule(schedule, Waste.WasteType.GLASS);
+		Waste glass = new Waste("glass", true, false);
+		wasteDAO.insert(glass);
+		boolean result = oneTimeScheduleManager.updateWasteOneTimeSchedule(schedule, glass);
 		assertTrue(result);
 
 		Collection updated = collectionDAO.findAll().get(0);
-		assertEquals(Waste.WasteType.GLASS, updated.getWaste());
-		assertEquals(Waste.WasteType.GLASS, schedule.getWasteType());
+		assertEquals(glass, updated.getWaste());
+		assertEquals(glass, schedule.getWaste());
 	}
 
 	@Test
@@ -102,7 +103,7 @@ class OneTimeScheduleManagerTest extends AbstractDatabaseTest {
 		LocalDate oldDate = dateUtils.getCurrentDate().plusDays(1);
 		LocalDate newDate = oldDate.plusDays(3);
 
-		OneTimeSchedule schedule = new OneTimeSchedule(customer, Waste.WasteType.PLASTIC, oldDate);
+		OneTimeSchedule schedule = new OneTimeSchedule(customer, waste, oldDate);
 		ValidateUtils.validateEntity(schedule);
 		oneTimeScheduleDAO.insert(schedule);
 		collectionManager.generateOneTimeCollection(schedule);
@@ -120,20 +121,20 @@ class OneTimeScheduleManagerTest extends AbstractDatabaseTest {
 			oneTimeScheduleManager.updateStatusOneTimeSchedule(null, ScheduleStatus.ACTIVE)
 		);
 
-		OneTimeSchedule s0 = new OneTimeSchedule(customer, Waste.WasteType.GLASS, validDate);
+		OneTimeSchedule s0 = new OneTimeSchedule(customer, waste, validDate);
 		ValidateUtils.validateEntity(s0);
 		assertThrows(IllegalArgumentException.class, () ->
 			oneTimeScheduleManager.updateStatusOneTimeSchedule(s0, null)
 		);
 	
 		// 2) Already CANCELLED → false
-		OneTimeSchedule s2 = new OneTimeSchedule(customer, Waste.WasteType.PLASTIC, validDate);
+		OneTimeSchedule s2 = new OneTimeSchedule(customer, waste, validDate);
 		ValidateUtils.validateEntity(s2);
 		s2.setScheduleStatus(ScheduleStatus.CANCELLED);
 		assertFalse(oneTimeScheduleManager.updateStatusOneTimeSchedule(s2, ScheduleStatus.ACTIVE));
 			
 		// 3) ACTIVE → PAUSED
-		OneTimeSchedule s3 = oneTimeScheduleManager.createOneTimeSchedule(customer, Waste.WasteType.ORGANIC, validDate);
+		OneTimeSchedule s3 = oneTimeScheduleManager.createOneTimeSchedule(customer, waste, validDate);
 		assertTrue(oneTimeScheduleManager.updateStatusOneTimeSchedule(s3, ScheduleStatus.PAUSED));
 
 		Collection c3 = collectionManager.getCancelledCollectionsOneTimeSchedule(s3).stream().findFirst().orElse(null);		
@@ -150,7 +151,7 @@ class OneTimeScheduleManagerTest extends AbstractDatabaseTest {
 	void testCancelFail() {
 		LocalDate date = dateUtils.getCurrentDate().plusDays(1);
 
-		OneTimeSchedule schedule = new OneTimeSchedule(customer, Waste.WasteType.PLASTIC, date);
+		OneTimeSchedule schedule = new OneTimeSchedule(customer, waste, date);
 		ValidateUtils.validateEntity(schedule);
 		oneTimeScheduleDAO.insert(schedule);
 		collectionManager.generateOneTimeCollection(schedule);
