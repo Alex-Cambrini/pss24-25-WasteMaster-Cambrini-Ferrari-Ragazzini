@@ -13,10 +13,9 @@ import it.unibo.wastemaster.core.dao.OneTimeScheduleDAO;
 import it.unibo.wastemaster.core.dao.RecurringScheduleDAO;
 import it.unibo.wastemaster.core.dao.TripDAO;
 import it.unibo.wastemaster.core.dao.VehicleDAO;
+import it.unibo.wastemaster.core.dao.WasteDAO;
 import it.unibo.wastemaster.core.dao.WasteScheduleDAO;
 import it.unibo.wastemaster.core.models.Location;
-import it.unibo.wastemaster.core.models.Trip;
-import it.unibo.wastemaster.core.models.Waste;
 import it.unibo.wastemaster.core.services.CollectionManager;
 import it.unibo.wastemaster.core.services.CustomerManager;
 import it.unibo.wastemaster.core.services.EmployeeManager;
@@ -35,7 +34,7 @@ public abstract class AbstractDatabaseTest {
     protected EntityManager em;
 
     protected GenericDAO<Location> locationDAO;
-    protected GenericDAO<Waste> wasteDAO;
+    protected WasteDAO wasteDAO;
     protected CollectionDAO collectionDAO;
     protected CustomerDAO customerDAO;
     protected EmployeeDAO employeeDAO;
@@ -68,7 +67,7 @@ public void setUp() {
     em = emf.createEntityManager();
     dateUtils = new DateUtils();
 
-    wasteDAO              = new GenericDAO<>(em, Waste.class);
+    wasteDAO              = new WasteDAO(em);
     locationDAO           = new GenericDAO<>(em, Location.class);
     customerDAO           = new CustomerDAO(em);
     employeeDAO           = new EmployeeDAO(em);

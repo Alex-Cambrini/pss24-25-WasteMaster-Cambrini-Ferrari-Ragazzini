@@ -21,7 +21,7 @@ class WasteScheduleManagerTest extends AbstractDatabaseTest {
         super.setUp();
         em.getTransaction().begin();
 
-        waste = new Waste(Waste.WasteType.PLASTIC, true, false);
+        waste = new Waste("plastic", true, false);
         wasteDAO.insert(waste);
 
         wasteScheduleManager = new WasteScheduleManager(wasteScheduleDAO);
@@ -37,7 +37,7 @@ class WasteScheduleManagerTest extends AbstractDatabaseTest {
 
         assertTrue(schedule.getScheduleId() > 0);
 
-        WasteSchedule found = wasteScheduleDAO.findByWasteType(Waste.WasteType.PLASTIC);
+        WasteSchedule found = wasteScheduleDAO.findSchedulebyWaste(waste);
         assertNotNull(found);
         assertEquals(DayOfWeek.MONDAY, found.getDayOfWeek());
     }
@@ -53,32 +53,33 @@ class WasteScheduleManagerTest extends AbstractDatabaseTest {
 
         assertEquals(waste, updated.getWaste());
 
-        WasteSchedule found = wasteScheduleDAO.findByWasteType(Waste.WasteType.PLASTIC);
+        WasteSchedule found = wasteScheduleDAO.findSchedulebyWaste(waste);
         assertEquals(DayOfWeek.FRIDAY, found.getDayOfWeek());
     }
 
     @Test
-    void testGetWasteScheduleForWaste() {
+    void testgetWasteScheduleByWaste() {
         wasteScheduleManager.setupCollectionRoutine(waste, DayOfWeek.TUESDAY);
 
-        WasteSchedule found = wasteScheduleManager.getWasteScheduleForWaste(Waste.WasteType.PLASTIC);
+        WasteSchedule found = wasteScheduleManager.getWasteScheduleByWaste(waste);
 
         assertNotNull(found);
         assertEquals(DayOfWeek.TUESDAY, found.getDayOfWeek());
     }
 
     @Test
-    void testGetWasteScheduleForWaste_NullInput() {
+    void testgetWasteScheduleByWaste_NullInput() {
         Exception ex = assertThrows(IllegalArgumentException.class, () -> {
-            wasteScheduleManager.getWasteScheduleForWaste(null);
+            wasteScheduleManager.getWasteScheduleByWaste(null);
         });
         assertTrue(ex.getMessage().contains("WasteType cannot be null"));
     }
 
     @Test
-    void testGetWasteScheduleForWaste_NotFound() {
+    void testgetWasteScheduleByWaste_NotFound() {
+        Waste glass = new Waste("glass", true, false);
         Exception ex = assertThrows(IllegalStateException.class, () -> {
-            wasteScheduleManager.getWasteScheduleForWaste(Waste.WasteType.GLASS);
+            wasteScheduleManager.getWasteScheduleByWaste(glass);
         });
         assertTrue(ex.getMessage().contains("No WasteSchedule found for waste type"));
     }

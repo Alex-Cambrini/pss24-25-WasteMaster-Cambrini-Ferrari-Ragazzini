@@ -22,8 +22,8 @@ public class WasteScheduleDAOTest extends AbstractDatabaseTest {
     @BeforeEach
     public void setUp() {
         super.setUp();
-        plastic = new Waste(Waste.WasteType.PLASTIC, true, false);
-        paper = new Waste(Waste.WasteType.PAPER, true, false);
+        plastic = new Waste("plastic", true, false);
+        paper = new Waste("paper", true, false);
 
         plasticSchedule = new WasteSchedule(plastic, DayOfWeek.MONDAY);
         paperSchedule = new WasteSchedule(paper, DayOfWeek.WEDNESDAY);
@@ -36,15 +36,15 @@ public class WasteScheduleDAOTest extends AbstractDatabaseTest {
 
     @Test
     void testFindByWasteType() {
-        WasteSchedule resultPlastic = wasteScheduleDAO.findByWasteType(Waste.WasteType.PLASTIC);
+        WasteSchedule resultPlastic = wasteScheduleDAO.findSchedulebyWaste(plastic);
         assertNotNull(resultPlastic);
         assertEquals(plasticSchedule.getScheduleId(), resultPlastic.getScheduleId());
-        assertEquals(Waste.WasteType.PLASTIC, resultPlastic.getWaste().getType());
+        assertEquals(plastic, resultPlastic.getWaste());
 
-        WasteSchedule resultPaper = wasteScheduleDAO.findByWasteType(Waste.WasteType.PAPER);
+        WasteSchedule resultPaper = wasteScheduleDAO.findSchedulebyWaste(paper);
         assertNotNull(resultPaper);
         assertEquals(paperSchedule.getScheduleId(), resultPaper.getScheduleId());
-        assertEquals(Waste.WasteType.PAPER, resultPaper.getWaste().getType());
+        assertEquals(paper, resultPaper.getWaste());
     }
 
 }

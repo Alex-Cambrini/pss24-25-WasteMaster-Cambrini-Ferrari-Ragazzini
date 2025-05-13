@@ -23,6 +23,7 @@ import it.unibo.wastemaster.core.models.Waste;
 
 public class CollectionManagerTest extends AbstractDatabaseTest {
     private Customer customer;
+    private Waste plastic;
     private OneTimeSchedule oneTimeSchedule;
     private RecurringSchedule recurringSchedule;
 
@@ -33,11 +34,14 @@ public class CollectionManagerTest extends AbstractDatabaseTest {
         Location location = new Location("Via Roma", "10", "Bologna", "40100");
         customer = new Customer("Mario", "Rossi", location, "mario.rossi@example.com", "1234567890");
         LocalDate futureDate = dateUtils.getCurrentDate().plusDays(3);
+        plastic = new Waste("PLASTICA", true, false);
+        
 
         em.getTransaction().begin();
+        wasteDAO.insert(plastic);
         customerDAO.insert(customer);
 
-        oneTimeSchedule = new OneTimeSchedule(customer, Waste.WasteType.PLASTIC, futureDate);
+        oneTimeSchedule = new OneTimeSchedule(customer, plastic, futureDate);
         oneTimeSchedule.setScheduleStatus(Schedule.ScheduleStatus.PAUSED);
 
         oneTimeScheduleDAO.insert(oneTimeSchedule);
@@ -45,7 +49,7 @@ public class CollectionManagerTest extends AbstractDatabaseTest {
         Collection collection = new Collection(oneTimeSchedule);
         collectionDAO.insert(collection);
 
-        recurringSchedule = new RecurringSchedule(customer, Waste.WasteType.GLASS, futureDate,
+        recurringSchedule = new RecurringSchedule(customer, plastic, futureDate,
                 RecurringSchedule.Frequency.WEEKLY);
         recurringSchedule.setScheduleStatus(Schedule.ScheduleStatus.ACTIVE);
         recurringSchedule.setNextCollectionDate(futureDate);
@@ -62,7 +66,7 @@ public class CollectionManagerTest extends AbstractDatabaseTest {
     public void testGenerateCollection() {
 
         LocalDate futureDate = dateUtils.getCurrentDate().plusDays(5);
-        OneTimeSchedule futureSchedule = new OneTimeSchedule(customer, Waste.WasteType.PAPER, futureDate);
+        OneTimeSchedule futureSchedule = new OneTimeSchedule(customer, plastic, futureDate);
         futureSchedule.setScheduleStatus(Schedule.ScheduleStatus.ACTIVE);
 
         oneTimeScheduleDAO.insert(futureSchedule);
@@ -70,7 +74,7 @@ public class CollectionManagerTest extends AbstractDatabaseTest {
         collectionManager.generateCollection(futureSchedule);
 
         LocalDate pastDate = dateUtils.getCurrentDate().minusDays(2);
-        OneTimeSchedule pastSchedule = new OneTimeSchedule(customer, Waste.WasteType.GLASS, pastDate);
+        OneTimeSchedule pastSchedule = new OneTimeSchedule(customer, plastic, pastDate);
         pastSchedule.setScheduleStatus(Schedule.ScheduleStatus.ACTIVE);
 
         collectionManager.generateCollection(pastSchedule);
@@ -81,7 +85,7 @@ public class CollectionManagerTest extends AbstractDatabaseTest {
     @Test
     public void testGenerateOneTimeCollection() {
         LocalDate futureDate = dateUtils.getCurrentDate().plusDays(7);
-        OneTimeSchedule futureSchedule = new OneTimeSchedule(customer, Waste.WasteType.PAPER, futureDate);
+        OneTimeSchedule futureSchedule = new OneTimeSchedule(customer, plastic, futureDate);
         futureSchedule.setScheduleStatus(Schedule.ScheduleStatus.ACTIVE);
 
         oneTimeScheduleDAO.insert(futureSchedule);
@@ -102,7 +106,7 @@ public class CollectionManagerTest extends AbstractDatabaseTest {
 
         List<Collection> collections = collectionDAO.findAll();
         assertEquals(2, collections.size());
-        assertEquals(Waste.WasteType.GLASS, collections.get(1).getSchedule().getWasteType());
+        assertEquals(plastic, collections.get(1).getSchedule().getWaste());
     }
 
     @Test
@@ -121,7 +125,7 @@ public class CollectionManagerTest extends AbstractDatabaseTest {
     @Test
     public void testGetActiveCollectionByOneTimeSchedule() {
         LocalDate date = dateUtils.getCurrentDate().plusDays(3);
-        OneTimeSchedule schedule = oneTimeScheduleManager.createOneTimeSchedule(customer, Waste.WasteType.GLASS, date);
+        OneTimeSchedule schedule = oneTimeScheduleManager.createOneTimeSchedule(customer, plastic, date);
 
         Collection active = collectionManager.getActiveCollectionByOneTimeSchedule(schedule);
         assertNotNull(active);
@@ -137,7 +141,7 @@ public class CollectionManagerTest extends AbstractDatabaseTest {
 @Test
 public void testGetCancelledCollectionsOneTimeSchedule() {
     LocalDate date = dateUtils.getCurrentDate().plusDays(3);
-    OneTimeSchedule schedule = oneTimeScheduleManager.createOneTimeSchedule(customer, Waste.WasteType.GLASS, date);
+    OneTimeSchedule schedule = oneTimeScheduleManager.createOneTimeSchedule(customer, plastic, date);
 
     List<Collection> cancelledBefore = collectionManager.getCancelledCollectionsOneTimeSchedule(schedule);
     assertTrue(cancelledBefore.isEmpty());

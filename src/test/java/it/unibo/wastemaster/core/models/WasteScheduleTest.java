@@ -14,24 +14,24 @@ import java.util.Set;
 
 class WasteScheduleTest extends AbstractDatabaseTest {
 
-	private Waste waste;
+	private Waste plastic;
 	private WasteSchedule schedule;
 
 	@BeforeEach
 	public void setUp() {
 		super.setUp();
-		waste = new Waste(Waste.WasteType.PLASTIC, true, false);
-		schedule = new WasteSchedule(waste, DayOfWeek.FRIDAY);
+		plastic = new Waste("plastic", true, false);
+		schedule = new WasteSchedule(plastic, DayOfWeek.FRIDAY);
 	}
 
 	@Test
 	public void testGetterAndSetter() {
-		assertEquals(waste, schedule.getWaste());
+		assertEquals(plastic, schedule.getWaste());
 		assertEquals(DayOfWeek.FRIDAY, schedule.getDayOfWeek());
 
-		Waste newWaste = new Waste(Waste.WasteType.GLASS, false, false);
-		schedule.setWaste(newWaste);
-		assertEquals(newWaste, schedule.getWaste());
+		Waste glass = new Waste("glass", false, false);
+		schedule.setWaste(glass);
+		assertEquals(glass, schedule.getWaste());
 
 		schedule.setDayOfWeek(DayOfWeek.SUNDAY);
 		assertEquals(DayOfWeek.SUNDAY, schedule.getDayOfWeek());
@@ -55,25 +55,16 @@ class WasteScheduleTest extends AbstractDatabaseTest {
 
 	@Test
 	public void testPersistence() {
-		wasteDAO.insert(waste);
+		wasteDAO.insert(plastic);
 		wasteScheduleDAO.insert(schedule);
 		int ScheduleId = schedule.getScheduleId();
 		WasteSchedule found = wasteScheduleDAO.findById(ScheduleId);
 		assertNotNull(found);
-		assertEquals(waste.getType(), found.getWaste().getType());
+		assertEquals(plastic, found.getWaste());
 		assertEquals(schedule.getDayOfWeek(), found.getDayOfWeek());
 
 		wasteScheduleDAO.delete(found);
 		WasteSchedule deleted = wasteScheduleDAO.findById(ScheduleId);
 		assertNull(deleted);
-	}
-
-	@Test
-	public void testToString() {
-		String result = schedule.toString();
-		assertNotNull(result);
-		assertTrue(result.contains("WasteSchedule {"));
-		assertTrue(result.contains("Day: " + schedule.getDayOfWeek().name()));
-		assertTrue(result.contains("Waste: " + waste.toString()));
 	}
 }

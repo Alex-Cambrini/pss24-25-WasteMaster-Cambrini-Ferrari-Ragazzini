@@ -16,16 +16,19 @@ class RecurringScheduleTest extends AbstractDatabaseTest {
 
     private Customer customer;
     private Location location;
+    private Waste plastic;
     private LocalDate startDate;
     private RecurringSchedule schedule;
+
 
     @BeforeEach
     public void setUp() {
         super.setUp();
         location = new Location("Via Roma", "1", "Milano", "20100");
         customer = new Customer("Mario", "Rossi", location, "mario@rossi.com", "1234567890");
+        plastic = new Waste("PLASTICA", true, false);
         startDate = LocalDate.now();
-        schedule = new RecurringSchedule(customer, Waste.WasteType.PLASTIC, startDate,
+        schedule = new RecurringSchedule(customer, plastic, startDate,
                 RecurringSchedule.Frequency.WEEKLY);
         schedule.setScheduleStatus(RecurringSchedule.ScheduleStatus.ACTIVE);
     }
@@ -33,7 +36,7 @@ class RecurringScheduleTest extends AbstractDatabaseTest {
     @Test
     void testRecurringScheduleGettersAndSetters() {
         assertEquals(customer, schedule.getCustomer());
-        assertEquals(Waste.WasteType.PLASTIC, schedule.getWasteType());
+        assertEquals(plastic, schedule.getWaste());
         assertEquals(Schedule.ScheduleStatus.ACTIVE, schedule.getScheduleStatus());
         assertEquals(startDate, schedule.getStartDate());
         assertEquals(RecurringSchedule.Frequency.WEEKLY, schedule.getFrequency());
@@ -58,7 +61,7 @@ class RecurringScheduleTest extends AbstractDatabaseTest {
         invalid.setStartDate(LocalDate.now().minusDays(1));
         invalid.setFrequency(null);
         invalid.setCustomer(null);
-        invalid.setWasteType(null);
+        invalid.setWaste(null);
         invalid.setScheduleStatus(null);
 
         Set<ConstraintViolation<RecurringSchedule>> violations = ValidateUtils.VALIDATOR.validate(invalid);
@@ -81,6 +84,7 @@ class RecurringScheduleTest extends AbstractDatabaseTest {
     @Test
     void testRecurringSchedulePersistence() {
         customerDAO.insert(customer);
+        wasteDAO.insert(plastic);
         recurringScheduleDAO.insert(schedule);
         int scheduleId = schedule.getScheduleId();
         RecurringSchedule found = recurringScheduleDAO.findById(scheduleId);
@@ -99,7 +103,7 @@ class RecurringScheduleTest extends AbstractDatabaseTest {
         assertNotNull(result);
         assertTrue(result.contains("RECURRING Schedule"));
         assertTrue(result.contains(customer.getName()));
-        assertTrue(result.contains(Waste.WasteType.PLASTIC.name()));
+        assertTrue(result.contains(plastic.getWasteName()));
         assertTrue(result.contains(schedule.getStartDate().toString()));
     }
 

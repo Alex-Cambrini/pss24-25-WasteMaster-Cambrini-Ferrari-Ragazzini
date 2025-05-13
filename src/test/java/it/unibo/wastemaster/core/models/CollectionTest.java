@@ -21,7 +21,7 @@ class CollectionTest extends AbstractDatabaseTest {
     private Location location;
     private Customer customer;
     private LocalDate date;
-    private Waste.WasteType wasteType;
+    private Waste plastic;
     private Collection collection;
     private OneTimeSchedule schedule;
 
@@ -32,23 +32,24 @@ class CollectionTest extends AbstractDatabaseTest {
         customer = new Customer("Mario", "Rossi", location, "mario.rossi@example.com", "1234567890");
 
         date = dateUtils.getCurrentDate();
-        wasteType = Waste.WasteType.PLASTIC;
+        plastic = new Waste("PLASTICA", true, false);
 
-        schedule = new OneTimeSchedule(customer, wasteType, date);
+        schedule = new OneTimeSchedule(customer, plastic, date);
         collection = new Collection(schedule);
     }
 
     @Test
     void testCollectionGettersAndSetters() {
         collection = new Collection(schedule);
+        Waste glass = new Waste("VETRO", true, false);
         collection.setCollectionDate(date);
         collection.setCollectionStatus(Collection.CollectionStatus.COMPLETED);
         collection.setCancelLimitDays(5);
-        collection.setWaste(Waste.WasteType.GLASS);
+        collection.setWaste(glass);
 
         assertEquals(customer, collection.getCustomer());
         assertEquals(date, collection.getCollectionDate());
-        assertEquals(Waste.WasteType.GLASS, collection.getWaste());
+        assertEquals(glass, collection.getWaste());
         assertEquals(Collection.CollectionStatus.COMPLETED, collection.getCollectionStatus());
         assertEquals(5, collection.getCancelLimitDays());
         assertEquals(schedule, collection.getSchedule());
@@ -63,7 +64,7 @@ class CollectionTest extends AbstractDatabaseTest {
         assertTrue(toStringOutput.contains("ID: " + collection.getCollectionId()));
         assertTrue(toStringOutput.contains(collection.getCustomer().getName()));
         assertTrue(toStringOutput.contains(collection.getCollectionDate().toString()));
-        assertTrue(toStringOutput.contains(collection.getWaste().name()));
+        assertTrue(toStringOutput.contains(collection.getWaste().getWasteName()));
         assertTrue(toStringOutput.contains(collection.getCollectionStatus().name()));
         assertTrue(toStringOutput.contains(String.valueOf(Collection.CANCEL_LIMIT_DAYS)));
         assertTrue(toStringOutput.contains(String.valueOf(schedule.getScheduleId())));
@@ -74,6 +75,7 @@ class CollectionTest extends AbstractDatabaseTest {
     void testPersistence() {
         em.getTransaction().begin();
         customerDAO.insert(customer);
+        wasteDAO.insert(plastic);
         oneTimeScheduleDAO.insert(schedule);
         collectionDAO.insert(collection);
 
