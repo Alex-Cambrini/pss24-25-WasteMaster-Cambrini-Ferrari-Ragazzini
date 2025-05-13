@@ -182,10 +182,18 @@ public class Vehicle {
         this.vehicleStatus = vehicleStatus;
     }
 
-    public String getInfo() {
+    @Override
+    public String toString() {
         return String.format(
-                "Vehicle Info: Brand: %s, Model: %s, Registration year: %d, Plate: %s, Licence: %s, Capacity: %d persons, Status: %s, Last Maintenance: %s, Next Maintenance: %s",
-                brand, model, registrationYear, plate, licenceType, getCapacity(), vehicleStatus, lastMaintenanceDate,
-                nextMaintenanceDate);
+                "Vehicle {Plate: %s, Brand: %s, Model: %s, Year: %d, Licence: %s, Capacity: %d, Status: %s, LastMaint: %s, NextMaint: %s}",
+                plate != null ? plate : "N/A",
+                brand != null ? brand : "N/A",
+                model != null ? model : "N/A",
+                registrationYear,
+                licenceType != null ? licenceType.name() : "N/A",
+                getCapacity(),
+                vehicleStatus != null ? vehicleStatus.name() : "N/A",
+                lastMaintenanceDate != null ? lastMaintenanceDate.toString() : "N/A",
+                nextMaintenanceDate != null ? nextMaintenanceDate.toString() : "N/A");
     }
 }

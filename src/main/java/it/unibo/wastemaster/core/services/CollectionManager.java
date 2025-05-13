@@ -25,6 +25,14 @@ public class CollectionManager {
         return collectionDAO.findCollectionByStatus(status);
     }
 
+    public Collection getActiveCollectionByOneTimeSchedule(OneTimeSchedule schedule) {
+        return collectionDAO.findActiveCollectionByOneTimeSchedule(schedule);
+    }
+
+    public List<Collection> getCancelledCollectionsOneTimeSchedule(OneTimeSchedule schedule) {
+        return collectionDAO.findCancelledCollectionsOneTimeSchedule(schedule);
+    }
+
     public void generateCollection(Schedule schedule) {
         if (schedule.getCollectionDate().isAfter(dateUtils.getCurrentDate())) {
             Collection collection = new Collection(schedule);

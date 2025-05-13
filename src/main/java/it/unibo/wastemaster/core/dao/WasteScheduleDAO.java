@@ -13,11 +13,10 @@ public class WasteScheduleDAO extends GenericDAO<WasteSchedule> {
         super(entityManager, WasteSchedule.class);
     }
 
-
-    public WasteSchedule findByWasteType(Waste.WasteType wasteType) {
+    public WasteSchedule findSchedulebyWaste(Waste waste) {
         TypedQuery<WasteSchedule> query = entityManager.createQuery(
-                "SELECT ws FROM WasteSchedule ws WHERE ws.waste.type = :wasteType", WasteSchedule.class);
-        query.setParameter("wasteType", wasteType);
+                "SELECT ws FROM WasteSchedule ws WHERE ws.waste.name = :wasteName", WasteSchedule.class);
+        query.setParameter("wasteName", waste.getWasteName());
 
         List<WasteSchedule> result = query.setMaxResults(1).getResultList();
         if (result.isEmpty()) {
@@ -26,4 +25,5 @@ public class WasteScheduleDAO extends GenericDAO<WasteSchedule> {
             return result.get(0);
         }
     }
+
 }

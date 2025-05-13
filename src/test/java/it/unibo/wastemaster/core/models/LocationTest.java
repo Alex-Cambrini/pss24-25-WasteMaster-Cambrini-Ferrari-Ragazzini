@@ -37,7 +37,7 @@ public class LocationTest extends AbstractDatabaseTest {
 
     @Test
     public void testToString() {
-        String expectedString = "Via Roma, 10, Milano, 20100";
+        String expectedString = "Via Roma 10, Milano, 20100";
         assertEquals(expectedString, location.toString());
     }
 

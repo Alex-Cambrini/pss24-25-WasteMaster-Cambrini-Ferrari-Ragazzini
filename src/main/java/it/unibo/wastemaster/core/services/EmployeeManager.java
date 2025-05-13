@@ -4,11 +4,11 @@ import it.unibo.wastemaster.core.dao.EmployeeDAO;
 import it.unibo.wastemaster.core.models.Employee;
 import it.unibo.wastemaster.core.utils.ValidateUtils;
 
-public class EmployeManager {
+public class EmployeeManager {
 
     private EmployeeDAO employeeDAO;
 
-    public EmployeManager(EmployeeDAO employeeDAO) {
+    public EmployeeManager(EmployeeDAO employeeDAO) {
         this.employeeDAO = employeeDAO;
     }
 

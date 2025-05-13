@@ -24,18 +24,19 @@ public class RecurringScheduleDAOTest extends AbstractDatabaseTest {
     private Location location2;
     private Customer customer1;
     private Customer customer2;
+    private Waste waste;
     RecurringSchedule recurringSchedule1;
     RecurringSchedule recurringSchedule2;
     RecurringSchedule recurringSchedule3;
     RecurringSchedule recurringSchedule4;
     private LocalDate date;
-    private Waste.WasteType wasteType;
+
 
     @BeforeEach
     public void setUp() {
         super.setUp();
         date = dateUtils.getCurrentDate();
-        wasteType = Waste.WasteType.PLASTIC;
+        waste = new Waste("PLASTICA", true, false);
 
         location1 = new Location("Via Roma", "10", "Bologna", "40100");
         location2 = new Location("Via Milano", "32", "Torino", "80700");
@@ -43,28 +44,28 @@ public class RecurringScheduleDAOTest extends AbstractDatabaseTest {
         customer2 = new Customer("Luca", "Verdi", location2, "luca.verdi@example.com", "1234567890");
 
         em.getTransaction().begin();
-
+        wasteDAO.insert(waste);
         customerDAO.insert(customer1);
         customerDAO.insert(customer2);
 
-        recurringSchedule1 = new RecurringSchedule(customer1, wasteType, date,
+        recurringSchedule1 = new RecurringSchedule(customer1, waste, date,
                 RecurringSchedule.Frequency.WEEKLY);
-        recurringSchedule1.setStatus(RecurringSchedule.ScheduleStatus.ACTIVE);
+        recurringSchedule1.setScheduleStatus(RecurringSchedule.ScheduleStatus.ACTIVE);
         recurringSchedule1.setNextCollectionDate(date.plusDays(1));
 
-        recurringSchedule2 = new RecurringSchedule(customer1, wasteType, date.plusDays(1),
+        recurringSchedule2 = new RecurringSchedule(customer1, waste, date.plusDays(1),
                 RecurringSchedule.Frequency.MONTHLY);
-        recurringSchedule2.setStatus(RecurringSchedule.ScheduleStatus.ACTIVE);
+        recurringSchedule2.setScheduleStatus(RecurringSchedule.ScheduleStatus.ACTIVE);
         recurringSchedule2.setNextCollectionDate(date.minusDays(1));
 
-        recurringSchedule3 = new RecurringSchedule(customer1, wasteType, date.plusDays(2),
+        recurringSchedule3 = new RecurringSchedule(customer1, waste, date.plusDays(2),
                 RecurringSchedule.Frequency.WEEKLY);
-        recurringSchedule3.setStatus(RecurringSchedule.ScheduleStatus.CANCELLED);
+        recurringSchedule3.setScheduleStatus(RecurringSchedule.ScheduleStatus.CANCELLED);
         recurringSchedule3.setNextCollectionDate(date.minusDays(2));
 
-        recurringSchedule4 = new RecurringSchedule(customer2, wasteType, date.plusDays(3),
+        recurringSchedule4 = new RecurringSchedule(customer2, waste, date.plusDays(3),
                 RecurringSchedule.Frequency.MONTHLY);
-        recurringSchedule4.setStatus(RecurringSchedule.ScheduleStatus.ACTIVE);
+        recurringSchedule4.setScheduleStatus(RecurringSchedule.ScheduleStatus.ACTIVE);
         recurringSchedule4.setNextCollectionDate(date.minusDays(5));
 
         recurringScheduleDAO.insert(recurringSchedule1);
@@ -135,9 +136,9 @@ public class RecurringScheduleDAOTest extends AbstractDatabaseTest {
 
     @Test
     void testNoResult() {
-        recurringSchedule1.setStatus(RecurringSchedule.ScheduleStatus.CANCELLED);
-        recurringSchedule2.setStatus(RecurringSchedule.ScheduleStatus.CANCELLED);
-        recurringSchedule4.setStatus(RecurringSchedule.ScheduleStatus.CANCELLED);
+        recurringSchedule1.setScheduleStatus(RecurringSchedule.ScheduleStatus.CANCELLED);
+        recurringSchedule2.setScheduleStatus(RecurringSchedule.ScheduleStatus.CANCELLED);
+        recurringSchedule4.setScheduleStatus(RecurringSchedule.ScheduleStatus.CANCELLED);
 
         recurringScheduleDAO.update(recurringSchedule1);
         recurringScheduleDAO.update(recurringSchedule2);

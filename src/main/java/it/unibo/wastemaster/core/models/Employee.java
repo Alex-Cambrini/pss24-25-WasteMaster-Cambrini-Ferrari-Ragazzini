@@ -16,7 +16,7 @@ public class Employee extends Person {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int employeeId;
+    private Integer employeeId;
 
     @NotNull (message = "Role cannot be null")
     @Enumerated(EnumType.STRING)
@@ -83,12 +83,16 @@ public class Employee extends Person {
 	}
 
     @Override
-    public String getInfo() {
-        return String.format("%s, EmployeeId: %d, Role: %s, Licence: %s",
-            super.getInfo(),
-            employeeId,
-            role,
-            licenceType != null ? licenceType : "N/A"
-        );
+    public String toString() {
+        return String.format(
+                "Employee {ID: %d, Name: %s %s, Email: %s, Phone: %s, Location: %s, Role: %s, Licence: %s}",
+                employeeId,
+                getName(),
+                getSurname(),
+                getEmail(),
+                getPhone(),
+                getLocation() != null ? getLocation().toString() : "N/A",
+                role,
+                licenceType);
     }
 }

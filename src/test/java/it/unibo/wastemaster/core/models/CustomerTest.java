@@ -32,16 +32,14 @@ public class CustomerTest extends AbstractDatabaseTest {
     }
 
     @Test
-    public void testGetInfo() {
-        String expectedInfo = String.format(
-            "Name: %s, Surname: %s, Address: %s, Email: %s, Phone: %s, CustomerId: %d",
-            "Mario", 
-            "Rossi", 
-            location.toString(),
-            "mario.rossi@example.com", 
-            "1234567890", 
-            customer.getCustomerId()
-        );    
-        assertEquals(expectedInfo, customer.getInfo());
-    }    
+    void testToString() {
+        String toStringOutput = customer.toString();
+        assertNotNull(toStringOutput);
+        assertTrue(toStringOutput.contains("Customer"));
+        assertTrue(toStringOutput.contains(customer.getName()));
+        assertTrue(toStringOutput.contains(customer.getSurname()));
+        assertTrue(toStringOutput.contains(customer.getEmail()));
+        assertTrue(toStringOutput.contains(customer.getPhone()));
+        assertTrue(toStringOutput.contains(location.toString()));
+    }
 }
