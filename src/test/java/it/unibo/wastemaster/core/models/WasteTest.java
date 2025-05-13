@@ -38,13 +38,10 @@ class WasteTest extends AbstractDatabaseTest {
 
 	@Test
 	public void testToString() {
-		String expected = String.format(
-				"Waste {ID: %d, Type: %s, Recyclable: %s, Dangerous: %s}",
-				waste.getWasteId(),
-				waste.getType().name(),
-				waste.getIsRecyclable().toString(),
-				waste.getIsDangerous().toString());
-		assertEquals(expected, waste.toString());
+    String expected = "Waste Type: " + waste.getType() + "\n" +
+                      "Recyclable: " + (waste.getIsRecyclable() ? "Yes" : "No") + "\n" +
+                      "Dangerous: " + (waste.getIsDangerous() ? "Yes" : "No");
+    assertEquals(expected, waste.toString());
 	}
 
 	@Test
