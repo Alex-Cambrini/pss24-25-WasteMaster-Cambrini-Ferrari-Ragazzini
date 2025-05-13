@@ -10,12 +10,11 @@
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox alignment="TOP_CENTER" prefWidth="640.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1">
+<VBox alignment="TOP_CENTER" prefWidth="640.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.unibo.wastemaster.controller.schedule.ScheduleController">
     <children>
       <HBox alignment="TOP_CENTER" minHeight="40.0" prefHeight="40.0" prefWidth="600.0" spacing="10.0">
          <children>
-            <Button fx:id="addClientButton1" mnemonicParsing="false" onAction="#handleAddCustomer" text="Add One Time Schedule" />
-            <Button fx:id="addClientButton11" mnemonicParsing="false" onAction="#handleAddCustomer" text="Add Recurring Schedule" />
+            <Button fx:id="addScheduleButton" mnemonicParsing="false" onAction="#handleAddSchedule" text="Add Schedule" />
             <Region prefHeight="20" prefWidth="0.0" HBox.hgrow="ALWAYS" />
             <Button fx:id="filterButton" onMouseClicked="#showFilterMenu" text="Filter ▼" />
             <TextField fx:id="searchField" promptText="Search..." />
@@ -31,7 +30,7 @@
             <Insets right="20.0" />
          </padding>
       </HBox>
-        <TableView fx:id="customerTable" prefHeight="300.0" prefWidth="600.0" VBox.vgrow="ALWAYS">
+        <TableView fx:id="scheduleTable" prefHeight="300.0" prefWidth="600.0" VBox.vgrow="ALWAYS">
             <columns>
                 <TableColumn fx:id="nameColumn" prefWidth="100" text="Name" />
                 <TableColumn fx:id="surnameColumn" prefWidth="100" text="Surname" />
@@ -44,8 +43,8 @@
         </TableView>
         <HBox alignment="TOP_RIGHT" minHeight="50.0" prefHeight="100.0" prefWidth="600.0" spacing="10.0">
             <children>
-                <Button mnemonicParsing="false" onAction="#handleEditCustomer" text="Edit" />
-                <Button mnemonicParsing="false" onAction="#handleDeleteCustomer" text="Delete" />
+                <Button mnemonicParsing="false" onAction="#handleEditSchedule" text="Edit" />
+                <Button mnemonicParsing="false" onAction="#handleDeleteSchedule" text="Delete" />
             </children>
             <padding>
                 <Insets right="20.0" top="10.0" />
