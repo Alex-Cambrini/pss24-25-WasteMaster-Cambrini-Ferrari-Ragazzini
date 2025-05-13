@@ -11,7 +11,7 @@
               prefWidth="600.0"
               spacing="10.0">
             <children>
-                <Button fx:id="addClientButton" mnemonicParsing="false" onAction="#handleAddCustomer" text="Add Customer" />
+                <Button fx:id="addCustomerButton" mnemonicParsing="false" onAction="#handleAddCustomer" text="Add Customer" />
                 <Region prefHeight="20" prefWidth="0.0" HBox.hgrow="ALWAYS" />
                 <Button fx:id="filterButton" text="Filter ▼" onMouseClicked="#showFilterMenu" />
                 <TextField fx:id="searchField" promptText="Search..." />

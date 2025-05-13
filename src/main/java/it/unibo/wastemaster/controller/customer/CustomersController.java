@@ -34,7 +34,7 @@ public class CustomersController {
     private Button filterButton;
 
     @FXML
-    private Button addClientButton;
+    private Button addCustomerButton;
 
     @FXML
     private javafx.scene.control.TextField searchField;
