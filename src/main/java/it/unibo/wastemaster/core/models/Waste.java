@@ -2,8 +2,6 @@ package it.unibo.wastemaster.core.models;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -15,10 +13,9 @@ public class Waste {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int wasteId;
 
-    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     @NotNull(message = "Waste type must not be null")
-    private WasteType type;
+    private String name;
 
     @Column(nullable = false)
     @NotNull(message = "isRecyclable must not be null")
@@ -28,20 +25,12 @@ public class Waste {
     @NotNull(message = "isDangerous must not be null")
     private Boolean isDangerous;
 
-    public enum WasteType {
-        PLASTIC,
-        GLASS,
-        PAPER,
-        ORGANIC,
-        HAZARDOUS,
-        UNSORTED
-    }
 
     public Waste() {
     }
 
-    public Waste(WasteType type, Boolean isRecyclable, Boolean isDangerous) {
-        this.type = type;
+    public Waste(String name, Boolean isRecyclable, Boolean isDangerous) {
+        this.name = name;
         this.isRecyclable = isRecyclable;
         this.isDangerous = isDangerous;
     }
@@ -50,12 +39,12 @@ public class Waste {
         return wasteId;
     }
 
-    public WasteType getType() {
-        return type;
+    public String getWasteName() {
+        return name;
     }
 
-    public void setType(WasteType type) {
-        this.type = type;
+    public void setWasteName(String name) {
+        this.name = name;
     }
 
     public Boolean getIsRecyclable() {
@@ -76,7 +65,7 @@ public class Waste {
 
     @Override
     public String toString() {
-        return "Waste Type: " + type + "\n" +
+        return "Waste Type: " + name + "\n" +
                 "Recyclable: " + (isRecyclable ? "Yes" : "No") + "\n" +
                 "Dangerous: " + (isDangerous ? "Yes" : "No");
     }

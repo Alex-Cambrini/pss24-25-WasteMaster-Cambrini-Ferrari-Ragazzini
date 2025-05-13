@@ -33,9 +33,9 @@ public class RecurringScheduleManager {
         this.dateUtils = dateUtils;
     }
 
-    public void createRecurringSchedule(Customer customer, Waste.WasteType wasteType, LocalDate startDate,
+    public void createRecurringSchedule(Customer customer, Waste waste, LocalDate startDate,
             Frequency frequency) {
-        RecurringSchedule schedule = new RecurringSchedule(customer, wasteType, startDate, frequency);
+        RecurringSchedule schedule = new RecurringSchedule(customer, waste, startDate, frequency);
         LocalDate nextCollectionDate = calculateNextDate(schedule);
         schedule.setNextCollectionDate(nextCollectionDate);
         recurringScheduleDAO.insert(schedule);
@@ -43,9 +43,9 @@ public class RecurringScheduleManager {
     }
 
     protected LocalDate calculateNextDate(RecurringSchedule schedule) {
-        Waste.WasteType wasteType = schedule.getWasteType();
+        Waste waste = schedule.getWaste();
         RecurringSchedule.Frequency frequency = schedule.getFrequency();
-        WasteSchedule scheduleData = wasteScheduleManager.getWasteScheduleForWaste(wasteType);
+        WasteSchedule scheduleData = wasteScheduleManager.getWasteScheduleByWaste(waste);
         DayOfWeek scheduledDay = scheduleData.getDayOfWeek();
 
         LocalDate today = dateUtils.getCurrentDate();

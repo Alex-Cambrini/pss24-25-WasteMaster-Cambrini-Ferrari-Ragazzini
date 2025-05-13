@@ -22,12 +22,12 @@ public class OneTimeScheduleManager {
         this.collectionManager = collectionManager;
     }
 
-    public OneTimeSchedule createOneTimeSchedule(Customer customer, Waste.WasteType wasteType, LocalDate pickupDate) {
+    public OneTimeSchedule createOneTimeSchedule(Customer customer, Waste waste, LocalDate pickupDate) {
         if (!isDateValid(pickupDate, Collection.CANCEL_LIMIT_DAYS)) {
             throw new IllegalArgumentException(
                     "The pickup date must be at least " + Collection.CANCEL_LIMIT_DAYS + " days from now.");
         }
-        OneTimeSchedule schedule = new OneTimeSchedule(customer, wasteType, pickupDate);
+        OneTimeSchedule schedule = new OneTimeSchedule(customer, waste, pickupDate);
         oneTimeScheduleDAO.insert(schedule);
         collectionManager.generateOneTimeCollection(schedule);
         return schedule;
@@ -54,16 +54,16 @@ public class OneTimeScheduleManager {
         return false;
     }
 
-    public boolean updateWasteTypeOneTimeSchedule(OneTimeSchedule schedule, Waste.WasteType wasteType) {
+    public boolean updateWasteOneTimeSchedule(OneTimeSchedule schedule, Waste Waste) {
         Collection collection = collectionManager.getActiveCollectionByOneTimeSchedule(schedule);
         if (collection == null)
             return false;
 
         if (isDateValid(schedule.getPickupDate(), collection.getCancelLimitDays())) {
-            schedule.setWasteType(wasteType);
+            schedule.setWaste(Waste);
             oneTimeScheduleDAO.update(schedule);
 
-            collection.setWaste(wasteType);
+            collection.setWaste(Waste);
             collectionManager.updateCollection(collection);
             return true;
         }

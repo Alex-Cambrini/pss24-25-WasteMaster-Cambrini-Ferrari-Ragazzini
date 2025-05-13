@@ -19,8 +19,8 @@ public class OneTimeSchedule extends Schedule {
     public OneTimeSchedule() {
     }
 
-    public OneTimeSchedule(Customer customer, Waste.WasteType wasteType, LocalDate pickupDate) {
-        super(customer, wasteType);
+    public OneTimeSchedule(Customer customer, Waste waste, LocalDate pickupDate) {
+        super(customer, waste);
         this.pickupDate = pickupDate;
         this.setScheduleCategory(ScheduleCategory.ONE_TIME);
     }
