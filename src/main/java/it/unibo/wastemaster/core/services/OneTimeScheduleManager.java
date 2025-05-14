@@ -34,8 +34,8 @@ public class OneTimeScheduleManager {
     }
 
     private boolean isDateValid(LocalDate date, int limitDays) {
-        LocalDate today = new DateUtils().getCurrentDate();
-        return today.isBefore(date.minusDays(limitDays));
+        LocalDate minDate = new DateUtils().getCurrentDate().plusDays(limitDays);
+        return !date.isBefore(minDate);
     }
 
     public boolean updateDateOneTimeSchedule(OneTimeSchedule schedule, LocalDate newPickupDate) {
@@ -73,32 +73,32 @@ public class OneTimeScheduleManager {
     public boolean updateStatusOneTimeSchedule(OneTimeSchedule schedule, ScheduleStatus newStatus) {
         ValidateUtils.requireArgNotNull(schedule, "Schedule cannot be null");
         ValidateUtils.requireArgNotNull(newStatus, "New status cannot be null");
-        ValidateUtils.requireArgNotNull(schedule.getScheduleId(), "Schedule ID cannot be null");       
-    
+        ValidateUtils.requireArgNotNull(schedule.getScheduleId(), "Schedule ID cannot be null");
+
         if (schedule.getScheduleStatus() == ScheduleStatus.CANCELLED) {
             return false;
         }
-    
+
         if (schedule.getScheduleStatus() == ScheduleStatus.PAUSED && newStatus == ScheduleStatus.ACTIVE) {
             collectionManager.generateOneTimeCollection(schedule);
             return true;
         }
-    
+
         if (schedule.getScheduleStatus() == ScheduleStatus.ACTIVE
-            && (newStatus == ScheduleStatus.PAUSED || newStatus == ScheduleStatus.CANCELLED)) {
-    
-            Collection associatedCollection  = collectionManager.getActiveCollectionByOneTimeSchedule(schedule);
+                && (newStatus == ScheduleStatus.PAUSED || newStatus == ScheduleStatus.CANCELLED)) {
+
+            Collection associatedCollection = collectionManager.getActiveCollectionByOneTimeSchedule(schedule);
             ValidateUtils.requireArgNotNull(associatedCollection, "Associated collection not found");
-    
-            if (isDateValid(schedule.getPickupDate(), associatedCollection .getCancelLimitDays())) {
+
+            if (isDateValid(schedule.getPickupDate(), associatedCollection.getCancelLimitDays())) {
                 schedule.setScheduleStatus(newStatus);
                 oneTimeScheduleDAO.update(schedule);
                 associatedCollection.setCollectionStatus(CollectionStatus.CANCELLED);
-                collectionManager.updateCollection(associatedCollection );
+                collectionManager.updateCollection(associatedCollection);
                 return true;
             }
-        }    
+        }
         return false;
     }
-    
+
 }

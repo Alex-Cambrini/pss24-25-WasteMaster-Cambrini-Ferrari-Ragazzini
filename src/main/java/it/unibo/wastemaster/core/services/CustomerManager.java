@@ -1,5 +1,7 @@
 package it.unibo.wastemaster.core.services;
 
+import java.util.List;
+
 import it.unibo.wastemaster.core.dao.CustomerDAO;
 import it.unibo.wastemaster.core.models.Customer;
 import it.unibo.wastemaster.core.utils.ValidateUtils;
@@ -49,5 +51,9 @@ public class CustomerManager {
         } catch (IllegalArgumentException e) {
             return false;
         }
+    }
+
+    public List<Customer> getAllCustomers() {
+        return customerDAO.findAll();
     }
 }
