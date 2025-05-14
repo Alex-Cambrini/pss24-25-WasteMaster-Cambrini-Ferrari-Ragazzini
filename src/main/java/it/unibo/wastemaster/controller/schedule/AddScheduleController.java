@@ -36,7 +36,10 @@ public class AddScheduleController {
     private ComboBox<Waste> wasteComboBox;
 
     @FXML
-    private Label wasteField;
+    private Label wasteDetailsInfo;
+
+    @FXML
+    private Label wasteDetailsTitle;
 
     @FXML
     private Label dateLabel;
@@ -48,22 +51,37 @@ public class AddScheduleController {
     private Label locationField;
 
     @FXML
+    private Label missingWasteLabel;
+
+    @FXML
     private DatePicker datePicker;
 
     private List<Customer> allCustomers;
     private ContextMenu suggestionsMenu = new ContextMenu();
 
+    public void setScheduleController(ScheduleController controller) {
+        this.scheduleController = controller;
+    }
+
     @FXML
     public void initialize() {
         frequencyComboBox.setItems(FXCollections.observableArrayList(Frequency.values()));
-        wasteComboBox.setItems(FXCollections.observableArrayList(AppContext.wasteDAO.findAll()));
-        allCustomers = AppContext.customerDAO.findAll();
+        allCustomers = AppContext.customerManager.getAllCustomers();
+        List<Waste> wasteList = AppContext.wasteManager.getAllWastes();
 
-        // Converter per waste
+        if (wasteList.isEmpty()) {
+            wasteComboBox.setDisable(true);
+            missingWasteLabel.setText("No Waste available");
+        } else {
+            wasteComboBox.setItems(FXCollections.observableArrayList(wasteList));
+            wasteDetailsInfo.setText("No Waste selected.");
+            wasteDetailsTitle.setText("Waste Details:");
+        }
+
         wasteComboBox.setConverter(new StringConverter<Waste>() {
             @Override
             public String toString(Waste waste) {
-                return waste != null ? waste.getWasteName() : "";
+                return waste != null ? waste.getWasteName() : "Select Waste";
             }
 
             @Override
@@ -72,16 +90,7 @@ public class AddScheduleController {
             }
         });
 
-        // Listener per selezione waste
-        wasteComboBox.valueProperty().addListener((obs, oldVal, newVal) -> {
-            if (newVal != null) {
-                wasteField.setText(newVal.toString());
-            } else {
-                wasteField.setText("No Waste selected.");
-            }
-        });
-
-        // Autocomplete dinamico per customer
+        // Autocomplete dinamico per il customer
         customerField.textProperty().addListener((obs, oldText, newText) -> {
             if (newText == null || newText.isBlank()) {
                 suggestionsMenu.hide();
@@ -113,7 +122,7 @@ public class AddScheduleController {
             }
         });
 
-        // Gestione radio buttons per tipo di pianificazione
+        // Gestione dei radio buttons per tipo di pianificazione
         scheduleGroup.selectedToggleProperty().addListener((obs, oldVal, newVal) -> {
             if (newVal != null) {
                 RadioButton selected = (RadioButton) newVal;
@@ -122,10 +131,6 @@ public class AddScheduleController {
                 dateLabel.setText(isRecurring ? "Start Date" : "Pickup Date");
             }
         });
-    }
-
-    public void setScheduleController(ScheduleController controller) {
-        this.scheduleController = controller;
     }
 
     @FXML
@@ -151,9 +156,6 @@ public class AddScheduleController {
 
             if (isRecurring) {
                 Frequency selectedFrequency = frequencyComboBox.getValue();
-                if (selectedFrequency == null)
-                    throw new IllegalArgumentException("- Please select a frequency");
-
                 AppContext.recurringScheduleManager.createRecurringSchedule(selectedCustomer, selectedWaste,
                         selectedDate, selectedFrequency);
             } else {
