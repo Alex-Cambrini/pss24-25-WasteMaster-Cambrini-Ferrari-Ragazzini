@@ -14,7 +14,6 @@ import it.unibo.wastemaster.core.models.Vehicle;
 
 public class VehicleManagerTest extends AbstractDatabaseTest {
 
-        private VehicleManager vehicleManager;
         private Vehicle v1;
         private Vehicle v2;
         private Vehicle v3;
@@ -22,7 +21,6 @@ public class VehicleManagerTest extends AbstractDatabaseTest {
         @BeforeEach
         public void setUp() {
                 super.setUp();
-                vehicleManager = new VehicleManager(vehicleDAO);
                 em.getTransaction().begin();
 
                 v1 = new Vehicle("DD444DD", "Renault", "Master", 2023, Vehicle.LicenceType.C1,
