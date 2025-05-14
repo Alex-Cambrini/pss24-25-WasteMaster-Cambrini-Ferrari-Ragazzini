@@ -22,6 +22,8 @@ import it.unibo.wastemaster.core.services.EmployeeManager;
 import it.unibo.wastemaster.core.services.OneTimeScheduleManager;
 import it.unibo.wastemaster.core.services.RecurringScheduleManager;
 import it.unibo.wastemaster.core.services.TripManager;
+import it.unibo.wastemaster.core.services.VehicleManager;
+import it.unibo.wastemaster.core.services.WasteManager;
 import it.unibo.wastemaster.core.services.WasteScheduleManager;
 import it.unibo.wastemaster.core.utils.DateUtils;
 import jakarta.persistence.EntityManager;
@@ -34,24 +36,26 @@ public abstract class AbstractDatabaseTest {
     protected EntityManager em;
 
     protected GenericDAO<Location> locationDAO;
-    protected WasteDAO wasteDAO;
-    protected CollectionDAO collectionDAO;
-    protected CustomerDAO customerDAO;
     protected EmployeeDAO employeeDAO;
-    protected OneTimeScheduleDAO oneTimeScheduleDAO;
-    protected RecurringScheduleDAO recurringScheduleDAO;
+    protected WasteDAO wasteDAO;
+    protected CustomerDAO customerDAO;
     protected WasteScheduleDAO wasteScheduleDAO;
+    protected RecurringScheduleDAO recurringScheduleDAO;
+    protected CollectionDAO collectionDAO;
+    protected OneTimeScheduleDAO oneTimeScheduleDAO;
     protected VehicleDAO vehicleDAO;
     protected TripDAO tripDAO;
 
-
-    protected CustomerManager customerManager;
     protected EmployeeManager employeeManager;
+    protected WasteManager wasteManager;
+    protected CustomerManager customerManager;
     protected WasteScheduleManager wasteScheduleManager;
-    protected CollectionManager collectionManager;
     protected RecurringScheduleManager recurringScheduleManager;
     protected OneTimeScheduleManager oneTimeScheduleManager;
+    protected CollectionManager collectionManager;
+    protected VehicleManager vehicleManager;
     protected TripManager tripManager;
+
     protected DateUtils dateUtils;
 
     @BeforeAll
@@ -62,33 +66,33 @@ public abstract class AbstractDatabaseTest {
         }
     }
 
-@BeforeEach
-public void setUp() {
-    em = emf.createEntityManager();
-    dateUtils = new DateUtils();
+    @BeforeEach
+    public void setUp() {
+        em = emf.createEntityManager();
+        dateUtils = new DateUtils();
 
-    wasteDAO              = new WasteDAO(em);
-    locationDAO           = new GenericDAO<>(em, Location.class);
-    customerDAO           = new CustomerDAO(em);
-    employeeDAO           = new EmployeeDAO(em);
-    wasteScheduleDAO      = new WasteScheduleDAO(em);
-    oneTimeScheduleDAO    = new OneTimeScheduleDAO(em);
-    recurringScheduleDAO  = new RecurringScheduleDAO(em);
-    collectionDAO         = new CollectionDAO(em);
-    vehicleDAO            = new VehicleDAO(em);
-    tripDAO               = new TripDAO(em);
-    
+        wasteDAO = new WasteDAO(em);
+        locationDAO = new GenericDAO<>(em, Location.class);
+        customerDAO = new CustomerDAO(em);
+        employeeDAO = new EmployeeDAO(em);
+        wasteScheduleDAO = new WasteScheduleDAO(em);
+        oneTimeScheduleDAO = new OneTimeScheduleDAO(em);
+        recurringScheduleDAO = new RecurringScheduleDAO(em);
+        collectionDAO = new CollectionDAO(em);
+        vehicleDAO = new VehicleDAO(em);
+        tripDAO = new TripDAO(em);
 
-    customerManager       = new CustomerManager(customerDAO);
-    employeeManager       = new EmployeeManager(employeeDAO);
-    wasteScheduleManager  = new WasteScheduleManager(wasteScheduleDAO);
+        customerManager = new CustomerManager(customerDAO);
+        employeeManager = new EmployeeManager(employeeDAO);
+        wasteScheduleManager = new WasteScheduleManager(wasteScheduleDAO);
 
-    recurringScheduleManager = new RecurringScheduleManager(recurringScheduleDAO, wasteScheduleManager);
-    collectionManager        = new CollectionManager(collectionDAO, recurringScheduleManager);
-    recurringScheduleManager.setCollectionManager(collectionManager);
-    oneTimeScheduleManager = new OneTimeScheduleManager(oneTimeScheduleDAO, collectionManager);
-    tripManager = new TripManager(tripDAO);
-}
+        recurringScheduleManager = new RecurringScheduleManager(recurringScheduleDAO, wasteScheduleManager);
+        collectionManager = new CollectionManager(collectionDAO, recurringScheduleManager);
+        recurringScheduleManager.setCollectionManager(collectionManager);
+        oneTimeScheduleManager = new OneTimeScheduleManager(oneTimeScheduleDAO, collectionManager);
+        vehicleManager = new VehicleManager(vehicleDAO);
+        tripManager = new TripManager(tripDAO);
+    }
 
     @AfterEach
     public void tearDown() {
