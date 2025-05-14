@@ -133,7 +133,7 @@ public class AddScheduleController {
         try {
             Waste selectedWaste = wasteComboBox.getValue();
             String customerInput = customerField.getText();
-            LocalDate selectedDate = datePicker.getValue(); // Assicurati che il DatePicker abbia fx:id="datePicker"
+            LocalDate selectedDate = datePicker.getValue();
 
             if (selectedWaste == null)
                 throw new IllegalArgumentException("- Please select a waste type");
@@ -163,7 +163,7 @@ public class AddScheduleController {
             DialogUtils.showSuccess("Schedule saved successfully.");
             scheduleController.returnToScheduleView();
 
-        } catch (IllegalArgumentException e) {
+        } catch (Exception e) {
             DialogUtils.showError("Validation error", e.getMessage());
         }
     }
