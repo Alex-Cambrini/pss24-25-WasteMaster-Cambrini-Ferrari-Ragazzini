@@ -82,6 +82,7 @@ public abstract class AbstractDatabaseTest {
         vehicleDAO = new VehicleDAO(em);
         tripDAO = new TripDAO(em);
 
+        wasteManager = new WasteManager(wasteDAO);
         customerManager = new CustomerManager(customerDAO);
         employeeManager = new EmployeeManager(employeeDAO);
         wasteScheduleManager = new WasteScheduleManager(wasteScheduleDAO);
