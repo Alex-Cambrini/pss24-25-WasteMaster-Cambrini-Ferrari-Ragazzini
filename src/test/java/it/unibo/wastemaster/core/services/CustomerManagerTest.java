@@ -10,6 +10,8 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.util.List;
+
 class CustomerManagerTest extends AbstractDatabaseTest {
         private Location location;
         private Customer customer;
@@ -24,6 +26,7 @@ class CustomerManagerTest extends AbstractDatabaseTest {
                 customer = new Customer("Mario", "Rossi", location, email, "1234567890");
 
         }
+
         @Test
         void testAddCustomer() {
                 Customer saved = customerManager.addCustomer(customer);
@@ -198,5 +201,23 @@ class CustomerManagerTest extends AbstractDatabaseTest {
         void testUpdateCustomerNoChange() {
                 customerManager.addCustomer(customer);
                 assertDoesNotThrow(() -> customerManager.updateCustomer(customer));
+        }
+
+        @Test
+        void testGetAllCustomers() {
+                assertTrue(customerManager.getAllCustomers().isEmpty());
+
+                customerManager.addCustomer(customer);
+
+                Customer secondCustomer = new Customer("Luigi", "Verdi", location, "luigi@test.it", "0987654321");
+                customerManager.addCustomer(secondCustomer);
+
+                List<Customer> customers = customerManager.getAllCustomers();
+                assertNotNull(customers);
+                assertEquals(2, customers.size());
+
+                List<String> emails = customers.stream().map(Customer::getEmail).toList();
+                assertTrue(emails.contains(customer.getEmail()));
+                assertTrue(emails.contains(secondCustomer.getEmail()));
         }
 }
