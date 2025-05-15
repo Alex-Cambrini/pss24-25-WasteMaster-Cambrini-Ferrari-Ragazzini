@@ -6,6 +6,7 @@ import it.unibo.wastemaster.core.AbstractDatabaseTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -86,7 +87,27 @@ public class TripTest extends AbstractDatabaseTest {
                 new Location("Via Napoli", "5", "Napoli", "80100"),
                 "luca.bianchi@example.com", "1122334455",
                 Employee.Role.OPERATOR, Employee.LicenceType.C1);
-                
+       
+
+        Customer customer1 = new Customer("Mario Rossi", null, null, null, null);
+        Customer customer2 = new Customer("Anna Bianchi", null, null, null, null);
+        
+
+        Waste waste1 = new Waste("Organico", null, null);
+        Waste waste2 = new Waste("Carta", null, null);
+       
+
+        OneTimeSchedule oneTime1 = new OneTimeSchedule( customer1, waste1, LocalDate.now().plusDays(1));
+       
+        RecurringSchedule recurring = new RecurringSchedule(customer2, waste2, LocalDate.now(), RecurringSchedule.Frequency.WEEKLY);
+        recurring.setNextCollectionDate(LocalDate.now().plusDays(7));  
+
+        Collection collection1 = new Collection(oneTime1);
+        Collection collection2 = new Collection(recurring);
+ 
+        List<Collection> collections = List.of(collection1, collection2);
+
+
         employeeDAO.insert(operator1);
         employeeDAO.insert(operator2);
         employeeDAO.insert(operator3);
@@ -97,7 +118,7 @@ public class TripTest extends AbstractDatabaseTest {
         Trip trip = new Trip("40100", vehicle, operators,
                 LocalDateTime.now().plusHours(1),
                 LocalDateTime.now().plusHours(5),
-                Trip.TripStatus.PENDING, new ArrayList<>());
+                Trip.TripStatus.PENDING,collections);
 
         tripDAO.insert(trip);
 
