@@ -45,10 +45,6 @@ public class TripManager {
         return tripDAO.findById(tripId);
     }
 
-    
-    public List<Trip> getTripsByStatus(Trip.TripStatus status) {
-        return tripDAO.findByStatus(status);
-    }
 
     public void deleteTrip(int tripId) {
         Trip trip = tripDAO.findById(tripId);
@@ -58,29 +54,7 @@ public class TripManager {
     }
 
     
-    public List<Trip> getTripsByPostalCode(String postalCode) {
-        return tripDAO.findByPostalCode(postalCode);
-    }
-
     
-    public List<Trip> getTripsByOperator(Employee operator) {
-        return tripDAO.findByOperator(operator);
-    }
-
-    
-    public List<Trip> getTripsByVehicle(Vehicle vehicle) {
-        return tripDAO.findByVehicle(vehicle);
-    }
-   
-
-    public List<Trip> getTripsByDateRange(LocalDateTime startDate, LocalDateTime endDate) {
-        return tripDAO.findByDateRange(startDate, endDate);
-    }
-
-     
-         public long countTripsByStatus(Trip.TripStatus status) {
-         return tripDAO.countByStatus(status);
-     }
 }
 
 
