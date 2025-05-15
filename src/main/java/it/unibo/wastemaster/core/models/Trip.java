@@ -45,6 +45,8 @@ public class Trip {
     @Column(nullable = false)
     private TripStatus status;
 
+    @NotNull(message = "collection cannot be null")
+    @Column(nullable = false)
     @OneToMany(mappedBy = "trip")
     private List<Collection> collections;
 

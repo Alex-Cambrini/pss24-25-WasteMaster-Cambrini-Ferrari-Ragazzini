@@ -7,7 +7,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDateTime;
-
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -86,6 +86,7 @@ public class TripTest extends AbstractDatabaseTest {
                 new Location("Via Napoli", "5", "Napoli", "80100"),
                 "luca.bianchi@example.com", "1122334455",
                 Employee.Role.OPERATOR, Employee.LicenceType.C1);
+                
         employeeDAO.insert(operator1);
         employeeDAO.insert(operator2);
         employeeDAO.insert(operator3);
@@ -96,7 +97,7 @@ public class TripTest extends AbstractDatabaseTest {
         Trip trip = new Trip("40100", vehicle, operators,
                 LocalDateTime.now().plusHours(1),
                 LocalDateTime.now().plusHours(5),
-                Trip.TripStatus.PENDING, null);
+                Trip.TripStatus.PENDING, new ArrayList<>());
 
         tripDAO.insert(trip);
 
