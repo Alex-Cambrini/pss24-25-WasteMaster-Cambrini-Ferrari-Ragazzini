@@ -1,7 +1,7 @@
 package it.unibo.wastemaster.core.models;
 
 import it.unibo.wastemaster.core.AbstractDatabaseTest;
-import it.unibo.wastemaster.core.dao.TripDAO;
+
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
