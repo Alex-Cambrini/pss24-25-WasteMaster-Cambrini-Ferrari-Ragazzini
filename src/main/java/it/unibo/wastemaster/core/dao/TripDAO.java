@@ -7,7 +7,6 @@ import java.util.List;
 import it.unibo.wastemaster.core.models.Employee;
 import it.unibo.wastemaster.core.models.Trip;
 import it.unibo.wastemaster.core.models.Vehicle;
-import it.unibo.wastemaster.core.utils.TransactionHelper;
 import jakarta.persistence.EntityManager;
 
 public class TripDAO extends GenericDAO<Trip> {
@@ -57,9 +56,6 @@ public class TripDAO extends GenericDAO<Trip> {
                             .setParameter("status", status)
                             .getSingleResult();
     }
-   
-    public void insert(Trip trip) {
-    TransactionHelper.executeTransaction(entityManager, () -> entityManager.merge(trip));
-    }   
+ 
 }
 
