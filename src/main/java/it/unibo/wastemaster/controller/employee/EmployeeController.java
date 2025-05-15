@@ -199,6 +199,10 @@ public class EmployeeController {
     @FXML
     private void handleResetSearch() {
         searchField.clear();
+
+        activeFilters.clear();
+        activeFilters.addAll("name", "surname", "email", "role", "licence", "city");
+
         loadEmployee();
     }
 

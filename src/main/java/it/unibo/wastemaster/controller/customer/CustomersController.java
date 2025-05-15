@@ -197,6 +197,10 @@ public class CustomersController {
     @FXML
     private void handleResetSearch() {
         searchField.clear();
+
+        activeFilters.clear();
+        activeFilters.addAll("name", "surname", "email", "street", "civic", "city", "postal");
+
         loadCustomers();
     }
 

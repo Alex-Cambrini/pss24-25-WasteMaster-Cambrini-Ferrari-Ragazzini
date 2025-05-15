@@ -217,6 +217,13 @@ public class VehicleController {
 	@FXML
 	private void handleResetSearch() {
 		searchField.clear();
+
+		activeFilters.clear();
+		activeFilters.addAll(
+				"plate", "brand", "model", "year",
+				"licenceType", "vehicleStatus",
+				"lastMaintenanceDate", "nextMaintenanceDate");
+
 		loadVehicles();
 	}
 
