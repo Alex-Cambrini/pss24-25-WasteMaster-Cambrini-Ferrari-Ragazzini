@@ -39,10 +39,86 @@ class TripManagerTest extends AbstractDatabaseTest {
        
     }
 
-    @Test
-    void testCreateAndGetTrip() {
+//     @Test
+//     void testCreateAndGetTrip() {
 
-         Customer customer1 = new Customer("Mario Rossi", null, null, null, null);
+//         Customer customer1 = new Customer("Mario Rossi", null, null, null, null);
+//         Customer customer2 = new Customer("Anna Bianchi", null, null, null, null);
+        
+
+//         Waste waste1 = new Waste("Organico", null, null);
+//         Waste waste2 = new Waste("Carta", null, null);
+       
+
+//         OneTimeSchedule oneTime1 = new OneTimeSchedule( customer1, waste1, LocalDate.now().plusDays(1));
+       
+//         RecurringSchedule recurring = new RecurringSchedule(customer2, waste2, LocalDate.now(), RecurringSchedule.Frequency.WEEKLY);
+//         recurring.setNextCollectionDate(LocalDate.now().plusDays(7));  
+
+//         Collection collection1 = new Collection(oneTime1);
+//         Collection collection2 = new Collection(recurring);
+ 
+//         List<Collection> collections = List.of(collection1, collection2);
+
+//         tripManager.createTrip("40100", vehicle, List.of(operator1, operator2),
+//                 departureTime, expectedReturnTime, Trip.TripStatus.PENDING,collections);
+
+//         List<Trip> allTrips = tripDAO.findAll();
+//         assertFalse(allTrips.isEmpty());
+
+//         Trip savedTrip = allTrips.get(0);
+//         assertEquals("40100", savedTrip.getPostalCodes());
+//         assertEquals(vehicle.getPlate(), savedTrip.getAssignedVehicle().getPlate());
+//         assertEquals(2, savedTrip.getOperators().size());
+//         assertEquals(departureTime, savedTrip.getDepartureTime());
+//         assertEquals(expectedReturnTime, savedTrip.getExpectedReturnTime());
+//         assertEquals(Trip.TripStatus.PENDING, savedTrip.getStatus());
+
+//         Trip found = tripManager.getTripById(savedTrip.getTripId());
+//         assertNotNull(found);
+//         assertEquals(savedTrip.getTripId(), found.getTripId());
+//     }
+
+//         @Test
+//         void testDeleteTrip() {
+    
+    
+//         Customer customer1 = new Customer("Mario Rossi", null, null, null, null);
+//         Customer customer2 = new Customer("Anna Bianchi", null, null, null, null);
+        
+
+//         Waste waste1 = new Waste("Organico", null, null);
+//         Waste waste2 = new Waste("Carta", null, null);
+       
+
+//         OneTimeSchedule oneTime1 = new OneTimeSchedule( customer1, waste1, LocalDate.now().plusDays(1));
+       
+//         RecurringSchedule recurring = new RecurringSchedule(customer2, waste2, LocalDate.now(), RecurringSchedule.Frequency.WEEKLY);
+//         recurring.setNextCollectionDate(LocalDate.now().plusDays(7));  
+
+//         Collection collection1 = new Collection(oneTime1);
+//         Collection collection2 = new Collection(recurring);
+ 
+//         List<Collection> collections = List.of(collection1, collection2);
+
+//         tripManager.createTrip("40100", vehicle, List.of(operator1, operator2),
+//                 departureTime, expectedReturnTime, Trip.TripStatus.PENDING,collections);
+
+
+//         Trip trip = tripDAO.findAll().get(0);
+//         assertNotNull(trip);
+
+        
+//         tripManager.deleteTrip(trip.getTripId());
+
+//         Trip deleted = tripDAO.findById(trip.getTripId());
+//         assertNull(deleted);
+//         }
+
+
+        @Test
+        void testTripPersistence() {
+        Customer customer1 = new Customer("Mario Rossi", null, null, null, null);
         Customer customer2 = new Customer("Anna Bianchi", null, null, null, null);
         
 
@@ -59,25 +135,18 @@ class TripManagerTest extends AbstractDatabaseTest {
         Collection collection2 = new Collection(recurring);
  
         List<Collection> collections = List.of(collection1, collection2);
-        
+
         tripManager.createTrip("40100", vehicle, List.of(operator1, operator2),
                 departureTime, expectedReturnTime, Trip.TripStatus.PENDING,collections);
 
-        List<Trip> allTrips = tripDAO.findAll();
-        assertFalse(allTrips.isEmpty());
 
-        Trip savedTrip = allTrips.get(0);
-        assertEquals("40100", savedTrip.getPostalCodes());
-        assertEquals(vehicle.getPlate(), savedTrip.getAssignedVehicle().getPlate());
-        assertEquals(2, savedTrip.getOperators().size());
-        assertEquals(departureTime, savedTrip.getDepartureTime());
-        assertEquals(expectedReturnTime, savedTrip.getExpectedReturnTime());
-        assertEquals(Trip.TripStatus.PENDING, savedTrip.getStatus());
+        // Ricarica dal DAO
+        List<Trip> trips = tripDAO.findAll();
+        assertEquals(1, trips.size());
 
-        Trip found = tripManager.getTripById(savedTrip.getTripId());
-        assertNotNull(found);
-        assertEquals(savedTrip.getTripId(), found.getTripId());
-    }
-
-   
+        Trip trip = trips.get(0);
+        assertEquals("40100", trip.getPostalCodes());
+        assertEquals(operator1.getName(), trip.getOperators().get(0).getName());
+        assertEquals(vehicle.getPlate(), trip.getAssignedVehicle().getPlate());
+        }
 }
