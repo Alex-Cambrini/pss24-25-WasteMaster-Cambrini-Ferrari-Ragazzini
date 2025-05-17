@@ -156,7 +156,48 @@ public class ScheduleController {
 
     @FXML
     private void handleEditSchedule() {
-        // TODO
+        ScheduleRow selected = scheduleTable.getSelectionModel().getSelectedItem();
+        if (selected == null) {
+            DialogUtils.showError("No Selection", "Please select a schedule to edit.");
+            return;
+        }
+
+        try {
+            if ("ONE_TIME".equals(selected.getScheduleType())) {
+                var schedule = AppContext.oneTimeScheduleDAO.findAll().stream()
+                        .filter(s -> s.getCustomer().getName().equals(selected.getCustomerName())
+                                && s.getCustomer().getSurname().equals(selected.getCustomerSurname())
+                                && s.getPickupDate() != null
+                                && s.getPickupDate().toString().equals(selected.getPickupDate()))
+                        .findFirst().orElse(null);
+
+                if (schedule != null) {
+                    MainLayoutController.getInstance().setPageTitle("Edit One-Time Schedule");
+                    EditScheduleController controller = MainLayoutController.getInstance()
+                            .loadCenterWithController("/layouts/schedule/EditScheduleView.fxml");
+                    controller.setScheduleToEdit(schedule);
+                    controller.setScheduleController(this);
+                }
+            } else if ("RECURRING".equals(selected.getScheduleType())) {
+                var schedule = AppContext.recurringScheduleDAO.findAll().stream()
+                        .filter(s -> s.getCustomer().getName().equals(selected.getCustomerName())
+                                && s.getCustomer().getSurname().equals(selected.getCustomerSurname())
+                                && s.getStartDate() != null
+                                && s.getStartDate().toString().equals(selected.getStartDate()))
+                        .findFirst().orElse(null);
+
+                if (schedule != null) {
+                    MainLayoutController.getInstance().setPageTitle("Edit Recurring Schedule");
+                    EditScheduleController controller = MainLayoutController.getInstance()
+                            .loadCenterWithController("/layouts/schedule/EditScheduleView.fxml");
+                    controller.setScheduleToEdit(schedule);
+                    controller.setScheduleController(this);
+                }
+            }
+        } catch (Exception e) {
+            DialogUtils.showError("Error", "Could not load edit view.");
+            e.printStackTrace();
+        }
     }
 
     @FXML
