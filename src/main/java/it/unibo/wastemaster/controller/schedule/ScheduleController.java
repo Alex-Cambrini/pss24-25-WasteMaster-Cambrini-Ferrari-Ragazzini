@@ -5,6 +5,7 @@ import it.unibo.wastemaster.controller.utils.DialogUtils;
 import it.unibo.wastemaster.core.context.AppContext;
 import it.unibo.wastemaster.core.models.OneTimeSchedule;
 import it.unibo.wastemaster.core.models.RecurringSchedule;
+import it.unibo.wastemaster.core.models.Schedule.ScheduleStatus;
 import it.unibo.wastemaster.viewmodels.ScheduleRow;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -143,7 +144,54 @@ public class ScheduleController {
 
     @FXML
     private void handleDeleteSchedule() {
-        // TODO
+        ScheduleRow selected = scheduleTable.getSelectionModel().getSelectedItem();
+        if (selected == null) {
+            DialogUtils.showError("No Selection", "Please select a schedule to delete.");
+            return;
+        }
+
+        try {
+            boolean success = false;
+
+            if ("ONE_TIME".equals(selected.getScheduleType())) {
+                var schedule = AppContext.oneTimeScheduleDAO.findAll().stream()
+                        .filter(s -> s.getCustomer().getName().equals(selected.getCustomerName())
+                                && s.getCustomer().getSurname().equals(selected.getCustomerSurname())
+                                && s.getPickupDate() != null
+                                && s.getPickupDate().toString().equals(selected.getPickupDate()))
+                        .findFirst().orElse(null);
+
+                if (schedule != null) {
+                    success = AppContext.oneTimeScheduleManager.updateStatusOneTimeSchedule(schedule,
+                            ScheduleStatus.CANCELLED);
+                }
+            }
+
+            if ("RECURRING".equals(selected.getScheduleType())) {
+                var schedule = AppContext.recurringScheduleDAO.findAll().stream()
+                        .filter(s -> s.getCustomer().getName().equals(selected.getCustomerName())
+                                && s.getCustomer().getSurname().equals(selected.getCustomerSurname())
+                                && s.getStartDate() != null
+                                && s.getStartDate().toString().equals(selected.getStartDate()))
+                        .findFirst().orElse(null);
+
+                if (schedule != null) {
+                    success = AppContext.recurringScheduleManager.updateStatusRecurringSchedule(schedule,
+                            ScheduleStatus.CANCELLED);
+                }
+            }
+
+            if (success) {
+                DialogUtils.showSuccess("Schedule cancelled successfully.");
+                loadSchedules();
+            } else {
+                DialogUtils.showError("Cancellation failed", "Schedule could not be cancelled.");
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            DialogUtils.showError("Error", "An error occurred while cancelling the schedule.");
+        }
     }
 
     @FXML
