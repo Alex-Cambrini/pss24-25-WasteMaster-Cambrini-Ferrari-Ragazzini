@@ -8,9 +8,12 @@ import it.unibo.wastemaster.core.dao.RecurringScheduleDAO;
 import it.unibo.wastemaster.core.models.Customer;
 import it.unibo.wastemaster.core.models.RecurringSchedule;
 import it.unibo.wastemaster.core.models.RecurringSchedule.Frequency;
+import it.unibo.wastemaster.core.models.Schedule.ScheduleStatus;
 import it.unibo.wastemaster.core.models.Waste;
 import it.unibo.wastemaster.core.models.WasteSchedule;
 import it.unibo.wastemaster.core.utils.DateUtils;
+import it.unibo.wastemaster.core.models.Collection;
+
 
 public class RecurringScheduleManager {
 
@@ -99,5 +102,41 @@ public class RecurringScheduleManager {
 
     public List<RecurringSchedule> getSchedulesByCustomer(Customer customer) {
         return recurringScheduleDAO.findSchedulesByCustomer(customer);
+    }
+
+    public boolean updateStatusRecurringSchedule(RecurringSchedule schedule, ScheduleStatus newStatus) {
+        if (schedule == null || newStatus == null) {
+            throw new IllegalArgumentException("Schedule and status must not be null.");
+        }
+
+        if (schedule.getScheduleStatus() == ScheduleStatus.CANCELLED) {
+            return false;
+        }
+
+        if (schedule.getScheduleStatus() == ScheduleStatus.PAUSED && newStatus == ScheduleStatus.ACTIVE) {
+            collectionManager.generateCollection(schedule);
+            schedule.setScheduleStatus(ScheduleStatus.ACTIVE);
+            recurringScheduleDAO.update(schedule);
+            return true;
+        }
+
+        if (schedule.getScheduleStatus() == ScheduleStatus.ACTIVE &&
+                (newStatus == ScheduleStatus.PAUSED || newStatus == ScheduleStatus.CANCELLED)) {
+
+            schedule.setScheduleStatus(newStatus);
+            recurringScheduleDAO.update(schedule);
+
+            if (newStatus == ScheduleStatus.CANCELLED) {
+                var associatedCollection = collectionManager.getActiveCollectionByRecurringSchedule(schedule);
+                if (associatedCollection != null) {
+                    associatedCollection.setCollectionStatus(Collection.CollectionStatus.CANCELLED);
+                    collectionManager.updateCollection(associatedCollection);
+                }
+            }
+
+            return true;
+        }
+
+        return false;
     }
 }
