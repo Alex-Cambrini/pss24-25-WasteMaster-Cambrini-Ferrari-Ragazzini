@@ -10,8 +10,6 @@ import java.time.LocalDate;
 
 
 
-
-
 @Entity
 @Table(name = "invoices")
 public class Invoice {
@@ -90,5 +88,17 @@ public class Invoice {
         this.paymentStatus = paymentStatus;
     }
 
-
+    @Override
+    public String toString() {
+    return String.format(
+        "Invoice {ID: %d, CollectionID: %s, Customer: %s, Waste: %s, Amount: %s, IssueDate: %s, Status: %s}",
+        invoiceId,
+        collection != null ? collection.getCollectionId() : "N/A",
+        collection != null && collection.getCustomer() != null ? collection.getCustomer().getName() : "N/A",
+        collection != null && collection.getWaste() != null ? collection.getWaste().getWasteName() : "N/A",
+        amount != null ? amount.toString() : "N/A",
+        issueDate != null ? issueDate.toString() : "N/A",
+        paymentStatus != null ? paymentStatus.name() : "N/A"
+    );
+    }
 }
