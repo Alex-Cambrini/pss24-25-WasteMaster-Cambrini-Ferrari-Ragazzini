@@ -47,5 +47,13 @@ public class Invoice {
 
     public Invoice() {}
 
-    
+    public Invoice(Collection collection, BigDecimal amount, LocalDate issueDate, PaymentStatus paymentStatus) {
+        this.collection = collection;
+        this.amount = amount;
+        this.issueDate = issueDate;
+        this.paymentStatus = paymentStatus;
+    }
+
+
+
 }
