@@ -1,17 +1,18 @@
 package it.unibo.wastemaster.core.models;
 
 import it.unibo.wastemaster.core.AbstractDatabaseTest;
-import it.unibo.wastemaster.core.dao.TripDAO;
+
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import java.util.List;
 
-
 import static org.junit.jupiter.api.Assertions.*;
+
 public class TripTest extends AbstractDatabaseTest {
 
     private Trip trip;
@@ -19,31 +20,27 @@ public class TripTest extends AbstractDatabaseTest {
     private Employee operator;
     private LocalDateTime departureTime;
     private LocalDateTime expectedReturnTime;
-    private TripDAO tripDAO;
 
     @BeforeEach
     public void setUp() {
         super.setUp();
-        vehicle = new Vehicle("AB123CD", "Iveco", "Daily", 2020, Vehicle.LicenceType.C1, Vehicle.VehicleStatus.IN_SERVICE);
-        operator = new Employee("John", "Doe", new Location("Via Roma", "10", "Bologna", "40100"), "john.doe@example.com", "1234567890", Employee.Role.OPERATOR, Employee.LicenceType.C1);
+        em.getTransaction().begin();
+        vehicle = new Vehicle("AB123CD", "Iveco", "Daily", 2020, Vehicle.LicenceType.C1,
+                Vehicle.VehicleStatus.IN_SERVICE);
+        operator = new Employee("John", "Doe", new Location("Via Roma", "10", "Bologna", "40100"),
+                "john.doe@example.com", "1234567890", Employee.Role.OPERATOR, Employee.LicenceType.C1);
         departureTime = LocalDateTime.now().plusHours(1);
         expectedReturnTime = departureTime.plusHours(5);
-        assertNotNull(vehicle);
-        assertNotNull(operator);
-        assertNotNull(em, "EntityManager should be initialized!");
-        tripDAO = new TripDAO(em);
-        assertNotNull(tripDAO, "TripDAO should be initialized!");
     }
-    
 
-   
     @Test
-        public void testGetterSetter() {
-        
-        trip = new Trip(1, "40100", vehicle, List.of(operator), departureTime, expectedReturnTime, Trip.TripStatus.PENDING, null);
-        
-        trip.setPostalCodes("40200");  
-        assertEquals("40200", trip.getPostalCodes()); 
+    public void testGetterSetter() {
+
+        trip = new Trip("40100", vehicle, List.of(operator), departureTime, expectedReturnTime, Trip.TripStatus.PENDING,
+                null);
+
+        trip.setPostalCodes("40200");
+        assertEquals("40200", trip.getPostalCodes());
 
         trip.setDepartureTime(departureTime);
         assertEquals(departureTime, trip.getDepartureTime());
@@ -58,55 +55,82 @@ public class TripTest extends AbstractDatabaseTest {
         assertEquals(1, trip.getOperators().size());
     }
 
-     
-   @Test
+    @Test
     public void testToString() {
-    trip = new Trip(1, "40100", vehicle, List.of(operator), departureTime, expectedReturnTime, Trip.TripStatus.PENDING, null);
-    
-    String toStringOutput = trip.toString();
+        trip = new Trip("40100", vehicle, List.of(operator), departureTime, expectedReturnTime, Trip.TripStatus.PENDING,
+                null);
 
-    assertNotNull(toStringOutput);
-    assertTrue(toStringOutput.contains("Trip")); 
-    assertTrue(toStringOutput.contains("ID: " + trip.getTripId())); 
-    assertTrue(toStringOutput.contains(trip.getPostalCodes())); 
-    assertTrue(toStringOutput.contains(vehicle != null ? vehicle.getPlate() : "N/A")); 
-    assertTrue(toStringOutput.contains(departureTime.toString())); 
-    assertTrue(toStringOutput.contains(expectedReturnTime.toString())); 
-    assertTrue(toStringOutput.contains(trip.getStatus().name())); 
+        String toStringOutput = trip.toString();
+
+        assertNotNull(toStringOutput);
+        assertTrue(toStringOutput.contains("Trip"));
+        assertTrue(toStringOutput.contains("ID: " + trip.getTripId()));
+        assertTrue(toStringOutput.contains(trip.getPostalCodes()));
+        assertTrue(toStringOutput.contains(vehicle != null ? vehicle.getPlate() : "N/A"));
+        assertTrue(toStringOutput.contains(departureTime.toString()));
+        assertTrue(toStringOutput.contains(expectedReturnTime.toString()));
+        assertTrue(toStringOutput.contains(trip.getStatus().name()));
     }
-
 
     @Test
     public void testPersistence() {
-    
-    Employee operator = new Employee("John", "Doe",
-            new Location("Via Roma", "10", "Bologna", "40100"),
-            "john.doe@example.com", "1234567890",
-            Employee.Role.OPERATOR, Employee.LicenceType.C1);
 
-    em.getTransaction().begin();
-    vehicleDAO.insert(vehicle);
-    employeeDAO.insert(operator);
+        Employee operator1 = new Employee("John", "Doe",
+                new Location("Via Roma", "10", "Bologna", "40100"),
+                "john.doe@example.com", "1234567890",
+                Employee.Role.OPERATOR, Employee.LicenceType.C1);
+        Employee operator2 = new Employee("Anna", "Rossi",
+                new Location("Via Milano", "22", "Milano", "20100"),
+                "anna.rossi@example.com", "0987654321",
+                Employee.Role.OPERATOR, Employee.LicenceType.C1);
+        Employee operator3 = new Employee("Luca", "Bianchi",
+                new Location("Via Napoli", "5", "Napoli", "80100"),
+                "luca.bianchi@example.com", "1122334455",
+                Employee.Role.OPERATOR, Employee.LicenceType.C1);
+       
 
-    Trip trip = new Trip(0, "40100", vehicle, List.of(operator),
-            LocalDateTime.now().plusHours(1),
-            LocalDateTime.now().plusHours(5),
-            Trip.TripStatus.PENDING, null);
+        Customer customer1 = new Customer("Mario Rossi", null, null, null, null);
+        Customer customer2 = new Customer("Anna Bianchi", null, null, null, null);
+        
 
-    tripDAO.insert(trip);
-    em.getTransaction().commit();
+        Waste waste1 = new Waste("Organico", null, null);
+        Waste waste2 = new Waste("Carta", null, null);
+       
 
-    Trip found = em.find(Trip.class, trip.getTripId());
-    assertNotNull(found);
-    assertEquals(trip.getPostalCodes(), found.getPostalCodes());
+        OneTimeSchedule oneTime1 = new OneTimeSchedule( customer1, waste1, LocalDate.now().plusDays(1));
+       
+        RecurringSchedule recurring = new RecurringSchedule(customer2, waste2, LocalDate.now(), RecurringSchedule.Frequency.WEEKLY);
+        recurring.setNextCollectionDate(LocalDate.now().plusDays(7));  
 
-    em.getTransaction().begin();
-    tripDAO.delete(found);
-    em.getTransaction().commit();
+        Collection collection1 = new Collection(oneTime1);
+        Collection collection2 = new Collection(recurring);
+ 
+        List<Collection> collections = List.of(collection1, collection2);
 
-    Trip deleted = em.find(Trip.class, trip.getTripId());
-    assertNull(deleted);
+
+        employeeDAO.insert(operator1);
+        employeeDAO.insert(operator2);
+        employeeDAO.insert(operator3);
+
+        vehicleDAO.insert(vehicle);
+        List<Employee> operators = List.of(operator1, operator2, operator3);
+
+        Trip trip = new Trip("40100", vehicle, operators,
+                LocalDateTime.now().plusHours(1),
+                LocalDateTime.now().plusHours(5),
+                Trip.TripStatus.PENDING,collections);
+
+        tripDAO.insert(trip);
+
+        Trip found = tripDAO.findById(trip.getTripId());
+        assertNotNull(found);
+
+        int foundId = found.getTripId();
+        assertEquals(trip.getPostalCodes(), found.getPostalCodes());
+        tripDAO.delete(found);
+
+        Trip deleted = tripDAO.findById(foundId);
+        assertNull(deleted);
     }
-
 
 }

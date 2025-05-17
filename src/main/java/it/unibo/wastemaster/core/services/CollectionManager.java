@@ -54,4 +54,9 @@ public class CollectionManager {
     public void updateCollection(Collection collection) {
         collectionDAO.update(collection);
     }
+
+    public Collection getActiveCollectionByRecurringSchedule(RecurringSchedule schedule) {
+        return collectionDAO.findActiveCollectionByRecurringSchedule(schedule);
+    }
+
 }
