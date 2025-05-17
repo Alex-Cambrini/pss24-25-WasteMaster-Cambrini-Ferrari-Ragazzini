@@ -21,9 +21,15 @@ public class Trip {
     private String postalCode;
 
     @ManyToOne
+    @JoinColumn(name = "vehicle_id", nullable = false)
     private Vehicle assignedVehicle;
 
     @ManyToMany
+    @JoinTable(
+        name = "trip_operators",
+        joinColumns = @JoinColumn(name = "trip_id"),
+        inverseJoinColumns = @JoinColumn(name = "employee_id")
+    )
     private List<Employee> operators;
 
     @NotNull
@@ -39,13 +45,18 @@ public class Trip {
     @Column(nullable = false)
     private TripStatus status;
 
+    @NotNull(message = "collection cannot be null")
+    @Column(nullable = false)
     @OneToMany(mappedBy = "trip")
     private List<Collection> collections;
 
-    public Trip(int tripId, String postalCode, Vehicle assignedVehicle,
+    public Trip() {
+        
+    }
+    public Trip(String postalCode, Vehicle assignedVehicle,
             List<Employee> operators, LocalDateTime departureTime,
             LocalDateTime expectedReturnTime, TripStatus status, List<Collection> collections) {
-        this.tripId = tripId;
+       
         this.postalCode = postalCode;
         this.assignedVehicle = assignedVehicle;
         this.operators = operators;
@@ -55,7 +66,7 @@ public class Trip {
         this.collections = collections;
     }
 
-    public int getTripId() {
+    public Integer getTripId() {
         return tripId;
     }
 
