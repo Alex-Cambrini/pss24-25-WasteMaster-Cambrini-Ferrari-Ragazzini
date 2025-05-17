@@ -25,8 +25,8 @@
         </HBox>
         <HBox alignment="TOP_RIGHT" prefHeight="30.0" prefWidth="30.0" spacing="10.0">
             <children>
-                <CheckBox mnemonicParsing="false" text="CheckBox" />
-                <CheckBox mnemonicParsing="false" text="CheckBox" />
+                <CheckBox fx:id="oneTimeCheckBox" text="OneTime" />
+                <CheckBox fx:id="recurringCheckBox" text="Recurring" />
             </children>
             <padding>
                 <Insets right="20.0" />
