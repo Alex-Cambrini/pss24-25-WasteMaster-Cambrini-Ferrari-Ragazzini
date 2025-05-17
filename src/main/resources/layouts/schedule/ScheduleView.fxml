@@ -10,36 +10,41 @@
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox alignment="TOP_CENTER" prefWidth="640.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.unibo.wastemaster.controller.schedule.ScheduleController">
+<VBox alignment="TOP_CENTER" prefWidth="640.0"
+    xmlns="http://javafx.com/javafx/23.0.1"
+    xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.unibo.wastemaster.controller.schedule.ScheduleController">
     <children>
-      <HBox alignment="TOP_CENTER" minHeight="40.0" prefHeight="40.0" prefWidth="600.0" spacing="10.0">
-         <children>
-            <Button fx:id="addScheduleButton" mnemonicParsing="false" onAction="#handleAddSchedule" text="Add Schedule" />
-            <Region prefHeight="20" prefWidth="0.0" HBox.hgrow="ALWAYS" />
-            <Button fx:id="filterButton" onMouseClicked="#showFilterMenu" text="Filter ▼" />
-            <TextField fx:id="searchField" promptText="Search..." />
-            <Button mnemonicParsing="false" onAction="#handleResetSearch" text="Reset" />
-         </children>
-      </HBox>
-      <HBox alignment="TOP_RIGHT" prefHeight="30.0" prefWidth="30.0" spacing="10.0">
-         <children>
-            <CheckBox mnemonicParsing="false" text="CheckBox" />
-            <CheckBox mnemonicParsing="false" text="CheckBox" />
-         </children>
-         <padding>
-            <Insets right="20.0" />
-         </padding>
-      </HBox>
+        <HBox alignment="TOP_CENTER" minHeight="40.0" prefHeight="40.0" prefWidth="600.0" spacing="10.0">
+            <children>
+                <Button fx:id="addScheduleButton" mnemonicParsing="false" onAction="#handleAddSchedule" text="Add Schedule" />
+                <Region prefHeight="20" prefWidth="0.0" HBox.hgrow="ALWAYS" />
+                <Button fx:id="filterButton" onMouseClicked="#showFilterMenu" text="Filter ▼" />
+                <TextField fx:id="searchField" promptText="Search..." />
+                <Button mnemonicParsing="false" onAction="#handleResetSearch" text="Reset" />
+            </children>
+        </HBox>
+        <HBox alignment="TOP_RIGHT" prefHeight="30.0" prefWidth="30.0" spacing="10.0">
+            <children>
+                <CheckBox mnemonicParsing="false" text="CheckBox" />
+                <CheckBox mnemonicParsing="false" text="CheckBox" />
+            </children>
+            <padding>
+                <Insets right="20.0" />
+            </padding>
+        </HBox>
         <TableView fx:id="scheduleTable" prefHeight="300.0" prefWidth="600.0" VBox.vgrow="ALWAYS">
             <columns>
-                <TableColumn fx:id="nameColumn" prefWidth="100" text="Name" />
-                <TableColumn fx:id="surnameColumn" prefWidth="100" text="Surname" />
-                <TableColumn fx:id="emailColumn" prefWidth="150" text="Email" />
-                <TableColumn fx:id="streetColumn" prefWidth="100" text="Street" />
-                <TableColumn fx:id="civicColumn" prefWidth="60" text="Civic n." />
-                <TableColumn fx:id="cityColumn" prefWidth="100" text="City" />
-                <TableColumn fx:id="postalColumn" prefWidth="90" text="Postal Code" />
+                <TableColumn fx:id="wasteColumn" prefWidth="100" text="Waste Type" />
+                <TableColumn fx:id="typeColumn" prefWidth="120" text="Schedule Type" />
+                <TableColumn fx:id="frequencyColumn" prefWidth="100" text="Frequency" />
+                <TableColumn fx:id="pickupColumn" prefWidth="120" text="Pickup Date" />
+                <TableColumn fx:id="nextColumn" prefWidth="120" text="Next Collection" />
+                <TableColumn fx:id="startColumn" prefWidth="120" text="Start Date" />
+                <TableColumn fx:id="statusColumn" prefWidth="100" text="Status" />
+                <TableColumn fx:id="customerNameColumn" prefWidth="120" text="Customer Name" />
+                <TableColumn fx:id="customerSurnameColumn" prefWidth="120" text="Customer Surname" />
             </columns>
+
         </TableView>
         <HBox alignment="TOP_RIGHT" minHeight="50.0" prefHeight="100.0" prefWidth="600.0" spacing="10.0">
             <children>
