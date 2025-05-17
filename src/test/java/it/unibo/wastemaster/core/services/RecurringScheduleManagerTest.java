@@ -2,6 +2,7 @@ package it.unibo.wastemaster.core.services;
 
 import it.unibo.wastemaster.core.models.RecurringSchedule;
 import it.unibo.wastemaster.core.models.RecurringSchedule.Frequency;
+import it.unibo.wastemaster.core.models.Schedule.ScheduleStatus;
 import it.unibo.wastemaster.core.utils.DateUtils;
 import it.unibo.wastemaster.core.utils.ValidateUtils;
 import it.unibo.wastemaster.core.AbstractDatabaseTest;
@@ -147,5 +148,56 @@ class RecurringScheduleManagerTest extends AbstractDatabaseTest {
 
         RecurringSchedule updated = recurringScheduleDAO.findSchedulesByCustomer(customer).get(0);
         assertTrue(updated.getNextCollectionDate().isAfter(oldNextDate));
+    }
+
+    @Test
+    void testUpdateStatusRecurringSchedule() {
+        LocalDate validDate = dateUtils.getCurrentDate().plusDays(3);
+
+        assertThrows(IllegalArgumentException.class,
+                () -> recurringScheduleManager.updateStatusRecurringSchedule(null, ScheduleStatus.ACTIVE));
+
+        RecurringSchedule s0 = new RecurringSchedule(customer, waste, validDate, Frequency.WEEKLY);
+        assertThrows(IllegalArgumentException.class,
+                () -> recurringScheduleManager.updateStatusRecurringSchedule(s0, null));
+
+        RecurringSchedule s1 = new RecurringSchedule(customer, waste, validDate, Frequency.WEEKLY);
+        s1.setScheduleStatus(ScheduleStatus.CANCELLED);
+        assertFalse(recurringScheduleManager.updateStatusRecurringSchedule(s1, ScheduleStatus.ACTIVE));
+
+        wasteScheduleDAO.insert(new WasteSchedule(waste, DayOfWeek.MONDAY));
+
+        RecurringSchedule s2 = new RecurringSchedule(customer, waste, validDate, Frequency.WEEKLY);
+        s2.setScheduleStatus(ScheduleStatus.ACTIVE);
+        s2.setNextCollectionDate(validDate.plusDays(2));
+        recurringScheduleDAO.insert(s2);
+
+        assertTrue(recurringScheduleManager.updateStatusRecurringSchedule(s2, ScheduleStatus.PAUSED));
+
+        RecurringSchedule reloaded2 = recurringScheduleDAO.findById(s2.getScheduleId());
+        assertEquals(ScheduleStatus.PAUSED, reloaded2.getScheduleStatus());
+
+        assertTrue(recurringScheduleManager.updateStatusRecurringSchedule(reloaded2, ScheduleStatus.ACTIVE));
+        RecurringSchedule reloaded3 = recurringScheduleDAO.findById(s2.getScheduleId());
+        assertEquals(ScheduleStatus.ACTIVE, reloaded3.getScheduleStatus());
+
+        assertTrue(recurringScheduleManager.updateStatusRecurringSchedule(reloaded3, ScheduleStatus.CANCELLED));
+        RecurringSchedule reloaded4 = recurringScheduleDAO.findById(s2.getScheduleId());
+        assertEquals(ScheduleStatus.CANCELLED, reloaded4.getScheduleStatus());
+
+        assertFalse(recurringScheduleManager.updateStatusRecurringSchedule(reloaded4, ScheduleStatus.ACTIVE));
+    }
+
+    @Test
+    void testGetSchedulesByCustomer() {
+        RecurringSchedule schedule = new RecurringSchedule(customer, waste, dateUtils.getCurrentDate(),
+                Frequency.WEEKLY);
+        recurringScheduleDAO.insert(schedule);
+
+        List<RecurringSchedule> result = recurringScheduleManager.getSchedulesByCustomer(customer);
+
+        assertEquals(1, result.size());
+        assertEquals(customer, result.get(0).getCustomer());
+        assertEquals(waste, result.get(0).getWaste());
     }
 }
