@@ -17,6 +17,7 @@ public class AppContext {
     public static CustomerDAO customerDAO;
     public static WasteScheduleDAO wasteScheduleDAO;
     public static RecurringScheduleDAO recurringScheduleDAO;
+    public static ScheduleDAO scheduleDAO;
     public static CollectionDAO collectionDAO;
     public static OneTimeScheduleDAO oneTimeScheduleDAO;
     public static VehicleDAO vehicleDAO;
@@ -44,6 +45,7 @@ public class AppContext {
         customerDAO = new CustomerDAO(em);
         wasteScheduleDAO = new WasteScheduleDAO(em);
         recurringScheduleDAO = new RecurringScheduleDAO(em);
+        scheduleDAO = new ScheduleDAO(em);
         collectionDAO = new CollectionDAO(em);
         oneTimeScheduleDAO = new OneTimeScheduleDAO(em);
         vehicleDAO = new VehicleDAO(em);
