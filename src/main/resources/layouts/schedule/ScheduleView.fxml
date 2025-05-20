@@ -23,6 +23,7 @@
         </HBox>
         <HBox alignment="TOP_RIGHT" prefHeight="30.0" prefWidth="30.0" spacing="10.0">
             <children>
+                <CheckBox fx:id="showDeletedCheckBox" text="Show Deleted" />
                 <CheckBox fx:id="oneTimeCheckBox" text="OneTime" />
                 <CheckBox fx:id="recurringCheckBox" text="Recurring" />
             </children>
