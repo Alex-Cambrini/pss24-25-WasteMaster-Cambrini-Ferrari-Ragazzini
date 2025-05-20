@@ -1,9 +1,6 @@
 package it.unibo.wastemaster.core.models;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.Set;
 
@@ -11,12 +8,13 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import it.unibo.wastemaster.core.AbstractDatabaseTest;
-import it.unibo.wastemaster.core.models.Employee.LicenceType;
+import it.unibo.wastemaster.core.models.Employee.Licence;
 import it.unibo.wastemaster.core.models.Employee.Role;
 import it.unibo.wastemaster.core.utils.ValidateUtils;
 import jakarta.validation.ConstraintViolation;
 
 public class EmployeeTest extends AbstractDatabaseTest {
+
         private Employee employee;
         private Location location;
 
@@ -25,8 +23,7 @@ public class EmployeeTest extends AbstractDatabaseTest {
                 super.setUp();
                 location = new Location("Via Roma", "10", "Bologna", "40100");
                 employee = new Employee("Mario", "Rossi", location, "mario.rossi@example.com", "1234567890",
-                                Role.OPERATOR,
-                                LicenceType.C1);
+                                Role.OPERATOR, Licence.C1);
         }
 
         @Test
@@ -47,13 +44,13 @@ public class EmployeeTest extends AbstractDatabaseTest {
 
         @Test
         public void testSoftDeleteAndRestore() {
-                assertEquals(false, employee.isDeleted());
+                assertFalse(employee.isDeleted());
 
                 employee.delete();
-                assertEquals(true, employee.isDeleted());
+                assertTrue(employee.isDeleted());
 
                 employee.restore();
-                assertEquals(false, employee.isDeleted());
+                assertFalse(employee.isDeleted());
         }
 
         @Test
@@ -67,62 +64,64 @@ public class EmployeeTest extends AbstractDatabaseTest {
                 Set<ConstraintViolation<Employee>> violations;
 
                 violations = ValidateUtils.VALIDATOR
-                                .validate(new Employee(null, "Rossi", location, "mario.rossi@example.com",
-                                                "1234567890", Role.OPERATOR, LicenceType.C1));
-                assertTrue(violations.size() > 0);
+                                .validate(new Employee(null, "Rossi", location, "mario.rossi@example.com", "1234567890",
+                                                Role.OPERATOR, Licence.C1));
+                assertFalse(violations.isEmpty());
 
                 violations = ValidateUtils.VALIDATOR
-                                .validate(new Employee("", "Rossi", location, "mario.rossi@example.com",
-                                                "1234567890", Role.OPERATOR, LicenceType.C1));
-                assertTrue(violations.size() > 0);
+                                .validate(new Employee("", "Rossi", location, "mario.rossi@example.com", "1234567890",
+                                                Role.OPERATOR, Licence.C1));
+                assertFalse(violations.isEmpty());
 
                 violations = ValidateUtils.VALIDATOR
-                                .validate(new Employee("Mario", null, location, "mario.rossi@example.com",
-                                                "1234567890", Role.OPERATOR, LicenceType.C1));
-                assertTrue(violations.size() > 0);
+                                .validate(new Employee("Mario", null, location, "mario.rossi@example.com", "1234567890",
+                                                Role.OPERATOR, Licence.C1));
+                assertFalse(violations.isEmpty());
 
                 violations = ValidateUtils.VALIDATOR
-                                .validate(new Employee("Mario", "", location, "mario.rossi@example.com",
-                                                "1234567890", Role.OPERATOR, LicenceType.C1));
-                assertTrue(violations.size() > 0);
+                                .validate(new Employee("Mario", "", location, "mario.rossi@example.com", "1234567890",
+                                                Role.OPERATOR, Licence.C1));
+                assertFalse(violations.isEmpty());
 
                 violations = ValidateUtils.VALIDATOR
-                                .validate(new Employee("Mario", "Rossi", null, "mario.rossi@example.com",
-                                                "1234567890", Role.OPERATOR, LicenceType.C1));
-                assertTrue(violations.size() > 0);
+                                .validate(new Employee("Mario", "Rossi", null, "mario.rossi@example.com", "1234567890",
+                                                Role.OPERATOR, Licence.C1));
+                assertFalse(violations.isEmpty());
 
                 violations = ValidateUtils.VALIDATOR
                                 .validate(new Employee("Mario", "Rossi", location, null, "1234567890", Role.OPERATOR,
-                                                LicenceType.C1));
-                assertTrue(violations.size() > 0);
+                                                Licence.C1));
+                assertFalse(violations.isEmpty());
 
                 violations = ValidateUtils.VALIDATOR
                                 .validate(new Employee("Mario", "Rossi", location, "mario.rossiexample.com",
-                                                "1234567890", Role.OPERATOR, LicenceType.C1));
-                assertTrue(violations.size() > 0);
+                                                "1234567890", Role.OPERATOR, Licence.C1));
+                assertFalse(violations.isEmpty());
 
                 violations = ValidateUtils.VALIDATOR
                                 .validate(new Employee("Mario", "Rossi", location, "", "1234567890", Role.OPERATOR,
-                                                LicenceType.C1));
-                assertTrue(violations.size() > 0);
+                                                Licence.C1));
+                assertFalse(violations.isEmpty());
 
-                violations = ValidateUtils.VALIDATOR.validate(new Employee("Mario", "Rossi", location,
-                                "mario.rossi@example.com", null, Role.OPERATOR, LicenceType.C1));
-                assertTrue(violations.size() > 0);
+                violations = ValidateUtils.VALIDATOR
+                                .validate(new Employee("Mario", "Rossi", location, "mario.rossi@example.com", null,
+                                                Role.OPERATOR, Licence.C1));
+                assertFalse(violations.isEmpty());
 
-                violations = ValidateUtils.VALIDATOR.validate(
-                                new Employee("Mario", "Rossi", location, "mario.rossi@example.com", "", Role.OPERATOR,
-                                                LicenceType.C1));
-                assertTrue(violations.size() > 0);
+                violations = ValidateUtils.VALIDATOR
+                                .validate(new Employee("Mario", "Rossi", location, "mario.rossi@example.com", "",
+                                                Role.OPERATOR, Licence.C1));
+                assertFalse(violations.isEmpty());
 
-                violations = ValidateUtils.VALIDATOR.validate(new Employee("Mario", "Rossi", location,
-                                "mario.rossi@example.com", "1234567890", null, LicenceType.C1));
-                assertTrue(violations.size() > 0);
+                violations = ValidateUtils.VALIDATOR
+                                .validate(new Employee("Mario", "Rossi", location, "mario.rossi@example.com",
+                                                "1234567890", null, Licence.C1));
+                assertFalse(violations.isEmpty());
 
-                violations = ValidateUtils.VALIDATOR.validate(
-                                new Employee("Mario", "Rossi", location, "mario.rossi@example.com", "1234567890",
-                                                Role.OPERATOR, null));
-                assertTrue(violations.size() > 0);
+                violations = ValidateUtils.VALIDATOR
+                                .validate(new Employee("Mario", "Rossi", location, "mario.rossi@example.com",
+                                                "1234567890", Role.OPERATOR, null));
+                assertFalse(violations.isEmpty());
         }
 
         @Test
@@ -135,7 +134,7 @@ public class EmployeeTest extends AbstractDatabaseTest {
                 emptyEmployee.setEmail("giovanni.bianchi@example.com");
                 emptyEmployee.setPhone("0987654321");
                 emptyEmployee.setRole(Role.OPERATOR);
-                emptyEmployee.setLicenceType(LicenceType.C1);
+                emptyEmployee.setLicence(Licence.C1);
 
                 assertEquals("Giovanni", emptyEmployee.getName());
                 assertEquals("Bianchi", emptyEmployee.getSurname());
@@ -143,17 +142,15 @@ public class EmployeeTest extends AbstractDatabaseTest {
                 assertEquals("giovanni.bianchi@example.com", emptyEmployee.getEmail());
                 assertEquals("0987654321", emptyEmployee.getPhone());
                 assertEquals(Role.OPERATOR, emptyEmployee.getRole());
-                assertEquals(LicenceType.C1, emptyEmployee.getLicenceType());
+                assertEquals(Licence.C1, emptyEmployee.getLicence());
 
-                assertEquals(Role.OPERATOR, emptyEmployee.getRole());
-                assertEquals(LicenceType.C1, emptyEmployee.getLicenceType());
-                assertEquals("3.5 t - 7.5 t", LicenceType.C1.getLicenceDescription());
+                assertEquals("3.5 t - 7.5 t", Licence.C1.getLicenceDescription());
 
                 emptyEmployee.setRole(Role.ADMINISTRATOR);
-                emptyEmployee.setLicenceType(LicenceType.C);
+                emptyEmployee.setLicence(Licence.C);
 
                 assertEquals(Role.ADMINISTRATOR, emptyEmployee.getRole());
-                assertEquals(LicenceType.C, emptyEmployee.getLicenceType());
+                assertEquals(Licence.C, emptyEmployee.getLicence());
         }
 
         @Test
@@ -161,7 +158,7 @@ public class EmployeeTest extends AbstractDatabaseTest {
                 employeeDAO.insert(employee);
                 int employeeId = employee.getEmployeeId();
                 Employee found = employeeDAO.findById(employeeId);
-                ;
+
                 assertEquals(employee.getName(), found.getName());
                 assertEquals(employee.getEmail(), found.getEmail());
 
@@ -180,7 +177,7 @@ public class EmployeeTest extends AbstractDatabaseTest {
                 assertTrue(output.contains(employee.getEmail()));
                 assertTrue(output.contains(employee.getPhone()));
                 assertTrue(output.contains(employee.getRole().name()));
-                assertTrue(output.contains(employee.getLicenceType().name()));
+                assertTrue(output.contains(employee.getLicence().name()));
                 assertTrue(output.contains(location.toString()));
         }
 }
