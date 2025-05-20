@@ -5,6 +5,9 @@ import it.unibo.wastemaster.controller.utils.DialogUtils;
 import it.unibo.wastemaster.core.context.AppContext;
 import it.unibo.wastemaster.core.models.OneTimeSchedule;
 import it.unibo.wastemaster.core.models.RecurringSchedule;
+import it.unibo.wastemaster.core.models.RecurringSchedule.Frequency;
+import it.unibo.wastemaster.core.models.Schedule;
+import it.unibo.wastemaster.core.models.Schedule.ScheduleCategory;
 import it.unibo.wastemaster.core.models.Schedule.ScheduleStatus;
 import it.unibo.wastemaster.viewmodels.ScheduleRow;
 import javafx.animation.KeyFrame;
@@ -12,10 +15,16 @@ import javafx.animation.Timeline;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 import javafx.util.Duration;
 
+import java.io.IOException;
 import java.util.List;
 
 public class ScheduleController {
@@ -31,6 +40,8 @@ public class ScheduleController {
     private CheckBox oneTimeCheckBox;
     @FXML
     private CheckBox recurringCheckBox;
+    @FXML
+    private CheckBox showDeletedCheckBox;
 
     @FXML
     private ContextMenu filterMenu;
@@ -45,42 +56,38 @@ public class ScheduleController {
     @FXML
     private TableColumn<ScheduleRow, String> frequencyColumn;
     @FXML
-    private TableColumn<ScheduleRow, String> pickupColumn;
-    @FXML
-    private TableColumn<ScheduleRow, String> nextColumn;
+    private TableColumn<ScheduleRow, String> dateColumn;
     @FXML
     private TableColumn<ScheduleRow, String> startColumn;
     @FXML
     private TableColumn<ScheduleRow, String> statusColumn;
     @FXML
-    private TableColumn<ScheduleRow, String> customerNameColumn;
-    @FXML
-    private TableColumn<ScheduleRow, String> customerSurnameColumn;
+    private TableColumn<ScheduleRow, String> customerColumn;
 
     @FXML
     private TextField searchField;
 
     @FXML
     public void initialize() {
-        wasteColumn.setCellValueFactory(new PropertyValueFactory<>("wasteType"));
+        wasteColumn.setCellValueFactory(new PropertyValueFactory<>("wasteName"));
         typeColumn.setCellValueFactory(new PropertyValueFactory<>("scheduleType"));
         frequencyColumn.setCellValueFactory(new PropertyValueFactory<>("frequency"));
-        pickupColumn.setCellValueFactory(new PropertyValueFactory<>("pickupDate"));
-        nextColumn.setCellValueFactory(new PropertyValueFactory<>("nextCollectionDate"));
+        dateColumn.setCellValueFactory(new PropertyValueFactory<>("executionDate"));
         startColumn.setCellValueFactory(new PropertyValueFactory<>("startDate"));
         statusColumn.setCellValueFactory(new PropertyValueFactory<>("status"));
-        customerNameColumn.setCellValueFactory(new PropertyValueFactory<>("customerName"));
-        customerSurnameColumn.setCellValueFactory(new PropertyValueFactory<>("customerSurname"));
+        customerColumn.setCellValueFactory(new PropertyValueFactory<>("customer"));
 
         oneTimeCheckBox.setSelected(true);
         recurringCheckBox.setSelected(true);
+        showDeletedCheckBox.setSelected(false);
 
         loadSchedules();
         startAutoRefresh();
         searchField.textProperty().addListener((obs, oldText, newText) -> handleSearch());
         oneTimeCheckBox.selectedProperty().addListener((obs, oldVal, newVal) -> loadSchedules());
         recurringCheckBox.selectedProperty().addListener((obs, oldVal, newVal) -> loadSchedules());
-
+        recurringCheckBox.selectedProperty().addListener((obs, oldVal, newVal) -> loadSchedules());
+        showDeletedCheckBox.selectedProperty().addListener((obs, oldVal, newVal) -> loadSchedules());
     }
 
     private void startAutoRefresh() {
@@ -98,42 +105,25 @@ public class ScheduleController {
 
     private void loadSchedules() {
         allSchedules.clear();
+        List<Schedule> all = AppContext.scheduleDAO.findAll();
+        all.forEach(s -> System.out.println(s));
 
-        if (oneTimeCheckBox.isSelected()) {
-            List<OneTimeSchedule> oneTimeList = AppContext.oneTimeScheduleDAO.findAll();
-            for (OneTimeSchedule s : oneTimeList) {
-                if (s == null || s.getCustomer() == null || s.getWaste() == null || s.getScheduleStatus() == null)
-                    continue;
+        for (Schedule s : all) {
+            if (s == null || s.getCustomer() == null || s.getWaste() == null || s.getScheduleStatus() == null)
+                continue;
 
-                allSchedules.add(new ScheduleRow(
-                        s.getWaste().getWasteName(),
-                        s.getScheduleCategory().name(),
-                        "-",
-                        s.getPickupDate() != null ? s.getPickupDate().toString() : "-",
-                        "-",
-                        "-",
-                        s.getScheduleStatus().name(),
-                        s.getCustomer().getName(),
-                        s.getCustomer().getSurname()));
-            }
-        }
+            ScheduleCategory scheduleType = s.getScheduleCategory();
+            boolean isDeleted = s.getScheduleStatus() == ScheduleStatus.CANCELLED;
 
-        if (recurringCheckBox.isSelected()) {
-            List<RecurringSchedule> recurringList = AppContext.recurringScheduleDAO.findAll();
-            for (RecurringSchedule s : recurringList) {
-                if (s == null || s.getCustomer() == null || s.getWaste() == null || s.getScheduleStatus() == null)
-                    continue;
+            boolean matchesType = (oneTimeCheckBox.isSelected() && scheduleType == ScheduleCategory.ONE_TIME)
+                    || (recurringCheckBox.isSelected() && scheduleType == ScheduleCategory.RECURRING);
+            boolean matchesDeleted = showDeletedCheckBox.isSelected() || !isDeleted;
 
-                allSchedules.add(new ScheduleRow(
-                        s.getWaste().getWasteName(),
-                        s.getScheduleCategory().name(),
-                        s.getFrequency() != null ? s.getFrequency().name() : "-",
-                        "-",
-                        s.getNextCollectionDate() != null ? s.getNextCollectionDate().toString() : "-",
-                        s.getStartDate() != null ? s.getStartDate().toString() : "-",
-                        s.getScheduleStatus().name(),
-                        s.getCustomer().getName(),
-                        s.getCustomer().getSurname()));
+            if (matchesType && matchesDeleted) {
+                if (scheduleType == ScheduleCategory.ONE_TIME)
+                    allSchedules.add(new ScheduleRow((OneTimeSchedule) s));
+                else if (scheduleType == ScheduleCategory.RECURRING)
+                    allSchedules.add(new ScheduleRow((RecurringSchedule) s));
             }
         }
 
@@ -155,49 +145,52 @@ public class ScheduleController {
     }
 
     @FXML
-    private void handleEditSchedule() {
+    private void handleChangeFrequency() {
         ScheduleRow selected = scheduleTable.getSelectionModel().getSelectedItem();
         if (selected == null) {
             DialogUtils.showError("No Selection", "Please select a schedule to edit.");
             return;
         }
 
+        if (selected.getScheduleType() == ScheduleCategory.ONE_TIME) {
+            DialogUtils.showError("Edit not allowed", "Cannot edit one-time schedules.");
+            return;
+        }
         try {
-            if ("ONE_TIME".equals(selected.getScheduleType())) {
-                var schedule = AppContext.oneTimeScheduleDAO.findAll().stream()
-                        .filter(s -> s.getCustomer().getName().equals(selected.getCustomerName())
-                                && s.getCustomer().getSurname().equals(selected.getCustomerSurname())
-                                && s.getPickupDate() != null
-                                && s.getPickupDate().toString().equals(selected.getPickupDate()))
-                        .findFirst().orElse(null);
+            RecurringSchedule schedule = AppContext.recurringScheduleDAO.findById(selected.getId());
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/layouts/schedule/ChangeFrequencyDialog.fxml"));
+            Parent root = loader.load();
 
-                if (schedule != null) {
-                    MainLayoutController.getInstance().setPageTitle("Edit One-Time Schedule");
-                    EditScheduleController controller = MainLayoutController.getInstance()
-                            .loadCenterWithController("/layouts/schedule/EditScheduleView.fxml");
-                    controller.setScheduleToEdit(schedule);
-                    controller.setScheduleController(this);
-                }
-            } else if ("RECURRING".equals(selected.getScheduleType())) {
-                var schedule = AppContext.recurringScheduleDAO.findAll().stream()
-                        .filter(s -> s.getCustomer().getName().equals(selected.getCustomerName())
-                                && s.getCustomer().getSurname().equals(selected.getCustomerSurname())
-                                && s.getStartDate() != null
-                                && s.getStartDate().toString().equals(selected.getStartDate()))
-                        .findFirst().orElse(null);
+            Stage dialogStage = new Stage();
+            Stage mainStage = (Stage) MainLayoutController.getInstance().getRootPane().getScene().getWindow();
 
-                if (schedule != null) {
-                    MainLayoutController.getInstance().setPageTitle("Edit Recurring Schedule");
-                    EditScheduleController controller = MainLayoutController.getInstance()
-                            .loadCenterWithController("/layouts/schedule/EditScheduleView.fxml");
-                    controller.setScheduleToEdit(schedule);
-                    controller.setScheduleController(this);
-                }
+            dialogStage.setTitle("Change Frequency");
+            dialogStage.initModality(Modality.APPLICATION_MODAL);
+            dialogStage.initOwner(mainStage);
+            dialogStage.setScene(new Scene(root));
+
+            ChangeFrequencyDialogController controller = loader.getController();
+            controller.setSchedule(schedule);
+            controller.setFrequencies(List.of(Frequency.values()));
+            controller.setCurrentFrequency(schedule.getFrequency());
+
+            dialogStage.showAndWait();
+
+            Frequency selectedFreq = controller.getSelectedFrequency();
+
+            if (selectedFreq != null) {
+                AppContext.recurringScheduleManager.updateFrequency(schedule, selectedFreq);
+
             }
-        } catch (Exception e) {
-            DialogUtils.showError("Error", "Could not load edit view.");
+            loadSchedules();
+        } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    @FXML
+    private void handleStatusToggle() {
+
     }
 
     @FXML
@@ -208,34 +201,23 @@ public class ScheduleController {
             return;
         }
 
+        boolean success = false;
+
         try {
-            boolean success = false;
-
-            if ("ONE_TIME".equals(selected.getScheduleType())) {
-                var schedule = AppContext.oneTimeScheduleDAO.findAll().stream()
-                        .filter(s -> s.getCustomer().getName().equals(selected.getCustomerName())
-                                && s.getCustomer().getSurname().equals(selected.getCustomerSurname())
-                                && s.getPickupDate() != null
-                                && s.getPickupDate().toString().equals(selected.getPickupDate()))
-                        .findFirst().orElse(null);
-
-                if (schedule != null) {
-                    success = AppContext.oneTimeScheduleManager.updateStatusOneTimeSchedule(schedule,
-                            ScheduleStatus.CANCELLED);
+            switch (selected.getScheduleType()) {
+                case ONE_TIME -> {
+                    OneTimeSchedule schedule = AppContext.oneTimeScheduleDAO.findById(selected.getId());
+                    if (schedule != null) {
+                        success = AppContext.oneTimeScheduleManager.softDeleteOneTimeSchedule(schedule);
+                    }
                 }
-            }
 
-            if ("RECURRING".equals(selected.getScheduleType())) {
-                var schedule = AppContext.recurringScheduleDAO.findAll().stream()
-                        .filter(s -> s.getCustomer().getName().equals(selected.getCustomerName())
-                                && s.getCustomer().getSurname().equals(selected.getCustomerSurname())
-                                && s.getStartDate() != null
-                                && s.getStartDate().toString().equals(selected.getStartDate()))
-                        .findFirst().orElse(null);
-
-                if (schedule != null) {
-                    success = AppContext.recurringScheduleManager.updateStatusRecurringSchedule(schedule,
-                            ScheduleStatus.CANCELLED);
+                case RECURRING -> {
+                    RecurringSchedule schedule = AppContext.recurringScheduleDAO.findById(selected.getId());
+                    if (schedule != null) {
+                        success = AppContext.recurringScheduleManager
+                                .updateStatusRecurringSchedule(schedule, ScheduleStatus.CANCELLED);
+                    }
                 }
             }
 
@@ -254,33 +236,38 @@ public class ScheduleController {
 
     @FXML
     private void handleSearch() {
-        String query = searchField.getText().toLowerCase().trim();
+        // String query = searchField.getText().toLowerCase().trim();
 
-        if (query.isEmpty()) {
-            scheduleTable.setItems(FXCollections.observableArrayList(allSchedules));
-            return;
-        }
+        // if (query.isEmpty()) {
+        // scheduleTable.setItems(FXCollections.observableArrayList(allSchedules));
+        // return;
+        // }
 
-        ObservableList<ScheduleRow> filtered = FXCollections.observableArrayList();
+        // ObservableList<ScheduleRow> filtered = FXCollections.observableArrayList();
 
-        for (ScheduleRow row : allSchedules) {
-            if ((activeFilters.contains("wasteType") && row.getWasteType().toLowerCase().contains(query)) ||
-                    (activeFilters.contains("scheduleType") && row.getScheduleType().toLowerCase().contains(query)) ||
-                    (activeFilters.contains("frequency") && row.getFrequency().toLowerCase().contains(query)) ||
-                    (activeFilters.contains("pickupDate") && row.getPickupDate().toLowerCase().contains(query)) ||
-                    (activeFilters.contains("nextCollectionDate")
-                            && row.getNextCollectionDate().toLowerCase().contains(query))
-                    ||
-                    (activeFilters.contains("startDate") && row.getStartDate().toLowerCase().contains(query)) ||
-                    (activeFilters.contains("status") && row.getStatus().toLowerCase().contains(query)) ||
-                    (activeFilters.contains("customerName") && row.getCustomerName().toLowerCase().contains(query)) ||
-                    (activeFilters.contains("customerSurname")
-                            && row.getCustomerSurname().toLowerCase().contains(query))) {
-                filtered.add(row);
-            }
-        }
+        // for (ScheduleRow row : allSchedules) {
+        // if ((activeFilters.contains("wasteType") &&
+        // row.getWasteName().toLowerCase().contains(query)) ||
+        // (activeFilters.contains("scheduleType") &&
+        // row.getScheduleType().toLowerCase().contains(query)) ||
+        // (activeFilters.contains("frequency") &&
+        // row.getFrequency().toLowerCase().contains(query)) ||
+        // (activeFilters.contains("pickupDate") &&
+        // row.getExecutionDate().toLowerCase().contains(query)) ||
+        // (activeFilters.contains("nextCollectionDate")
+        // && row.getExecutionDate().toLowerCase().contains(query))
+        // ||
+        // (activeFilters.contains("startDate") &&
+        // row.getStartDate().toLowerCase().contains(query)) ||
+        // (activeFilters.contains("status") &&
+        // row.getStatus().toLowerCase().contains(query)) ||
+        // (activeFilters.contains("customer")
+        // && row.getCustomer().toLowerCase().contains(query))) {
+        // filtered.add(row);
+        // }
+        // }
 
-        scheduleTable.setItems(filtered);
+        // scheduleTable.setItems(filtered);
     }
 
     @FXML
