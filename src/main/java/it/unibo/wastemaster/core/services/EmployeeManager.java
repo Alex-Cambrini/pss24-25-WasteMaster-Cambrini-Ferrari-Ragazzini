@@ -2,6 +2,7 @@ package it.unibo.wastemaster.core.services;
 
 import it.unibo.wastemaster.core.dao.EmployeeDAO;
 import it.unibo.wastemaster.core.models.Employee;
+import it.unibo.wastemaster.core.models.Vehicle;
 import it.unibo.wastemaster.core.utils.ValidateUtils;
 
 public class EmployeeManager {
@@ -13,6 +14,9 @@ public class EmployeeManager {
     }
 
     public Employee addEmployee(Employee employee) {
+        ValidateUtils.requireArgNotNull(employee, "Employee cannot be null");
+        ValidateUtils.validateEntity(employee);
+
         if (isEmailRegistered(employee.getEmail())) {
             throw new IllegalArgumentException(
                     String.format("Cannot add employee: the email address '%s' is already in use.",
@@ -33,6 +37,7 @@ public class EmployeeManager {
     public void updateEmployee(Employee toUpdateEmployee) {
         ValidateUtils.validateEntity(toUpdateEmployee);
         ValidateUtils.requireArgNotNull(toUpdateEmployee.getEmployeeId(), "Employee ID cannot be null");
+
         Employee existing = employeeDAO.findByEmail(toUpdateEmployee.getEmail());
         if (existing != null && !existing.getEmployeeId().equals(toUpdateEmployee.getEmployeeId())) {
             throw new IllegalArgumentException("Email is already used by another employee.");
@@ -50,5 +55,18 @@ public class EmployeeManager {
         } catch (IllegalArgumentException e) {
             return false;
         }
+    }
+
+    public boolean canDriveVehicle(Employee employee, Vehicle vehicle) {
+        ValidateUtils.requireArgNotNull(employee, "Employee cannot be null");
+        ValidateUtils.requireArgNotNull(vehicle, "Vehicle cannot be null");
+
+        return switch (employee.getLicence()) {
+            case C -> true;
+            case C1 -> vehicle.getRequiredLicence() == Vehicle.RequiredLicence.B
+                    || vehicle.getRequiredLicence() == Vehicle.RequiredLicence.C1;
+            case B -> vehicle.getRequiredLicence() == Vehicle.RequiredLicence.B;
+            default -> false;
+        };
     }
 }
