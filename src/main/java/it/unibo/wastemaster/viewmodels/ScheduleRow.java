@@ -1,32 +1,45 @@
 package it.unibo.wastemaster.viewmodels;
 
+import it.unibo.wastemaster.core.models.OneTimeSchedule;
+import it.unibo.wastemaster.core.models.RecurringSchedule;
+
 public class ScheduleRow {
-    private final String wasteType;
+    private final int id;
+    private final String wasteName;
     private final String scheduleType;
     private final String frequency;
-    private final String pickupDate;
-    private final String nextCollectionDate;
+    private final String executionDate;
     private final String startDate;
     private final String status;
-    private final String customerName;
-    private final String customerSurname;
+    private final String customer;
 
-    public ScheduleRow(String wasteType, String scheduleType, String frequency, String pickupDate,
-            String nextCollectionDate, String startDate, String status,
-            String customerName, String customerSurname) {
-        this.wasteType = wasteType;
-        this.scheduleType = scheduleType;
-        this.frequency = frequency;
-        this.pickupDate = pickupDate;
-        this.nextCollectionDate = nextCollectionDate;
-        this.startDate = startDate;
-        this.status = status;
-        this.customerName = customerName;
-        this.customerSurname = customerSurname;
+    public ScheduleRow(OneTimeSchedule schedule) {
+        this.id = schedule.getScheduleId();        
+        this.wasteName = schedule.getWaste().getWasteName();
+        this.scheduleType = "One Time";
+        this.frequency = "N/A";
+        this.executionDate = schedule.getPickupDate().toString();
+        this.startDate = "N/A";
+        this.status = schedule.getScheduleStatus().toString();
+        this.customer = schedule.getCustomer().getName() + " " + schedule.getCustomer().getSurname();
+    }
+    public ScheduleRow(RecurringSchedule schedule) {
+        this.id = schedule.getScheduleId();
+        this.wasteName = schedule.getWaste().getWasteName();
+        this.scheduleType = "Recurring";
+        this.frequency = schedule.getFrequency().toString();
+        this.executionDate = schedule.getNextCollectionDate().toString();
+        this.startDate = schedule.getStartDate().toString();
+        this.status = schedule.getScheduleStatus().toString();
+        this.customer = schedule.getCustomer().getName() + " " + schedule.getCustomer().getSurname();
     }
 
-    public String getWasteType() {
-        return wasteType;
+    public int getId() {
+        return id;
+    }
+
+    public String getWasteName() {
+        return wasteName;
     }
 
     public String getScheduleType() {
@@ -37,12 +50,8 @@ public class ScheduleRow {
         return frequency;
     }
 
-    public String getPickupDate() {
-        return pickupDate;
-    }
-
-    public String getNextCollectionDate() {
-        return nextCollectionDate;
+    public String getExecutionDate() {
+        return executionDate;
     }
 
     public String getStartDate() {
@@ -53,11 +62,7 @@ public class ScheduleRow {
         return status;
     }
 
-    public String getCustomerName() {
-        return customerName;
-    }
-
-    public String getCustomerSurname() {
-        return customerSurname;
+    public String getCustomer() {
+        return customer;
     }
 }
