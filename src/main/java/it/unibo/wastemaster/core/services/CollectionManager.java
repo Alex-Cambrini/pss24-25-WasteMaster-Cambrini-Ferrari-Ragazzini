@@ -9,6 +9,7 @@ import it.unibo.wastemaster.core.models.OneTimeSchedule;
 import it.unibo.wastemaster.core.models.RecurringSchedule;
 import it.unibo.wastemaster.core.models.Schedule;
 import it.unibo.wastemaster.core.utils.DateUtils;
+import it.unibo.wastemaster.core.utils.ValidateUtils;
 
 public class CollectionManager {
 
@@ -49,6 +50,18 @@ public class CollectionManager {
         for (RecurringSchedule schedule : upcomingSchedules) {
             generateCollection(schedule);
         }
+    }
+
+    public boolean softDeleteCollection(Collection collection) {
+        ValidateUtils.requireArgNotNull(collection, "Collection cannot be null");
+        ValidateUtils.requireArgNotNull(collection.getCollectionId(), "Collection ID cannot be null");
+
+        if (collection.getCollectionStatus() == CollectionStatus.CANCELLED) {
+            return false;
+        }
+        collection.setCollectionStatus(CollectionStatus.CANCELLED);
+        updateCollection(collection);
+        return true;
     }
 
     public void updateCollection(Collection collection) {
