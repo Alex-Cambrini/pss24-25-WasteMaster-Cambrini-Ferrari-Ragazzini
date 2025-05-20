@@ -12,8 +12,8 @@ import it.unibo.wastemaster.core.models.Schedule.ScheduleStatus;
 import it.unibo.wastemaster.core.models.Waste;
 import it.unibo.wastemaster.core.models.WasteSchedule;
 import it.unibo.wastemaster.core.utils.DateUtils;
+import it.unibo.wastemaster.core.utils.ValidateUtils;
 import it.unibo.wastemaster.core.models.Collection;
-
 
 public class RecurringScheduleManager {
 
@@ -36,13 +36,14 @@ public class RecurringScheduleManager {
         this.dateUtils = dateUtils;
     }
 
-    public void createRecurringSchedule(Customer customer, Waste waste, LocalDate startDate,
+    public RecurringSchedule createRecurringSchedule(Customer customer, Waste waste, LocalDate startDate,
             Frequency frequency) {
         RecurringSchedule schedule = new RecurringSchedule(customer, waste, startDate, frequency);
         LocalDate nextCollectionDate = calculateNextDate(schedule);
         schedule.setNextCollectionDate(nextCollectionDate);
         recurringScheduleDAO.insert(schedule);
         collectionManager.generateCollection(schedule);
+        return schedule;
     }
 
     protected LocalDate calculateNextDate(RecurringSchedule schedule) {
@@ -114,9 +115,11 @@ public class RecurringScheduleManager {
         }
 
         if (schedule.getScheduleStatus() == ScheduleStatus.PAUSED && newStatus == ScheduleStatus.ACTIVE) {
-            collectionManager.generateCollection(schedule);
+            LocalDate nextDate = calculateNextDate(schedule);
+            schedule.setNextCollectionDate(nextDate);
             schedule.setScheduleStatus(ScheduleStatus.ACTIVE);
             recurringScheduleDAO.update(schedule);
+            collectionManager.generateCollection(schedule);
             return true;
         }
 
@@ -126,17 +129,11 @@ public class RecurringScheduleManager {
             schedule.setScheduleStatus(newStatus);
             recurringScheduleDAO.update(schedule);
 
-            if (newStatus == ScheduleStatus.CANCELLED) {
-                var associatedCollection = collectionManager.getActiveCollectionByRecurringSchedule(schedule);
-                if (associatedCollection != null) {
-                    associatedCollection.setCollectionStatus(Collection.CollectionStatus.CANCELLED);
-                    collectionManager.updateCollection(associatedCollection);
-                }
-            }
-
-            return true;
+            Collection associatedCollection = collectionManager.getActiveCollectionByRecurringSchedule(schedule);
+            ValidateUtils.requireStateNotNull(associatedCollection, "Associated collection must not be null");
+            collectionManager.softDeleteCollection(associatedCollection);
         }
-
-        return false;
+        return true;
     }
+
 }
