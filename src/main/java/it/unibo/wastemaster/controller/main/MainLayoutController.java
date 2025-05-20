@@ -108,4 +108,8 @@ public class MainLayoutController {
         }
     }
 
+    public BorderPane getRootPane() {
+        return rootPane;
+    }
+
 }
