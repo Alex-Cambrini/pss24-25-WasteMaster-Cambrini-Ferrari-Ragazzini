@@ -36,13 +36,14 @@ public class RecurringScheduleManager {
         this.dateUtils = dateUtils;
     }
 
-    public void createRecurringSchedule(Customer customer, Waste waste, LocalDate startDate,
+    public RecurringSchedule createRecurringSchedule(Customer customer, Waste waste, LocalDate startDate,
             Frequency frequency) {
         RecurringSchedule schedule = new RecurringSchedule(customer, waste, startDate, frequency);
         LocalDate nextCollectionDate = calculateNextDate(schedule);
         schedule.setNextCollectionDate(nextCollectionDate);
         recurringScheduleDAO.insert(schedule);
         collectionManager.generateCollection(schedule);
+        return schedule;
     }
 
     protected LocalDate calculateNextDate(RecurringSchedule schedule) {
@@ -128,9 +129,9 @@ public class RecurringScheduleManager {
             schedule.setScheduleStatus(newStatus);
             recurringScheduleDAO.update(schedule);
 
-                Collection associatedCollection = collectionManager.getActiveCollectionByRecurringSchedule(schedule);
-                ValidateUtils.requireStateNotNull(associatedCollection, "Associated collection must not be null");
-                collectionManager.softDeleteCollection(associatedCollection);
+            Collection associatedCollection = collectionManager.getActiveCollectionByRecurringSchedule(schedule);
+            ValidateUtils.requireStateNotNull(associatedCollection, "Associated collection must not be null");
+            collectionManager.softDeleteCollection(associatedCollection);
         }
         return true;
     }
