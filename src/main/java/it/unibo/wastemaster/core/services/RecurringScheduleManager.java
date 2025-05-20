@@ -136,4 +136,21 @@ public class RecurringScheduleManager {
         return true;
     }
 
+    public Boolean updateFrequency(RecurringSchedule schedule, Frequency newFrequency) {
+        ValidateUtils.requireArgNotNull(schedule, "Schedule must not be null");
+        ValidateUtils.requireArgNotNull(newFrequency, "Frequency must not be null");
+
+        if (schedule.getScheduleStatus() == ScheduleStatus.CANCELLED) {
+            return false;
+        }
+
+        if (schedule.getFrequency() == newFrequency) {
+            return false;
+        }
+
+        schedule.setFrequency(newFrequency);
+        recurringScheduleDAO.update(schedule);
+        return true;
+    }
+
 }
