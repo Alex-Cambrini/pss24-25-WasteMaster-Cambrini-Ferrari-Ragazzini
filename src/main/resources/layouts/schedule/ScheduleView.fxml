@@ -10,9 +10,7 @@
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox alignment="TOP_CENTER" prefWidth="640.0"
-    xmlns="http://javafx.com/javafx/23.0.1"
-    xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.unibo.wastemaster.controller.schedule.ScheduleController">
+<VBox alignment="TOP_CENTER" prefWidth="640.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.unibo.wastemaster.controller.schedule.ScheduleController">
     <children>
         <HBox alignment="TOP_CENTER" minHeight="40.0" prefHeight="40.0" prefWidth="600.0" spacing="10.0">
             <children>
@@ -34,25 +32,25 @@
         </HBox>
         <TableView fx:id="scheduleTable" prefHeight="300.0" prefWidth="600.0" VBox.vgrow="ALWAYS">
             <columns>
-                <TableColumn fx:id="wasteColumn" prefWidth="100" text="Waste Type" />
+                <TableColumn fx:id="wasteColumn" prefWidth="100" text="Waste Name" />
                 <TableColumn fx:id="typeColumn" prefWidth="120" text="Schedule Type" />
                 <TableColumn fx:id="frequencyColumn" prefWidth="100" text="Frequency" />
-                <TableColumn fx:id="pickupColumn" prefWidth="120" text="Pickup Date" />
-                <TableColumn fx:id="nextColumn" prefWidth="120" text="Next Collection" />
+                <TableColumn fx:id="dateColumn" prefWidth="120" text="Execution Date" />
                 <TableColumn fx:id="startColumn" prefWidth="120" text="Start Date" />
                 <TableColumn fx:id="statusColumn" prefWidth="100" text="Status" />
-                <TableColumn fx:id="customerNameColumn" prefWidth="120" text="Customer Name" />
-                <TableColumn fx:id="customerSurnameColumn" prefWidth="120" text="Customer Surname" />
+                <TableColumn fx:id="customerColumn" prefWidth="120" text="Customer" />
             </columns>
 
         </TableView>
         <HBox alignment="TOP_RIGHT" minHeight="50.0" prefHeight="100.0" prefWidth="600.0" spacing="10.0">
             <children>
-                <Button mnemonicParsing="false" onAction="#handleEditSchedule" text="Edit" />
+            <Button mnemonicParsing="false" onAction="#handleChangeFrequency" text="Change Frequency" />
+            <Button mnemonicParsing="false" onAction="#handleStatusToggle" text="Pause" />
+            <Region prefHeight="200.0" prefWidth="200.0" HBox.hgrow="ALWAYS" />
                 <Button mnemonicParsing="false" onAction="#handleDeleteSchedule" text="Delete" />
             </children>
             <padding>
-                <Insets right="20.0" top="10.0" />
+                <Insets top="10.0" />
             </padding>
         </HBox>
     </children>
