@@ -7,7 +7,6 @@ import it.unibo.wastemaster.core.models.Location;
 import it.unibo.wastemaster.core.models.OneTimeSchedule;
 import it.unibo.wastemaster.core.models.Schedule.ScheduleStatus;
 import it.unibo.wastemaster.core.models.Waste;
-import it.unibo.wastemaster.core.utils.ValidateUtils;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -63,100 +62,32 @@ class OneTimeScheduleManagerTest extends AbstractDatabaseTest {
 	}
 
 	@Test
-	void testUpdateDateOneTimeSchedule() {
-		LocalDate oldDate = dateUtils.getCurrentDate().plusDays(5);
-		LocalDate newDate = oldDate.plusDays(3);
-
-		OneTimeSchedule schedule = new OneTimeSchedule(customer, waste, oldDate);
-		ValidateUtils.validateEntity(schedule);
-		oneTimeScheduleDAO.insert(schedule);
-		collectionManager.generateOneTimeCollection(schedule);
-
-		boolean result = oneTimeScheduleManager.updateDateOneTimeSchedule(schedule, newDate);
-		assertTrue(result);
-
-		Collection updated = collectionDAO.findAll().get(0);
-		assertEquals(newDate, updated.getCollectionDate());
-		assertEquals(newDate, schedule.getPickupDate());
-	}
-
-	@Test
-	void testUpdateWasteOneTimeSchedule() {
-		LocalDate date = dateUtils.getCurrentDate().plusDays(5);
-		OneTimeSchedule schedule = new OneTimeSchedule(customer, waste, date);
-		ValidateUtils.validateEntity(schedule);
-		oneTimeScheduleDAO.insert(schedule);
-		
-		collectionManager.generateOneTimeCollection(schedule);
-		Waste glass = new Waste("glass", true, false);
-		wasteDAO.insert(glass);
-		boolean result = oneTimeScheduleManager.updateWasteOneTimeSchedule(schedule, glass);
-		assertTrue(result);
-
-		Collection updated = collectionDAO.findAll().get(0);
-		assertEquals(glass, updated.getWaste());
-		assertEquals(glass, schedule.getWaste());
-	}
-
-	@Test
-	void testUpdateDateFail() {
-		LocalDate oldDate = dateUtils.getCurrentDate().plusDays(1);
-		LocalDate newDate = oldDate.plusDays(3);
-
-		OneTimeSchedule schedule = new OneTimeSchedule(customer, waste, oldDate);
-		ValidateUtils.validateEntity(schedule);
-		oneTimeScheduleDAO.insert(schedule);
-		collectionManager.generateOneTimeCollection(schedule);
-
-		boolean result = oneTimeScheduleManager.updateDateOneTimeSchedule(schedule, newDate);
-		assertFalse(result);
-	}
-
-	@Test
-	void testUpdateStatusOneTimeSchedule_allCases() {
+	void testSoftDeleteOneTimeSchedule_allCases() {
 		LocalDate validDate = dateUtils.getCurrentDate().plusDays(3);
 
 		// 1) Null args
-		assertThrows(IllegalArgumentException.class, () ->
-			oneTimeScheduleManager.updateStatusOneTimeSchedule(null, ScheduleStatus.ACTIVE)
-		);
+		assertThrows(IllegalArgumentException.class, () -> oneTimeScheduleManager.softDeleteOneTimeSchedule(null));
 
-		OneTimeSchedule s0 = new OneTimeSchedule(customer, waste, validDate);
-		ValidateUtils.validateEntity(s0);
-		assertThrows(IllegalArgumentException.class, () ->
-			oneTimeScheduleManager.updateStatusOneTimeSchedule(s0, null)
-		);
-	
 		// 2) Already CANCELLED → false
-		OneTimeSchedule s2 = new OneTimeSchedule(customer, waste, validDate);
-		ValidateUtils.validateEntity(s2);
-		s2.setScheduleStatus(ScheduleStatus.CANCELLED);
-		assertFalse(oneTimeScheduleManager.updateStatusOneTimeSchedule(s2, ScheduleStatus.ACTIVE));
-			
-		// 3) ACTIVE → PAUSED
-		OneTimeSchedule s3 = oneTimeScheduleManager.createOneTimeSchedule(customer, waste, validDate);
-		assertTrue(oneTimeScheduleManager.updateStatusOneTimeSchedule(s3, ScheduleStatus.PAUSED));
+		OneTimeSchedule cancelledSchedule = new OneTimeSchedule(customer, waste, validDate);
+		cancelledSchedule.setScheduleStatus(ScheduleStatus.CANCELLED);
+		assertFalse(oneTimeScheduleManager.softDeleteOneTimeSchedule(cancelledSchedule));
 
-		Collection c3 = collectionManager.getCancelledCollectionsOneTimeSchedule(s3).stream().findFirst().orElse(null);		
-		assertNotNull(c3);
-		assertEquals(c3.getCollectionStatus(), Collection.CollectionStatus.CANCELLED);
+		// 3) ACTIVE → CANCELLED
+		OneTimeSchedule activeSchedule = oneTimeScheduleManager.createOneTimeSchedule(customer, waste, validDate);
+		boolean deleted = oneTimeScheduleManager.softDeleteOneTimeSchedule(activeSchedule);
+		assertTrue(deleted);
 
-		// 3) PAUSED → ACTIVE
-		assertTrue(oneTimeScheduleManager.updateStatusOneTimeSchedule(s3, ScheduleStatus.ACTIVE));
-		c3 = collectionManager.getActiveCollectionByOneTimeSchedule(s3);
-		assertNotNull(c3);
-	}
+		// Check collection also cancelled
+		Collection cancelledCollection = collectionManager.getCancelledCollectionsOneTimeSchedule(activeSchedule)
+				.stream()
+				.findFirst()
+				.orElse(null);
 
-	@Test
-	void testCancelFail() {
-		LocalDate date = dateUtils.getCurrentDate().plusDays(1);
+		assertNotNull(cancelledCollection);
+		assertEquals(Collection.CollectionStatus.CANCELLED, cancelledCollection.getCollectionStatus());
 
-		OneTimeSchedule schedule = new OneTimeSchedule(customer, waste, date);
-		ValidateUtils.validateEntity(schedule);
-		oneTimeScheduleDAO.insert(schedule);
-		collectionManager.generateOneTimeCollection(schedule);
-
-		boolean result = oneTimeScheduleManager.updateStatusOneTimeSchedule(schedule, ScheduleStatus.CANCELLED);
-		assertFalse(result);
+		// 4) Try to delete again → false
+		assertFalse(oneTimeScheduleManager.softDeleteOneTimeSchedule(activeSchedule));
 	}
 }

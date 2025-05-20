@@ -34,8 +34,7 @@ public class CollectionManagerTest extends AbstractDatabaseTest {
         Location location = new Location("Via Roma", "10", "Bologna", "40100");
         customer = new Customer("Mario", "Rossi", location, "mario.rossi@example.com", "1234567890");
         LocalDate futureDate = dateUtils.getCurrentDate().plusDays(3);
-        plastic = new Waste("PLASTICA", true, false);
-        
+        plastic = new Waste("PLASTIC", true, false);
 
         em.getTransaction().begin();
         wasteDAO.insert(plastic);
@@ -138,29 +137,51 @@ public class CollectionManagerTest extends AbstractDatabaseTest {
         assertNull(none);
     }
 
-@Test
-public void testGetCancelledCollectionsOneTimeSchedule() {
-    LocalDate date = dateUtils.getCurrentDate().plusDays(3);
-    OneTimeSchedule schedule = oneTimeScheduleManager.createOneTimeSchedule(customer, plastic, date);
+    @Test
+    public void testGetCancelledCollectionsOneTimeSchedule() {
+        LocalDate date = dateUtils.getCurrentDate().plusDays(3);
+        OneTimeSchedule schedule = oneTimeScheduleManager.createOneTimeSchedule(customer, plastic, date);
 
-    List<Collection> cancelledBefore = collectionManager.getCancelledCollectionsOneTimeSchedule(schedule);
-    assertTrue(cancelledBefore.isEmpty());
+        List<Collection> cancelledBefore = collectionManager.getCancelledCollectionsOneTimeSchedule(schedule);
+        assertTrue(cancelledBefore.isEmpty());
 
-    Collection c1 = collectionManager.getActiveCollectionByOneTimeSchedule(schedule);
-    c1.setCollectionStatus(CollectionStatus.CANCELLED);
-    collectionManager.updateCollection(c1);
+        Collection c1 = collectionManager.getActiveCollectionByOneTimeSchedule(schedule);
+        c1.setCollectionStatus(CollectionStatus.CANCELLED);
+        collectionManager.updateCollection(c1);
 
-    Collection c2 = new Collection(schedule);
-    c2.setCollectionStatus(CollectionStatus.CANCELLED);
-    collectionDAO.insert(c2);
+        Collection c2 = new Collection(schedule);
+        c2.setCollectionStatus(CollectionStatus.CANCELLED);
+        collectionDAO.insert(c2);
 
-    List<Collection> cancelled = collectionManager.getCancelledCollectionsOneTimeSchedule(schedule);
-    assertEquals(2, cancelled.size());
-    cancelled.forEach(c -> {
-        assertEquals(CollectionStatus.CANCELLED, c.getCollectionStatus());
-        assertEquals(schedule, c.getSchedule());
-    });
-}
+        List<Collection> cancelled = collectionManager.getCancelledCollectionsOneTimeSchedule(schedule);
+        assertEquals(2, cancelled.size());
+        cancelled.forEach(c -> {
+            assertEquals(CollectionStatus.CANCELLED, c.getCollectionStatus());
+            assertEquals(schedule, c.getSchedule());
+        });
+    }
 
+    @Test
+    public void testGetActiveCollectionByRecurringSchedule() {
+        LocalDate date = dateUtils.getCurrentDate().plusDays(5);
+
+        RecurringSchedule schedule = new RecurringSchedule(customer, plastic, date, RecurringSchedule.Frequency.WEEKLY);
+        schedule.setScheduleStatus(Schedule.ScheduleStatus.ACTIVE);
+        schedule.setNextCollectionDate(date);
+
+        recurringScheduleDAO.insert(schedule);
+        collectionManager.generateCollection(schedule);
+
+        Collection active = collectionManager.getActiveCollectionByRecurringSchedule(schedule);
+        assertNotNull(active);
+        assertEquals(CollectionStatus.PENDING, active.getCollectionStatus());
+        assertEquals(schedule, active.getSchedule());
+
+        active.setCollectionStatus(CollectionStatus.CANCELLED);
+        collectionManager.updateCollection(active);
+
+        Collection none = collectionManager.getActiveCollectionByRecurringSchedule(schedule);
+        assertNull(none);
+    }
 
 }

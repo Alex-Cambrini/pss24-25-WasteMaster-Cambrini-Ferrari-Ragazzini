@@ -36,7 +36,7 @@ public class CollectionDAOTest extends AbstractDatabaseTest {
         super.setUp();
         em.getTransaction().begin();
         date = dateUtils.getCurrentDate();
-        waste = new Waste("PLASTICA", true,false);
+        waste = new Waste("PLASTIC", true, false);
 
         pending = Collection.CollectionStatus.PENDING;
         inProgress = Collection.CollectionStatus.IN_PROGRESS;
@@ -106,7 +106,7 @@ public class CollectionDAOTest extends AbstractDatabaseTest {
         assertEquals(result.getCollectionStatus(), Collection.CollectionStatus.PENDING);
 
         result.setCollectionStatus(cancelled);
-        
+
         Collection nullResult = collectionDAO.findActiveCollectionByOneTimeSchedule(schedule);
         assertNull(nullResult);
     }
@@ -130,6 +130,29 @@ public class CollectionDAOTest extends AbstractDatabaseTest {
         for (Collection c : resultList) {
             assertEquals(Collection.CollectionStatus.CANCELLED, c.getCollectionStatus());
         }
+    }
+
+    @Test
+    public void testFindActiveCollectionByRecurringSchedule() {
+        LocalDate newDate = dateUtils.getCurrentDate().plusDays(4);
+        recurringSchedule.setNextCollectionDate(newDate);
+        recurringSchedule.setScheduleStatus(RecurringSchedule.ScheduleStatus.ACTIVE);
+        recurringScheduleDAO.update(recurringSchedule);
+
+        Collection collection = new Collection(recurringSchedule);
+        collection.setCollectionDate(newDate);
+        collection.setCollectionStatus(Collection.CollectionStatus.PENDING);
+        collectionDAO.insert(collection);
+
+        Collection result = collectionDAO.findActiveCollectionByRecurringSchedule(recurringSchedule);
+        assertNotNull(result);
+        assertEquals(Collection.CollectionStatus.PENDING, result.getCollectionStatus());
+
+        result.setCollectionStatus(Collection.CollectionStatus.CANCELLED);
+        collectionDAO.update(result);
+
+        Collection nullResult = collectionDAO.findActiveCollectionByRecurringSchedule(recurringSchedule);
+        assertNull(nullResult);
     }
 
 }
