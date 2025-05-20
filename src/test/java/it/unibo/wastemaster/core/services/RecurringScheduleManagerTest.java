@@ -6,10 +6,12 @@ import it.unibo.wastemaster.core.models.Schedule.ScheduleStatus;
 import it.unibo.wastemaster.core.utils.DateUtils;
 import it.unibo.wastemaster.core.utils.ValidateUtils;
 import it.unibo.wastemaster.core.AbstractDatabaseTest;
+import it.unibo.wastemaster.core.models.Collection;
 import it.unibo.wastemaster.core.models.Customer;
 import it.unibo.wastemaster.core.models.Location;
 import it.unibo.wastemaster.core.models.Waste;
 import it.unibo.wastemaster.core.models.WasteSchedule;
+import it.unibo.wastemaster.core.models.Collection.CollectionStatus;
 
 import org.junit.jupiter.api.*;
 
@@ -154,37 +156,52 @@ class RecurringScheduleManagerTest extends AbstractDatabaseTest {
     void testUpdateStatusRecurringSchedule() {
         LocalDate validDate = dateUtils.getCurrentDate().plusDays(3);
 
+        // Null arguments throw exception
         assertThrows(IllegalArgumentException.class,
                 () -> recurringScheduleManager.updateStatusRecurringSchedule(null, ScheduleStatus.ACTIVE));
-
         RecurringSchedule s0 = new RecurringSchedule(customer, waste, validDate, Frequency.WEEKLY);
         assertThrows(IllegalArgumentException.class,
                 () -> recurringScheduleManager.updateStatusRecurringSchedule(s0, null));
 
+        // Cannot update CANCELLED schedule
         RecurringSchedule s1 = new RecurringSchedule(customer, waste, validDate, Frequency.WEEKLY);
         s1.setScheduleStatus(ScheduleStatus.CANCELLED);
         assertFalse(recurringScheduleManager.updateStatusRecurringSchedule(s1, ScheduleStatus.ACTIVE));
 
         wasteScheduleDAO.insert(new WasteSchedule(waste, DayOfWeek.MONDAY));
 
-        RecurringSchedule s2 = new RecurringSchedule(customer, waste, validDate, Frequency.WEEKLY);
-        s2.setScheduleStatus(ScheduleStatus.ACTIVE);
-        s2.setNextCollectionDate(validDate.plusDays(2));
-        recurringScheduleDAO.insert(s2);
+        // ACTIVE -> PAUSED: update status and soft delete associated collection
+        RecurringSchedule s2 = recurringScheduleManager.createRecurringSchedule(customer, waste, validDate,
+                Frequency.WEEKLY);
+        Collection associatedCollection = collectionManager.getActiveCollectionByRecurringSchedule(s2);
+        int associatedCollectionId = associatedCollection.getCollectionId();
 
+        assertNotEquals(CollectionStatus.CANCELLED, associatedCollection.getCollectionStatus());
         assertTrue(recurringScheduleManager.updateStatusRecurringSchedule(s2, ScheduleStatus.PAUSED));
 
         RecurringSchedule reloaded2 = recurringScheduleDAO.findById(s2.getScheduleId());
-        assertEquals(ScheduleStatus.PAUSED, reloaded2.getScheduleStatus());
+        associatedCollection = collectionDAO.findById(associatedCollectionId);
 
+        assertEquals(ScheduleStatus.PAUSED, reloaded2.getScheduleStatus());
+        assertEquals(CollectionStatus.CANCELLED, associatedCollection.getCollectionStatus());
+
+        // PAUSED -> ACTIVE: recalc next date, update status, generate new collection
         assertTrue(recurringScheduleManager.updateStatusRecurringSchedule(reloaded2, ScheduleStatus.ACTIVE));
+
         RecurringSchedule reloaded3 = recurringScheduleDAO.findById(s2.getScheduleId());
         assertEquals(ScheduleStatus.ACTIVE, reloaded3.getScheduleStatus());
+        associatedCollection = collectionManager.getActiveCollectionByRecurringSchedule(reloaded3);
+        assertNotNull(associatedCollection);
+        assertNotNull(reloaded3.getNextCollectionDate());
 
+        // ACTIVE -> CANCELLED: update status and soft delete collection
         assertTrue(recurringScheduleManager.updateStatusRecurringSchedule(reloaded3, ScheduleStatus.CANCELLED));
         RecurringSchedule reloaded4 = recurringScheduleDAO.findById(s2.getScheduleId());
+        associatedCollection = collectionManager.getActiveCollectionByRecurringSchedule(reloaded4);
+        assertNull(associatedCollection);
         assertEquals(ScheduleStatus.CANCELLED, reloaded4.getScheduleStatus());
 
+        // Cannot reactivate CANCELLED schedule
         assertFalse(recurringScheduleManager.updateStatusRecurringSchedule(reloaded4, ScheduleStatus.ACTIVE));
     }
 
