@@ -13,49 +13,49 @@ import jakarta.validation.constraints.NotNull;
 @Entity
 @Table(name = "employee")
 public class Employee extends Person {
-    
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer employeeId;
 
-    @NotNull (message = "Role cannot be null")
+    @NotNull(message = "Role cannot be null")
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Role role;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    @NotNull(message = "Licence type cannot be null")
-	private LicenceType licenceType;
+    @NotNull(message = "Licence cannot be null")
+    private Licence licence;
 
-    public enum LicenceType {
+    public enum Licence {
         NONE("None"),
         B("Fino a 3.5 t"),
         C1("3.5 t - 7.5 t"),
         C("Oltre 7.5 t");
 
-    
         private final String licenceDescription;
-    
-        LicenceType(String licenceDescription) {
+
+        Licence(String licenceDescription) {
             this.licenceDescription = licenceDescription;
         }
-    
+
         public String getLicenceDescription() {
             return licenceDescription;
         }
     }
-        
+
     public enum Role {
         ADMINISTRATOR,
         OFFICE_WORKER,
         OPERATOR
     }
 
-    public Employee(String name, String surname, Location address, String email, String phone, Role role, LicenceType licenceType) {
+    public Employee(String name, String surname, Location address, String email, String phone, Role role,
+            Licence licence) {
         super(name, surname, address, email, phone);
         this.role = role;
-        this.licenceType = licenceType;
+        this.licence = licence;
     }
 
     public Employee() {
@@ -74,13 +74,13 @@ public class Employee extends Person {
         this.role = role;
     }
 
-    public LicenceType getLicenceType() {
-		return licenceType;
-	}
+    public Licence getLicence() {
+        return licence;
+    }
 
-    public void setLicenceType(LicenceType licenceType) {  
-		this.licenceType = licenceType;
-	}
+    public void setLicence(Licence licence) {
+        this.licence = licence;
+    }
 
     @Override
     public String toString() {
@@ -93,6 +93,6 @@ public class Employee extends Person {
                 getPhone(),
                 getLocation() != null ? getLocation().toString() : "N/A",
                 role,
-                licenceType);
+                licence);
     }
 }
