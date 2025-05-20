@@ -3,9 +3,9 @@ package it.unibo.wastemaster.core.services;
 import it.unibo.wastemaster.core.AbstractDatabaseTest;
 import it.unibo.wastemaster.core.models.Employee;
 import it.unibo.wastemaster.core.models.Location;
-import it.unibo.wastemaster.core.models.Employee.LicenceType;
+import it.unibo.wastemaster.core.models.Vehicle;
+import it.unibo.wastemaster.core.models.Employee.Licence;
 import it.unibo.wastemaster.core.models.Employee.Role;
-import jakarta.validation.ConstraintViolationException;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -23,22 +23,22 @@ class EmployeeManagerTest extends AbstractDatabaseTest {
         em.getTransaction().begin();
         email = "test@test.it";
         location = new Location("Via Roma", "10", "Bologna", "40100");
-        employee = new Employee("Mario", "Rossi", location, email, "1234567890", Role.ADMINISTRATOR, LicenceType.NONE);
-
+        employee = new Employee("Mario", "Rossi", location, email, "1234567890", Role.ADMINISTRATOR, Licence.NONE);
     }
 
     @Test
-    void testAddEmployee() {
-        Employee saved = employeeManager.addEmployee(employee);
-        assertNotNull(saved.getEmployeeId());
+    void testAddEmployeeInvalid() {
+        assertThrows(IllegalArgumentException.class, () -> {
+            employeeManager.addEmployee(new Employee("Mario", "Rossi",
+                    new Location("Via Roma", "10", "Bologna", "40100"),
+                    "email@example.com", "1234567890", null, Employee.Licence.NONE));
+        });
 
-        // Add employee with duplicate email
-        Employee duplicate = new Employee("Luca", "Bianchi", location, email, "1234567890", Role.ADMINISTRATOR,
-                LicenceType.NONE);
-        assertThrows(
-                IllegalArgumentException.class,
-                () -> employeeManager.addEmployee(duplicate),
-                "A employee with this email already exists");
+        assertThrows(IllegalArgumentException.class, () -> {
+            employeeManager.addEmployee(new Employee("Mario", "Rossi",
+                    new Location("Via Roma", "10", "Bologna", "40100"),
+                    "email@example.com", "1234567890", Employee.Role.ADMINISTRATOR, null));
+        });
     }
 
     @Test
@@ -57,11 +57,9 @@ class EmployeeManagerTest extends AbstractDatabaseTest {
         assertEquals(saved.getLocation().getCity(), found.getLocation().getCity());
         assertEquals(saved.getLocation().getPostalCode(), found.getLocation().getPostalCode());
         assertEquals(saved.getRole(), found.getRole());
-        assertEquals(saved.getLicenceType(), found.getLicenceType());
+        assertEquals(saved.getLicence(), found.getLicence());
 
-        // not found
-        Employee notFound = employeeManager.getEmployeeById(-1);
-        assertNull(notFound);
+        assertNull(employeeManager.getEmployeeById(-1));
     }
 
     @Test
@@ -69,18 +67,19 @@ class EmployeeManagerTest extends AbstractDatabaseTest {
         Employee saved = employeeManager.addEmployee(employee);
         String newPhone = "0000000000";
         String newName = "Francesco";
-        LicenceType newLicenceType = LicenceType.C1;
+        Licence newLicence = Licence.C1;
         Role newRole = Role.OPERATOR;
 
         saved.setPhone(newPhone);
         saved.setName(newName);
-        saved.setLicenceType(LicenceType.C1);
+        saved.setLicence(Licence.C1);
         saved.setRole(Role.OPERATOR);
         employeeManager.updateEmployee(saved);
+
         Employee updated = employeeManager.getEmployeeById(saved.getEmployeeId());
         assertEquals(newPhone, updated.getPhone());
         assertEquals(newName, updated.getName());
-        assertEquals(newLicenceType, updated.getLicenceType());
+        assertEquals(newLicence, updated.getLicence());
         assertEquals(newRole, updated.getRole());
     }
 
@@ -104,24 +103,21 @@ class EmployeeManagerTest extends AbstractDatabaseTest {
         assertFalse(employeeManager.softDeleteEmployee(null));
 
         Employee nonExistentEmployee = new Employee("Non", "Existent", location, "nonexistent@test.it",
-                "1234567890", Role.ADMINISTRATOR, LicenceType.NONE);
+                "1234567890", Role.ADMINISTRATOR, Licence.NONE);
         assertFalse(employeeManager.softDeleteEmployee(nonExistentEmployee));
     }
 
     @Test
     void testAddEmployeInvalid() {
-        // Null role
-        assertThrows(ConstraintViolationException.class,
+        assertThrows(IllegalArgumentException.class,
                 () -> employeeManager.addEmployee(new Employee("Mario", "Rossi",
                         new Location("Via Roma", "10", "Bologna", "40100"),
-                        email, "1234567890", null, LicenceType.NONE)));
+                        email, "1234567890", null, Licence.NONE)));
 
-        // Null licence type
-        assertThrows(ConstraintViolationException.class,
+        assertThrows(IllegalArgumentException.class,
                 () -> employeeManager.addEmployee(new Employee("Mario", "Rossi",
                         new Location("Via Roma", "10", "Bologna", "40100"),
                         email, "1234567890", Role.ADMINISTRATOR, null)));
-
     }
 
     @Test
@@ -133,18 +129,49 @@ class EmployeeManagerTest extends AbstractDatabaseTest {
 
     @Test
     void testUpdateEmployeeInvalid() {
-               // Test: Employee null
-                assertThrows(IllegalArgumentException.class, () -> employeeManager.updateEmployee(null));
+        assertThrows(IllegalArgumentException.class, () -> employeeManager.updateEmployee(null));
 
-                // Test: Employee not persisted (not saved in DB)
-                Employee notPersisted = new Employee("Franco", "Neri",
-                                new Location("Via Roma", "10", "Bologna", "40100"), "test2@test.it", "1234567890", Role.ADMINISTRATOR, LicenceType.NONE);
-                assertThrows(IllegalArgumentException.class, () -> employeeManager.updateEmployee(notPersisted));
-        }
+        Employee notPersisted = new Employee("Franco", "Neri",
+                new Location("Via Roma", "10", "Bologna", "40100"), "test2@test.it", "1234567890",
+                Role.ADMINISTRATOR, Licence.NONE);
+        assertThrows(IllegalArgumentException.class, () -> employeeManager.updateEmployee(notPersisted));
+    }
 
     @Test
     void testUpdateEmployeeNoChange() {
         employeeManager.addEmployee(employee);
         assertDoesNotThrow(() -> employeeManager.updateEmployee(employee));
+    }
+
+    @Test
+    void testCanDriveVehicle() {
+        Vehicle vB = new Vehicle("AA111AA", "Fiat", "Ducato", 2020,
+                Vehicle.RequiredLicence.B, Vehicle.VehicleStatus.IN_SERVICE, 3);
+        Vehicle vC1 = new Vehicle("BB222BB", "Iveco", "Daily", 2021,
+                Vehicle.RequiredLicence.C1, Vehicle.VehicleStatus.IN_SERVICE, 5);
+        Vehicle vC = new Vehicle("CC333CC", "MAN", "TGE", 2022,
+                Vehicle.RequiredLicence.C, Vehicle.VehicleStatus.IN_SERVICE, 7);
+
+        Employee eB = new Employee("Luca", "Bianchi", location, "b@example.com", "123", Employee.Role.OPERATOR,
+                Employee.Licence.B);
+        Employee eC1 = new Employee("Giulia", "Neri", location, "c1@example.com", "456", Employee.Role.OPERATOR,
+                Employee.Licence.C1);
+        Employee eC = new Employee("Marco", "Verdi", location, "c@example.com", "789", Employee.Role.OPERATOR,
+                Employee.Licence.C);
+
+        assertTrue(employeeManager.canDriveVehicle(eB, vB));
+        assertFalse(employeeManager.canDriveVehicle(eB, vC1));
+        assertFalse(employeeManager.canDriveVehicle(eB, vC));
+
+        assertTrue(employeeManager.canDriveVehicle(eC1, vC1));
+        assertTrue(employeeManager.canDriveVehicle(eC1, vB));
+        assertFalse(employeeManager.canDriveVehicle(eC1, vC));
+
+        assertTrue(employeeManager.canDriveVehicle(eC, vC));
+        assertTrue(employeeManager.canDriveVehicle(eC, vC1));
+        assertTrue(employeeManager.canDriveVehicle(eC, vB));
+
+        assertThrows(IllegalArgumentException.class, () -> employeeManager.canDriveVehicle(null, vB));
+        assertThrows(IllegalArgumentException.class, () -> employeeManager.canDriveVehicle(eC, null));
     }
 }

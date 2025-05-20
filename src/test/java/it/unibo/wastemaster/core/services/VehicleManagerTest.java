@@ -3,8 +3,6 @@ package it.unibo.wastemaster.core.services;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.time.LocalDate;
-import java.util.Arrays;
-import java.util.Collections;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -23,12 +21,12 @@ public class VehicleManagerTest extends AbstractDatabaseTest {
                 super.setUp();
                 em.getTransaction().begin();
 
-                v1 = new Vehicle("DD444DD", "Renault", "Master", 2023, Vehicle.LicenceType.C1,
-                                Vehicle.VehicleStatus.IN_SERVICE);
-                v2 = new Vehicle("EE555EE", "MAN", "TGE", 2022, Vehicle.LicenceType.C,
-                                Vehicle.VehicleStatus.IN_MAINTENANCE);
-                v3 = new Vehicle("FF666FF", "Ford", "Transit", 2021, Vehicle.LicenceType.C1,
-                                Vehicle.VehicleStatus.OUT_OF_SERVICE);
+                v1 = new Vehicle("DD444DD", "Renault", "Master", 2023, Vehicle.RequiredLicence.C1,
+                                Vehicle.VehicleStatus.IN_SERVICE, 3);
+                v2 = new Vehicle("EE555EE", "MAN", "TGE", 2022, Vehicle.RequiredLicence.C,
+                                Vehicle.VehicleStatus.IN_MAINTENANCE, 2);
+                v3 = new Vehicle("FF666FF", "Ford", "Transit", 2021, Vehicle.RequiredLicence.C1,
+                                Vehicle.VehicleStatus.OUT_OF_SERVICE, 3);
 
                 vehicleDAO.insert(v1);
                 vehicleDAO.insert(v2);
@@ -38,8 +36,7 @@ public class VehicleManagerTest extends AbstractDatabaseTest {
         @Test
         public void testPlateNormalization() {
                 Vehicle vehicleWithLowerCasePlate = new Vehicle("aa111aa", "Fiat", "Panda", 2024,
-                                Vehicle.LicenceType.C1,
-                                Vehicle.VehicleStatus.IN_SERVICE);
+                                Vehicle.RequiredLicence.C1, Vehicle.VehicleStatus.IN_SERVICE, 1);
                 vehicleWithLowerCasePlate.setLastMaintenanceDate(LocalDate.now());
                 vehicleWithLowerCasePlate.setNextMaintenanceDate(LocalDate.now().plusYears(1));
 
@@ -55,8 +52,7 @@ public class VehicleManagerTest extends AbstractDatabaseTest {
         @Test
         public void testUpdateVehiclePlate() {
                 Vehicle vehicle = new Vehicle("CC333CC", "Toyota", "HiAce", 2026,
-                                Vehicle.LicenceType.C,
-                                Vehicle.VehicleStatus.IN_SERVICE);
+                                Vehicle.RequiredLicence.C, Vehicle.VehicleStatus.IN_SERVICE, 4);
                 vehicleManager.addVehicle(vehicle);
 
                 vehicle.setPlate("cc333cc");
@@ -69,30 +65,25 @@ public class VehicleManagerTest extends AbstractDatabaseTest {
 
         @Test
         public void testAddVehicle() {
-
-                Vehicle toAddVeichle = new Vehicle("gg000gg", "Renault", "Master", 2023, Vehicle.LicenceType.C1,
-                                Vehicle.VehicleStatus.IN_SERVICE);
-                Vehicle saved = vehicleManager.addVehicle(toAddVeichle);
+                Vehicle toAddVehicle = new Vehicle("gg000gg", "Renault", "Master", 2023,
+                                Vehicle.RequiredLicence.C1, Vehicle.VehicleStatus.IN_SERVICE, 3);
+                Vehicle saved = vehicleManager.addVehicle(toAddVehicle);
 
                 assertNotNull(saved);
                 assertEquals("Renault", saved.getBrand());
 
                 assertThrows(IllegalArgumentException.class, () -> vehicleManager.addVehicle(null));
 
-                Vehicle duplicate = new Vehicle("gg000GG", "Renault", "Master", 2023, Vehicle.LicenceType.C1,
-                                Vehicle.VehicleStatus.IN_SERVICE);
-
-
+                Vehicle duplicate = new Vehicle("gg000GG", "Renault", "Master", 2023,
+                                Vehicle.RequiredLicence.C1, Vehicle.VehicleStatus.IN_SERVICE, 3);
                 assertThrows(IllegalArgumentException.class, () -> vehicleManager.addVehicle(duplicate));
 
-                Vehicle withSpaces = new Vehicle("  AA000BB ", "Brand", "Model", 2024, Vehicle.LicenceType.C1,
-                                Vehicle.VehicleStatus.IN_SERVICE);
-
+                Vehicle withSpaces = new Vehicle("  AA000BB ", "Brand", "Model", 2024,
+                                Vehicle.RequiredLicence.C1, Vehicle.VehicleStatus.IN_SERVICE, 2);
                 vehicleManager.addVehicle(withSpaces);
                 Vehicle savedNoSpaces = vehicleManager.findVehicleByPlate("aa000bb");
                 assertNotNull(savedNoSpaces);
                 assertEquals("AA000BB", savedNoSpaces.getPlate());
-
         }
 
         @Test
@@ -106,8 +97,8 @@ public class VehicleManagerTest extends AbstractDatabaseTest {
 
                 assertThrows(IllegalArgumentException.class, () -> vehicleManager.updateVehicle(null));
 
-                Vehicle ghost = new Vehicle("ZZ999ZZ", "Ghost", "Model", 2024, Vehicle.LicenceType.C1,
-                                Vehicle.VehicleStatus.IN_SERVICE);
+                Vehicle ghost = new Vehicle("ZZ999ZZ", "Ghost", "Model", 2024,
+                                Vehicle.RequiredLicence.C1, Vehicle.VehicleStatus.IN_SERVICE, 1);
                 assertDoesNotThrow(() -> vehicleManager.updateVehicle(ghost));
 
                 v1.setBrand(null);
@@ -128,19 +119,5 @@ public class VehicleManagerTest extends AbstractDatabaseTest {
 
                 assertThrows(IllegalArgumentException.class, () -> vehicleManager.markMaintenanceAsComplete(null));
                 assertThrows(IllegalArgumentException.class, () -> vehicleManager.markMaintenanceAsComplete(v1));
-        }
-
-        @Test
-        public void testCanOperateVehicle() {
-                assertTrue(vehicleManager.canOperateVehicle(v1, Arrays.asList(Vehicle.LicenceType.C1)));
-                assertTrue(vehicleManager.canOperateVehicle(v1, Arrays.asList(Vehicle.LicenceType.C)));
-                assertFalse(vehicleManager.canOperateVehicle(v2, Arrays.asList(Vehicle.LicenceType.C1)));
-                assertTrue(vehicleManager.canOperateVehicle(v2, Arrays.asList(Vehicle.LicenceType.C)));
-
-                assertThrows(IllegalArgumentException.class,
-                                () -> vehicleManager.canOperateVehicle(null, Arrays.asList(Vehicle.LicenceType.C1)));
-                assertThrows(IllegalArgumentException.class, () -> vehicleManager.canOperateVehicle(v1, null));
-                assertThrows(IllegalArgumentException.class,
-                                () -> vehicleManager.canOperateVehicle(v1, Collections.emptyList()));
         }
 }

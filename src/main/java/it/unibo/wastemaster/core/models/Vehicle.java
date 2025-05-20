@@ -42,8 +42,12 @@ public class Vehicle {
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
-    @NotNull(message = "Licence type is required")
-    private LicenceType licenceType;
+    @NotNull(message = "Required licence is required")
+    private RequiredLicence requiredLicence;
+
+    @Column(nullable = false)
+    @NotNull(message = "Vehicle capacity is required")
+    private int capacity;
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
@@ -59,19 +63,10 @@ public class Vehicle {
     @FutureOrPresent(message = "Next maintenance date cannot be in the past")
     private LocalDate nextMaintenanceDate;
 
-    public enum LicenceType {
-        C1(3),
-        C(2);
-
-        private final int capacity;
-
-        LicenceType(int capacity) {
-            this.capacity = capacity;
-        }
-
-        public int getCapacity() {
-            return capacity;
-        }
+    public enum RequiredLicence {
+        B,
+        C1,
+        C
     }
 
     public enum VehicleStatus {
@@ -84,7 +79,7 @@ public class Vehicle {
     }
 
     public Vehicle(String plate, String brand, String model, int registrationYear,
-            LicenceType licenceType, VehicleStatus vehicleStatus) {
+            RequiredLicence requiredLicence, VehicleStatus vehicleStatus, int capacity) {
         if (plate == null) {
             throw new IllegalArgumentException("Plate must not be null");
         }
@@ -92,8 +87,9 @@ public class Vehicle {
         this.brand = brand;
         this.model = model;
         this.registrationYear = registrationYear;
-        this.licenceType = licenceType;
+        this.requiredLicence = requiredLicence;
         this.vehicleStatus = vehicleStatus;
+        this.capacity = capacity;
         this.lastMaintenanceDate = LocalDate.now();
         this.nextMaintenanceDate = lastMaintenanceDate.plusYears(1);
     }
@@ -126,8 +122,12 @@ public class Vehicle {
         return registrationYear;
     }
 
-    public LicenceType getLicenceType() {
-        return licenceType;
+    public RequiredLicence getRequiredLicence() {
+        return requiredLicence;
+    }
+
+    public void setRequiredLicence(RequiredLicence requiredLicence) {
+        this.requiredLicence = requiredLicence;
     }
 
     public VehicleStatus getVehicleStatus() {
@@ -135,7 +135,11 @@ public class Vehicle {
     }
 
     public int getCapacity() {
-        return licenceType.getCapacity();
+        return capacity;
+    }
+
+    public void setCapacity(int capacity) {
+        this.capacity = capacity;
     }
 
     public LocalDate getLastMaintenanceDate() {
@@ -162,10 +166,6 @@ public class Vehicle {
         this.registrationYear = registrationYear;
     }
 
-    public void setLicenceType(LicenceType licenceType) {
-        this.licenceType = licenceType;
-    }
-
     public void setVehicleStatus(VehicleStatus vehicleStatus) {
         this.vehicleStatus = vehicleStatus;
     }
@@ -185,13 +185,13 @@ public class Vehicle {
     @Override
     public String toString() {
         return String.format(
-                "Vehicle {Plate: %s, Brand: %s, Model: %s, Year: %d, Licence: %s, Capacity: %d, Status: %s, LastMaint: %s, NextMaint: %s}",
+                "Vehicle {Plate: %s, Brand: %s, Model: %s, Year: %d, RequiredLicence: %s, Capacity: %d, Status: %s, LastMaint: %s, NextMaint: %s}",
                 plate != null ? plate : "N/A",
                 brand != null ? brand : "N/A",
                 model != null ? model : "N/A",
                 registrationYear,
-                licenceType != null ? licenceType.name() : "N/A",
-                getCapacity(),
+                requiredLicence != null ? requiredLicence.name() : "N/A",
+                capacity,
                 vehicleStatus != null ? vehicleStatus.name() : "N/A",
                 lastMaintenanceDate != null ? lastMaintenanceDate.toString() : "N/A",
                 nextMaintenanceDate != null ? nextMaintenanceDate.toString() : "N/A");
