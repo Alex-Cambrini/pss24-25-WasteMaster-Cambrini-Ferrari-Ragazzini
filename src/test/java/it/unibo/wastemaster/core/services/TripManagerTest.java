@@ -13,140 +13,140 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class TripManagerTest extends AbstractDatabaseTest {
 
-    private Vehicle vehicle;
-    private Employee operator1, operator2;
-    private LocalDateTime departureTime;
-    private LocalDateTime expectedReturnTime;
+        private Vehicle vehicle;
+        private Employee operator1, operator2;
+        private LocalDateTime departureTime;
+        private LocalDateTime expectedReturnTime;
 
-    @BeforeEach
-    public void setUp() {
-        super.setUp();
+        @BeforeEach
+        public void setUp() {
+                super.setUp();
 
-        vehicle = new Vehicle("AB123CD", "Iveco", "Daily", 2020,
-                Vehicle.LicenceType.C1, Vehicle.VehicleStatus.IN_SERVICE);
-        employeeDAO.insert(new Employee("John", "Doe", new Location("Via Roma", "10", "Bologna", "40100"),
-                "john.doe@example.com", "+391234567890", Employee.Role.OPERATOR, Employee.LicenceType.C1));
-        employeeDAO.insert(new Employee("Anna", "Rossi", new Location("Via Milano", "22", "Milano", "20100"),
-                "anna.rossi@example.com", "+390987654321", Employee.Role.OPERATOR, Employee.LicenceType.C1));
+                vehicle = new Vehicle("AB123CD", "Iveco", "Daily", 2020,
+                                Vehicle.RequiredLicence.C1, Vehicle.VehicleStatus.IN_SERVICE, 3);
+                vehicleDAO.insert(vehicle);
 
-        operator1 = employeeDAO.findAll().get(0);
-        operator2 = employeeDAO.findAll().get(1);
+                Employee emp1 = new Employee("John", "Doe",
+                                new Location("Via Roma", "10", "Bologna", "40100"),
+                                "john.doe@example.com", "+391234567890",
+                                Employee.Role.OPERATOR, Employee.Licence.C1);
+                Employee emp2 = new Employee("Anna", "Rossi",
+                                new Location("Via Milano", "22", "Milano", "20100"),
+                                "anna.rossi@example.com", "+390987654321",
+                                Employee.Role.OPERATOR, Employee.Licence.C1);
 
-        vehicleDAO.insert(vehicle);
+                employeeDAO.insert(emp1);
+                employeeDAO.insert(emp2);
 
-        departureTime = LocalDateTime.now().plusHours(1);
-        expectedReturnTime = departureTime.plusHours(5);
-       
-    }
+                operator1 = emp1;
+                operator2 = emp2;
 
-//     @Test
-//     void testCreateAndGetTrip() {
+                departureTime = LocalDateTime.now().plusHours(1);
+                expectedReturnTime = departureTime.plusHours(5);
+        }
 
-//         Customer customer1 = new Customer("Mario Rossi", null, null, null, null);
-//         Customer customer2 = new Customer("Anna Bianchi", null, null, null, null);
-        
+        // @Test
+        // void testCreateAndGetTrip() {
 
-//         Waste waste1 = new Waste("Organico", null, null);
-//         Waste waste2 = new Waste("Carta", null, null);
-       
+        // Customer customer1 = new Customer("Mario Rossi", null, null, null, null);
+        // Customer customer2 = new Customer("Anna Bianchi", null, null, null, null);
 
-//         OneTimeSchedule oneTime1 = new OneTimeSchedule( customer1, waste1, LocalDate.now().plusDays(1));
-       
-//         RecurringSchedule recurring = new RecurringSchedule(customer2, waste2, LocalDate.now(), RecurringSchedule.Frequency.WEEKLY);
-//         recurring.setNextCollectionDate(LocalDate.now().plusDays(7));  
+        // Waste waste1 = new Waste("Organico", null, null);
+        // Waste waste2 = new Waste("Carta", null, null);
 
-//         Collection collection1 = new Collection(oneTime1);
-//         Collection collection2 = new Collection(recurring);
- 
-//         List<Collection> collections = List.of(collection1, collection2);
+        // OneTimeSchedule oneTime1 = new OneTimeSchedule( customer1, waste1,
+        // LocalDate.now().plusDays(1));
 
-//         tripManager.createTrip("40100", vehicle, List.of(operator1, operator2),
-//                 departureTime, expectedReturnTime, Trip.TripStatus.PENDING,collections);
+        // RecurringSchedule recurring = new RecurringSchedule(customer2, waste2,
+        // LocalDate.now(), RecurringSchedule.Frequency.WEEKLY);
+        // recurring.setNextCollectionDate(LocalDate.now().plusDays(7));
 
-//         List<Trip> allTrips = tripDAO.findAll();
-//         assertFalse(allTrips.isEmpty());
+        // Collection collection1 = new Collection(oneTime1);
+        // Collection collection2 = new Collection(recurring);
 
-//         Trip savedTrip = allTrips.get(0);
-//         assertEquals("40100", savedTrip.getPostalCodes());
-//         assertEquals(vehicle.getPlate(), savedTrip.getAssignedVehicle().getPlate());
-//         assertEquals(2, savedTrip.getOperators().size());
-//         assertEquals(departureTime, savedTrip.getDepartureTime());
-//         assertEquals(expectedReturnTime, savedTrip.getExpectedReturnTime());
-//         assertEquals(Trip.TripStatus.PENDING, savedTrip.getStatus());
+        // List<Collection> collections = List.of(collection1, collection2);
 
-//         Trip found = tripManager.getTripById(savedTrip.getTripId());
-//         assertNotNull(found);
-//         assertEquals(savedTrip.getTripId(), found.getTripId());
-//     }
+        // tripManager.createTrip("40100", vehicle, List.of(operator1, operator2),
+        // departureTime, expectedReturnTime, Trip.TripStatus.PENDING,collections);
 
-//         @Test
-//         void testDeleteTrip() {
-    
-    
-//         Customer customer1 = new Customer("Mario Rossi", null, null, null, null);
-//         Customer customer2 = new Customer("Anna Bianchi", null, null, null, null);
-        
+        // List<Trip> allTrips = tripDAO.findAll();
+        // assertFalse(allTrips.isEmpty());
 
-//         Waste waste1 = new Waste("Organico", null, null);
-//         Waste waste2 = new Waste("Carta", null, null);
-       
+        // Trip savedTrip = allTrips.get(0);
+        // assertEquals("40100", savedTrip.getPostalCodes());
+        // assertEquals(vehicle.getPlate(), savedTrip.getAssignedVehicle().getPlate());
+        // assertEquals(2, savedTrip.getOperators().size());
+        // assertEquals(departureTime, savedTrip.getDepartureTime());
+        // assertEquals(expectedReturnTime, savedTrip.getExpectedReturnTime());
+        // assertEquals(Trip.TripStatus.PENDING, savedTrip.getStatus());
 
-//         OneTimeSchedule oneTime1 = new OneTimeSchedule( customer1, waste1, LocalDate.now().plusDays(1));
-       
-//         RecurringSchedule recurring = new RecurringSchedule(customer2, waste2, LocalDate.now(), RecurringSchedule.Frequency.WEEKLY);
-//         recurring.setNextCollectionDate(LocalDate.now().plusDays(7));  
+        // Trip found = tripManager.getTripById(savedTrip.getTripId());
+        // assertNotNull(found);
+        // assertEquals(savedTrip.getTripId(), found.getTripId());
+        // }
 
-//         Collection collection1 = new Collection(oneTime1);
-//         Collection collection2 = new Collection(recurring);
- 
-//         List<Collection> collections = List.of(collection1, collection2);
+        // @Test
+        // void testDeleteTrip() {
 
-//         tripManager.createTrip("40100", vehicle, List.of(operator1, operator2),
-//                 departureTime, expectedReturnTime, Trip.TripStatus.PENDING,collections);
+        // Customer customer1 = new Customer("Mario Rossi", null, null, null, null);
+        // Customer customer2 = new Customer("Anna Bianchi", null, null, null, null);
 
+        // Waste waste1 = new Waste("Organico", null, null);
+        // Waste waste2 = new Waste("Carta", null, null);
 
-//         Trip trip = tripDAO.findAll().get(0);
-//         assertNotNull(trip);
+        // OneTimeSchedule oneTime1 = new OneTimeSchedule( customer1, waste1,
+        // LocalDate.now().plusDays(1));
 
-        
-//         tripManager.deleteTrip(trip.getTripId());
+        // RecurringSchedule recurring = new RecurringSchedule(customer2, waste2,
+        // LocalDate.now(), RecurringSchedule.Frequency.WEEKLY);
+        // recurring.setNextCollectionDate(LocalDate.now().plusDays(7));
 
-//         Trip deleted = tripDAO.findById(trip.getTripId());
-//         assertNull(deleted);
-//         }
+        // Collection collection1 = new Collection(oneTime1);
+        // Collection collection2 = new Collection(recurring);
 
+        // List<Collection> collections = List.of(collection1, collection2);
+
+        // tripManager.createTrip("40100", vehicle, List.of(operator1, operator2),
+        // departureTime, expectedReturnTime, Trip.TripStatus.PENDING,collections);
+
+        // Trip trip = tripDAO.findAll().get(0);
+        // assertNotNull(trip);
+
+        // tripManager.deleteTrip(trip.getTripId());
+
+        // Trip deleted = tripDAO.findById(trip.getTripId());
+        // assertNull(deleted);
+        // }
 
         @Test
         void testTripPersistence() {
-        Customer customer1 = new Customer("Mario Rossi", null, null, null, null);
-        Customer customer2 = new Customer("Anna Bianchi", null, null, null, null);
-        
+                Customer customer1 = new Customer("Mario Rossi", null, null, null, null);
+                Customer customer2 = new Customer("Anna Bianchi", null, null, null, null);
 
-        Waste waste1 = new Waste("Organico", null, null);
-        Waste waste2 = new Waste("Carta", null, null);
-       
+                Waste waste1 = new Waste("Organico", null, null);
+                Waste waste2 = new Waste("Carta", null, null);
 
-        OneTimeSchedule oneTime1 = new OneTimeSchedule( customer1, waste1, LocalDate.now().plusDays(1));
-       
-        RecurringSchedule recurring = new RecurringSchedule(customer2, waste2, LocalDate.now(), RecurringSchedule.Frequency.WEEKLY);
-        recurring.setNextCollectionDate(LocalDate.now().plusDays(7));  
+                OneTimeSchedule oneTime1 = new OneTimeSchedule(customer1, waste1, LocalDate.now().plusDays(1));
 
-        Collection collection1 = new Collection(oneTime1);
-        Collection collection2 = new Collection(recurring);
- 
-        List<Collection> collections = List.of(collection1, collection2);
+                RecurringSchedule recurring = new RecurringSchedule(customer2, waste2, LocalDate.now(),
+                                RecurringSchedule.Frequency.WEEKLY);
+                recurring.setNextCollectionDate(LocalDate.now().plusDays(7));
 
-        tripManager.createTrip("40100", vehicle, List.of(operator1, operator2),
-                departureTime, expectedReturnTime, Trip.TripStatus.PENDING,collections);
+                Collection collection1 = new Collection(oneTime1);
+                Collection collection2 = new Collection(recurring);
 
+                List<Collection> collections = List.of(collection1, collection2);
 
-        // Ricarica dal DAO
-        List<Trip> trips = tripDAO.findAll();
-        assertEquals(1, trips.size());
+                tripManager.createTrip("40100", vehicle, List.of(operator1, operator2),
+                                departureTime, expectedReturnTime, Trip.TripStatus.PENDING, collections);
 
-        Trip trip = trips.get(0);
-        assertEquals("40100", trip.getPostalCodes());
-        assertEquals(operator1.getName(), trip.getOperators().get(0).getName());
-        assertEquals(vehicle.getPlate(), trip.getAssignedVehicle().getPlate());
+                // Ricarica dal DAO
+                List<Trip> trips = tripDAO.findAll();
+                assertEquals(1, trips.size());
+
+                Trip trip = trips.get(0);
+                assertEquals("40100", trip.getPostalCodes());
+                assertEquals(operator1.getName(), trip.getOperators().get(0).getName());
+                assertEquals(vehicle.getPlate(), trip.getAssignedVehicle().getPlate());
         }
 }
