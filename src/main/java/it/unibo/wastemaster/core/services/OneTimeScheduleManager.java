@@ -38,65 +38,23 @@ public class OneTimeScheduleManager {
         return !date.isBefore(minDate);
     }
 
-    public boolean updateDateOneTimeSchedule(OneTimeSchedule schedule, LocalDate newPickupDate) {
-        Collection collection = collectionManager.getActiveCollectionByOneTimeSchedule(schedule);
-        if (collection == null)
-            return false;
-
-        if (isDateValid(schedule.getPickupDate(), collection.getCancelLimitDays())) {
-            schedule.setPickupDate(newPickupDate);
-            oneTimeScheduleDAO.update(schedule);
-
-            collection.setCollectionDate(newPickupDate);
-            collectionManager.updateCollection(collection);
-            return true;
-        }
-        return false;
-    }
-
-    public boolean updateWasteOneTimeSchedule(OneTimeSchedule schedule, Waste Waste) {
-        Collection collection = collectionManager.getActiveCollectionByOneTimeSchedule(schedule);
-        if (collection == null)
-            return false;
-
-        if (isDateValid(schedule.getPickupDate(), collection.getCancelLimitDays())) {
-            schedule.setWaste(Waste);
-            oneTimeScheduleDAO.update(schedule);
-
-            collection.setWaste(Waste);
-            collectionManager.updateCollection(collection);
-            return true;
-        }
-        return false;
-    }
-
-    public boolean updateStatusOneTimeSchedule(OneTimeSchedule schedule, ScheduleStatus newStatus) {
+    public boolean softDeleteOneTimeSchedule(OneTimeSchedule schedule) {
         ValidateUtils.requireArgNotNull(schedule, "Schedule cannot be null");
-        ValidateUtils.requireArgNotNull(newStatus, "New status cannot be null");
         ValidateUtils.requireArgNotNull(schedule.getScheduleId(), "Schedule ID cannot be null");
 
         if (schedule.getScheduleStatus() == ScheduleStatus.CANCELLED) {
             return false;
         }
 
-        if (schedule.getScheduleStatus() == ScheduleStatus.PAUSED && newStatus == ScheduleStatus.ACTIVE) {
-            collectionManager.generateOneTimeCollection(schedule);
+        Collection collection = collectionManager.getActiveCollectionByOneTimeSchedule(schedule);
+        ValidateUtils.requireArgNotNull(collection, "Associated collection not found");
+
+        if (isDateValid(schedule.getPickupDate(), collection.getCancelLimitDays())) {
+            schedule.setScheduleStatus(ScheduleStatus.CANCELLED);
+            oneTimeScheduleDAO.update(schedule);
+            collection.setCollectionStatus(CollectionStatus.CANCELLED);
+            collectionManager.updateCollection(collection);
             return true;
-        }
-
-        if (schedule.getScheduleStatus() == ScheduleStatus.ACTIVE
-                && (newStatus == ScheduleStatus.PAUSED || newStatus == ScheduleStatus.CANCELLED)) {
-
-            Collection associatedCollection = collectionManager.getActiveCollectionByOneTimeSchedule(schedule);
-            ValidateUtils.requireArgNotNull(associatedCollection, "Associated collection not found");
-
-            if (isDateValid(schedule.getPickupDate(), associatedCollection.getCancelLimitDays())) {
-                schedule.setScheduleStatus(newStatus);
-                oneTimeScheduleDAO.update(schedule);
-                associatedCollection.setCollectionStatus(CollectionStatus.CANCELLED);
-                collectionManager.updateCollection(associatedCollection);
-                return true;
-            }
         }
         return false;
     }
