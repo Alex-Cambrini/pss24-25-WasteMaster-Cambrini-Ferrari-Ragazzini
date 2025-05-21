@@ -11,7 +11,7 @@ import jakarta.validation.constraints.NotNull;
 public class Waste {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int wasteId;
+    private Integer wasteId;
 
     @Column(nullable = false)
     @NotNull(message = "Waste type must not be null")
@@ -25,6 +25,8 @@ public class Waste {
     @NotNull(message = "isDangerous must not be null")
     private Boolean isDangerous;
 
+    @Column(nullable = false)
+    private boolean deleted = false;
 
     public Waste() {
     }
@@ -35,7 +37,7 @@ public class Waste {
         this.isDangerous = isDangerous;
     }
 
-    public int getWasteId() {
+    public Integer getWasteId() {
         return wasteId;
     }
 
@@ -61,6 +63,14 @@ public class Waste {
 
     public void setIsDangerous(Boolean isDangerous) {
         this.isDangerous = isDangerous;
+    }
+
+    public boolean isDeleted() {
+        return deleted;
+    }
+
+    public void delete() {
+        this.deleted = true;
     }
 
     @Override
