@@ -65,7 +65,8 @@ public abstract class Schedule {
     public enum ScheduleStatus {
         ACTIVE,
         CANCELLED,
-        PAUSED
+        PAUSED,
+        COMPLETED
     }
 
     // No-args constructor required by JPA
