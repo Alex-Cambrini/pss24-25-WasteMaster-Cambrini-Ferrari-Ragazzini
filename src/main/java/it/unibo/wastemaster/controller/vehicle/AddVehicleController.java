@@ -2,7 +2,7 @@ package it.unibo.wastemaster.controller.vehicle;
 
 import it.unibo.wastemaster.core.context.AppContext;
 import it.unibo.wastemaster.core.models.Vehicle;
-import it.unibo.wastemaster.core.models.Vehicle.LicenceType;
+import it.unibo.wastemaster.core.models.Vehicle.RequiredLicence;
 import it.unibo.wastemaster.core.models.Vehicle.VehicleStatus;
 
 import static it.unibo.wastemaster.controller.utils.DialogUtils.*;
@@ -22,7 +22,9 @@ public class AddVehicleController {
 	@FXML
 	private TextField yearField;
 	@FXML
-	private ComboBox<LicenceType> licenceComboBox;
+	private TextField capacityField;
+	@FXML
+	private ComboBox<RequiredLicence> licenceComboBox;
 	@FXML
 	private ComboBox<VehicleStatus> statusComboBox;
 
@@ -34,7 +36,7 @@ public class AddVehicleController {
 
 	@FXML
 	public void initialize() {
-		licenceComboBox.getItems().setAll(LicenceType.values());
+		licenceComboBox.getItems().setAll(RequiredLicence.values());
 		licenceComboBox.getSelectionModel().selectFirst();
 
 		statusComboBox.getItems().setAll(VehicleStatus.values());
@@ -48,10 +50,11 @@ public class AddVehicleController {
 			String brand = brandField.getText();
 			String model = modelField.getText();
 			int year = Integer.parseInt(yearField.getText());
-			LicenceType licence = licenceComboBox.getValue();
+			int capacity = Integer.parseInt(capacityField.getText());
+			RequiredLicence licence = licenceComboBox.getValue();
 			VehicleStatus status = statusComboBox.getValue();
 
-			Vehicle vehicle = new Vehicle(plate, brand, model, year, licence, status);
+			Vehicle vehicle = new Vehicle(plate, brand, model, year, licence, status, capacity);
 			AppContext.vehicleManager.addVehicle(vehicle);
 			showSuccess("Vehicle saved successfully.");
 
