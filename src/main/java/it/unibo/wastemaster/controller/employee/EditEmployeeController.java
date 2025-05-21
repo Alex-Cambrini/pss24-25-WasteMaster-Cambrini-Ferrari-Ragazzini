@@ -3,7 +3,7 @@ package it.unibo.wastemaster.controller.employee;
 import it.unibo.wastemaster.controller.utils.DialogUtils;
 import it.unibo.wastemaster.core.context.AppContext;
 import it.unibo.wastemaster.core.models.Employee;
-import it.unibo.wastemaster.core.models.Employee.LicenceType;
+import it.unibo.wastemaster.core.models.Employee.Licence;
 import it.unibo.wastemaster.core.models.Employee.Role;
 
 import javafx.fxml.FXML;
@@ -24,7 +24,7 @@ public class EditEmployeeController {
 	@FXML
 	private ComboBox<Role> roleComboBox;
 	@FXML
-	private ComboBox<LicenceType> licenceComboBox;
+	private ComboBox<Licence> licenceComboBox;
 	@FXML
 	private TextField cityField;
 
@@ -43,8 +43,8 @@ public class EditEmployeeController {
 		roleComboBox.getItems().setAll(Role.values());
 		roleComboBox.getSelectionModel().select(employee.getRole());
 
-		licenceComboBox.getItems().setAll(LicenceType.values());
-		licenceComboBox.getSelectionModel().select(employee.getLicenceType());
+		licenceComboBox.getItems().setAll(Licence.values());
+		licenceComboBox.getSelectionModel().select(employee.getLicence());
 	}
 
 	@FXML
@@ -56,12 +56,11 @@ public class EditEmployeeController {
 				return;
 			}
 
-			boolean changed =
-					!original.getName().equals(nameField.getText()) ||
+			boolean changed = !original.getName().equals(nameField.getText()) ||
 					!original.getSurname().equals(surnameField.getText()) ||
 					!original.getLocation().getCity().equals(cityField.getText()) ||
 					original.getRole() != roleComboBox.getValue() ||
-					original.getLicenceType() != licenceComboBox.getValue();
+					original.getLicence() != licenceComboBox.getValue();
 
 			if (!changed) {
 				DialogUtils.showError("No changes", "No fields were modified.");
@@ -71,7 +70,7 @@ public class EditEmployeeController {
 			employee.setName(nameField.getText());
 			employee.setSurname(surnameField.getText());
 			employee.setRole(roleComboBox.getValue());
-			employee.setLicenceType(licenceComboBox.getValue());
+			employee.setLicence(licenceComboBox.getValue());
 			employee.getLocation().setCity(cityField.getText());
 
 			AppContext.employeeManager.updateEmployee(employee);

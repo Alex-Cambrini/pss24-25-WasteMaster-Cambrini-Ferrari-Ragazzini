@@ -2,7 +2,7 @@ package it.unibo.wastemaster.controller.employee;
 
 import it.unibo.wastemaster.core.context.AppContext;
 import it.unibo.wastemaster.core.models.Employee;
-import it.unibo.wastemaster.core.models.Employee.LicenceType;
+import it.unibo.wastemaster.core.models.Employee.Licence;
 import it.unibo.wastemaster.core.models.Employee.Role;
 import it.unibo.wastemaster.core.models.Location;
 import it.unibo.wastemaster.core.utils.ValidateUtils;
@@ -34,7 +34,7 @@ public class AddEmployeeController {
     @FXML
     private ComboBox<Role> roleComboBox;
     @FXML
-    private ComboBox<LicenceType> licenceComboBox;
+    private ComboBox<Licence> licenceComboBox;
 
     private EmployeeController employeeController;
 
@@ -47,7 +47,7 @@ public class AddEmployeeController {
         roleComboBox.getItems().setAll(Role.values());
         roleComboBox.getSelectionModel().selectFirst();
 
-        licenceComboBox.getItems().setAll(LicenceType.values());
+        licenceComboBox.getItems().setAll(Licence.values());
         licenceComboBox.getSelectionModel().selectFirst();
     }
 
@@ -63,7 +63,7 @@ public class AddEmployeeController {
             String city = cityField.getText();
             String postalCode = postalCodeField.getText();
             Role role = roleComboBox.getValue();
-            LicenceType licence = licenceComboBox.getValue();
+            Licence licence = licenceComboBox.getValue();
 
             Location address = new Location(street, civic, city, postalCode);
             Employee employee = new Employee(name, surname, address, email, phone, role, licence);

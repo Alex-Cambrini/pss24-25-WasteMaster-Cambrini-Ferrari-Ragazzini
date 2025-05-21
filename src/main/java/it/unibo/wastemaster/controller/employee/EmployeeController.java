@@ -92,7 +92,7 @@ public class EmployeeController {
                         e.getSurname(),
                         e.getEmail(),
                         e.getRole().name(),
-                        e.getLicenceType().name(),
+                        e.getLicence().name(),
                         e.getLocation().getCity()));
             }
         }
