@@ -47,37 +47,40 @@ public class RecurringScheduleManager {
     }
 
     protected LocalDate calculateNextDate(RecurringSchedule schedule) {
-        Waste waste = schedule.getWaste();
-        RecurringSchedule.Frequency frequency = schedule.getFrequency();
-        WasteSchedule scheduleData = wasteScheduleManager.getWasteScheduleByWaste(waste);
-        DayOfWeek scheduledDay = scheduleData.getDayOfWeek();
-
+        ValidateUtils.requireArgNotNull(schedule, "Schedule must not be null");
+        ValidateUtils.requireArgNotNull(schedule.getScheduleId(), "Schedule ID must not be null");
         LocalDate today = dateUtils.getCurrentDate();
-        LocalDate existingNext = schedule.getNextCollectionDate();
-        LocalDate nextDate = null;
 
-        // Se la data esistente è null, significa che è il primo ritiro
-        if (existingNext == null) {
-            nextDate = schedule.getStartDate().plusDays(2); // Aggiungi 2 giorni alla start date per il primo ritiro
-            nextDate = alignToScheduledDay(nextDate, scheduledDay); // Allineamento iniziale
-        } else { // significa che non è il primo ritiro
-            nextDate = existingNext;
-            // Aggiungi la frequenza (settimanale o mensile)
-            if (frequency == RecurringSchedule.Frequency.WEEKLY) {
-                nextDate = nextDate.plusWeeks(1); // Aggiungi 7 giorni per la frequenza settimanale
-            } else if (frequency == RecurringSchedule.Frequency.MONTHLY) {
-                nextDate = nextDate.plusMonths(1); // Aggiungi 1 mese per la frequenza mensile
-                nextDate = alignToScheduledDay(nextDate, scheduledDay); // Allineamento per frequenza mensile
-            }
+        if (schedule.getNextCollectionDate() == null) {
+            return calculateFirstDate(schedule);
+        } else {
+            return calculateRecurringDate(schedule, today);
+        }
+    }
 
-            // Se la data risultante è nel passato, scorrere giorno per giorno
-            while (nextDate.isBefore(today)) {
-                nextDate = nextDate.plusDays(1); // Incrementa di un giorno
-                nextDate = alignToScheduledDay(nextDate, scheduledDay); // Allineamento per trovare il giorno giusto
-            }
+    private LocalDate calculateFirstDate(RecurringSchedule schedule) {
+        WasteSchedule scheduleData = wasteScheduleManager.getWasteScheduleByWaste(schedule.getWaste());
+        LocalDate date = schedule.getStartDate().plusDays(2);
+        return alignToScheduledDay(date, scheduleData.getDayOfWeek());
+    }
+
+    private LocalDate calculateRecurringDate(RecurringSchedule schedule, LocalDate today) {
+        WasteSchedule scheduleData = wasteScheduleManager.getWasteScheduleByWaste(schedule.getWaste());
+        LocalDate date = schedule.getNextCollectionDate();
+
+        if (schedule.getFrequency() == RecurringSchedule.Frequency.WEEKLY) {
+            date = date.plusWeeks(1);
+        } else {
+            date = date.plusMonths(1);
+            date = alignToScheduledDay(date, scheduleData.getDayOfWeek());
         }
 
-        return nextDate;
+        while (date.isBefore(today)) {
+            date = date.plusDays(1);
+            date = alignToScheduledDay(date, scheduleData.getDayOfWeek());
+        }
+
+        return date;
     }
 
     private LocalDate alignToScheduledDay(LocalDate date, DayOfWeek scheduledDay) {
@@ -149,6 +152,8 @@ public class RecurringScheduleManager {
         }
 
         schedule.setFrequency(newFrequency);
+        LocalDate nextDate = calculateFirstDate(schedule);
+        schedule.setNextCollectionDate(nextDate);
         recurringScheduleDAO.update(schedule);
         return true;
     }
