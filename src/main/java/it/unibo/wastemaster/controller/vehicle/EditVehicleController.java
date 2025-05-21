@@ -2,6 +2,8 @@ package it.unibo.wastemaster.controller.vehicle;
 
 import it.unibo.wastemaster.core.context.AppContext;
 import it.unibo.wastemaster.core.models.Vehicle;
+import it.unibo.wastemaster.core.models.Vehicle.RequiredLicence;
+import it.unibo.wastemaster.core.models.Vehicle.VehicleStatus;
 import it.unibo.wastemaster.controller.utils.DialogUtils;
 import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
@@ -21,9 +23,11 @@ public class EditVehicleController {
 	@FXML
 	private TextField yearField;
 	@FXML
-	private ComboBox<Vehicle.LicenceType> licenceComboBox;
+	private TextField capacityField;
 	@FXML
-	private ComboBox<Vehicle.VehicleStatus> statusComboBox;
+	private ComboBox<RequiredLicence> licenceComboBox;
+	@FXML
+	private ComboBox<VehicleStatus> statusComboBox;
 
 	public void setVehicleController(VehicleController controller) {
 		this.vehicleController = controller;
@@ -36,9 +40,12 @@ public class EditVehicleController {
 		brandField.setText(vehicle.getBrand());
 		modelField.setText(vehicle.getModel());
 		yearField.setText(String.valueOf(vehicle.getRegistrationYear()));
-		licenceComboBox.getItems().setAll(Vehicle.LicenceType.values());
-		licenceComboBox.getSelectionModel().select(vehicle.getLicenceType());
-		statusComboBox.getItems().setAll(Vehicle.VehicleStatus.values());
+		capacityField.setText(String.valueOf(vehicle.getCapacity()));
+
+		licenceComboBox.getItems().setAll(RequiredLicence.values());
+		licenceComboBox.getSelectionModel().select(vehicle.getRequiredLicence());
+
+		statusComboBox.getItems().setAll(VehicleStatus.values());
 		statusComboBox.getSelectionModel().select(vehicle.getVehicleStatus());
 	}
 
@@ -54,8 +61,9 @@ public class EditVehicleController {
 			boolean changed = !original.getBrand().equals(brandField.getText()) ||
 					!original.getModel().equals(modelField.getText()) ||
 					original.getRegistrationYear() != Integer.parseInt(yearField.getText()) ||
-					original.getLicenceType() != licenceComboBox.getValue() ||
-					original.getVehicleStatus() != statusComboBox.getValue();
+					original.getRequiredLicence() != licenceComboBox.getValue() ||
+					original.getVehicleStatus() != statusComboBox.getValue() ||
+					original.getCapacity() != Integer.parseInt(capacityField.getText());
 
 			if (!changed) {
 				DialogUtils.showError("No changes", "No fields were modified.");
@@ -65,8 +73,9 @@ public class EditVehicleController {
 			vehicle.setBrand(brandField.getText());
 			vehicle.setModel(modelField.getText());
 			vehicle.setRegistrationYear(Integer.parseInt(yearField.getText()));
-			vehicle.setLicenceType(licenceComboBox.getValue());
+			vehicle.setRequiredLicence(licenceComboBox.getValue());
 			vehicle.setVehicleStatus(statusComboBox.getValue());
+			vehicle.setCapacity(Integer.parseInt(capacityField.getText()));
 
 			AppContext.vehicleManager.updateVehicle(vehicle);
 			DialogUtils.showSuccess("Vehicle updated successfully.");
