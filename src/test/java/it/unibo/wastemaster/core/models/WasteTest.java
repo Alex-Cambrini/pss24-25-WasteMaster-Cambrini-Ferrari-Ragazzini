@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 
 import it.unibo.wastemaster.core.AbstractDatabaseTest;
 import it.unibo.wastemaster.core.utils.ValidateUtils;
+
 import jakarta.validation.ConstraintViolation;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -22,8 +23,8 @@ class WasteTest extends AbstractDatabaseTest {
 	}
 
 	@Test
-	public void testWasteGettersAndSetters() {
-		assertEquals(waste.getWasteName(), "plastic");
+	public void testGettersAndSetters() {
+		assertEquals("plastic", waste.getWasteName());
 		assertTrue(waste.getIsRecyclable());
 		assertFalse(waste.getIsDangerous());
 
@@ -31,41 +32,44 @@ class WasteTest extends AbstractDatabaseTest {
 		waste.setIsRecyclable(false);
 		waste.setIsDangerous(true);
 
-		assertEquals(waste.getWasteName(), "glass");
+		assertEquals("glass", waste.getWasteName());
 		assertFalse(waste.getIsRecyclable());
 		assertTrue(waste.getIsDangerous());
 	}
 
 	@Test
 	public void testToString() {
-    String expected = "Waste Type: " + waste.getWasteName() + "\n" +
-                      "Recyclable: " + (waste.getIsRecyclable() ? "Yes" : "No") + "\n" +
-                      "Dangerous: " + (waste.getIsDangerous() ? "Yes" : "No");
-    assertEquals(expected, waste.toString());
+		String expected = "Waste Type: plastic\n" +
+				"Recyclable: Yes\n" +
+				"Dangerous: No";
+		assertEquals(expected, waste.toString());
 	}
 
 	@Test
 	void testPersistence() {
 		wasteDAO.insert(waste);
-		int wasteId = waste.getWasteId();
-		Waste found = wasteDAO.findById(wasteId);
+		int id = waste.getWasteId();
+		Waste found = wasteDAO.findById(id);
 		assertNotNull(found);
 		assertEquals(waste.getWasteName(), found.getWasteName());
 		assertEquals(waste.getIsRecyclable(), found.getIsRecyclable());
 		assertEquals(waste.getIsDangerous(), found.getIsDangerous());
-
-		wasteDAO.delete(found);
-		Waste deleted = wasteDAO.findById(wasteId);
-		assertNull(deleted);
 	}
 
 	@Test
-	void testWasteValidation() {
-		Waste invalidWaste = new Waste(null, null, null);
+	void testSoftDelete() {
+		wasteDAO.insert(waste);
+		waste.delete();
+		wasteDAO.update(waste);
+		Waste found = wasteDAO.findById(waste.getWasteId());
+		assertTrue(found.isDeleted());
+	}
 
+	@Test
+	void testValidation() {
+		Waste invalidWaste = new Waste(null, null, null);
 		Set<ConstraintViolation<Waste>> violations = ValidateUtils.VALIDATOR.validate(invalidWaste);
 		assertFalse(violations.isEmpty());
-
 		assertTrue(violations.stream().anyMatch(v -> v.getMessage().contains("Waste type must not be null")));
 		assertTrue(violations.stream().anyMatch(v -> v.getMessage().contains("isRecyclable must not be null")));
 		assertTrue(violations.stream().anyMatch(v -> v.getMessage().contains("isDangerous must not be null")));
