@@ -5,14 +5,16 @@ public class VehicleRow {
 	private final String brand;
 	private final String model;
 	private final int registrationYear;
+	private final int capacity;
 	private final String licenceType;
 	private final String vehicleStatus;
 	private final String lastMaintenanceDate;
 	private final String nextMaintenanceDate;
 
 	public VehicleRow(String plate, String brand, String model, int registrationYear,
-	                  String licenceType, String vehicleStatus,
-	                  String lastMaintenanceDate, String nextMaintenanceDate) {
+			String licenceType, String vehicleStatus,
+			String lastMaintenanceDate, String nextMaintenanceDate,
+			int capacity) {
 		this.plate = plate;
 		this.brand = brand;
 		this.model = model;
@@ -21,6 +23,7 @@ public class VehicleRow {
 		this.vehicleStatus = vehicleStatus;
 		this.lastMaintenanceDate = lastMaintenanceDate;
 		this.nextMaintenanceDate = nextMaintenanceDate;
+		this.capacity = capacity;
 	}
 
 	public String getPlate() {
@@ -37,6 +40,10 @@ public class VehicleRow {
 
 	public int getRegistrationYear() {
 		return registrationYear;
+	}
+
+	public int getCapacity() {
+		return capacity;
 	}
 
 	public String getLicenceType() {
