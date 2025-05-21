@@ -5,6 +5,7 @@ import java.io.IOException;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
+import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
@@ -19,6 +20,17 @@ public class MainLayoutController {
 
     @FXML
     private Label pageTitleLabel;
+
+    @FXML
+    private Hyperlink dashboardLink;
+    @FXML
+    private Hyperlink clientiLink;
+    @FXML
+    private Hyperlink ScheduleLink;
+    @FXML
+    private Hyperlink veicoliLink;
+    @FXML
+    private Hyperlink employeeLink;
 
     @FXML
     public void initialize() {
@@ -61,30 +73,35 @@ public class MainLayoutController {
 
     @FXML
     private void handleCustomers() {
+        clientiLink.setVisited(false);
         setPageTitle("Customer Management");
         MainLayoutController.getInstance().loadCenter("/layouts/customer/CustomersView.fxml");
     }
 
     @FXML
     private void handleDashboard() {
+        dashboardLink.setVisited(false);
         setPageTitle("Dashboard");
         rootPane.setCenter(null);
     }
 
     @FXML
     private void handleVehicle() {
+        veicoliLink.setVisited(false);
         setPageTitle("Vehicle Management");
         MainLayoutController.getInstance().loadCenter("/layouts/vehicle/VehicleView.fxml");
     }
 
     @FXML
     private void handleEmployee() {
+        employeeLink.setVisited(false);
         setPageTitle("Employee Management");
         MainLayoutController.getInstance().loadCenter("/layouts/employee/EmployeeView.fxml");
     }
 
     @FXML
     private void handleSchedule() {
+        ScheduleLink.setVisited(false);
         setPageTitle("Schedule Management");
         MainLayoutController.getInstance().loadCenter("/layouts/schedule/ScheduleView.fxml");
     }
@@ -111,5 +128,4 @@ public class MainLayoutController {
     public BorderPane getRootPane() {
         return rootPane;
     }
-
 }
