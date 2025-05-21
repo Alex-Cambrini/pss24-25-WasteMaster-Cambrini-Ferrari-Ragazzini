@@ -25,6 +25,8 @@ public class Waste {
     @NotNull(message = "isDangerous must not be null")
     private Boolean isDangerous;
 
+    @Column(nullable = false)
+    private boolean deleted = false;
 
     public Waste() {
     }
@@ -61,6 +63,14 @@ public class Waste {
 
     public void setIsDangerous(Boolean isDangerous) {
         this.isDangerous = isDangerous;
+    }
+
+    public boolean isDeleted() {
+        return deleted;
+    }
+
+    public void delete() {
+        this.deleted = true;
     }
 
     @Override
