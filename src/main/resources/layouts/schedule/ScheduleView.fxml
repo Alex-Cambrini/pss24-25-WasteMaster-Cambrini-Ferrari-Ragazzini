@@ -45,10 +45,10 @@
         </TableView>
         <HBox alignment="TOP_RIGHT" minHeight="50.0" prefHeight="100.0" prefWidth="600.0" spacing="10.0">
             <children>
-            <Button mnemonicParsing="false" onAction="#handleChangeFrequency" text="Change Frequency" />
-            <Button mnemonicParsing="false" onAction="#handleStatusToggle" text="Pause" />
+            <Button fx:id="changeFrequencyButton" mnemonicParsing="false" onAction="#handleChangeFrequency" disable="true" text="Change Frequency" />
+            <Button fx:id="toggleStatusButton" mnemonicParsing="false" onAction="#handleStatusToggle" disable="true" text="Pause" />
             <Region prefHeight="200.0" prefWidth="200.0" HBox.hgrow="ALWAYS" />
-                <Button mnemonicParsing="false" onAction="#handleDeleteSchedule" text="Delete" />
+                <Button fx:id="deleteButton" mnemonicParsing="false" onAction="#handleDeleteSchedule" disable="true" text="Delete" />
             </children>
             <padding>
                 <Insets top="10.0" />
