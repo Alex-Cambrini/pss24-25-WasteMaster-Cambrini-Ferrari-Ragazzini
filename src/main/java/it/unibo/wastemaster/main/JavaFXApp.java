@@ -7,6 +7,8 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
+import atlantafx.base.theme.PrimerLight;
+
 import it.unibo.wastemaster.controller.utils.DialogUtils;
 import it.unibo.wastemaster.core.context.AppContext;
 
@@ -18,7 +20,7 @@ public class JavaFXApp extends Application {
 		AppContext.init();
 		FXMLLoader loader = new FXMLLoader(getClass().getResource("/layouts/main/MainLayout.fxml"));
 		Parent root = loader.load();
-
+		Application.setUserAgentStylesheet(new PrimerLight().getUserAgentStylesheet());
 		Scene scene = new Scene(root);
 		primaryStage.setScene(scene);
 		primaryStage.setTitle("WasteMaster");
