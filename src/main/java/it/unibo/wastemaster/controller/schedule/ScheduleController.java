@@ -125,6 +125,29 @@ public class ScheduleController {
         }
     }
 
+    @FXML
+    private void handleStatusToggle() {
+        ScheduleRow selected = scheduleTable.getSelectionModel().getSelectedItem();
+        if (selected == null)
+            return;
+        RecurringSchedule recurring = AppContext.recurringScheduleDAO.findById(selected.getId());
+        ScheduleStatus currentStatus = selected.getStatus();
+
+        switch (currentStatus) {
+            case ACTIVE:
+                AppContext.recurringScheduleManager.updateStatusRecurringSchedule(recurring, ScheduleStatus.PAUSED);
+                toggleStatusButton.setText("Resume");
+                break;
+            case PAUSED:
+                AppContext.recurringScheduleManager.updateStatusRecurringSchedule(recurring, ScheduleStatus.ACTIVE);
+                toggleStatusButton.setText("Pause");
+                break;
+            default:
+                break;
+        }
+        loadSchedules();
+    }
+
     private void startAutoRefresh() {
         refreshTimeline = new Timeline(
                 new KeyFrame(Duration.seconds(30), e -> loadSchedules()));
@@ -221,11 +244,6 @@ public class ScheduleController {
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
-
-    @FXML
-    private void handleStatusToggle() {
-
     }
 
     @FXML
