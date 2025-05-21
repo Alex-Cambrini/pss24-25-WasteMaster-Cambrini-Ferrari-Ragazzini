@@ -52,6 +52,8 @@ public class VehicleController {
 	@FXML
 	private TableColumn<VehicleRow, Integer> yearColumn;
 	@FXML
+	private TableColumn<VehicleRow, Integer> capacityColumn;
+	@FXML
 	private TableColumn<VehicleRow, String> licenceTypeColumn;
 	@FXML
 	private TableColumn<VehicleRow, String> vehicleStatusColumn;
@@ -66,6 +68,7 @@ public class VehicleController {
 		brandColumn.setCellValueFactory(new PropertyValueFactory<>("brand"));
 		modelColumn.setCellValueFactory(new PropertyValueFactory<>("model"));
 		yearColumn.setCellValueFactory(new PropertyValueFactory<>("registrationYear"));
+		capacityColumn.setCellValueFactory(new PropertyValueFactory<>("capacity"));
 		licenceTypeColumn.setCellValueFactory(
 				cellData -> new SimpleStringProperty(formatEnum(cellData.getValue().getLicenceType())));
 		vehicleStatusColumn.setCellValueFactory(
@@ -104,14 +107,15 @@ public class VehicleController {
 					row[4].toString(),
 					row[5].toString(),
 					row[6].toString(),
-					row[7].toString()));
+					row[7].toString(),
+					(Integer) row[8]));
 		}
 
 		VehicleTable.setItems(FXCollections.observableArrayList(allVehicles));
+
 		if (!searchField.getText().isBlank()) {
 			handleSearch();
 		}
-
 	}
 
 	@FXML
