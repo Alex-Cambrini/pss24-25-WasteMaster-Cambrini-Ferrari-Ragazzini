@@ -42,6 +42,13 @@ public class ScheduleController {
     private CheckBox recurringCheckBox;
     @FXML
     private CheckBox showDeletedCheckBox;
+    // buttons
+    @FXML
+    private Button changeFrequencyButton;
+    @FXML
+    private Button toggleStatusButton;
+    @FXML
+    private Button deleteButton;
 
     @FXML
     private ContextMenu filterMenu;
@@ -76,7 +83,6 @@ public class ScheduleController {
         startColumn.setCellValueFactory(new PropertyValueFactory<>("startDate"));
         statusColumn.setCellValueFactory(new PropertyValueFactory<>("status"));
         customerColumn.setCellValueFactory(new PropertyValueFactory<>("customer"));
-
         oneTimeCheckBox.setSelected(true);
         recurringCheckBox.setSelected(true);
         showDeletedCheckBox.setSelected(false);
@@ -88,6 +94,35 @@ public class ScheduleController {
         recurringCheckBox.selectedProperty().addListener((obs, oldVal, newVal) -> loadSchedules());
         recurringCheckBox.selectedProperty().addListener((obs, oldVal, newVal) -> loadSchedules());
         showDeletedCheckBox.selectedProperty().addListener((obs, oldVal, newVal) -> loadSchedules());
+        scheduleTable.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
+            updateButtons(newVal);
+        });
+
+    }
+
+    private void updateButtons(ScheduleRow selected) {
+        if (selected != null) {
+            boolean isRecurring = selected.getScheduleType() == ScheduleCategory.RECURRING;
+
+            changeFrequencyButton.setDisable(!isRecurring);
+            toggleStatusButton.setDisable(!isRecurring && selected == null);
+
+            deleteButton.setDisable(false);
+
+            ScheduleStatus status = selected.getStatus();
+
+            switch (status) {
+                case ACTIVE -> toggleStatusButton.setText("Pause");
+                case PAUSED -> toggleStatusButton.setText("Resume");
+                case COMPLETED, CANCELLED -> {
+                    toggleStatusButton.setDisable(true);
+                }
+            }
+        } else {
+            changeFrequencyButton.setDisable(true);
+            toggleStatusButton.setDisable(true);
+            deleteButton.setDisable(true);
+        }
     }
 
     private void startAutoRefresh() {
