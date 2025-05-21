@@ -112,10 +112,20 @@ public class ScheduleController {
             ScheduleStatus status = selected.getStatus();
 
             switch (status) {
-                case ACTIVE -> toggleStatusButton.setText("Pause");
-                case PAUSED -> toggleStatusButton.setText("Resume");
+                case ACTIVE -> {
+                    toggleStatusButton.setDisable(!isRecurring);
+                    toggleStatusButton.setText("Pause");
+                    changeFrequencyButton.setDisable(!isRecurring);
+                }
+                case PAUSED -> {
+                    toggleStatusButton.setDisable(!isRecurring);
+                    toggleStatusButton.setText("Resume");
+                    changeFrequencyButton.setDisable(true);
+                }
                 case COMPLETED, CANCELLED -> {
                     toggleStatusButton.setDisable(true);
+                    changeFrequencyButton.setDisable(true);
+                    deleteButton.setDisable(true);
                 }
             }
         } else {
