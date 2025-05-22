@@ -73,8 +73,8 @@
                 <Insets right="20.0" top="10.0" />
             </padding>
             <children>
-                <Button mnemonicParsing="false" text="Cancel" onAction="#handleAbortCustomerEdit" />
-                <Button mnemonicParsing="false" text="Update" onAction="#handleUpdateCustomer" />
+                <Button mnemonicParsing="false" text="Cancel" onAction="#handleAbortCustomerEdit" styleClass="danger"/>
+                <Button mnemonicParsing="false" text="Save" onAction="#handleUpdateCustomer" styleClass="accent"/>
             </children>
         </HBox>
     </children>

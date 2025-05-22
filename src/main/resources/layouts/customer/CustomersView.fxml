@@ -13,11 +13,11 @@
     <children>
         <HBox alignment="TOP_CENTER" minHeight="40" prefHeight="60" prefWidth="600.0" spacing="10.0">
             <children>
-                <Button fx:id="addCustomerButton" mnemonicParsing="false" onAction="#handleAddCustomer" text="Add Customer" />
+                <Button fx:id="addCustomerButton" mnemonicParsing="false" onAction="#handleAddCustomer" text="Add Customer" styleClass="accent"/>
                 <Region prefHeight="20" prefWidth="0.0" HBox.hgrow="ALWAYS" />
-                <Button fx:id="filterButton" onMouseClicked="#showFilterMenu" text="Filter ▼" />
+                <Button fx:id="filterButton" onMouseClicked="#showFilterMenu" text="Filter ▼" styleClass="accent"/>
                 <TextField fx:id="searchField" promptText="Search..." />
-                <Button mnemonicParsing="false" onAction="#handleResetSearch" text="Reset" />
+                <Button mnemonicParsing="false" onAction="#handleResetSearch" text="Reset" styleClass="accent, button-outlined"/>
             </children>
         </HBox>
         <TableView fx:id="customerTable" prefHeight="300.0" prefWidth="600.0" VBox.vgrow="ALWAYS">
@@ -33,8 +33,8 @@
         </TableView>
         <HBox alignment="TOP_RIGHT" minHeight="50.0" prefHeight="100.0" prefWidth="600.0" spacing="10.0">
             <children>
-                <Button mnemonicParsing="false" onAction="#handleEditCustomer" text="Edit" />
-                <Button mnemonicParsing="false" onAction="#handleDeleteCustomer" text="Delete" />
+                <Button mnemonicParsing="false" onAction="#handleEditCustomer" text="Edit" styleClass="accent"/>
+                <Button mnemonicParsing="false" onAction="#handleDeleteCustomer" text="Delete" styleClass="danger"/>
             </children>
             <padding>
                 <Insets right="20.0" top="10.0" />
