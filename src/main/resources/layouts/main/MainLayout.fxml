@@ -12,7 +12,7 @@
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.text.Font?>
 
-<StackPane xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.unibo.wastemaster.controller.main.MainLayoutController">
+<StackPane fx:id="rootPane" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.unibo.wastemaster.controller.main.MainLayoutController">
     <children>
         <VBox fx:id="rootVBox" spacing="0">
             <MenuBar>
@@ -36,7 +36,7 @@
             </MenuBar>
 
             <HBox fx:id="mainHBox" spacing="0" VBox.vgrow="always">
-                <VBox fx:id="leftMenu" prefWidth="180" spacing="20.0" styleClass="side-menu">
+                <VBox fx:id="sideMenu" prefWidth="180" spacing="20.0" styleClass="side-menu">
                     <padding>
                         <Insets top="20" left="20" right="20" bottom="20"/>
                     </padding>
@@ -56,7 +56,7 @@
                     </padding>
                     <children>
                         <Label fx:id="pageTitleLabel" text="MAIN_TITLE" styleClass="title-1" />
-                        <StackPane fx:id="centerPane" VBox.vgrow="always"/>
+                        <StackPane fx:id="centerPane" VBox.vgrow="always" styleClass="center-pane"/>
                     </children>
                 </VBox>
             </HBox>
