@@ -129,6 +129,10 @@
   -fx-padding: inherit;
 }
 
+.central-box{
+  -fx-background-color: -color-base-1;
+}
+
 .side-menu {
   -fx-background-color: -color-base-3;
   -fx-border-color: -color-base-4;
@@ -136,11 +140,12 @@
 }
 
 .center-pane {
-  -fx-background-color: -color-base-2;
+  -fx-background-color: -color-base-0;
   -fx-padding: 20;
   -fx-border-color: -color-base-3;
   -fx-border-radius: 10;
   -fx-background-radius: 10;
+  -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 10, 0.5, 0, 3);
 }
 
 .modal-pane {
