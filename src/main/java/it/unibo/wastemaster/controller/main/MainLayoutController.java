@@ -79,9 +79,7 @@ public class MainLayoutController {
 
     @FXML
     private void handleDashboard() {
-        dashboardLink.setVisited(false);
-        setPageTitle("Dashboard");
-        rootPane.getChildren().clear();
+
     }
 
     @FXML
