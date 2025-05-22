@@ -4,11 +4,10 @@ import java.io.IOException;
 
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.geometry.Pos;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
-import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.StackPane;
 
 public class MainLayoutController {
 
@@ -16,7 +15,10 @@ public class MainLayoutController {
     private String previousTitle;
 
     @FXML
-    private BorderPane rootPane;
+    private StackPane rootPane;
+
+    @FXML
+    private StackPane centerPane;
 
     @FXML
     private Label pageTitleLabel;
@@ -50,9 +52,7 @@ public class MainLayoutController {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
             Pane view = loader.load();
-            setAlignmentTopCenter(view);
-
-            rootPane.setCenter(view);
+            centerPane.getChildren().setAll(view);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -62,8 +62,7 @@ public class MainLayoutController {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
             Pane view = loader.load();
-            setAlignmentTopCenter(view);
-            rootPane.setCenter(view);
+            centerPane.getChildren().setAll(view);
             return loader.getController();
         } catch (IOException e) {
             e.printStackTrace();
@@ -82,7 +81,7 @@ public class MainLayoutController {
     private void handleDashboard() {
         dashboardLink.setVisited(false);
         setPageTitle("Dashboard");
-        rootPane.setCenter(null);
+        rootPane.getChildren().clear();
     }
 
     @FXML
@@ -119,13 +118,7 @@ public class MainLayoutController {
         }
     }
 
-    private static void setAlignmentTopCenter(javafx.scene.Node node) {
-        if (node != null) {
-            BorderPane.setAlignment(node, Pos.TOP_CENTER);
-        }
-    }
-
-    public BorderPane getRootPane() {
+    public StackPane getRootPane() {
         return rootPane;
     }
 }
