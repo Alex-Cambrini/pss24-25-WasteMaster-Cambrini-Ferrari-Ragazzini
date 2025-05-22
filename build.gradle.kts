@@ -71,8 +71,6 @@ dependencies {
 
     implementation("org.slf4j:slf4j-simple:2.0.9")
 
-    implementation("io.github.mkpaz:atlantafx-base:2.0.0")
-
     // Dipendenza H2 per il database in memoria durante i test
     testImplementation("com.h2database:h2:2.1.214")
 
