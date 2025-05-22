@@ -14,11 +14,11 @@
     <children>
         <HBox alignment="TOP_CENTER" minHeight="40.0" prefHeight="40.0" prefWidth="600.0" spacing="10.0">
             <children>
-                <Button fx:id="addScheduleButton" mnemonicParsing="false" onAction="#handleAddSchedule" text="Add Schedule" styleClass="button1" />
+                <Button fx:id="addScheduleButton" mnemonicParsing="false" onAction="#handleAddSchedule" text="Add Schedule" styleClass="success" />
                 <Region prefHeight="20" prefWidth="0.0" HBox.hgrow="ALWAYS" />
-                <Button fx:id="filterButton" onMouseClicked="#showFilterMenu" text="Filter ▼" />
+                <Button fx:id="filterButton" onMouseClicked="#showFilterMenu" text="Filter ▼" styleClass="accent" />
                 <TextField fx:id="searchField" promptText="Search..." />
-                <Button mnemonicParsing="false" onAction="#handleResetSearch" text="Reset" />
+                <Button mnemonicParsing="false" onAction="#handleResetSearch" text="Reset" styleClass="accent, button-outlined"/>
             </children>
         </HBox>
         <HBox alignment="TOP_RIGHT" prefHeight="30.0" prefWidth="30.0" spacing="10.0">
@@ -45,10 +45,10 @@
         </TableView>
         <HBox alignment="TOP_RIGHT" minHeight="50.0" prefHeight="100.0" prefWidth="600.0" spacing="10.0">
             <children>
-            <Button fx:id="changeFrequencyButton" disable="true" mnemonicParsing="false" onAction="#handleChangeFrequency" text="Change Frequency" styleClass="button1"/>
-            <Button fx:id="toggleStatusButton" disable="true" mnemonicParsing="false" onAction="#handleStatusToggle" text="Pause" styleClass="button1"/>
+            <Button fx:id="changeFrequencyButton" disable="true" mnemonicParsing="false" onAction="#handleChangeFrequency" text="Change Frequency" styleClass="accent"/>
+            <Button fx:id="toggleStatusButton" disable="true" mnemonicParsing="false" onAction="#handleStatusToggle" text="Pause" styleClass="accent"/>
             <Region prefHeight="200.0" prefWidth="200.0" HBox.hgrow="ALWAYS" />
-                <Button fx:id="deleteButton" disable="true" mnemonicParsing="false" onAction="#handleDeleteSchedule" text="Delete" styleClass="button2"/>
+                <Button fx:id="deleteButton" disable="true" mnemonicParsing="false" onAction="#handleDeleteSchedule" text="Delete" styleClass="danger"/>
             </children>
             <padding>
                 <Insets top="10.0" />
