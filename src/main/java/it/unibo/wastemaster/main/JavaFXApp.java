@@ -7,8 +7,6 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
-import atlantafx.base.theme.PrimerLight;
-
 import it.unibo.wastemaster.controller.utils.DialogUtils;
 import it.unibo.wastemaster.core.context.AppContext;
 
@@ -20,14 +18,14 @@ public class JavaFXApp extends Application {
 		AppContext.init();
 		FXMLLoader loader = new FXMLLoader(getClass().getResource("/layouts/main/MainLayout.fxml"));
 		Parent root = loader.load();
-		Application.setUserAgentStylesheet(new PrimerLight().getUserAgentStylesheet());
 		Scene scene = new Scene(root);
+		scene.getStylesheets().add(getClass().getResource("/css/primer-light.css").toExternalForm());
 		primaryStage.setScene(scene);
 		primaryStage.setTitle("WasteMaster");
-		primaryStage.setWidth(800);
-		primaryStage.setHeight(600);
-		primaryStage.setMinWidth(800);
-		primaryStage.setMinHeight(200);
+		primaryStage.setWidth(1000);
+		primaryStage.setHeight(700);
+		primaryStage.setMinWidth(1000);
+		primaryStage.setMinHeight(700);
 		primaryStage.show();
 
 	} catch (Exception e) {
