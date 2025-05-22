@@ -109,41 +109,57 @@ public class RecurringScheduleManager {
     }
 
     public boolean updateStatusRecurringSchedule(RecurringSchedule schedule, ScheduleStatus newStatus) {
-        if (schedule == null || newStatus == null) {
-            throw new IllegalArgumentException("Schedule and status must not be null.");
-        }
+        ValidateUtils.requireArgNotNull(schedule, "Schedule must not be null");
+        ValidateUtils.requireArgNotNull(newStatus, "Status must not be null");
 
-        if (schedule.getScheduleStatus() == ScheduleStatus.CANCELLED) {
+        ScheduleStatus currentStatus = schedule.getScheduleStatus();
+
+        if (currentStatus == ScheduleStatus.CANCELLED || currentStatus == ScheduleStatus.COMPLETED) {
             return false;
         }
 
-        if (schedule.getScheduleStatus() == ScheduleStatus.PAUSED && newStatus == ScheduleStatus.ACTIVE) {
-            LocalDate nextDate = calculateNextDate(schedule);
-            schedule.setNextCollectionDate(nextDate);
-            schedule.setScheduleStatus(ScheduleStatus.ACTIVE);
-            recurringScheduleDAO.update(schedule);
-            collectionManager.generateCollection(schedule);
-            return true;
+        switch (currentStatus) {
+            case PAUSED -> {
+                if (newStatus == ScheduleStatus.CANCELLED) {
+                    schedule.setScheduleStatus(ScheduleStatus.CANCELLED);
+                    recurringScheduleDAO.update(schedule);
+                    return true;
+                }
+                if (newStatus == ScheduleStatus.ACTIVE) {
+                    LocalDate nextDate = calculateNextDate(schedule);
+                    schedule.setNextCollectionDate(nextDate);
+                    schedule.setScheduleStatus(ScheduleStatus.ACTIVE);
+                    recurringScheduleDAO.update(schedule);
+                    collectionManager.generateCollection(schedule);
+                    return true;
+                }
+                return false;
+            }
+            case ACTIVE -> {
+                if (newStatus == ScheduleStatus.PAUSED || newStatus == ScheduleStatus.CANCELLED) {
+                    schedule.setNextCollectionDate(null);
+                    schedule.setScheduleStatus(newStatus);
+                    recurringScheduleDAO.update(schedule);
+
+                    Collection associatedCollection = collectionManager
+                            .getActiveCollectionByRecurringSchedule(schedule);
+                    ValidateUtils.requireStateNotNull(associatedCollection, "Associated collection must not be null");
+                    collectionManager.softDeleteCollection(associatedCollection);
+                    return true;
+                }
+                return false;
+            }
+            default -> {
+                return false;
+            }
         }
-
-        if (schedule.getScheduleStatus() == ScheduleStatus.ACTIVE &&
-                (newStatus == ScheduleStatus.PAUSED || newStatus == ScheduleStatus.CANCELLED)) {
-
-            schedule.setScheduleStatus(newStatus);
-            recurringScheduleDAO.update(schedule);
-
-            Collection associatedCollection = collectionManager.getActiveCollectionByRecurringSchedule(schedule);
-            ValidateUtils.requireStateNotNull(associatedCollection, "Associated collection must not be null");
-            collectionManager.softDeleteCollection(associatedCollection);
-        }
-        return true;
     }
 
-    public Boolean updateFrequency(RecurringSchedule schedule, Frequency newFrequency) {
+    public boolean updateFrequency(RecurringSchedule schedule, Frequency newFrequency) {
         ValidateUtils.requireArgNotNull(schedule, "Schedule must not be null");
         ValidateUtils.requireArgNotNull(newFrequency, "Frequency must not be null");
 
-        if (schedule.getScheduleStatus() == ScheduleStatus.CANCELLED) {
+        if (schedule.getScheduleStatus() != ScheduleStatus.ACTIVE) {
             return false;
         }
 
@@ -151,11 +167,23 @@ public class RecurringScheduleManager {
             return false;
         }
 
+        LocalDate oldNextDate = schedule.getNextCollectionDate();
         schedule.setFrequency(newFrequency);
-        LocalDate nextDate = calculateFirstDate(schedule);
-        schedule.setNextCollectionDate(nextDate);
-        recurringScheduleDAO.update(schedule);
-        return true;
+        LocalDate newNextDate = calculateFirstDate(schedule);
+
+        if (!newNextDate.equals(oldNextDate)) {
+            schedule.setNextCollectionDate(newNextDate);
+            recurringScheduleDAO.update(schedule);
+
+            Collection activeCollection = collectionManager.getActiveCollectionByRecurringSchedule(schedule);
+            if (activeCollection != null) {
+                collectionManager.softDeleteCollection(activeCollection);
+            }
+            collectionManager.generateCollection(schedule);
+            return true;
+        }
+
+        return false;
     }
 
 }
