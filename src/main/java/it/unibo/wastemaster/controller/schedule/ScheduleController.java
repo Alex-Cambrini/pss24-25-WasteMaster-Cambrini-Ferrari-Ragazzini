@@ -15,17 +15,14 @@ import javafx.animation.Timeline;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 
 public class ScheduleController {
 
@@ -91,7 +88,6 @@ public class ScheduleController {
         startAutoRefresh();
         searchField.textProperty().addListener((obs, oldText, newText) -> handleSearch());
         oneTimeCheckBox.selectedProperty().addListener((obs, oldVal, newVal) -> loadSchedules());
-        recurringCheckBox.selectedProperty().addListener((obs, oldVal, newVal) -> loadSchedules());
         recurringCheckBox.selectedProperty().addListener((obs, oldVal, newVal) -> loadSchedules());
         showDeletedCheckBox.selectedProperty().addListener((obs, oldVal, newVal) -> loadSchedules());
         scheduleTable.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
@@ -202,13 +198,19 @@ public class ScheduleController {
     @FXML
     private void handleAddSchedule() {
         try {
-            MainLayoutController.getInstance().setPageTitle("Add Schedule");
-            AddScheduleController controller = MainLayoutController.getInstance()
-                    .loadCenterWithController("/layouts/schedule/AddScheduleView.fxml");
-            controller.setScheduleController(this);
-        } catch (Exception e) {
-            DialogUtils.showError("Navigation error", "Could not load Add Schedule view.");
-            e.printStackTrace();
+            Stage mainStage = (Stage) MainLayoutController.getInstance().getRootPane().getScene().getWindow();
+
+            Optional<AddScheduleController> controllerOpt = DialogUtils.showModalWithController(
+                    "Add Schedule",
+                    "/layouts/schedule/AddScheduleView.fxml",
+                    mainStage,
+                    ctrl -> ctrl.setScheduleController(this));
+
+            if (controllerOpt.isPresent()) {
+                loadSchedules();
+            }
+        } catch (IOException e) {
+            DialogUtils.showError("Loading Error", "Could not load Add Schedule dialog.");
         }
     }
 
@@ -219,40 +221,39 @@ public class ScheduleController {
             DialogUtils.showError("No Selection", "Please select a schedule to edit.");
             return;
         }
-
         if (selected.getScheduleType() == ScheduleCategory.ONE_TIME) {
             DialogUtils.showError("Edit not allowed", "Cannot edit one-time schedules.");
             return;
         }
+
         try {
             RecurringSchedule schedule = AppContext.recurringScheduleDAO.findById(selected.getId());
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/layouts/schedule/ChangeFrequencyDialog.fxml"));
-            Parent root = loader.load();
-
-            Stage dialogStage = new Stage();
-            Stage mainStage = (Stage) MainLayoutController.getInstance().getRootPane().getScene().getWindow();
-
-            dialogStage.setTitle("Change Frequency");
-            dialogStage.initModality(Modality.APPLICATION_MODAL);
-            dialogStage.initOwner(mainStage);
-            dialogStage.setScene(new Scene(root));
-
-            ChangeFrequencyDialogController controller = loader.getController();
-            controller.setSchedule(schedule);
-            controller.setFrequencies(List.of(Frequency.values()));
-            controller.setCurrentFrequency(schedule.getFrequency());
-
-            dialogStage.showAndWait();
-
-            Frequency selectedFreq = controller.getSelectedFrequency();
-
-            if (selectedFreq != null) {
-                AppContext.recurringScheduleManager.updateFrequency(schedule, selectedFreq);
-
+            if (schedule == null) {
+                DialogUtils.showError("Error", "Schedule not found.");
+                return;
             }
-            loadSchedules();
+
+            Optional<ChangeFrequencyDialogController> controllerOpt = DialogUtils.showModalWithController(
+                    "Change Frequency",
+                    "/layouts/schedule/ChangeFrequencyDialog.fxml",
+                    (Stage) MainLayoutController.getInstance().getRootPane().getScene().getWindow(),
+                    ctrl -> {
+                        ctrl.setSchedule(schedule);
+                        ctrl.setFrequencies(List.of(Frequency.values()));
+                        ctrl.setCurrentFrequency(schedule.getFrequency());
+                    });
+
+            if (controllerOpt.isPresent()) {
+                Frequency newFreq = controllerOpt.get().getSelectedFrequency();
+                if (newFreq != null) {
+                    AppContext.recurringScheduleManager.updateFrequency(schedule, newFreq);
+                    loadSchedules();
+                }
+            }
         } catch (IOException e) {
-            e.printStackTrace();
+            DialogUtils.showError("Loading Error", "Failed to load the dialog.");
+        } catch (Exception e) {
+            DialogUtils.showError("Unexpected Error", "An unexpected error occurred.");
         }
     }
 
