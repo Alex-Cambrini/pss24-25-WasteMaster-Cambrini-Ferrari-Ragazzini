@@ -114,7 +114,7 @@ public class CustomersController {
                     .loadCenterWithController("/layouts/customer/AddCustomerView.fxml");
             controller.setCustomerController(this);
         } catch (Exception e) {
-            DialogUtils.showError("Navigation error", "Could not load Add Customer view.");
+            DialogUtils.showError("Navigation error", "Could not load Add Customer view.",AppContext.getOwner());
             e.printStackTrace();
         }
     }
@@ -123,23 +123,23 @@ public class CustomersController {
     private void handleDeleteCustomer() {
         CustomerRow selected = customerTable.getSelectionModel().getSelectedItem();
         if (selected == null) {
-            DialogUtils.showError("No Selection", "Please select a customer to delete.");
+            DialogUtils.showError("No Selection", "Please select a customer to delete.",AppContext.getOwner());
             return;
         }
 
         var customer = AppContext.customerDAO.findByEmail(selected.getEmail());
 
         if (customer == null) {
-            DialogUtils.showError("Not Found", "The selected customer could not be found.");
+            DialogUtils.showError("Not Found", "The selected customer could not be found.",AppContext.getOwner());
             return;
         }
 
         boolean success = AppContext.customerManager.softDeleteCustomer(customer);
         if (success) {
-            DialogUtils.showSuccess("Customer deleted successfully.");
+            DialogUtils.showSuccess("Customer deleted successfully.", AppContext.getOwner());
             loadCustomers();
         } else {
-            DialogUtils.showError("Deletion Failed", "Unable to delete the selected customer.");
+            DialogUtils.showError("Deletion Failed", "Unable to delete the selected customer.",AppContext.getOwner());
         }
     }
 
@@ -147,13 +147,13 @@ public class CustomersController {
     private void handleEditCustomer() {
         CustomerRow selected = customerTable.getSelectionModel().getSelectedItem();
         if (selected == null) {
-            DialogUtils.showError("No Selection", "Please select a customer to edit.");
+            DialogUtils.showError("No Selection", "Please select a customer to edit.",AppContext.getOwner());
             return;
         }
 
         var customer = AppContext.customerDAO.findByEmail(selected.getEmail());
         if (customer == null) {
-            DialogUtils.showError("Not Found", "Customer not found.");
+            DialogUtils.showError("Not Found", "Customer not found.",AppContext.getOwner());
             return;
         }
 
@@ -164,7 +164,7 @@ public class CustomersController {
             controller.setCustomerToEdit(customer);
             controller.setCustomerController(this);
         } catch (Exception e) {
-            DialogUtils.showError("Navigation error", "Could not load Edit view.");
+            DialogUtils.showError("Navigation error", "Could not load Edit view.",AppContext.getOwner());
         }
     }
 
@@ -247,7 +247,7 @@ public class CustomersController {
             MainLayoutController.getInstance().restorePreviousTitle();
             MainLayoutController.getInstance().loadCenter("/layouts/customer/CustomersView.fxml");
         } catch (Exception e) {
-            DialogUtils.showError("Navigation error", "Failed to load customer view.");
+            DialogUtils.showError("Navigation error", "Failed to load customer view.",AppContext.getOwner());
         }
     }
 

@@ -83,7 +83,6 @@ public class ScheduleController {
         oneTimeCheckBox.setSelected(true);
         recurringCheckBox.setSelected(true);
         showDeletedCheckBox.setSelected(false);
-
         loadSchedules();
         startAutoRefresh();
         searchField.textProperty().addListener((obs, oldText, newText) -> handleSearch());
@@ -210,7 +209,7 @@ public class ScheduleController {
                 loadSchedules();
             }
         } catch (IOException e) {
-            DialogUtils.showError("Loading Error", "Could not load Add Schedule dialog.");
+            DialogUtils.showError("Loading Error", "Could not load Add Schedule dialog.", AppContext.getOwner());
         }
     }
 
@@ -218,18 +217,18 @@ public class ScheduleController {
     private void handleChangeFrequency() {
         ScheduleRow selected = scheduleTable.getSelectionModel().getSelectedItem();
         if (selected == null) {
-            DialogUtils.showError("No Selection", "Please select a schedule to edit.");
+            DialogUtils.showError("No Selection", "Please select a schedule to edit.", AppContext.getOwner());
             return;
         }
         if (selected.getScheduleType() == ScheduleCategory.ONE_TIME) {
-            DialogUtils.showError("Edit not allowed", "Cannot edit one-time schedules.");
+            DialogUtils.showError("Edit not allowed", "Cannot edit one-time schedules.", AppContext.getOwner());
             return;
         }
 
         try {
             RecurringSchedule schedule = AppContext.recurringScheduleDAO.findById(selected.getId());
             if (schedule == null) {
-                DialogUtils.showError("Error", "Schedule not found.");
+                DialogUtils.showError("Error", "Schedule not found.", AppContext.getOwner());
                 return;
             }
 
@@ -251,9 +250,9 @@ public class ScheduleController {
                 }
             }
         } catch (IOException e) {
-            DialogUtils.showError("Loading Error", "Failed to load the dialog.");
+            DialogUtils.showError("Loading Error", "Failed to load the dialog.", AppContext.getOwner());
         } catch (Exception e) {
-            DialogUtils.showError("Unexpected Error", "An unexpected error occurred.");
+            DialogUtils.showError("Unexpected Error", "An unexpected error occurred.", AppContext.getOwner());
         }
     }
 
@@ -261,7 +260,7 @@ public class ScheduleController {
     private void handleDeleteSchedule() {
         ScheduleRow selected = scheduleTable.getSelectionModel().getSelectedItem();
         if (selected == null) {
-            DialogUtils.showError("No Selection", "Please select a schedule to delete.");
+            DialogUtils.showError("No Selection", "Please select a schedule to delete.", AppContext.getOwner());
             return;
         }
 
@@ -286,15 +285,15 @@ public class ScheduleController {
             }
 
             if (success) {
-                DialogUtils.showSuccess("Schedule cancelled successfully.");
+                DialogUtils.showSuccess("Schedule cancelled successfully.", AppContext.getOwner());
                 loadSchedules();
             } else {
-                DialogUtils.showError("Cancellation failed", "Schedule could not be cancelled.");
+                DialogUtils.showError("Cancellation failed", "Schedule could not be cancelled.", AppContext.getOwner());
             }
 
         } catch (Exception e) {
             e.printStackTrace();
-            DialogUtils.showError("Error", "An error occurred while cancelling the schedule.");
+            DialogUtils.showError("Error", "An error occurred while cancelling the schedule.", AppContext.getOwner());
         }
     }
 
@@ -384,14 +383,5 @@ public class ScheduleController {
         }
 
         filterMenu.show(scheduleTable, event.getScreenX(), event.getScreenY());
-    }
-
-    public void returnToScheduleView() {
-        try {
-            MainLayoutController.getInstance().restorePreviousTitle();
-            MainLayoutController.getInstance().loadCenter("/layouts/schedule/ScheduleView.fxml");
-        } catch (Exception e) {
-            DialogUtils.showError("Navigation error", "Failed to load schedule view.");
-        }
     }
 }

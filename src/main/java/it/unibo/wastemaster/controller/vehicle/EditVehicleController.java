@@ -14,6 +14,7 @@ public class EditVehicleController {
 	private Vehicle vehicle;
 	private VehicleController vehicleController;
 
+
 	@FXML
 	private TextField plateField;
 	@FXML
@@ -28,6 +29,7 @@ public class EditVehicleController {
 	private ComboBox<RequiredLicence> licenceComboBox;
 	@FXML
 	private ComboBox<VehicleStatus> statusComboBox;
+
 
 	public void setVehicleController(VehicleController controller) {
 		this.vehicleController = controller;
@@ -54,7 +56,7 @@ public class EditVehicleController {
 		try {
 			Vehicle original = AppContext.vehicleManager.findVehicleByPlate(vehicle.getPlate());
 			if (original == null) {
-				DialogUtils.showError("Error", "Vehicle not found.");
+				DialogUtils.showError("Error", "Vehicle not found.", AppContext.getOwner());
 				return;
 			}
 
@@ -66,7 +68,7 @@ public class EditVehicleController {
 					original.getCapacity() != Integer.parseInt(capacityField.getText());
 
 			if (!changed) {
-				DialogUtils.showError("No changes", "No fields were modified.");
+				DialogUtils.showError("No changes", "No fields were modified.", AppContext.getOwner());
 				return;
 			}
 
@@ -78,13 +80,13 @@ public class EditVehicleController {
 			vehicle.setCapacity(Integer.parseInt(capacityField.getText()));
 
 			AppContext.vehicleManager.updateVehicle(vehicle);
-			DialogUtils.showSuccess("Vehicle updated successfully.");
+			DialogUtils.showSuccess("Vehicle updated successfully.", AppContext.getOwner());
 			vehicleController.returnToVehicleView();
 
 		} catch (IllegalArgumentException e) {
-			DialogUtils.showError("Validation error", e.getMessage());
+			DialogUtils.showError("Validation error", e.getMessage(), AppContext.getOwner());
 		} catch (Exception e) {
-			DialogUtils.showError("Unexpected error", e.getMessage());
+			DialogUtils.showError("Unexpected error", e.getMessage(), AppContext.getOwner());
 		}
 	}
 

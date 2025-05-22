@@ -4,7 +4,9 @@ import java.io.IOException;
 import java.util.Optional;
 import java.util.function.Consumer;
 
+import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
@@ -13,19 +15,25 @@ import javafx.stage.Stage;
 
 public class DialogUtils {
 
-	public static void showError(String title, String message) {
+	public static void showError(String title, String message, Stage owner) {
 		Alert alert = new Alert(Alert.AlertType.ERROR);
+		alert.initOwner(owner);
 		alert.setTitle(title);
 		alert.setHeaderText("Please fix the following errors:");
 		alert.setContentText(message);
+		Scene scene = alert.getDialogPane().getScene();
+		scene.getStylesheets().addAll(owner.getScene().getStylesheets());
 		alert.showAndWait();
 	}
 
-	public static void showSuccess(String message) {
+	public static void showSuccess(String message, Stage owner) {
 		Alert alert = new Alert(Alert.AlertType.INFORMATION);
+		alert.initOwner(owner);
 		alert.setTitle("Success");
 		alert.setHeaderText(null);
 		alert.setContentText(message);
+		Scene scene = alert.getDialogPane().getScene();
+		scene.getStylesheets().addAll(owner.getScene().getStylesheets());
 		alert.showAndWait();
 	}
 
@@ -61,6 +69,10 @@ public class DialogUtils {
 		Scene scene = new Scene(root);
 		scene.getStylesheets().addAll(owner.getScene().getStylesheets());
 		return scene;
+	}
+
+	public static void closeModal(ActionEvent event) {
+		((Stage) ((Node) event.getSource()).getScene().getWindow()).close();
 	}
 
 }

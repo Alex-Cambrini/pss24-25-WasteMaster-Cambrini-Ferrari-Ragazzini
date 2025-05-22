@@ -45,14 +45,14 @@ public class EditEmployeeController {
 
 		licenceComboBox.getItems().setAll(Licence.values());
 		licenceComboBox.getSelectionModel().select(employee.getLicence());
-	}
-
+}
+	
 	@FXML
 	private void handleUpdateEmployee() {
 		try {
 			Employee original = AppContext.employeeDAO.findByEmail(employee.getEmail());
 			if (original == null) {
-				DialogUtils.showError("Error", "Employee not found.");
+				DialogUtils.showError("Error", "Employee not found.", AppContext.getOwner());
 				return;
 			}
 
@@ -63,7 +63,7 @@ public class EditEmployeeController {
 					original.getLicence() != licenceComboBox.getValue();
 
 			if (!changed) {
-				DialogUtils.showError("No changes", "No fields were modified.");
+				DialogUtils.showError("No changes", "No fields were modified.", AppContext.getOwner());
 				return;
 			}
 
@@ -74,13 +74,13 @@ public class EditEmployeeController {
 			employee.getLocation().setCity(cityField.getText());
 
 			AppContext.employeeManager.updateEmployee(employee);
-			DialogUtils.showSuccess("Employee updated successfully.");
+			DialogUtils.showSuccess("Employee updated successfully.", AppContext.getOwner());
 			employeeController.returnToEmployeeView();
 
 		} catch (IllegalArgumentException e) {
-			DialogUtils.showError("Validation error", e.getMessage());
+			DialogUtils.showError("Validation error", e.getMessage(), AppContext.getOwner());
 		} catch (Exception e) {
-			DialogUtils.showError("Unexpected error", e.getMessage());
+			DialogUtils.showError("Unexpected error", e.getMessage(), AppContext.getOwner());
 		}
 	}
 

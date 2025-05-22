@@ -12,7 +12,6 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
 
 public class AddVehicleController {
-
 	@FXML
 	private TextField plateField;
 	@FXML
@@ -56,16 +55,16 @@ public class AddVehicleController {
 
 			Vehicle vehicle = new Vehicle(plate, brand, model, year, licence, status, capacity);
 			AppContext.vehicleManager.addVehicle(vehicle);
-			showSuccess("Vehicle saved successfully.");
+			showSuccess("Vehicle saved successfully.", AppContext.getOwner());
 
 			if (vehicleController != null) {
 				vehicleController.returnToVehicleView();
 			}
 		} catch (IllegalArgumentException e) {
-			showError("Validation error", e.getMessage());
+			showError("Validation error", e.getMessage(), AppContext.getOwner());
 		} catch (Exception e) {
 			e.printStackTrace();
-			showError("Unexpected error", e.getMessage());
+			showError("Unexpected error", e.getMessage(), AppContext.getOwner());
 		}
 	}
 

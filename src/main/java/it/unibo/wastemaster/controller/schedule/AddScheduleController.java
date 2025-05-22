@@ -161,17 +161,18 @@ public class AddScheduleController {
             } else {
                 AppContext.oneTimeScheduleManager.createOneTimeSchedule(selectedCustomer, selectedWaste, selectedDate);
             }
-
-            DialogUtils.showSuccess("Schedule saved successfully.");
-            scheduleController.returnToScheduleView();
+            
+            DialogUtils.showSuccess("Schedule saved successfully.", AppContext.getOwner());
+            DialogUtils.closeModal(event);
 
         } catch (Exception e) {
-            DialogUtils.showError("Validation error", e.getMessage());
+            DialogUtils.showError("Validation error", e.getMessage(), AppContext.getOwner());
+
         }
     }
 
     @FXML
     private void handleAbortScheduleCreation(ActionEvent event) {
-        scheduleController.returnToScheduleView();
+         DialogUtils.closeModal(event);
     }
 }

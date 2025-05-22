@@ -15,6 +15,7 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.stage.Stage;
 
 import java.util.List;
 
@@ -23,6 +24,7 @@ public class EmployeeController {
     private Timeline refreshTimeline;
     private ContextMenu filterMenu;
     private ObservableList<EmployeeRow> allEmployees = FXCollections.observableArrayList();
+    private Stage owner;
 
     private final ObservableList<String> activeFilters = FXCollections.observableArrayList(
             "name", "surname", "email", "role", "licence", "city");
@@ -53,6 +55,7 @@ public class EmployeeController {
 
     @FXML
     public void initialize() {
+        owner = (Stage) MainLayoutController.getInstance().getRootPane().getScene().getWindow();
         nameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
         surnameColumn.setCellValueFactory(new PropertyValueFactory<>("surname"));
         emailColumn.setCellValueFactory(new PropertyValueFactory<>("email"));
@@ -135,23 +138,23 @@ public class EmployeeController {
     private void handleDeleteEmployee() {
         EmployeeRow selected = employeeTable.getSelectionModel().getSelectedItem();
         if (selected == null) {
-            DialogUtils.showError("No Selection", "Please select an employee to delete.");
+            DialogUtils.showError("No Selection", "Please select an employee to delete.", owner);
             return;
         }
 
         var employee = AppContext.employeeDAO.findByEmail(selected.getEmail());
 
         if (employee == null) {
-            DialogUtils.showError("Not Found", "The selected employee could not be found.");
+            DialogUtils.showError("Not Found", "The selected employee could not be found.", owner);
             return;
         }
 
         boolean success = AppContext.employeeManager.softDeleteEmployee(employee);
         if (success) {
-            DialogUtils.showSuccess("Employee deleted successfully.");
+            DialogUtils.showSuccess("Employee deleted successfully.", owner);
             loadEmployee();
         } else {
-            DialogUtils.showError("Deletion Failed", "Unable to delete the selected employee.");
+            DialogUtils.showError("Deletion Failed", "Unable to delete the selected employee.", owner);
         }
     }
 
@@ -167,7 +170,7 @@ public class EmployeeController {
 
         } catch (Exception e) {
             e.printStackTrace();
-            DialogUtils.showError("Navigation error", "Could not load Add Employee view.");
+            DialogUtils.showError("Navigation error", "Could not load Add Employee view.", owner);
         }
     }
 
@@ -175,13 +178,13 @@ public class EmployeeController {
     private void handleEditEmployee() {
         EmployeeRow selected = employeeTable.getSelectionModel().getSelectedItem();
         if (selected == null) {
-            DialogUtils.showError("No Selection", "Please select an employee to edit.");
+            DialogUtils.showError("No Selection", "Please select an employee to edit.", owner);
             return;
         }
 
         var employee = AppContext.employeeDAO.findByEmail(selected.getEmail());
         if (employee == null) {
-            DialogUtils.showError("Not Found", "Employee not found.");
+            DialogUtils.showError("Not Found", "Employee not found.", owner);
             return;
         }
 
@@ -192,7 +195,7 @@ public class EmployeeController {
             controller.setEmployeeToEdit(employee);
             controller.setEmployeeController(this);
         } catch (Exception e) {
-            DialogUtils.showError("Navigation error", "Could not load Edit view.");
+            DialogUtils.showError("Navigation error", "Could not load Edit view.", owner);
         }
     }
 
@@ -261,7 +264,7 @@ public class EmployeeController {
             MainLayoutController.getInstance().restorePreviousTitle();
             MainLayoutController.getInstance().loadCenter("/layouts/employee/EmployeeView.fxml");
         } catch (Exception e) {
-            DialogUtils.showError("Navigation error", "Failed to load employee view.");
+            DialogUtils.showError("Navigation error", "Failed to load employee view.", owner);
         }
     }
 }

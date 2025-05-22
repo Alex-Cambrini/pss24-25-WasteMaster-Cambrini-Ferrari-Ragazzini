@@ -76,6 +76,7 @@ public class VehicleController {
 		lastMaintenanceDateColumn.setCellValueFactory(new PropertyValueFactory<>("lastMaintenanceDate"));
 		nextMaintenanceDateColumn.setCellValueFactory(new PropertyValueFactory<>("nextMaintenanceDate"));
 
+
 		loadVehicles();
 		startAutoRefresh();
 		searchField.textProperty().addListener((obs, oldText, newText) -> handleSearch());
@@ -126,7 +127,7 @@ public class VehicleController {
 					.loadCenterWithController("/layouts/vehicle/AddVehicleView.fxml");
 			controller.setVehicleController(this);
 		} catch (Exception e) {
-			DialogUtils.showError("Navigation error", "Could not load Add Vehicle view.");
+			DialogUtils.showError("Navigation error", "Could not load Add Vehicle view.", AppContext.getOwner());
 			e.printStackTrace();
 		}
 	}
@@ -140,24 +141,24 @@ public class VehicleController {
 	private void handleDeleteVehicle() {
 		VehicleRow selected = VehicleTable.getSelectionModel().getSelectedItem();
 		if (selected == null) {
-			DialogUtils.showError("No Selection", "Please select a vehicle to delete.");
+			DialogUtils.showError("No Selection", "Please select a vehicle to delete.", AppContext.getOwner());
 			return;
 		}
 
 		Vehicle vehicle = AppContext.vehicleManager.findVehicleByPlate(selected.getPlate());
 
 		if (vehicle == null) {
-			DialogUtils.showError("Not Found", "The selected vehicle could not be found.");
+			DialogUtils.showError("Not Found", "The selected vehicle could not be found.", AppContext.getOwner());
 			return;
 		}
 
 		boolean success = AppContext.vehicleManager.deleteVehicle(vehicle);
 
 		if (success) {
-			DialogUtils.showSuccess("Vehicle deleted successfully.");
+			DialogUtils.showSuccess("Vehicle deleted successfully.", AppContext.getOwner());
 			loadVehicles();
 		} else {
-			DialogUtils.showError("Deletion Failed", "Unable to delete the selected vehicle.");
+			DialogUtils.showError("Deletion Failed", "Unable to delete the selected vehicle.", AppContext.getOwner());
 		}
 	}
 
@@ -165,13 +166,13 @@ public class VehicleController {
 	private void handleEditVehicle() {
 		VehicleRow selected = VehicleTable.getSelectionModel().getSelectedItem();
 		if (selected == null) {
-			DialogUtils.showError("No Selection", "Please select a vehicle to edit.");
+			DialogUtils.showError("No Selection", "Please select a vehicle to edit.", AppContext.getOwner());
 			return;
 		}
 
 		Vehicle vehicle = AppContext.vehicleManager.findVehicleByPlate(selected.getPlate());
 		if (vehicle == null) {
-			DialogUtils.showError("Not Found", "Vehicle not found.");
+			DialogUtils.showError("Not Found", "Vehicle not found.", AppContext.getOwner());
 			return;
 		}
 
@@ -182,7 +183,7 @@ public class VehicleController {
 			controller.setVehicleToEdit(vehicle);
 			controller.setVehicleController(this);
 		} catch (Exception e) {
-			DialogUtils.showError("Navigation error", "Could not load Edit view.");
+			DialogUtils.showError("Navigation error", "Could not load Edit view.", AppContext.getOwner());
 		}
 	}
 
@@ -280,7 +281,7 @@ public class VehicleController {
 			MainLayoutController.getInstance().restorePreviousTitle();
 			MainLayoutController.getInstance().loadCenter("/layouts/vehicle/VehicleView.fxml");
 		} catch (Exception e) {
-			DialogUtils.showError("Navigation error", "Failed to load vehicle view.");
+			DialogUtils.showError("Navigation error", "Failed to load vehicle view.", AppContext.getOwner());
 		}
 	}
 

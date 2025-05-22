@@ -9,8 +9,8 @@ import javafx.scene.control.TextField;
 
 public class EditCustomerController {
 
-    private Customer customer;    
-	private CustomersController customerController;
+    private Customer customer;
+    private CustomersController customerController;
 
     @FXML
     private TextField nameField;
@@ -29,10 +29,9 @@ public class EditCustomerController {
     @FXML
     private TextField postalCodeField;
 
-	public void setCustomerController(CustomersController controller) {
-		this.customerController = controller;
-	}
-
+    public void setCustomerController(CustomersController controller) {
+        this.customerController = controller;
+    }
 
     public void setCustomerToEdit(Customer customer) {
         this.customer = customer;
@@ -52,7 +51,7 @@ public class EditCustomerController {
         try {
             Customer original = AppContext.customerManager.getCustomerById(customer.getCustomerId());
             if (original == null) {
-                DialogUtils.showError("Error", "Customer not found.");
+                DialogUtils.showError("Error", "Customer not found.", AppContext.getOwner());
                 return;
             }
 
@@ -66,7 +65,7 @@ public class EditCustomerController {
                     !original.getLocation().getPostalCode().equals(postalCodeField.getText());
 
             if (!changed) {
-                DialogUtils.showError("No changes", "No fields were modified.");
+                DialogUtils.showError("No changes", "No fields were modified.", AppContext.getOwner());
                 return;
             }
 
@@ -81,11 +80,11 @@ public class EditCustomerController {
                     postalCodeField.getText()));
 
             AppContext.customerManager.updateCustomer(customer);
-            DialogUtils.showSuccess("Customer updated successfully.");
+            DialogUtils.showSuccess("Customer updated successfully.", AppContext.getOwner());
             customerController.returnToCustomerView();
 
         } catch (IllegalArgumentException e) {
-            DialogUtils.showError("Validation error", e.getMessage());
+            DialogUtils.showError("Validation error", e.getMessage(), AppContext.getOwner());
         }
     }
 

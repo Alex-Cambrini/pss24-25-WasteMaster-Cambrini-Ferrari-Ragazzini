@@ -11,7 +11,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.TextField;
 
 public class AddCustomerController {
-	
+
 	@FXML
 	private TextField emailField;
 	@FXML
@@ -37,7 +37,6 @@ public class AddCustomerController {
 
 	@FXML
 	private void handleSaveCustomer() {
-
 		try {
 			String email = emailField.getText();
 			String name = nameField.getText();
@@ -58,16 +57,16 @@ public class AddCustomerController {
 			}
 
 			AppContext.customerManager.addCustomer(customer);
-			showSuccess("Customer saved successfully.");
+			showSuccess("Customer saved successfully.", AppContext.getOwner());
 			customerController.returnToCustomerView();
 
 		} catch (IllegalArgumentException e) {
-			showError("Validation error", e.getMessage());
+			showError("Validation error", e.getMessage(), AppContext.getOwner());
 		}
 	}
 
 	@FXML
 	private void handleAbortCustomerCreation() {
-			customerController.returnToCustomerView();
+		customerController.returnToCustomerView();
 	}
 }

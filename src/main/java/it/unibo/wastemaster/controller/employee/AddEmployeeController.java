@@ -14,7 +14,6 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
 
 public class AddEmployeeController {
-
     @FXML
     private TextField nameField;
     @FXML
@@ -72,16 +71,16 @@ public class AddEmployeeController {
 
             AppContext.employeeManager.addEmployee(employee);
 
-            showSuccess("Employee saved successfully.");
+            showSuccess("Employee saved successfully.", AppContext.getOwner());
 
             if (employeeController != null) {
                 employeeController.returnToEmployeeView();
             }
         } catch (IllegalArgumentException e) {
-            showError("Validation error", e.getMessage());
+            showError("Validation error", e.getMessage(), AppContext.getOwner());
         } catch (Exception e) {
             e.printStackTrace();
-            showError("Unexpected error", e.getMessage());
+            showError("Unexpected error", e.getMessage(), AppContext.getOwner());
         }
     }
 
