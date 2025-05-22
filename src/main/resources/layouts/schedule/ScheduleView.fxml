@@ -3,10 +3,10 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.CheckBox?>
-<?import javafx.scene.control.Tooltip?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.Tooltip?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
@@ -21,44 +21,46 @@
                 <TextField fx:id="searchField" promptText="Search..." />
                 <Button mnemonicParsing="false" onAction="#handleResetSearch" styleClass="accent, button-outlined" text="Reset" />
             </children>
+         <VBox.margin>
+            <Insets bottom="10.0" />
+         </VBox.margin>
         </HBox>
-        <HBox alignment="TOP_RIGHT" prefHeight="30.0" prefWidth="30.0" spacing="10.0">
+        <HBox alignment="CENTER_RIGHT" prefHeight="30.0" prefWidth="30.0" spacing="10.0">
 <children>
         <CheckBox mnemonicParsing="false" text="Show Active">
             <tooltip>
-                <Tooltip text="Show Active"/>
+                <Tooltip text="Show Active" />
             </tooltip>
         </CheckBox>
         <CheckBox mnemonicParsing="false" text="Show Paused">
             <tooltip>
-                <Tooltip text="Show Paused"/>
+                <Tooltip text="Show Paused" />
             </tooltip>
         </CheckBox>
         <CheckBox mnemonicParsing="false" text="Show Completed">
             <tooltip>
-                <Tooltip text="Show Completed"/>
+                <Tooltip text="Show Completed" />
             </tooltip>
         </CheckBox>
         <CheckBox fx:id="showDeletedCheckBox" text="Show Deleted">
             <tooltip>
-                <Tooltip text="Show Deleted"/>
+                <Tooltip text="Show Deleted" />
             </tooltip>
         </CheckBox>
-        <Region prefHeight="30.0" prefWidth="18.0" HBox.hgrow="ALWAYS"/>
         <CheckBox fx:id="oneTimeCheckBox" text="OneTime">
             <tooltip>
-                <Tooltip text="OneTime"/>
+                <Tooltip text="OneTime" />
             </tooltip>
         </CheckBox>
         <CheckBox fx:id="recurringCheckBox" text="Recurring">
             <tooltip>
-                <Tooltip text="Recurring"/>
+                <Tooltip text="Recurring" />
             </tooltip>
         </CheckBox>
     </children>
-            <padding>
-                <Insets right="20.0" />
-            </padding>
+         <VBox.margin>
+            <Insets bottom="5.0" />
+         </VBox.margin>
         </HBox>
         <TableView fx:id="scheduleTable" prefHeight="300.0" prefWidth="600.0" styleClass="table-view" VBox.vgrow="ALWAYS">
             <columns>
