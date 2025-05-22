@@ -3,6 +3,7 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.Tooltip?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextField?>
@@ -14,24 +15,52 @@
     <children>
         <HBox alignment="TOP_CENTER" minHeight="40.0" prefHeight="40.0" prefWidth="600.0" spacing="10.0">
             <children>
-                <Button fx:id="addScheduleButton" mnemonicParsing="false" onAction="#handleAddSchedule" text="Add Schedule" styleClass="success" />
+                <Button fx:id="addScheduleButton" mnemonicParsing="false" onAction="#handleAddSchedule" styleClass="success" text="Add Schedule" />
                 <Region prefHeight="20" prefWidth="0.0" HBox.hgrow="ALWAYS" />
-                <Button fx:id="filterButton" onMouseClicked="#showFilterMenu" text="Filter ▼" styleClass="accent" />
+                <Button fx:id="filterButton" onMouseClicked="#showFilterMenu" styleClass="accent" text="Filter ▼" />
                 <TextField fx:id="searchField" promptText="Search..." />
-                <Button mnemonicParsing="false" onAction="#handleResetSearch" text="Reset" styleClass="accent, button-outlined"/>
+                <Button mnemonicParsing="false" onAction="#handleResetSearch" styleClass="accent, button-outlined" text="Reset" />
             </children>
         </HBox>
         <HBox alignment="TOP_RIGHT" prefHeight="30.0" prefWidth="30.0" spacing="10.0">
-            <children>
-                <CheckBox fx:id="showDeletedCheckBox" text="Show Deleted" />
-                <CheckBox fx:id="oneTimeCheckBox" text="OneTime" />
-                <CheckBox fx:id="recurringCheckBox" text="Recurring" />
-            </children>
+<children>
+        <CheckBox mnemonicParsing="false" text="Show Active">
+            <tooltip>
+                <Tooltip text="Show Active"/>
+            </tooltip>
+        </CheckBox>
+        <CheckBox mnemonicParsing="false" text="Show Paused">
+            <tooltip>
+                <Tooltip text="Show Paused"/>
+            </tooltip>
+        </CheckBox>
+        <CheckBox mnemonicParsing="false" text="Show Completed">
+            <tooltip>
+                <Tooltip text="Show Completed"/>
+            </tooltip>
+        </CheckBox>
+        <CheckBox fx:id="showDeletedCheckBox" text="Show Deleted">
+            <tooltip>
+                <Tooltip text="Show Deleted"/>
+            </tooltip>
+        </CheckBox>
+        <Region prefHeight="30.0" prefWidth="18.0" HBox.hgrow="ALWAYS"/>
+        <CheckBox fx:id="oneTimeCheckBox" text="OneTime">
+            <tooltip>
+                <Tooltip text="OneTime"/>
+            </tooltip>
+        </CheckBox>
+        <CheckBox fx:id="recurringCheckBox" text="Recurring">
+            <tooltip>
+                <Tooltip text="Recurring"/>
+            </tooltip>
+        </CheckBox>
+    </children>
             <padding>
                 <Insets right="20.0" />
             </padding>
         </HBox>
-        <TableView fx:id="scheduleTable" prefHeight="300.0" prefWidth="600.0" VBox.vgrow="ALWAYS">
+        <TableView fx:id="scheduleTable" prefHeight="300.0" prefWidth="600.0" styleClass="table-view" VBox.vgrow="ALWAYS">
             <columns>
                 <TableColumn fx:id="wasteColumn" prefWidth="100" text="Waste Name" />
                 <TableColumn fx:id="typeColumn" prefWidth="120" text="Schedule Type" />
@@ -45,10 +74,10 @@
         </TableView>
         <HBox alignment="TOP_RIGHT" minHeight="50.0" prefHeight="100.0" prefWidth="600.0" spacing="10.0">
             <children>
-            <Button fx:id="changeFrequencyButton" disable="true" mnemonicParsing="false" onAction="#handleChangeFrequency" text="Change Frequency" styleClass="accent"/>
-            <Button fx:id="toggleStatusButton" disable="true" mnemonicParsing="false" onAction="#handleStatusToggle" text="Pause" styleClass="accent"/>
+            <Button fx:id="changeFrequencyButton" disable="true" mnemonicParsing="false" onAction="#handleChangeFrequency" styleClass="accent" text="Change Frequency" />
+            <Button fx:id="toggleStatusButton" disable="true" mnemonicParsing="false" onAction="#handleStatusToggle" styleClass="accent" text="Pause" />
             <Region prefHeight="200.0" prefWidth="200.0" HBox.hgrow="ALWAYS" />
-                <Button fx:id="deleteButton" disable="true" mnemonicParsing="false" onAction="#handleDeleteSchedule" text="Delete" styleClass="danger"/>
+                <Button fx:id="deleteButton" disable="true" mnemonicParsing="false" onAction="#handleDeleteSchedule" styleClass="danger" text="Delete" />
             </children>
             <padding>
                 <Insets top="10.0" />
