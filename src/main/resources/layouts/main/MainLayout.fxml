@@ -50,7 +50,7 @@
                     </children>
                 </VBox>
 
-                <VBox fx:id="contentVBox" spacing="10" HBox.hgrow="always">
+                <VBox fx:id="contentVBox" spacing="10" HBox.hgrow="always" styleClass="central-box">
                     <padding>
                         <Insets top="20" left="20" right="20" bottom="20"/>
                     </padding>
