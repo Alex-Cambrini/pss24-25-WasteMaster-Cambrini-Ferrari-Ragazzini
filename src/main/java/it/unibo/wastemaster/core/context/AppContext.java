@@ -5,11 +5,13 @@ import it.unibo.wastemaster.core.services.*;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
+import javafx.stage.Stage;
 
 public class AppContext {
 
     private static EntityManagerFactory emf;
     private static EntityManager em;
+    private static Stage owner;
 
     // DAOs
     public static EmployeeDAO employeeDAO;
@@ -32,13 +34,18 @@ public class AppContext {
     public static CollectionManager collectionManager;
     public static VehicleManager vehicleManager;
 
+    public static void setOwner(Stage stage) {
+        owner = stage;
+    }
 
-
+    public static Stage getOwner() {
+        return owner;
+    }
 
     public static void init() {
         emf = Persistence.createEntityManagerFactory("myJpaUnit");
         em = emf.createEntityManager();
-        
+
         // Inizializzazione dei DAO
         employeeDAO = new EmployeeDAO(em);
         wasteDAO = new WasteDAO(em);
@@ -49,7 +56,7 @@ public class AppContext {
         collectionDAO = new CollectionDAO(em);
         oneTimeScheduleDAO = new OneTimeScheduleDAO(em);
         vehicleDAO = new VehicleDAO(em);
-        
+
         // Inizializzazione dei Services
         employeeManager = new EmployeeManager(employeeDAO);
         wasteManager = new WasteManager(wasteDAO);
@@ -60,8 +67,6 @@ public class AppContext {
         oneTimeScheduleManager = new OneTimeScheduleManager(oneTimeScheduleDAO, collectionManager);
         vehicleManager = new VehicleManager(vehicleDAO);
 
-
-        
         // Collegamento
         recurringScheduleManager.setCollectionManager(collectionManager);
     }
