@@ -28,6 +28,8 @@ public class MainLayoutController {
     @FXML
     private Hyperlink clientiLink;
     @FXML
+    private Hyperlink wasteLink;
+    @FXML
     private Hyperlink ScheduleLink;
     @FXML
     private Hyperlink veicoliLink;
@@ -80,6 +82,13 @@ public class MainLayoutController {
     @FXML
     private void handleDashboard() {
 
+    }
+
+    @FXML
+    private void handleWaste() {
+        wasteLink.setVisited(false);
+        setPageTitle("Waste Management");
+        MainLayoutController.getInstance().loadCenter("/layouts/waste/WasteOverviewView.fxml");
     }
 
     @FXML
