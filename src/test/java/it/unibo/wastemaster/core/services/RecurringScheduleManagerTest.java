@@ -174,6 +174,11 @@ class RecurringScheduleManagerTest extends AbstractDatabaseTest {
         s1.setScheduleStatus(ScheduleStatus.CANCELLED);
         assertFalse(recurringScheduleManager.updateStatusRecurringSchedule(s1, ScheduleStatus.ACTIVE));
 
+        // Cannot update COMPLETED schedule
+        RecurringSchedule sCompleted = new RecurringSchedule(customer, waste, validDate, Frequency.WEEKLY);
+        sCompleted.setScheduleStatus(ScheduleStatus.COMPLETED);
+        assertFalse(recurringScheduleManager.updateStatusRecurringSchedule(sCompleted, ScheduleStatus.ACTIVE));
+
         wasteScheduleDAO.insert(new WasteSchedule(waste, DayOfWeek.MONDAY));
 
         // ACTIVE -> PAUSED: update status and soft delete associated collection
@@ -209,6 +214,51 @@ class RecurringScheduleManagerTest extends AbstractDatabaseTest {
 
         // Cannot reactivate CANCELLED schedule
         assertFalse(recurringScheduleManager.updateStatusRecurringSchedule(reloaded4, ScheduleStatus.ACTIVE));
+    }
+
+    @Test
+    void testUpdateFrequency() {
+        LocalDate validDate = dateUtils.getCurrentDate().plusDays(3);
+
+        // Null arguments throw exception
+        assertThrows(IllegalArgumentException.class,
+                () -> recurringScheduleManager.updateFrequency(null, Frequency.WEEKLY));
+        RecurringSchedule s0 = new RecurringSchedule(customer, waste, validDate, Frequency.WEEKLY);
+        assertThrows(IllegalArgumentException.class,
+                () -> recurringScheduleManager.updateFrequency(s0, null));
+
+        // Cannot update frequency if schedule is not ACTIVE
+        RecurringSchedule s1 = new RecurringSchedule(customer, waste, validDate, Frequency.WEEKLY);
+        s1.setScheduleStatus(ScheduleStatus.PAUSED);
+        assertFalse(recurringScheduleManager.updateFrequency(s1, Frequency.MONTHLY));
+
+        // No update if new frequency equals current frequency
+        RecurringSchedule s2 = new RecurringSchedule(customer, waste, validDate, Frequency.WEEKLY);
+        s2.setScheduleStatus(ScheduleStatus.ACTIVE);
+        assertFalse(recurringScheduleManager.updateFrequency(s2, Frequency.WEEKLY));
+
+        // Update frequency successfully
+        RecurringSchedule s3 = recurringScheduleManager.createRecurringSchedule(customer, waste, validDate,
+                Frequency.WEEKLY);
+        s3.setScheduleStatus(ScheduleStatus.ACTIVE);
+
+        LocalDate oldNextDate = s3.getNextCollectionDate();
+
+        boolean updated = recurringScheduleManager.updateFrequency(s3, Frequency.MONTHLY);
+        assertTrue(updated);
+
+        RecurringSchedule reloaded = recurringScheduleDAO.findById(s3.getScheduleId());
+        assertEquals(Frequency.MONTHLY, reloaded.getFrequency());
+
+        // Verifica che nextCollectionDate sia >= today+2 (non serve uguaglianza esatta)
+        LocalDate todayPlus2 = dateUtils.getCurrentDate().plusDays(2);
+        assertFalse(reloaded.getNextCollectionDate().isBefore(todayPlus2));
+
+        // Verifica che la collection precedente sia stata cancellata e creata una nuova
+        // attiva
+        Collection activeCollection = collectionManager.getActiveCollectionByRecurringSchedule(reloaded);
+        assertNotNull(activeCollection);
+        assertNotEquals(CollectionStatus.CANCELLED, activeCollection.getCollectionStatus());
     }
 
     @Test
