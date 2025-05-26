@@ -58,6 +58,12 @@ class RecurringScheduleManagerTest extends AbstractDatabaseTest {
         assertEquals(waste, s2.getWaste());
         assertEquals(Frequency.MONTHLY, s2.getFrequency());
         assertNotNull(s2.getNextCollectionDate());
+
+        LocalDate pastDate = dateUtils.getCurrentDate().minusDays(1);
+        IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class, () -> {
+            recurringScheduleManager.createRecurringSchedule(customer, waste, pastDate, Frequency.WEEKLY);
+        });
+        assertEquals("Start Date must be today or in the future", thrown.getMessage());
     }
 
     @Test

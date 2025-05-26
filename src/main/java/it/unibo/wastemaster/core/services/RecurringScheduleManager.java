@@ -38,6 +38,9 @@ public class RecurringScheduleManager {
 
     public RecurringSchedule createRecurringSchedule(Customer customer, Waste waste, LocalDate startDate,
             Frequency frequency) {
+        if (startDate.isBefore(LocalDate.now())) {
+            throw new IllegalArgumentException("Start Date must be today or in the future");
+        }
         RecurringSchedule schedule = new RecurringSchedule(customer, waste, startDate, frequency);
         LocalDate nextCollectionDate = calculateNextDate(schedule);
         schedule.setNextCollectionDate(nextCollectionDate);
