@@ -85,19 +85,11 @@ public class EmployeeController {
     }
 
     private void loadEmployee() {
-        List<Employee> employees = AppContext.employeeDAO.findAll();
+        List<Employee> employees = AppContext.employeeDAO.findEmployeeDetails();
         allEmployees.clear();
 
-        for (Employee e : employees) {
-            if (!e.isDeleted()) {
-                allEmployees.add(new EmployeeRow(
-                        e.getName(),
-                        e.getSurname(),
-                        e.getEmail(),
-                        e.getRole().name(),
-                        e.getLicence().name(),
-                        e.getLocation().getCity()));
-            }
+        for (Employee employee : employees) {
+            allEmployees.add(new EmployeeRow(employee));
         }
 
         employeeTable.setItems(FXCollections.observableArrayList(allEmployees));
@@ -247,15 +239,18 @@ public class EmployeeController {
         filterMenu.show(filterButton, event.getScreenX(), event.getScreenY());
     }
 
-    private String formatEnumOrNone(String raw) {
-        if (raw == null || raw.equalsIgnoreCase("none")) {
+    private String formatEnumOrNone(Enum<?> value) {
+        if (value == null || value.name().equalsIgnoreCase("none")) {
             return "None";
         }
-        return formatEnum(raw);
+        return formatEnum(value);
     }
 
-    private String formatEnum(String raw) {
-        String lower = raw.toLowerCase().replace("_", " ");
+    private String formatEnum(Enum<?> value) {
+        if (value == null) {
+            return "";
+        }
+        String lower = value.name().toLowerCase().replace("_", " ");
         return Character.toUpperCase(lower.charAt(0)) + lower.substring(1);
     }
 
