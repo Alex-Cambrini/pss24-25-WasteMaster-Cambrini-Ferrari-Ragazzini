@@ -44,7 +44,6 @@
                         <Hyperlink fx:id="dashboardLink" onAction="#handleDashboard" text="Dashboard" />
                         <Hyperlink fx:id="clientiLink" onAction="#handleCustomers" text="Customers" />
                         <Hyperlink fx:id="wasteLink" onAction="#handleWaste" text="Waste" />
-                        <Hyperlink fx:id="raccolteLink" text="Raccolte" />
                         <Hyperlink fx:id="ScheduleLink" onAction="#handleSchedule" text="Schedule" />
                         <Hyperlink fx:id="veicoliLink" onAction="#handleVehicle" text="Vehicle" />
                         <Hyperlink fx:id="employeeLink" onAction="#handleEmployee" text="Employee" />
