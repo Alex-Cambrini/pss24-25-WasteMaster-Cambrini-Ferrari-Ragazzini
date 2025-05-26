@@ -1,6 +1,10 @@
 package it.unibo.wastemaster.viewmodels;
 
+import java.time.LocalDate;
+
 import it.unibo.wastemaster.core.models.Vehicle;
+import it.unibo.wastemaster.core.models.Vehicle.RequiredLicence;
+import it.unibo.wastemaster.core.models.Vehicle.VehicleStatus;
 
 public class VehicleRow {
 	private final String plate;
@@ -8,10 +12,10 @@ public class VehicleRow {
 	private final String model;
 	private final int registrationYear;
 	private final int capacity;
-	private final String licenceType;
-	private final String vehicleStatus;
-	private final String lastMaintenanceDate;
-	private final String nextMaintenanceDate;
+	private final RequiredLicence licenceType;
+	private final VehicleStatus vehicleStatus;
+	private final LocalDate lastMaintenanceDate;
+	private final LocalDate nextMaintenanceDate;
 
 	public VehicleRow(Vehicle vehicle) {
 		this.plate = vehicle.getPlate();
@@ -19,10 +23,10 @@ public class VehicleRow {
 		this.model = vehicle.getModel();
 		this.registrationYear = vehicle.getRegistrationYear();
 		this.capacity = vehicle.getCapacity();
-		this.licenceType = vehicle.getRequiredLicence().toString();
-		this.vehicleStatus = vehicle.getVehicleStatus().toString();
-		this.lastMaintenanceDate = vehicle.getLastMaintenanceDate().toString();
-		this.nextMaintenanceDate = vehicle.getNextMaintenanceDate().toString();
+		this.licenceType = vehicle.getRequiredLicence();
+		this.vehicleStatus = vehicle.getVehicleStatus();
+		this.lastMaintenanceDate = vehicle.getLastMaintenanceDate();
+		this.nextMaintenanceDate = vehicle.getNextMaintenanceDate();
 	}
 
 	public String getPlate() {
@@ -45,19 +49,19 @@ public class VehicleRow {
 		return capacity;
 	}
 
-	public String getLicenceType() {
+	public RequiredLicence getLicenceType() {
 		return licenceType;
 	}
 
-	public String getVehicleStatus() {
+	public VehicleStatus getVehicleStatus() {
 		return vehicleStatus;
 	}
 
-	public String getLastMaintenanceDate() {
+	public LocalDate getLastMaintenanceDate() {
 		return lastMaintenanceDate;
 	}
 
-	public String getNextMaintenanceDate() {
+	public LocalDate getNextMaintenanceDate() {
 		return nextMaintenanceDate;
 	}
 }

@@ -1,21 +1,23 @@
 package it.unibo.wastemaster.viewmodels;
 
 import it.unibo.wastemaster.core.models.Employee;
+import it.unibo.wastemaster.core.models.Employee.Licence;
+import it.unibo.wastemaster.core.models.Employee.Role;
 
 public class EmployeeRow {
 	private final String name;
 	private final String surname;
 	private final String email;
-	private final String role;
-	private final String licence;
+	private final Role role;
+	private final Licence licence;
 	private final String city;
 
 	public EmployeeRow(Employee employee) {
 		this.name = employee.getName();
 		this.surname = employee.getSurname();
 		this.email = employee.getEmail();
-		this.role = employee.getRole().toString();
-		this.licence = employee.getLicence().toString();
+		this.role = employee.getRole();
+		this.licence = employee.getLicence();
 		this.city = employee.getLocation().getCity();
 	}
 
@@ -31,11 +33,11 @@ public class EmployeeRow {
 		return email;
 	}
 
-	public String getRole() {
+	public Role getRole() {
 		return role;
 	}
 
-	public String getLicence() {
+	public Licence getLicence() {
 		return licence;
 	}
 
