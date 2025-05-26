@@ -39,6 +39,12 @@ public class ScheduleController {
     private CheckBox recurringCheckBox;
     @FXML
     private CheckBox showDeletedCheckBox;
+    @FXML
+    private CheckBox showActiveCheckBox;
+    @FXML
+    private CheckBox showPausedCheckBox;
+    @FXML
+    private CheckBox showCompletedCheckBox;
     // buttons
     @FXML
     private Button changeFrequencyButton;
@@ -80,19 +86,29 @@ public class ScheduleController {
         startColumn.setCellValueFactory(new PropertyValueFactory<>("startDate"));
         statusColumn.setCellValueFactory(new PropertyValueFactory<>("status"));
         customerColumn.setCellValueFactory(new PropertyValueFactory<>("customer"));
+
         oneTimeCheckBox.setSelected(true);
         recurringCheckBox.setSelected(true);
         showDeletedCheckBox.setSelected(false);
+        showActiveCheckBox.setSelected(true);
+        showPausedCheckBox.setSelected(false);
+        showCompletedCheckBox.setSelected(false);
+
         loadSchedules();
         startAutoRefresh();
+
         searchField.textProperty().addListener((obs, oldText, newText) -> handleSearch());
+
         oneTimeCheckBox.selectedProperty().addListener((obs, oldVal, newVal) -> loadSchedules());
         recurringCheckBox.selectedProperty().addListener((obs, oldVal, newVal) -> loadSchedules());
         showDeletedCheckBox.selectedProperty().addListener((obs, oldVal, newVal) -> loadSchedules());
+        showActiveCheckBox.selectedProperty().addListener((obs, oldVal, newVal) -> loadSchedules());
+        showPausedCheckBox.selectedProperty().addListener((obs, oldVal, newVal) -> loadSchedules());
+        showCompletedCheckBox.selectedProperty().addListener((obs, oldVal, newVal) -> loadSchedules());
+
         scheduleTable.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
             updateButtons(newVal);
         });
-
     }
 
     private void updateButtons(ScheduleRow selected) {
@@ -169,20 +185,24 @@ public class ScheduleController {
     private void loadSchedules() {
         allSchedules.clear();
         List<Schedule> all = AppContext.scheduleDAO.findAll();
-        all.forEach(s -> System.out.println(s));
 
         for (Schedule s : all) {
             if (s == null || s.getCustomer() == null || s.getWaste() == null || s.getScheduleStatus() == null)
                 continue;
 
             ScheduleCategory scheduleType = s.getScheduleCategory();
-            boolean isDeleted = s.getScheduleStatus() == ScheduleStatus.CANCELLED;
+            ScheduleStatus status = s.getScheduleStatus();
 
-            boolean matchesType = (oneTimeCheckBox.isSelected() && scheduleType == ScheduleCategory.ONE_TIME)
-                    || (recurringCheckBox.isSelected() && scheduleType == ScheduleCategory.RECURRING);
-            boolean matchesDeleted = showDeletedCheckBox.isSelected() || !isDeleted;
+            boolean isOneTime = oneTimeCheckBox.isSelected() && scheduleType == ScheduleCategory.ONE_TIME;
+            boolean isRecurring = recurringCheckBox.isSelected() && scheduleType == ScheduleCategory.RECURRING;
+            boolean matchesType = isOneTime || isRecurring;
 
-            if (matchesType && matchesDeleted) {
+            boolean matchesStatus = (status == ScheduleStatus.CANCELLED && showDeletedCheckBox.isSelected()) ||
+                    (status == ScheduleStatus.ACTIVE && showActiveCheckBox.isSelected()) ||
+                    (status == ScheduleStatus.PAUSED && showPausedCheckBox.isSelected()) ||
+                    (status == ScheduleStatus.COMPLETED && showCompletedCheckBox.isSelected());
+
+            if (matchesType && matchesStatus) {
                 if (scheduleType == ScheduleCategory.ONE_TIME)
                     allSchedules.add(new ScheduleRow((OneTimeSchedule) s));
                 else if (scheduleType == ScheduleCategory.RECURRING)
