@@ -56,7 +56,7 @@ class OneTimeScheduleManagerTest extends AbstractDatabaseTest {
 		assertNotNull(newSchedule);
 		assertEquals(newSchedule.getScheduleStatus(), ScheduleStatus.ACTIVE);
 
-		Collection associatedCollection = collectionManager.getActiveCollectionByOneTimeSchedule(newSchedule);
+		Collection associatedCollection = collectionManager.getAllCollectionBySchedule(newSchedule).get(0);
 		assertNotNull(associatedCollection);
 		assertEquals(associatedCollection.getCollectionStatus(), Collection.CollectionStatus.PENDING);
 	}
@@ -79,11 +79,7 @@ class OneTimeScheduleManagerTest extends AbstractDatabaseTest {
 		assertTrue(deleted);
 
 		// Check collection also cancelled
-		Collection cancelledCollection = collectionManager.getCancelledCollectionsOneTimeSchedule(activeSchedule)
-				.stream()
-				.findFirst()
-				.orElse(null);
-
+		Collection cancelledCollection = collectionManager.getAllCollectionBySchedule(activeSchedule).get(0);
 		assertNotNull(cancelledCollection);
 		assertEquals(Collection.CollectionStatus.CANCELLED, cancelledCollection.getCollectionStatus());
 
