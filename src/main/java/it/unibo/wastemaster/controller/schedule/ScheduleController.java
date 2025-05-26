@@ -23,7 +23,7 @@ import javafx.stage.Stage;
 import javafx.util.Duration;
 
 import java.io.IOException;
-import java.util.Collections;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -64,17 +64,17 @@ public class ScheduleController {
     private TableView<ScheduleRow> scheduleTable;
 
     @FXML
-    private TableColumn<ScheduleRow, String> wasteColumn;
+    private TableColumn<ScheduleRow, String> wasteNameColumn;
     @FXML
-    private TableColumn<ScheduleRow, String> typeColumn;
+    private TableColumn<ScheduleRow, ScheduleCategory> scheduleCategoryColumn;
     @FXML
-    private TableColumn<ScheduleRow, String> frequencyColumn;
+    private TableColumn<ScheduleRow, Frequency> frequencyColumn;
     @FXML
-    private TableColumn<ScheduleRow, String> dateColumn;
+    private TableColumn<ScheduleRow, LocalDate> executionDateColumn;
     @FXML
-    private TableColumn<ScheduleRow, String> startColumn;
+    private TableColumn<ScheduleRow, LocalDate> startDateColumn;
     @FXML
-    private TableColumn<ScheduleRow, String> statusColumn;
+    private TableColumn<ScheduleRow, ScheduleStatus> statusColumn;
     @FXML
     private TableColumn<ScheduleRow, String> customerColumn;
 
@@ -83,11 +83,11 @@ public class ScheduleController {
 
     @FXML
     public void initialize() {
-        wasteColumn.setCellValueFactory(new PropertyValueFactory<>("wasteName"));
-        typeColumn.setCellValueFactory(new PropertyValueFactory<>("scheduleType"));
+        wasteNameColumn.setCellValueFactory(new PropertyValueFactory<>("wasteName"));
+        scheduleCategoryColumn.setCellValueFactory(new PropertyValueFactory<>("scheduleCategory"));
         frequencyColumn.setCellValueFactory(new PropertyValueFactory<>("frequency"));
-        dateColumn.setCellValueFactory(new PropertyValueFactory<>("executionDate"));
-        startColumn.setCellValueFactory(new PropertyValueFactory<>("startDate"));
+        executionDateColumn.setCellValueFactory(new PropertyValueFactory<>("executionDate"));
+        startDateColumn.setCellValueFactory(new PropertyValueFactory<>("startDate"));
         statusColumn.setCellValueFactory(new PropertyValueFactory<>("status"));
         customerColumn.setCellValueFactory(new PropertyValueFactory<>("customer"));
         oneTimeCheckBox.setSelected(true);
@@ -116,7 +116,7 @@ public class ScheduleController {
 
     private void updateButtons(ScheduleRow selected) {
         if (selected != null) {
-            boolean isRecurring = selected.getScheduleType() == ScheduleCategory.RECURRING;
+            boolean isRecurring = selected.getScheduleCategory() == ScheduleCategory.RECURRING;
 
             changeFrequencyButton.setDisable(!isRecurring);
             toggleStatusButton.setDisable(!isRecurring && selected == null);
@@ -245,7 +245,7 @@ public class ScheduleController {
             DialogUtils.showError("No Selection", "Please select a schedule to edit.", AppContext.getOwner());
             return;
         }
-        if (selected.getScheduleType() == ScheduleCategory.ONE_TIME) {
+        if (selected.getScheduleCategory() == ScheduleCategory.ONE_TIME) {
             DialogUtils.showError("Edit not allowed", "Cannot edit one-time schedules.", AppContext.getOwner());
             return;
         }
@@ -292,7 +292,7 @@ public class ScheduleController {
         boolean success = false;
 
         try {
-            switch (selected.getScheduleType()) {
+            switch (selected.getScheduleCategory()) {
                 case ONE_TIME -> {
                     OneTimeSchedule schedule = AppContext.oneTimeScheduleDAO.findById(selected.getId());
                     if (schedule != null) {
@@ -371,30 +371,14 @@ public class ScheduleController {
             return;
         }
 
-        List<Collection> collections;
-        switch (selected.getScheduleType()) {
-            case ONE_TIME -> {
-                OneTimeSchedule schedule = AppContext.oneTimeScheduleDAO.findById(selected.getId());
-                if (schedule == null) {
-                    DialogUtils.showError("Error", "Schedule not found.", AppContext.getOwner());
-                    return;
-                }
-                collections = AppContext.collectionDAO.findCancelledCollectionsOneTimeSchedule(schedule);
-            }
-            case RECURRING -> {
-                RecurringSchedule schedule = AppContext.recurringScheduleDAO.findById(selected.getId());
-                if (schedule == null) {
-                    DialogUtils.showError("Error", "Schedule not found.", AppContext.getOwner());
-                    return;
-                }
-                Collection c = AppContext.collectionDAO.findActiveCollectionByRecurringSchedule(schedule);
-                collections = c != null ? List.of(c) : Collections.emptyList();
-            }
-            default -> {
-                DialogUtils.showError("Error", "Unknown schedule type.", AppContext.getOwner());
-                return;
-            }
+        Schedule schedule;
+        if (selected.getScheduleCategory() == ScheduleCategory.ONE_TIME) {
+            schedule = AppContext.oneTimeScheduleDAO.findById(selected.getId());
+        } else {
+            schedule = AppContext.recurringScheduleDAO.findById(selected.getId());
         }
+
+        List<Collection> collections = AppContext.collectionManager.getAllCollectionBySchedule(schedule);
 
         try {
             MainLayoutController.getInstance().setPageTitle("Associated Collections");
