@@ -76,6 +76,14 @@ public class AddScheduleController {
             wasteComboBox.setItems(FXCollections.observableArrayList(wasteList));
             wasteDetailsInfo.setText("No Waste selected.");
             wasteDetailsTitle.setText("Waste Details:");
+
+            wasteComboBox.valueProperty().addListener((obs, oldWaste, newWaste) -> {
+                if (newWaste != null) {
+                    wasteDetailsInfo.setText(newWaste.toString());
+                } else {
+                    wasteDetailsInfo.setText("No Waste selected.");
+                }
+            });
         }
 
         wasteComboBox.setConverter(new StringConverter<Waste>() {
@@ -161,7 +169,7 @@ public class AddScheduleController {
             } else {
                 AppContext.oneTimeScheduleManager.createOneTimeSchedule(selectedCustomer, selectedWaste, selectedDate);
             }
-            
+
             DialogUtils.showSuccess("Schedule saved successfully.", AppContext.getOwner());
             DialogUtils.closeModal(event);
 
@@ -173,6 +181,6 @@ public class AddScheduleController {
 
     @FXML
     private void handleAbortScheduleCreation(ActionEvent event) {
-         DialogUtils.closeModal(event);
+        DialogUtils.closeModal(event);
     }
 }
