@@ -4,6 +4,7 @@ import it.unibo.wastemaster.core.context.AppContext;
 import it.unibo.wastemaster.core.models.Customer;
 import it.unibo.wastemaster.core.models.Location;
 import it.unibo.wastemaster.controller.utils.DialogUtils;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.TextField;
 
@@ -47,7 +48,7 @@ public class EditCustomerController {
     }
 
     @FXML
-    private void handleUpdateCustomer() {
+    private void handleUpdateCustomer(ActionEvent event) {
         try {
             Customer original = AppContext.customerManager.getCustomerById(customer.getCustomerId());
             if (original == null) {
@@ -81,7 +82,7 @@ public class EditCustomerController {
 
             AppContext.customerManager.updateCustomer(customer);
             DialogUtils.showSuccess("Customer updated successfully.", AppContext.getOwner());
-            customerController.returnToCustomerView();
+            DialogUtils.closeModal(event);
 
         } catch (IllegalArgumentException e) {
             DialogUtils.showError("Validation error", e.getMessage(), AppContext.getOwner());
@@ -89,7 +90,7 @@ public class EditCustomerController {
     }
 
     @FXML
-    private void handleAbortCustomerEdit() {
-        customerController.returnToCustomerView();
+    private void handleAbortCustomerEdit(ActionEvent event) {
+        DialogUtils.closeModal(event);
     }
 }
