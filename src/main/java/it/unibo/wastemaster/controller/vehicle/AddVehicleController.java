@@ -7,31 +7,33 @@ import it.unibo.wastemaster.core.models.Vehicle.VehicleStatus;
 
 import static it.unibo.wastemaster.controller.utils.DialogUtils.*;
 
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
 
 public class AddVehicleController {
+
 	@FXML
 	private TextField plateField;
+
 	@FXML
 	private TextField brandField;
+
 	@FXML
 	private TextField modelField;
+
 	@FXML
 	private TextField yearField;
+
 	@FXML
 	private TextField capacityField;
+
 	@FXML
 	private ComboBox<RequiredLicence> licenceComboBox;
+
 	@FXML
 	private ComboBox<VehicleStatus> statusComboBox;
-
-	private VehicleController vehicleController;
-
-	public void setVehicleController(VehicleController controller) {
-		this.vehicleController = controller;
-	}
 
 	@FXML
 	public void initialize() {
@@ -43,7 +45,7 @@ public class AddVehicleController {
 	}
 
 	@FXML
-	private void handleSaveVehicle() {
+	private void handleSaveVehicle(ActionEvent event) {
 		try {
 			String plate = plateField.getText();
 			String brand = brandField.getText();
@@ -56,10 +58,8 @@ public class AddVehicleController {
 			Vehicle vehicle = new Vehicle(plate, brand, model, year, licence, status, capacity);
 			AppContext.vehicleManager.addVehicle(vehicle);
 			showSuccess("Vehicle saved successfully.", AppContext.getOwner());
+			closeModal(event);
 
-			if (vehicleController != null) {
-				vehicleController.returnToVehicleView();
-			}
 		} catch (IllegalArgumentException e) {
 			showError("Validation error", e.getMessage(), AppContext.getOwner());
 		} catch (Exception e) {
@@ -69,9 +69,7 @@ public class AddVehicleController {
 	}
 
 	@FXML
-	private void handleAbortVehicleCreation() {
-		if (vehicleController != null) {
-			vehicleController.returnToVehicleView();
-		}
+	private void handleAbortVehicleCreation(ActionEvent event) {
+		closeModal(event);
 	}
 }
