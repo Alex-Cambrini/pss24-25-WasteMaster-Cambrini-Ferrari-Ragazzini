@@ -1,6 +1,7 @@
 package it.unibo.wastemaster.controller.customer;
 
 import it.unibo.wastemaster.core.context.AppContext;
+import it.unibo.wastemaster.core.models.Customer;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.util.Duration;
@@ -86,18 +87,11 @@ public class CustomersController {
     }
 
     private void loadCustomers() {
-        List<Object[]> rawData = AppContext.customerDAO.findCustomerDetails();
+        List<Customer> customers = AppContext.customerDAO.findCustomerDetails();
         allCustomers.clear();
 
-        for (Object[] row : rawData) {
-            allCustomers.add(new CustomerRow(
-                    (String) row[0],
-                    (String) row[1],
-                    (String) row[2],
-                    (String) row[3],
-                    (String) row[4],
-                    (String) row[5],
-                    (String) row[6]));
+        for (Customer customer : customers) {
+            allCustomers.add(new CustomerRow(customer));
         }
 
         customerTable.setItems(FXCollections.observableArrayList(allCustomers));
