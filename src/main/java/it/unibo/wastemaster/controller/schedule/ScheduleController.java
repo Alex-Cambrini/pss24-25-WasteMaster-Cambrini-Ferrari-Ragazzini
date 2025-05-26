@@ -1,8 +1,10 @@
 package it.unibo.wastemaster.controller.schedule;
 
+import it.unibo.wastemaster.controller.collection.CollectionController;
 import it.unibo.wastemaster.controller.main.MainLayoutController;
 import it.unibo.wastemaster.controller.utils.DialogUtils;
 import it.unibo.wastemaster.core.context.AppContext;
+import it.unibo.wastemaster.core.models.Collection;
 import it.unibo.wastemaster.core.models.OneTimeSchedule;
 import it.unibo.wastemaster.core.models.RecurringSchedule;
 import it.unibo.wastemaster.core.models.RecurringSchedule.Frequency;
@@ -21,6 +23,7 @@ import javafx.stage.Stage;
 import javafx.util.Duration;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -49,6 +52,8 @@ public class ScheduleController {
     private Button changeFrequencyButton;
     @FXML
     private Button toggleStatusButton;
+    @FXML
+    private Button viewAssociatedCollectionsButton;
     @FXML
     private Button deleteButton;
 
@@ -117,6 +122,7 @@ public class ScheduleController {
             toggleStatusButton.setDisable(!isRecurring && selected == null);
 
             deleteButton.setDisable(false);
+            viewAssociatedCollectionsButton.setDisable(false);
 
             ScheduleStatus status = selected.getStatus();
 
@@ -141,6 +147,7 @@ public class ScheduleController {
             changeFrequencyButton.setDisable(true);
             toggleStatusButton.setDisable(true);
             deleteButton.setDisable(true);
+            viewAssociatedCollectionsButton.setDisable(true);
         }
     }
 
@@ -353,6 +360,52 @@ public class ScheduleController {
         recurringCheckBox.setSelected(true);
 
         loadSchedules();
+    }
+
+    @FXML
+    private void handleViewAssociatedCollections() {
+        ScheduleRow selected = scheduleTable.getSelectionModel().getSelectedItem();
+        if (selected == null) {
+            DialogUtils.showError("No Selection", "Please select a schedule to view associated collection.",
+                    AppContext.getOwner());
+            return;
+        }
+
+        List<Collection> collections;
+        switch (selected.getScheduleType()) {
+            case ONE_TIME -> {
+                OneTimeSchedule schedule = AppContext.oneTimeScheduleDAO.findById(selected.getId());
+                if (schedule == null) {
+                    DialogUtils.showError("Error", "Schedule not found.", AppContext.getOwner());
+                    return;
+                }
+                collections = AppContext.collectionDAO.findCancelledCollectionsOneTimeSchedule(schedule);
+            }
+            case RECURRING -> {
+                RecurringSchedule schedule = AppContext.recurringScheduleDAO.findById(selected.getId());
+                if (schedule == null) {
+                    DialogUtils.showError("Error", "Schedule not found.", AppContext.getOwner());
+                    return;
+                }
+                Collection c = AppContext.collectionDAO.findActiveCollectionByRecurringSchedule(schedule);
+                collections = c != null ? List.of(c) : Collections.emptyList();
+            }
+            default -> {
+                DialogUtils.showError("Error", "Unknown schedule type.", AppContext.getOwner());
+                return;
+            }
+        }
+
+        try {
+            MainLayoutController.getInstance().setPageTitle("Associated Collections");
+            CollectionController controller = MainLayoutController.getInstance()
+                    .loadCenterWithController("/layouts/collection/CollectionView.fxml");
+            controller.setCollections(collections);
+        } catch (Exception e) {
+            DialogUtils.showError("Navigation error", "Could not load Associated Collections view.",
+                    AppContext.getOwner());
+            e.printStackTrace();
+        }
     }
 
     @FXML
