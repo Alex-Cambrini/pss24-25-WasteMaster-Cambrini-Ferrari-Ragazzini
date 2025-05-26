@@ -34,13 +34,4 @@ public class CustomerDAO extends GenericDAO<Customer> {
                 	WHERE c.isDeleted = false
                 """, Customer.class).getResultList();
     }
-    public List<Object[]> findCustomerDetails() {
-        return entityManager.createQuery("""
-            SELECT c.name, c.surname, c.email,
-                   l.street, l.civicNumber, l.city, l.postalCode
-            FROM Customer c
-            JOIN c.location l
-            WHERE c.isDeleted = false
-        """, Object[].class).getResultList();
-    }
 }
