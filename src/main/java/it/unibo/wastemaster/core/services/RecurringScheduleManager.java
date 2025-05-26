@@ -174,23 +174,25 @@ public class RecurringScheduleManager {
             return false;
         }
 
-        LocalDate oldNextDate = schedule.getNextCollectionDate();
         schedule.setFrequency(newFrequency);
-        LocalDate newNextDate = calculateFirstDate(schedule);
 
-        if (!newNextDate.equals(oldNextDate)) {
+        LocalDate restartDate = dateUtils.getCurrentDate().plusDays(2);
+        WasteSchedule wasteSchedule = wasteScheduleManager.getWasteScheduleByWaste(schedule.getWaste());
+        LocalDate newNextDate = alignToScheduledDay(restartDate, wasteSchedule.getDayOfWeek());
+
+        if (!newNextDate.equals(schedule.getNextCollectionDate())) {
             schedule.setNextCollectionDate(newNextDate);
-            recurringScheduleDAO.update(schedule);
-
-            Collection activeCollection = collectionManager.getActiveCollectionByRecurringSchedule(schedule);
-            if (activeCollection != null) {
-                collectionManager.softDeleteCollection(activeCollection);
-            }
-            collectionManager.generateCollection(schedule);
-            return true;
         }
 
-        return false;
+        recurringScheduleDAO.update(schedule);
+
+        Collection activeCollection = collectionManager.getActiveCollectionByRecurringSchedule(schedule);
+        if (activeCollection != null) {
+            collectionManager.softDeleteCollection(activeCollection);
+        }
+        collectionManager.generateCollection(schedule);
+
+        return true;
     }
 
 }
