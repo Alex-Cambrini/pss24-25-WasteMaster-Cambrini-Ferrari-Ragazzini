@@ -3,7 +3,9 @@ package it.unibo.wastemaster.core.dao;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -16,6 +18,7 @@ import it.unibo.wastemaster.core.models.Customer;
 import it.unibo.wastemaster.core.models.Location;
 import it.unibo.wastemaster.core.models.OneTimeSchedule;
 import it.unibo.wastemaster.core.models.RecurringSchedule;
+import it.unibo.wastemaster.core.models.RecurringSchedule.Frequency;
 import it.unibo.wastemaster.core.models.Waste;
 
 public class CollectionDAOTest extends AbstractDatabaseTest {
@@ -37,6 +40,8 @@ public class CollectionDAOTest extends AbstractDatabaseTest {
         em.getTransaction().begin();
         date = dateUtils.getCurrentDate();
         waste = new Waste("PLASTIC", true, false);
+        wasteDAO.insert(waste);
+        wasteScheduleManager.setupCollectionRoutine(waste, DayOfWeek.MONDAY);
 
         pending = Collection.CollectionStatus.PENDING;
         inProgress = Collection.CollectionStatus.IN_PROGRESS;
@@ -48,7 +53,7 @@ public class CollectionDAOTest extends AbstractDatabaseTest {
         oneTimeSchedule = new OneTimeSchedule(customer, waste, date);
         recurringSchedule = new RecurringSchedule(customer, waste, date, RecurringSchedule.Frequency.WEEKLY);
         customerDAO.insert(customer);
-        wasteDAO.insert(waste);
+
         oneTimeScheduleDAO.insert(oneTimeSchedule);
         recurringScheduleDAO.insert(recurringSchedule);
     }
@@ -97,39 +102,53 @@ public class CollectionDAOTest extends AbstractDatabaseTest {
     }
 
     @Test
-    public void testFindActiveCollectionByOneTimeSchedule() {
+    public void testFindAllCollectionByOneTimeSchedule() {
         LocalDate newDate = dateUtils.getCurrentDate().plusDays(3);
         OneTimeSchedule schedule = oneTimeScheduleManager.createOneTimeSchedule(customer, waste, newDate);
 
-        Collection result = collectionDAO.findActiveCollectionByOneTimeSchedule(schedule);
-        assertNotNull(result);
-        assertEquals(result.getCollectionStatus(), Collection.CollectionStatus.PENDING);
+        List<Collection> results = collectionDAO.findAllCollectionsBySchedule(schedule);
+        Collection active = results.stream()
+                .filter(c -> c.getCollectionStatus() != Collection.CollectionStatus.CANCELLED)
+                .findFirst()
+                .orElse(null);
 
-        result.setCollectionStatus(cancelled);
+        assertNotNull(active);
+        assertEquals(Collection.CollectionStatus.PENDING, active.getCollectionStatus());
 
-        Collection nullResult = collectionDAO.findActiveCollectionByOneTimeSchedule(schedule);
-        assertNull(nullResult);
+        active.setCollectionStatus(cancelled);
+
+        results = collectionDAO.findAllCollectionsBySchedule(schedule);
+        active = results.stream()
+                .filter(c -> c.getCollectionStatus() != Collection.CollectionStatus.CANCELLED)
+                .findFirst()
+                .orElse(null);
+
+        assertNull(active);
     }
 
     @Test
-    public void testFindCancelledCollectionsOneTimeSchedule() {
-        Collection cancelled1 = new Collection(oneTimeSchedule);
-        cancelled1.setCollectionStatus(Collection.CollectionStatus.CANCELLED);
-        collectionDAO.insert(cancelled1);
+    public void testFindAllCollectionByRecurringSchedule() {
+        LocalDate newDate = dateUtils.getCurrentDate().plusDays(3);
 
-        Collection cancelled2 = new Collection(oneTimeSchedule);
-        cancelled2.setCollectionStatus(Collection.CollectionStatus.CANCELLED);
-        collectionDAO.insert(cancelled2);
+        RecurringSchedule schedule = recurringScheduleManager.createRecurringSchedule(customer, waste, newDate,
+                Frequency.WEEKLY);
 
-        Collection active = new Collection(oneTimeSchedule);
-        active.setCollectionStatus(Collection.CollectionStatus.PENDING);
-        collectionDAO.insert(active);
+        recurringScheduleManager.updateStatusRecurringSchedule(schedule, RecurringSchedule.ScheduleStatus.PAUSED);
+        recurringScheduleManager.updateStatusRecurringSchedule(schedule, RecurringSchedule.ScheduleStatus.ACTIVE);
 
-        List<Collection> resultList = collectionDAO.findCancelledCollectionsOneTimeSchedule(oneTimeSchedule);
-        assertEquals(2, resultList.size());
-        for (Collection c : resultList) {
-            assertEquals(Collection.CollectionStatus.CANCELLED, c.getCollectionStatus());
-        }
+        List<Collection> collections = collectionDAO.findAllCollectionsBySchedule(schedule);
+        assertEquals(2, collections.size());
+
+        long cancelledCount = collections.stream()
+                .filter(c -> c.getCollectionStatus() == Collection.CollectionStatus.CANCELLED)
+                .count();
+        long activeCount = collections.stream()
+                .filter(c -> c.getCollectionStatus() != Collection.CollectionStatus.CANCELLED)
+                .count();
+
+        assertEquals(1, cancelledCount);
+        assertEquals(1, activeCount);
+        assertTrue(collections.stream().allMatch(c -> c.getSchedule().equals(schedule)));
     }
 
     @Test
