@@ -94,20 +94,11 @@ public class VehicleController {
 	}
 
 	private void loadVehicles() {
-		List<Object[]> rawData = AppContext.vehicleDAO.findVehicleDetails();
+		List<Vehicle> vehicles = AppContext.vehicleDAO.findVehicleDetails();
 		allVehicles.clear();
 
-		for (Object[] row : rawData) {
-			allVehicles.add(new VehicleRow(
-					(String) row[0],
-					(String) row[1],
-					(String) row[2],
-					(Integer) row[3],
-					row[4].toString(),
-					row[5].toString(),
-					row[6].toString(),
-					row[7].toString(),
-					(Integer) row[8]));
+		for (Vehicle vehicle : vehicles) {
+			allVehicles.add(new VehicleRow(vehicle));
 		}
 
 		VehicleTable.setItems(FXCollections.observableArrayList(allVehicles));
@@ -209,15 +200,15 @@ public class VehicleController {
 					(activeFilters.contains("brand") && row.getBrand().toLowerCase().contains(query)) ||
 					(activeFilters.contains("model") && row.getModel().toLowerCase().contains(query)) ||
 					(activeFilters.contains("year") && String.valueOf(row.getRegistrationYear()).contains(query)) ||
-					(activeFilters.contains("licenceType") && row.getLicenceType().equalsIgnoreCase(query)) ||
+					(activeFilters.contains("licenceType") && row.getLicenceType().name().equalsIgnoreCase(query)) ||
 					(activeFilters.contains("vehicleStatus")
 							&& formatEnum(row.getVehicleStatus()).toLowerCase().contains(query))
 					||
 					(activeFilters.contains("lastMaintenanceDate")
-							&& row.getLastMaintenanceDate().toLowerCase().contains(query))
+							&& row.getLastMaintenanceDate().toString().toLowerCase().contains(query))
 					||
 					(activeFilters.contains("nextMaintenanceDate")
-							&& row.getNextMaintenanceDate().toLowerCase().contains(query))) {
+							&& row.getNextMaintenanceDate().toString().toLowerCase().contains(query))) {
 				filtered.add(row);
 			}
 		}
@@ -282,8 +273,10 @@ public class VehicleController {
 		filterMenu.show(filterButton, event.getScreenX(), event.getScreenY());
 	}
 
-	private String formatEnum(String raw) {
-		String lower = raw.toLowerCase().replace("_", " ");
+	private String formatEnum(Enum<?> value) {
+		if (value == null)
+			return "";
+		String lower = value.name().toLowerCase().replace("_", " ");
 		return Character.toUpperCase(lower.charAt(0)) + lower.substring(1);
 	}
 }
