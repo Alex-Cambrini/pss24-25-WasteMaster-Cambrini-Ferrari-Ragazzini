@@ -52,36 +52,33 @@ public class RecurringScheduleManager {
     protected LocalDate calculateNextDate(RecurringSchedule schedule) {
         ValidateUtils.requireArgNotNull(schedule, "Schedule must not be null");
         ValidateUtils.requireArgNotNull(schedule.getScheduleId(), "Schedule ID must not be null");
-        LocalDate today = dateUtils.getCurrentDate();
 
         if (schedule.getNextCollectionDate() == null) {
             return calculateFirstDate(schedule);
         } else {
-            return calculateRecurringDate(schedule, today);
+            return calculateRecurringDate(schedule);
         }
     }
 
     private LocalDate calculateFirstDate(RecurringSchedule schedule) {
         WasteSchedule scheduleData = wasteScheduleManager.getWasteScheduleByWaste(schedule.getWaste());
         LocalDate date = schedule.getStartDate().plusDays(2);
+
         return alignToScheduledDay(date, scheduleData.getDayOfWeek());
     }
 
-    private LocalDate calculateRecurringDate(RecurringSchedule schedule, LocalDate today) {
+    private LocalDate calculateRecurringDate(RecurringSchedule schedule) {
         WasteSchedule scheduleData = wasteScheduleManager.getWasteScheduleByWaste(schedule.getWaste());
         LocalDate date = schedule.getNextCollectionDate();
-
-        if (schedule.getFrequency() == RecurringSchedule.Frequency.WEEKLY) {
-            date = date.plusWeeks(1);
-        } else {
-            date = date.plusMonths(1);
+        LocalDate today = dateUtils.getCurrentDate();
+        do {
+            if (schedule.getFrequency() == RecurringSchedule.Frequency.WEEKLY) {
+                date = date.plusWeeks(1);
+            } else {
+                date = date.plusMonths(1);
+            }
             date = alignToScheduledDay(date, scheduleData.getDayOfWeek());
-        }
-
-        while (date.isBefore(today)) {
-            date = date.plusDays(1);
-            date = alignToScheduledDay(date, scheduleData.getDayOfWeek());
-        }
+        } while (!date.isAfter(today));
 
         return date;
     }
@@ -115,6 +112,7 @@ public class RecurringScheduleManager {
         ValidateUtils.requireArgNotNull(schedule, "Schedule must not be null");
         ValidateUtils.requireArgNotNull(newStatus, "Status must not be null");
 
+        System.err.println(schedule);
         ScheduleStatus currentStatus = schedule.getScheduleStatus();
 
         if (currentStatus == ScheduleStatus.CANCELLED || currentStatus == ScheduleStatus.COMPLETED) {
@@ -129,7 +127,13 @@ public class RecurringScheduleManager {
                     return true;
                 }
                 if (newStatus == ScheduleStatus.ACTIVE) {
-                    LocalDate nextDate = calculateNextDate(schedule);
+                    LocalDate today = dateUtils.getCurrentDate();
+                    LocalDate nextDate = schedule.getNextCollectionDate();
+                    if (nextDate != null && !nextDate.isBefore(today)) {
+                        nextDate = schedule.getNextCollectionDate();
+                    } else {
+                        nextDate = calculateNextDate(schedule);
+                    }
                     schedule.setNextCollectionDate(nextDate);
                     schedule.setScheduleStatus(ScheduleStatus.ACTIVE);
                     recurringScheduleDAO.update(schedule);
@@ -140,7 +144,7 @@ public class RecurringScheduleManager {
             }
             case ACTIVE -> {
                 if (newStatus == ScheduleStatus.PAUSED || newStatus == ScheduleStatus.CANCELLED) {
-                    schedule.setNextCollectionDate(null);
+                    ;
                     schedule.setScheduleStatus(newStatus);
                     recurringScheduleDAO.update(schedule);
 

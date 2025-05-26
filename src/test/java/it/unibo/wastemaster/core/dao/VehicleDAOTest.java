@@ -78,4 +78,14 @@ public class VehicleDAOTest extends AbstractDatabaseTest {
         assertTrue(allVehicles.stream().anyMatch(v -> v.getPlate().equals("BB222BB")));
         assertTrue(allVehicles.stream().anyMatch(v -> v.getPlate().equals("CC333CC")));
     }
+
+    @Test
+    public void testFindVehicleDetails() {
+        List<Vehicle> result = vehicleDAO.findVehicleDetails();
+
+        assertEquals(3, result.size());
+        assertTrue(result.stream().anyMatch(v -> v.getPlate().equals("AA111AA")));
+        assertTrue(result.stream().anyMatch(v -> v.getPlate().equals("BB222BB")));
+        assertTrue(result.stream().anyMatch(v -> v.getPlate().equals("CC333CC")));
+    }
 }

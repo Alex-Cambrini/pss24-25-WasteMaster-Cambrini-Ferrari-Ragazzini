@@ -50,4 +50,27 @@ public class EmployeeDAOTest extends AbstractDatabaseTest {
         Employee notFoundEmployee = employeeDAO.findByEmail(nonExistingEmail);
         assertNull(notFoundEmployee, "Employee should not be found for non-existing email");
     }
+
+    @Test
+    public void testFindEmployeeDetails() {
+        Employee e1 = new Employee("Marco", "Verdi", location, "marco@example.com", "1111111111", Role.OPERATOR,
+                Licence.C);
+        Employee e2 = new Employee("Luca", "Bianchi", location, "luca@example.com", "2222222222", Role.OPERATOR,
+                Licence.C1);
+        Employee e3 = new Employee("Laura", "Rossi", location, "laura@example.com", "3333333333", Role.ADMINISTRATOR,
+                Licence.NONE);
+
+        employeeDAO.insert(e1);
+        employeeDAO.insert(e2);
+        employeeDAO.insert(e3);
+        e3.delete();
+        employeeDAO.update(e3);
+
+        var result = employeeDAO.findEmployeeDetails();
+
+        assertTrue(result.stream().anyMatch(e -> e.getEmail().equals("marco@example.com")), "Marco should be present");
+        assertTrue(result.stream().anyMatch(e -> e.getEmail().equals("luca@example.com")), "Luca should be present");
+        assertFalse(result.stream().anyMatch(e -> e.getEmail().equals("laura@example.com")),
+                "Laura (deleted) should not be present");
+    }
 }
