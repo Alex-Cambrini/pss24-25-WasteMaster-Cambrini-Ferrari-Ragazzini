@@ -1,5 +1,7 @@
 package it.unibo.wastemaster.viewmodels;
 
+import it.unibo.wastemaster.core.models.Employee;
+
 public class EmployeeRow {
 	private final String name;
 	private final String surname;
@@ -8,13 +10,13 @@ public class EmployeeRow {
 	private final String licence;
 	private final String city;
 
-	public EmployeeRow(String name, String surname, String email, String role, String licence, String city) {
-		this.name = name;
-		this.surname = surname;
-		this.email = email;
-		this.role = role;
-		this.licence = licence;
-		this.city = city;
+	public EmployeeRow(Employee employee) {
+		this.name = employee.getName();
+		this.surname = employee.getSurname();
+		this.email = employee.getEmail();
+		this.role = employee.getRole().toString();
+		this.licence = employee.getLicence().toString();
+		this.city = employee.getLocation().getCity();
 	}
 
 	public String getName() {
