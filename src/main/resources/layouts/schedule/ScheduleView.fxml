@@ -78,7 +78,7 @@
             <children>
                 <Button fx:id="changeFrequencyButton" disable="true" mnemonicParsing="false" onAction="#handleChangeFrequency" styleClass="accent" text="Change Frequency" />
                 <Button fx:id="toggleStatusButton" disable="true" mnemonicParsing="false" onAction="#handleStatusToggle" styleClass="accent" text="Pause" />
-                <Button fx:id="viewAssociatedCollections" mnemonicParsing="false" text="View collections" styleClass="accent" />
+                <Button fx:id="viewAssociatedCollectionsButton" disable="true" onAction="#handleViewAssociatedCollections" mnemonicParsing="false" text="View collections" styleClass="accent" />
                 <Region prefHeight="200.0" prefWidth="200.0" HBox.hgrow="ALWAYS" />
                 <Button fx:id="deleteButton" disable="true" mnemonicParsing="false" onAction="#handleDeleteSchedule" styleClass="danger" text="Delete" />
             </children>
