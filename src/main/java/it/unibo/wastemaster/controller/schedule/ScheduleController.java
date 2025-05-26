@@ -334,8 +334,8 @@ public class ScheduleController {
                     (activeFilters.contains("scheduleType") &&
                             row.getScheduleType().name().toLowerCase().contains(query))
                     ||
-
                     (activeFilters.contains("frequency") &&
+                            row.getFrequency() != null &&
                             row.getFrequency().name().toLowerCase().contains(query))
                     ||
 
@@ -348,6 +348,7 @@ public class ScheduleController {
                     ||
 
                     (activeFilters.contains("startDate") &&
+                            row.getStartDate() != null &&
                             row.getStartDate().toString().toLowerCase().contains(query))
                     ||
 
