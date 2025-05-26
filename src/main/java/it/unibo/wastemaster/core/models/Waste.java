@@ -75,7 +75,7 @@ public class Waste {
 
     @Override
     public String toString() {
-        return "Waste Type: " + name + "\n" +
+        return "Waste Name: " + name + "\n" +
                 "Recyclable: " + (isRecyclable ? "Yes" : "No") + "\n" +
                 "Dangerous: " + (isDangerous ? "Yes" : "No");
     }

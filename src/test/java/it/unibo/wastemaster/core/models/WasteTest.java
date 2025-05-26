@@ -39,7 +39,7 @@ class WasteTest extends AbstractDatabaseTest {
 
 	@Test
 	public void testToString() {
-		String expected = "Waste Type: plastic\n" +
+		String expected = "Waste Name: plastic\n" +
 				"Recyclable: Yes\n" +
 				"Dangerous: No";
 		assertEquals(expected, waste.toString());
