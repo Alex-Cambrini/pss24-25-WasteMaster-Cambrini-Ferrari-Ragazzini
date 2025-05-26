@@ -19,7 +19,7 @@
             <rowConstraints>
                 <RowConstraints prefHeight="30.0" vgrow="SOMETIMES" />
                 <RowConstraints prefHeight="30.0" vgrow="SOMETIMES" />
-                <RowConstraints prefHeight="100.0" vgrow="SOMETIMES" />
+                <RowConstraints prefHeight="30.0" vgrow="SOMETIMES" />
                 <RowConstraints prefHeight="30.0" vgrow="SOMETIMES" />
                 <RowConstraints prefHeight="30.0" vgrow="SOMETIMES" />
             </rowConstraints>
