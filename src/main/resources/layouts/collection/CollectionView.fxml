@@ -51,15 +51,13 @@
             <Insets bottom="5.0" />
          </VBox.margin>
         </HBox>
-        <TableView  prefHeight="300.0" prefWidth="600.0" styleClass="table-view" VBox.vgrow="ALWAYS">
+        <TableView fx:id="collectionTable" prefHeight="300.0" prefWidth="600.0" styleClass="table-view" VBox.vgrow="ALWAYS">
             <columns>
-                <TableColumn  prefWidth="100" text="Waste Name" />
-                <TableColumn prefWidth="120" text="Zone" />
-                <TableColumn  prefWidth="120" text="Trip Number" />
-                <TableColumn  prefWidth="120" text="Date" />
-                <TableColumn  prefWidth="100" text="Status" />
-                <TableColumn  prefWidth="120" text="Customer" />
-
+                <TableColumn fx:id="wasteNameColumn" prefWidth="100" text="Waste Name" />
+                <TableColumn fx:id="dateColumn" prefWidth="120" text="Date" />
+                <TableColumn fx:id="ZoneColumn" prefWidth="120" text="Zone" />
+                <TableColumn fx:id="statusColumn" prefWidth="100" text="Status" />
+                <TableColumn fx:id="customerColumn" prefWidth="120" text="Customer" />
             </columns>
 
         </TableView>
