@@ -11,7 +11,7 @@ import it.unibo.wastemaster.core.models.Schedule.ScheduleStatus;
 public class ScheduleRow {
     private final int id;
     private final String wasteName;
-    private final ScheduleCategory scheduleType;
+    private final ScheduleCategory scheduleCategory;
     private final Frequency frequency;
     private final LocalDate executionDate;
     private final LocalDate startDate;
@@ -21,7 +21,7 @@ public class ScheduleRow {
     public ScheduleRow(OneTimeSchedule schedule) {
         this.id = schedule.getScheduleId();
         this.wasteName = schedule.getWaste().getWasteName();
-        this.scheduleType = ScheduleCategory.ONE_TIME;
+        this.scheduleCategory = ScheduleCategory.ONE_TIME;
         this.frequency = null;
         this.executionDate = schedule.getPickupDate();
         this.startDate = null;
@@ -32,7 +32,7 @@ public class ScheduleRow {
     public ScheduleRow(RecurringSchedule schedule) {
         this.id = schedule.getScheduleId();
         this.wasteName = schedule.getWaste().getWasteName();
-        this.scheduleType = ScheduleCategory.RECURRING;
+        this.scheduleCategory = ScheduleCategory.RECURRING;
         this.frequency = schedule.getFrequency();
         this.executionDate = schedule.getNextCollectionDate();
         this.startDate = schedule.getStartDate();
@@ -48,8 +48,8 @@ public class ScheduleRow {
         return wasteName;
     }
 
-    public ScheduleCategory getScheduleType() {
-        return scheduleType;
+    public ScheduleCategory getScheduleCategory() {
+        return scheduleCategory;
     }
 
     public Frequency getFrequency() {
