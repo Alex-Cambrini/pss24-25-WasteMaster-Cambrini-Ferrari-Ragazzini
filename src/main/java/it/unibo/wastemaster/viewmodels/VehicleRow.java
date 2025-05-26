@@ -1,5 +1,7 @@
 package it.unibo.wastemaster.viewmodels;
 
+import it.unibo.wastemaster.core.models.Vehicle;
+
 public class VehicleRow {
 	private final String plate;
 	private final String brand;
@@ -11,19 +13,16 @@ public class VehicleRow {
 	private final String lastMaintenanceDate;
 	private final String nextMaintenanceDate;
 
-	public VehicleRow(String plate, String brand, String model, int registrationYear,
-			String licenceType, String vehicleStatus,
-			String lastMaintenanceDate, String nextMaintenanceDate,
-			int capacity) {
-		this.plate = plate;
-		this.brand = brand;
-		this.model = model;
-		this.registrationYear = registrationYear;
-		this.licenceType = licenceType;
-		this.vehicleStatus = vehicleStatus;
-		this.lastMaintenanceDate = lastMaintenanceDate;
-		this.nextMaintenanceDate = nextMaintenanceDate;
-		this.capacity = capacity;
+	public VehicleRow(Vehicle vehicle) {
+		this.plate = vehicle.getPlate();
+		this.brand = vehicle.getBrand();
+		this.model = vehicle.getModel();
+		this.registrationYear = vehicle.getRegistrationYear();
+		this.capacity = vehicle.getCapacity();
+		this.licenceType = vehicle.getRequiredLicence().toString();
+		this.vehicleStatus = vehicle.getVehicleStatus().toString();
+		this.lastMaintenanceDate = vehicle.getLastMaintenanceDate().toString();
+		this.nextMaintenanceDate = vehicle.getNextMaintenanceDate().toString();
 	}
 
 	public String getPlate() {
