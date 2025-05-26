@@ -27,17 +27,17 @@
         </HBox>
         <HBox alignment="CENTER_RIGHT" prefHeight="30.0" prefWidth="30.0" spacing="10.0">
 <children>
-        <CheckBox mnemonicParsing="false" text="Show Active">
+        <CheckBox fx:id="showActiveCheckBox" mnemonicParsing="false" text="Show Active">
             <tooltip>
                 <Tooltip text="Show Active" />
             </tooltip>
         </CheckBox>
-        <CheckBox mnemonicParsing="false" text="Show Paused">
+        <CheckBox fx:id="showPausedCheckBox" mnemonicParsing="false" text="Show Paused">
             <tooltip>
                 <Tooltip text="Show Paused" />
             </tooltip>
         </CheckBox>
-        <CheckBox mnemonicParsing="false" text="Show Completed">
+        <CheckBox fx:id="showCompletedCheckBox" mnemonicParsing="false" text="Show Completed">
             <tooltip>
                 <Tooltip text="Show Completed" />
             </tooltip>
