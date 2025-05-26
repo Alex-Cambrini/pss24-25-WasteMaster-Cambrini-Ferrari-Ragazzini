@@ -11,7 +11,9 @@
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox alignment="TOP_CENTER" prefWidth="640.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.unibo.wastemaster.controller.schedule.ScheduleController">
+<VBox alignment="TOP_CENTER" prefWidth="640.0"
+    xmlns="http://javafx.com/javafx/23.0.1"
+    xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.unibo.wastemaster.controller.schedule.ScheduleController">
     <children>
         <HBox alignment="TOP_CENTER" minHeight="40.0" prefHeight="40.0" prefWidth="600.0" spacing="10.0">
             <children>
@@ -21,9 +23,9 @@
                 <TextField fx:id="searchField" promptText="Search..." />
                 <Button mnemonicParsing="false" onAction="#handleResetSearch" styleClass="accent, button-outlined" text="Reset" />
             </children>
-         <VBox.margin>
-            <Insets bottom="10.0" />
-         </VBox.margin>
+            <VBox.margin>
+                <Insets bottom="10.0" />
+            </VBox.margin>
         </HBox>
         <HBox alignment="CENTER_RIGHT" prefHeight="30.0" prefWidth="30.0" spacing="10.0">
 <children>
@@ -70,15 +72,16 @@
                 <TableColumn fx:id="dateColumn" prefWidth="120" text="Execution Date" />
                 <TableColumn fx:id="startColumn" prefWidth="120" text="Start Date" />
                 <TableColumn fx:id="statusColumn" prefWidth="100" text="Status" />
-                <TableColumn fx:id="customerColumn" prefWidth="120" text="Customer" />
+                <TableColumn fx:id="customerNameColumn" prefWidth="100" text="Name" />
+                <TableColumn fx:id="customerSurnameColumn" prefWidth="100" text="Surname" />
             </columns>
 
         </TableView>
         <HBox alignment="TOP_RIGHT" minHeight="50.0" prefHeight="100.0" prefWidth="600.0" spacing="10.0">
             <children>
-            <Button fx:id="changeFrequencyButton" disable="true" mnemonicParsing="false" onAction="#handleChangeFrequency" styleClass="accent" text="Change Frequency" />
-            <Button fx:id="toggleStatusButton" disable="true" mnemonicParsing="false" onAction="#handleStatusToggle" styleClass="accent" text="Pause" />
-            <Region prefHeight="200.0" prefWidth="200.0" HBox.hgrow="ALWAYS" />
+                <Button fx:id="changeFrequencyButton" disable="true" mnemonicParsing="false" onAction="#handleChangeFrequency" styleClass="accent" text="Change Frequency" />
+                <Button fx:id="toggleStatusButton" disable="true" mnemonicParsing="false" onAction="#handleStatusToggle" styleClass="accent" text="Pause" />
+                <Region prefHeight="200.0" prefWidth="200.0" HBox.hgrow="ALWAYS" />
                 <Button fx:id="deleteButton" disable="true" mnemonicParsing="false" onAction="#handleDeleteSchedule" styleClass="danger" text="Delete" />
             </children>
             <padding>

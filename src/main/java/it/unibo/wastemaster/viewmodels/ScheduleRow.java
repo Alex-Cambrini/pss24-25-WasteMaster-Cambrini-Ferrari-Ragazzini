@@ -16,17 +16,19 @@ public class ScheduleRow {
     private final LocalDate executionDate;
     private final LocalDate startDate;
     private final ScheduleStatus status;
-    private final String customer;
+    private final String customerName;
+    private final String customerSurname;
 
     public ScheduleRow(OneTimeSchedule schedule) {
         this.id = schedule.getScheduleId();
-        this.wasteName = schedule.getWaste().getWasteName(); // String
+        this.wasteName = schedule.getWaste().getWasteName();
         this.scheduleType = ScheduleCategory.ONE_TIME;
-        this.frequency = null; // o Frequency.NA se definito, altrimenti null
+        this.frequency = null;
         this.executionDate = schedule.getPickupDate();
         this.startDate = null;
         this.status = schedule.getScheduleStatus();
-        this.customer = schedule.getCustomer().getName() + " " + schedule.getCustomer().getSurname();
+        this.customerName = schedule.getCustomer().getName();
+        this.customerSurname = schedule.getCustomer().getSurname();
     }
 
     public ScheduleRow(RecurringSchedule schedule) {
@@ -37,7 +39,8 @@ public class ScheduleRow {
         this.executionDate = schedule.getNextCollectionDate();
         this.startDate = schedule.getStartDate();
         this.status = schedule.getScheduleStatus();
-        this.customer = schedule.getCustomer().getName() + " " + schedule.getCustomer().getSurname();
+        this.customerName = schedule.getCustomer().getName();
+        this.customerSurname = schedule.getCustomer().getSurname();
     }
 
     public int getId() {
@@ -68,7 +71,11 @@ public class ScheduleRow {
         return status;
     }
 
-    public String getCustomer() {
-        return customer;
+    public String getCustomerName() {
+        return customerName;
+    }
+
+    public String getCustomerSurname() {
+        return customerSurname;
     }
 }

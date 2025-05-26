@@ -72,7 +72,9 @@ public class ScheduleController {
     @FXML
     private TableColumn<ScheduleRow, String> statusColumn;
     @FXML
-    private TableColumn<ScheduleRow, String> customerColumn;
+    private TableColumn<ScheduleRow, String> customerNameColumn;
+    @FXML
+    private TableColumn<ScheduleRow, String> customerSurnameColumn;
 
     @FXML
     private TextField searchField;
@@ -319,38 +321,54 @@ public class ScheduleController {
 
     @FXML
     private void handleSearch() {
-        // String query = searchField.getText().toLowerCase().trim();
+        String query = searchField.getText().toLowerCase().trim();
 
-        // if (query.isEmpty()) {
-        // scheduleTable.setItems(FXCollections.observableArrayList(allSchedules));
-        // return;
-        // }
+        if (query.isEmpty()) {
+            scheduleTable.setItems(FXCollections.observableArrayList(allSchedules));
+            return;
+        }
 
-        // ObservableList<ScheduleRow> filtered = FXCollections.observableArrayList();
+        ObservableList<ScheduleRow> filtered = FXCollections.observableArrayList();
 
-        // for (ScheduleRow row : allSchedules) {
-        // if ((activeFilters.contains("wasteType") &&
-        // row.getWasteName().toLowerCase().contains(query)) ||
-        // (activeFilters.contains("scheduleType") &&
-        // row.getScheduleType().toLowerCase().contains(query)) ||
-        // (activeFilters.contains("frequency") &&
-        // row.getFrequency().toLowerCase().contains(query)) ||
-        // (activeFilters.contains("pickupDate") &&
-        // row.getExecutionDate().toLowerCase().contains(query)) ||
-        // (activeFilters.contains("nextCollectionDate")
-        // && row.getExecutionDate().toLowerCase().contains(query))
-        // ||
-        // (activeFilters.contains("startDate") &&
-        // row.getStartDate().toLowerCase().contains(query)) ||
-        // (activeFilters.contains("status") &&
-        // row.getStatus().toLowerCase().contains(query)) ||
-        // (activeFilters.contains("customer")
-        // && row.getCustomer().toLowerCase().contains(query))) {
-        // filtered.add(row);
-        // }
-        // }
+        for (ScheduleRow row : allSchedules) {
+            if ((activeFilters.contains("wasteType") &&
+                    row.getWasteName().toLowerCase().contains(query)) ||
 
-        // scheduleTable.setItems(filtered);
+                    (activeFilters.contains("scheduleType") &&
+                            row.getScheduleType().name().toLowerCase().contains(query))
+                    ||
+
+                    (activeFilters.contains("frequency") &&
+                            row.getFrequency().name().toLowerCase().contains(query))
+                    ||
+
+                    (activeFilters.contains("pickupDate") &&
+                            row.getExecutionDate().toString().toLowerCase().contains(query))
+                    ||
+
+                    (activeFilters.contains("nextCollectionDate") &&
+                            row.getExecutionDate().toString().toLowerCase().contains(query))
+                    ||
+
+                    (activeFilters.contains("startDate") &&
+                            row.getStartDate().toString().toLowerCase().contains(query))
+                    ||
+
+                    (activeFilters.contains("status") &&
+                            row.getStatus().name().toLowerCase().contains(query))
+                    ||
+
+                    (activeFilters.contains("customerName") &&
+                            row.getCustomerName().toLowerCase().contains(query))
+                    ||
+
+                    (activeFilters.contains("customerSurname") &&
+                            row.getCustomerSurname().toLowerCase().contains(query))) {
+                filtered.add(row);
+            }
+        }
+
+        scheduleTable.setItems(filtered);
     }
 
     @FXML
