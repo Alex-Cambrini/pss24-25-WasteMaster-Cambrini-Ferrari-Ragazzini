@@ -28,41 +28,41 @@
             </VBox.margin>
         </HBox>
         <HBox alignment="CENTER_RIGHT" prefHeight="30.0" prefWidth="30.0" spacing="10.0">
-            <children>
-                <CheckBox mnemonicParsing="false" text="Show Active">
-                    <tooltip>
-                        <Tooltip text="Show Active" />
-                    </tooltip>
-                </CheckBox>
-                <CheckBox mnemonicParsing="false" text="Show Paused">
-                    <tooltip>
-                        <Tooltip text="Show Paused" />
-                    </tooltip>
-                </CheckBox>
-                <CheckBox mnemonicParsing="false" text="Show Completed">
-                    <tooltip>
-                        <Tooltip text="Show Completed" />
-                    </tooltip>
-                </CheckBox>
-                <CheckBox fx:id="showDeletedCheckBox" text="Show Deleted">
-                    <tooltip>
-                        <Tooltip text="Show Deleted" />
-                    </tooltip>
-                </CheckBox>
-                <CheckBox fx:id="oneTimeCheckBox" text="OneTime">
-                    <tooltip>
-                        <Tooltip text="OneTime" />
-                    </tooltip>
-                </CheckBox>
-                <CheckBox fx:id="recurringCheckBox" text="Recurring">
-                    <tooltip>
-                        <Tooltip text="Recurring" />
-                    </tooltip>
-                </CheckBox>
-            </children>
-            <VBox.margin>
-                <Insets bottom="5.0" />
-            </VBox.margin>
+<children>
+        <CheckBox fx:id="showActiveCheckBox" mnemonicParsing="false" text="Show Active">
+            <tooltip>
+                <Tooltip text="Show Active" />
+            </tooltip>
+        </CheckBox>
+        <CheckBox fx:id="showPausedCheckBox" mnemonicParsing="false" text="Show Paused">
+            <tooltip>
+                <Tooltip text="Show Paused" />
+            </tooltip>
+        </CheckBox>
+        <CheckBox fx:id="showCompletedCheckBox" mnemonicParsing="false" text="Show Completed">
+            <tooltip>
+                <Tooltip text="Show Completed" />
+            </tooltip>
+        </CheckBox>
+        <CheckBox fx:id="showDeletedCheckBox" text="Show Deleted">
+            <tooltip>
+                <Tooltip text="Show Deleted" />
+            </tooltip>
+        </CheckBox>
+        <CheckBox fx:id="oneTimeCheckBox" text="OneTime">
+            <tooltip>
+                <Tooltip text="OneTime" />
+            </tooltip>
+        </CheckBox>
+        <CheckBox fx:id="recurringCheckBox" text="Recurring">
+            <tooltip>
+                <Tooltip text="Recurring" />
+            </tooltip>
+        </CheckBox>
+    </children>
+         <VBox.margin>
+            <Insets bottom="5.0" />
+         </VBox.margin>
         </HBox>
         <TableView fx:id="scheduleTable" prefHeight="300.0" prefWidth="600.0" styleClass="table-view" VBox.vgrow="ALWAYS">
             <columns>
