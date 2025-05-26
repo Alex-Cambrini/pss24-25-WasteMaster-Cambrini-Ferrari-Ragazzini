@@ -64,11 +64,11 @@
         </HBox>
         <TableView fx:id="scheduleTable" prefHeight="300.0" prefWidth="600.0" styleClass="table-view" VBox.vgrow="ALWAYS">
             <columns>
-                <TableColumn fx:id="wasteColumn" prefWidth="100" text="Waste Name" />
-                <TableColumn fx:id="typeColumn" prefWidth="120" text="Schedule Type" />
+                <TableColumn fx:id="wasteNameColumn" prefWidth="100" text="Waste Name" />
+                <TableColumn fx:id="scheduleCategoryColumn" prefWidth="120" text="Schedule Type" />
                 <TableColumn fx:id="frequencyColumn" prefWidth="100" text="Frequency" />
-                <TableColumn fx:id="dateColumn" prefWidth="120" text="Execution Date" />
-                <TableColumn fx:id="startColumn" prefWidth="120" text="Start Date" />
+                <TableColumn fx:id="executionDateColumn" prefWidth="120" text="Execution Date" />
+                <TableColumn fx:id="startDateColumn" prefWidth="120" text="Start Date" />
                 <TableColumn fx:id="statusColumn" prefWidth="100" text="Status" />
                 <TableColumn fx:id="customerColumn" prefWidth="120" text="Customer" />
             </columns>
