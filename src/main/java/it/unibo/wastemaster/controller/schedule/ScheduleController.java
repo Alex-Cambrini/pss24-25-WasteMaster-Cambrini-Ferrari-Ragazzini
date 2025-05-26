@@ -28,7 +28,7 @@ public class ScheduleController {
 
     private final ObservableList<String> activeFilters = FXCollections.observableArrayList(
             "wasteType", "scheduleType", "frequency", "pickupDate", "nextCollectionDate",
-            "startDate", "status", "customerName", "customerSurname");
+            "startDate", "status", "customer");
 
     private Timeline refreshTimeline;
     private ObservableList<ScheduleRow> allSchedules = FXCollections.observableArrayList();
@@ -66,9 +66,7 @@ public class ScheduleController {
     @FXML
     private TableColumn<ScheduleRow, String> statusColumn;
     @FXML
-    private TableColumn<ScheduleRow, String> customerNameColumn;
-    @FXML
-    private TableColumn<ScheduleRow, String> customerSurnameColumn;
+    private TableColumn<ScheduleRow, String> customerColumn;
 
     @FXML
     private TextField searchField;
@@ -81,8 +79,7 @@ public class ScheduleController {
         dateColumn.setCellValueFactory(new PropertyValueFactory<>("executionDate"));
         startColumn.setCellValueFactory(new PropertyValueFactory<>("startDate"));
         statusColumn.setCellValueFactory(new PropertyValueFactory<>("status"));
-        customerNameColumn.setCellValueFactory(new PropertyValueFactory<>("customerName"));
-        customerSurnameColumn.setCellValueFactory(new PropertyValueFactory<>("customerSurname"));
+        customerColumn.setCellValueFactory(new PropertyValueFactory<>("customer"));
         oneTimeCheckBox.setSelected(true);
         recurringCheckBox.setSelected(true);
         showDeletedCheckBox.setSelected(false);
@@ -339,12 +336,8 @@ public class ScheduleController {
                             row.getStatus().name().toLowerCase().contains(query))
                     ||
 
-                    (activeFilters.contains("customerName") &&
-                            row.getCustomerName().toLowerCase().contains(query))
-                    ||
-
-                    (activeFilters.contains("customerSurname") &&
-                            row.getCustomerSurname().toLowerCase().contains(query))) {
+                    (activeFilters.contains("customer") &&
+                            row.getCustomer().toLowerCase().contains(query))) {
                 filtered.add(row);
             }
         }
@@ -357,7 +350,7 @@ public class ScheduleController {
         searchField.clear();
         activeFilters.clear();
         activeFilters.addAll("wasteType", "scheduleType", "frequency", "pickupDate",
-                "nextCollectionDate", "startDate", "status", "customerName", "customerSurname");
+                "nextCollectionDate", "startDate", "status", "customer");
         oneTimeCheckBox.setSelected(true);
         recurringCheckBox.setSelected(true);
 
@@ -374,9 +367,9 @@ public class ScheduleController {
         filterMenu = new ContextMenu();
 
         String[] fields = { "wasteType", "scheduleType", "frequency", "pickupDate",
-                "nextCollectionDate", "startDate", "status", "customerName", "customerSurname" };
+                "nextCollectionDate", "startDate", "status", "customer" };
 
-        String[] labels = { "Waste", "Type", "Frequency", "Pickup", "Next", "Start", "Status", "Name", "Surname" };
+        String[] labels = { "Waste", "Type", "Frequency", "Pickup", "Next", "Start", "Status", "Customer" };
 
         for (int i = 0; i < fields.length; i++) {
             String key = fields[i];

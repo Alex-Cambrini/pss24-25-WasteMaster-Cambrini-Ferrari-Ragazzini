@@ -16,8 +16,7 @@ public class ScheduleRow {
     private final LocalDate executionDate;
     private final LocalDate startDate;
     private final ScheduleStatus status;
-    private final String customerName;
-    private final String customerSurname;
+    private final String customer;
 
     public ScheduleRow(OneTimeSchedule schedule) {
         this.id = schedule.getScheduleId();
@@ -27,8 +26,7 @@ public class ScheduleRow {
         this.executionDate = schedule.getPickupDate();
         this.startDate = null;
         this.status = schedule.getScheduleStatus();
-        this.customerName = schedule.getCustomer().getName();
-        this.customerSurname = schedule.getCustomer().getSurname();
+        this.customer = schedule.getCustomer().getName() + " " + schedule.getCustomer().getSurname();
     }
 
     public ScheduleRow(RecurringSchedule schedule) {
@@ -39,8 +37,7 @@ public class ScheduleRow {
         this.executionDate = schedule.getNextCollectionDate();
         this.startDate = schedule.getStartDate();
         this.status = schedule.getScheduleStatus();
-        this.customerName = schedule.getCustomer().getName();
-        this.customerSurname = schedule.getCustomer().getSurname();
+        this.customer = schedule.getCustomer().getName() + " " + schedule.getCustomer().getSurname();
     }
 
     public int getId() {
@@ -71,11 +68,7 @@ public class ScheduleRow {
         return status;
     }
 
-    public String getCustomerName() {
-        return customerName;
-    }
-
-    public String getCustomerSurname() {
-        return customerSurname;
+    public String getCustomer() {
+        return customer;
     }
 }

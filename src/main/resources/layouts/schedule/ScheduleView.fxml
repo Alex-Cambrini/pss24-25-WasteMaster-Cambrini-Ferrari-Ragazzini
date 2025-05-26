@@ -72,8 +72,7 @@
                 <TableColumn fx:id="dateColumn" prefWidth="120" text="Execution Date" />
                 <TableColumn fx:id="startColumn" prefWidth="120" text="Start Date" />
                 <TableColumn fx:id="statusColumn" prefWidth="100" text="Status" />
-                <TableColumn fx:id="customerNameColumn" prefWidth="100" text="Name" />
-                <TableColumn fx:id="customerSurnameColumn" prefWidth="100" text="Surname" />
+                <TableColumn fx:id="customerColumn" prefWidth="120" text="Customer" />
             </columns>
 
         </TableView>
