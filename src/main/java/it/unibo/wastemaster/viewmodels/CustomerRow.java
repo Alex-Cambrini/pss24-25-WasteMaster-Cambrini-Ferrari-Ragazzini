@@ -1,5 +1,7 @@
 package it.unibo.wastemaster.viewmodels;
 
+import it.unibo.wastemaster.core.models.Customer;
+
 public class CustomerRow {
     private final String name;
     private final String surname;
@@ -9,16 +11,14 @@ public class CustomerRow {
     private final String city;
     private final String postalCode;
 
-    public CustomerRow(String name, String surname, String email,
-            String street, String civic,
-            String city, String postalCode) {
-        this.name = name;
-        this.surname = surname;
-        this.email = email;
-        this.street = street;
-        this.civic = civic;
-        this.city = city;
-        this.postalCode = postalCode;
+    public CustomerRow(Customer customer) {
+        this.name = customer.getName();
+		this.surname = customer.getSurname();
+		this.email = customer.getEmail();
+		this.street = customer.getLocation().getStreet();
+		this.civic = customer.getLocation().getCivicNumber();
+		this.city = customer.getLocation().getCity();
+		this.postalCode = customer.getLocation().getPostalCode();
     }
 
     public String getName() {
