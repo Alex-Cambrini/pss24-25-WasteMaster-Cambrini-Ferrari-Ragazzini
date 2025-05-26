@@ -50,4 +50,24 @@ public class CustomerDAOTest extends AbstractDatabaseTest {
         Customer notFoundCustomer = customerDAO.findByEmail(nonExistingEmail);
         assertNull(notFoundCustomer, "Customer should not be found for non-existing email");
     }
+
+    @Test
+    public void testFindCustomerDetails() {
+        Customer customer1 = new Customer("Marco", "Verdi", location, "marco@example.com", "1111111111");
+        Customer customer2 = new Customer("Luca", "Bianchi", location, "luca@example.com", "2222222222");
+        Customer deletedCustomer = new Customer("Laura", "Rossi", location, "laura@example.com", "3333333333");
+
+        customerDAO.insert(customer1);
+        customerDAO.insert(customer2);
+        customerDAO.insert(deletedCustomer);
+        deletedCustomer.delete();
+        customerDAO.update(deletedCustomer);
+
+        var result = customerDAO.findCustomerDetails();
+
+        assertTrue(result.stream().anyMatch(c -> c.getEmail().equals("marco@example.com")), "Marco should be present");
+        assertTrue(result.stream().anyMatch(c -> c.getEmail().equals("luca@example.com")), "Luca should be present");
+        assertFalse(result.stream().anyMatch(c -> c.getEmail().equals("laura@example.com")),
+                "Laura (deleted) should not be present");
+    }
 }
