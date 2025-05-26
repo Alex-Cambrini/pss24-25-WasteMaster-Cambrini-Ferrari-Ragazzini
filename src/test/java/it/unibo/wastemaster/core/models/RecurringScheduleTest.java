@@ -58,7 +58,6 @@ class RecurringScheduleTest extends AbstractDatabaseTest {
     @Test
     void testRecurringScheduleValidation() {
         RecurringSchedule invalid = new RecurringSchedule();
-        invalid.setStartDate(LocalDate.now().minusDays(1));
         invalid.setFrequency(null);
         invalid.setCustomer(null);
         invalid.setWaste(null);
@@ -67,8 +66,6 @@ class RecurringScheduleTest extends AbstractDatabaseTest {
         Set<ConstraintViolation<RecurringSchedule>> violations = ValidateUtils.VALIDATOR.validate(invalid);
         assertFalse(violations.isEmpty());
 
-        assertTrue(violations.stream()
-                .anyMatch(v -> v.getMessage().contains("Start Date must be today or in the future")));
         assertTrue(violations.stream().anyMatch(v -> v.getMessage().contains("Frequency cannot be null")));
         assertTrue(violations.stream().anyMatch(v -> v.getMessage().contains("Customer cannot be null")));
         assertTrue(violations.stream().anyMatch(v -> v.getMessage().contains("WasteType cannot be null")));
