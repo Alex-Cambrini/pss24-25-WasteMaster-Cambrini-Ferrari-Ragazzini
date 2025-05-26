@@ -27,8 +27,7 @@ import java.util.Optional;
 public class ScheduleController {
 
     private final ObservableList<String> activeFilters = FXCollections.observableArrayList(
-            "wasteType", "scheduleType", "frequency", "pickupDate", "nextCollectionDate",
-            "startDate", "status", "customer");
+            "wasteType", "frequency", "customer");
 
     private Timeline refreshTimeline;
     private ObservableList<ScheduleRow> allSchedules = FXCollections.observableArrayList();
@@ -331,29 +330,9 @@ public class ScheduleController {
             if ((activeFilters.contains("wasteType") &&
                     row.getWasteName().toLowerCase().contains(query)) ||
 
-                    (activeFilters.contains("scheduleType") &&
-                            row.getScheduleType().name().toLowerCase().contains(query))
-                    ||
                     (activeFilters.contains("frequency") &&
                             row.getFrequency() != null &&
                             row.getFrequency().name().toLowerCase().contains(query))
-                    ||
-
-                    (activeFilters.contains("pickupDate") &&
-                            row.getExecutionDate().toString().toLowerCase().contains(query))
-                    ||
-
-                    (activeFilters.contains("nextCollectionDate") &&
-                            row.getExecutionDate().toString().toLowerCase().contains(query))
-                    ||
-
-                    (activeFilters.contains("startDate") &&
-                            row.getStartDate() != null &&
-                            row.getStartDate().toString().toLowerCase().contains(query))
-                    ||
-
-                    (activeFilters.contains("status") &&
-                            row.getStatus().name().toLowerCase().contains(query))
                     ||
 
                     (activeFilters.contains("customer") &&
@@ -369,8 +348,7 @@ public class ScheduleController {
     private void handleResetSearch() {
         searchField.clear();
         activeFilters.clear();
-        activeFilters.addAll("wasteType", "scheduleType", "frequency", "pickupDate",
-                "nextCollectionDate", "startDate", "status", "customer");
+        activeFilters.addAll("wasteType", "frequency", "customer");
         oneTimeCheckBox.setSelected(true);
         recurringCheckBox.setSelected(true);
 
@@ -386,10 +364,8 @@ public class ScheduleController {
 
         filterMenu = new ContextMenu();
 
-        String[] fields = { "wasteType", "scheduleType", "frequency", "pickupDate",
-                "nextCollectionDate", "startDate", "status", "customer" };
-
-        String[] labels = { "Waste", "Type", "Frequency", "Pickup", "Next", "Start", "Status", "Customer" };
+        String[] fields = { "wasteType", "frequency", "customer" };
+        String[] labels = { "Waste", "Frequency", "Customer" };
 
         for (int i = 0; i < fields.length; i++) {
             String key = fields[i];
