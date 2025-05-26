@@ -46,7 +46,7 @@ public class OneTimeScheduleManager {
             return false;
         }
 
-        Collection collection = collectionManager.getActiveCollectionByOneTimeSchedule(schedule);
+        Collection collection = collectionManager.getAllCollectionBySchedule(schedule).get(0);
         ValidateUtils.requireArgNotNull(collection, "Associated collection not found");
 
         if (isDateValid(schedule.getPickupDate(), collection.getCancelLimitDays())) {
