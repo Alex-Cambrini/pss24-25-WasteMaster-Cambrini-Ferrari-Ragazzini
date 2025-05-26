@@ -12,15 +12,14 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.ContextMenu;
-import javafx.scene.control.CustomMenuItem;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.input.MouseEvent;
+import javafx.stage.Stage;
 import javafx.util.Duration;
 
+import java.util.Optional;
+import java.io.IOException;
 import java.util.List;
 
 public class VehicleController {
@@ -35,7 +34,7 @@ public class VehicleController {
 			"nextMaintenanceDate");
 
 	@FXML
-	private javafx.scene.control.TextField searchField;
+	private TextField searchField;
 
 	@FXML
 	private Button filterButton;
@@ -76,15 +75,14 @@ public class VehicleController {
 		lastMaintenanceDateColumn.setCellValueFactory(new PropertyValueFactory<>("lastMaintenanceDate"));
 		nextMaintenanceDateColumn.setCellValueFactory(new PropertyValueFactory<>("nextMaintenanceDate"));
 
-
 		loadVehicles();
 		startAutoRefresh();
+
 		searchField.textProperty().addListener((obs, oldText, newText) -> handleSearch());
 	}
 
 	private void startAutoRefresh() {
-		refreshTimeline = new Timeline(
-				new KeyFrame(Duration.seconds(30), event -> loadVehicles()));
+		refreshTimeline = new Timeline(new KeyFrame(Duration.seconds(30), event -> loadVehicles()));
 		refreshTimeline.setCycleCount(Timeline.INDEFINITE);
 		refreshTimeline.play();
 	}
@@ -122,19 +120,52 @@ public class VehicleController {
 	@FXML
 	private void handleAddVehicle() {
 		try {
-			MainLayoutController.getInstance().setPageTitle("Add Vehicle");
-			AddVehicleController controller = MainLayoutController.getInstance()
-					.loadCenterWithController("/layouts/vehicle/AddVehicleView.fxml");
-			controller.setVehicleController(this);
-		} catch (Exception e) {
+			Stage mainStage = (Stage) MainLayoutController.getInstance().getRootPane().getScene().getWindow();
+
+			Optional<AddVehicleController> controllerOpt = DialogUtils.showModalWithController(
+					"Add Vehicle",
+					"/layouts/vehicle/AddVehicleView.fxml",
+					mainStage,
+					ctrl -> {
+					});
+
+			if (controllerOpt.isPresent()) {
+				loadVehicles();
+			}
+		} catch (IOException e) {
 			DialogUtils.showError("Navigation error", "Could not load Add Vehicle view.", AppContext.getOwner());
 			e.printStackTrace();
 		}
 	}
 
-	private String formatEnum(String raw) {
-		String lower = raw.toLowerCase().replace("_", " ");
-		return Character.toUpperCase(lower.charAt(0)) + lower.substring(1);
+	@FXML
+	private void handleEditVehicle() {
+		VehicleRow selected = VehicleTable.getSelectionModel().getSelectedItem();
+		if (selected == null) {
+			DialogUtils.showError("No Selection", "Please select a vehicle to edit.", AppContext.getOwner());
+			return;
+		}
+
+		Vehicle vehicle = AppContext.vehicleManager.findVehicleByPlate(selected.getPlate());
+		if (vehicle == null) {
+			DialogUtils.showError("Not Found", "Vehicle not found.", AppContext.getOwner());
+			return;
+		}
+
+		try {
+			Optional<EditVehicleController> controllerOpt = DialogUtils.showModalWithController(
+					"Edit Vehicle",
+					"/layouts/vehicle/EditVehicleView.fxml",
+					AppContext.getOwner(),
+					ctrl -> ctrl.setVehicleToEdit(vehicle));
+
+			if (controllerOpt.isPresent()) {
+				loadVehicles();
+			}
+		} catch (Exception e) {
+			DialogUtils.showError("Navigation error", "Could not load Edit view.", AppContext.getOwner());
+			e.printStackTrace();
+		}
 	}
 
 	@FXML
@@ -159,31 +190,6 @@ public class VehicleController {
 			loadVehicles();
 		} else {
 			DialogUtils.showError("Deletion Failed", "Unable to delete the selected vehicle.", AppContext.getOwner());
-		}
-	}
-
-	@FXML
-	private void handleEditVehicle() {
-		VehicleRow selected = VehicleTable.getSelectionModel().getSelectedItem();
-		if (selected == null) {
-			DialogUtils.showError("No Selection", "Please select a vehicle to edit.", AppContext.getOwner());
-			return;
-		}
-
-		Vehicle vehicle = AppContext.vehicleManager.findVehicleByPlate(selected.getPlate());
-		if (vehicle == null) {
-			DialogUtils.showError("Not Found", "Vehicle not found.", AppContext.getOwner());
-			return;
-		}
-
-		try {
-			MainLayoutController.getInstance().setPageTitle("Edit Vehicle");
-			EditVehicleController controller = MainLayoutController.getInstance()
-					.loadCenterWithController("/layouts/vehicle/EditVehicleView.fxml");
-			controller.setVehicleToEdit(vehicle);
-			controller.setVehicleController(this);
-		} catch (Exception e) {
-			DialogUtils.showError("Navigation error", "Could not load Edit view.", AppContext.getOwner());
 		}
 	}
 
@@ -233,7 +239,7 @@ public class VehicleController {
 	}
 
 	@FXML
-	private void showFilterMenu(javafx.scene.input.MouseEvent event) {
+	private void showFilterMenu(MouseEvent event) {
 		if (filterMenu != null && filterMenu.isShowing()) {
 			filterMenu.hide();
 			return;
@@ -276,13 +282,8 @@ public class VehicleController {
 		filterMenu.show(filterButton, event.getScreenX(), event.getScreenY());
 	}
 
-	public void returnToVehicleView() {
-		try {
-			MainLayoutController.getInstance().restorePreviousTitle();
-			MainLayoutController.getInstance().loadCenter("/layouts/vehicle/VehicleView.fxml");
-		} catch (Exception e) {
-			DialogUtils.showError("Navigation error", "Failed to load vehicle view.", AppContext.getOwner());
-		}
+	private String formatEnum(String raw) {
+		String lower = raw.toLowerCase().replace("_", " ");
+		return Character.toUpperCase(lower.charAt(0)) + lower.substring(1);
 	}
-
 }

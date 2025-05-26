@@ -4,36 +4,37 @@ import it.unibo.wastemaster.core.context.AppContext;
 import it.unibo.wastemaster.core.models.Vehicle;
 import it.unibo.wastemaster.core.models.Vehicle.RequiredLicence;
 import it.unibo.wastemaster.core.models.Vehicle.VehicleStatus;
-import it.unibo.wastemaster.controller.utils.DialogUtils;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
 
+import static it.unibo.wastemaster.controller.utils.DialogUtils.*;
+
 public class EditVehicleController {
 
 	private Vehicle vehicle;
-	private VehicleController vehicleController;
-
 
 	@FXML
 	private TextField plateField;
+
 	@FXML
 	private TextField brandField;
+
 	@FXML
 	private TextField modelField;
+
 	@FXML
 	private TextField yearField;
+
 	@FXML
 	private TextField capacityField;
+
 	@FXML
 	private ComboBox<RequiredLicence> licenceComboBox;
+
 	@FXML
 	private ComboBox<VehicleStatus> statusComboBox;
-
-
-	public void setVehicleController(VehicleController controller) {
-		this.vehicleController = controller;
-	}
 
 	public void setVehicleToEdit(Vehicle vehicle) {
 		this.vehicle = vehicle;
@@ -52,11 +53,11 @@ public class EditVehicleController {
 	}
 
 	@FXML
-	private void handleUpdateVehicle() {
+	private void handleUpdateVehicle(ActionEvent event) {
 		try {
 			Vehicle original = AppContext.vehicleManager.findVehicleByPlate(vehicle.getPlate());
 			if (original == null) {
-				DialogUtils.showError("Error", "Vehicle not found.", AppContext.getOwner());
+				showError("Error", "Vehicle not found.", AppContext.getOwner());
 				return;
 			}
 
@@ -68,7 +69,7 @@ public class EditVehicleController {
 					original.getCapacity() != Integer.parseInt(capacityField.getText());
 
 			if (!changed) {
-				DialogUtils.showError("No changes", "No fields were modified.", AppContext.getOwner());
+				showError("No changes", "No fields were modified.", AppContext.getOwner());
 				return;
 			}
 
@@ -80,18 +81,18 @@ public class EditVehicleController {
 			vehicle.setCapacity(Integer.parseInt(capacityField.getText()));
 
 			AppContext.vehicleManager.updateVehicle(vehicle);
-			DialogUtils.showSuccess("Vehicle updated successfully.", AppContext.getOwner());
-			vehicleController.returnToVehicleView();
+			showSuccess("Vehicle updated successfully.", AppContext.getOwner());
+			closeModal(event);
 
 		} catch (IllegalArgumentException e) {
-			DialogUtils.showError("Validation error", e.getMessage(), AppContext.getOwner());
+			showError("Validation error", e.getMessage(), AppContext.getOwner());
 		} catch (Exception e) {
-			DialogUtils.showError("Unexpected error", e.getMessage(), AppContext.getOwner());
+			showError("Unexpected error", e.getMessage(), AppContext.getOwner());
 		}
 	}
 
 	@FXML
-	private void handleAbortVehicleEdit() {
-		vehicleController.returnToVehicleView();
+	private void handleAbortVehicleEdit(ActionEvent event) {
+		closeModal(event);
 	}
 }
