@@ -29,8 +29,8 @@ public class CustomersController {
     private ContextMenu filterMenu;
     private ObservableList<CustomerRow> allCustomers = FXCollections.observableArrayList();
 
-    private final ObservableList<String> activeFilters = FXCollections.observableArrayList(
-            "name", "surname", "email", "street", "civic", "city", "postal");
+    private final ObservableList<String> activeFilters = FXCollections.observableArrayList("name",
+            "surname", "email", "street", "civic", "city", "postal");
 
     @FXML
     private Button filterButton;
@@ -74,8 +74,8 @@ public class CustomersController {
     }
 
     private void startAutoRefresh() {
-        refreshTimeline = new Timeline(
-                new KeyFrame(Duration.seconds(30), event -> loadCustomers()));
+        refreshTimeline =
+                new Timeline(new KeyFrame(Duration.seconds(30), event -> loadCustomers()));
         refreshTimeline.setCycleCount(Timeline.INDEFINITE);
         refreshTimeline.play();
     }
@@ -105,16 +105,16 @@ public class CustomersController {
     private void handleAddCustomer() {
         try {
             Optional<AddCustomerController> controllerOpt = DialogUtils.showModalWithController(
-                    "Add Customer",
-                    "/layouts/customer/AddCustomerView.fxml",
-                    AppContext.getOwner(),
-                    ctrl -> ctrl.setCustomerController(this));
+                    "Add Customer", "/layouts/customer/AddCustomerView.fxml", AppContext.getOwner(),
+                    ctrl -> {
+                    });
 
             if (controllerOpt.isPresent()) {
                 loadCustomers();
             }
         } catch (Exception e) {
-            DialogUtils.showError("Navigation error", "Could not load Add Customer view.", AppContext.getOwner());
+            DialogUtils.showError("Navigation error", "Could not load Add Customer view.",
+                    AppContext.getOwner());
             e.printStackTrace();
         }
     }
@@ -123,14 +123,16 @@ public class CustomersController {
     private void handleDeleteCustomer() {
         CustomerRow selected = customerTable.getSelectionModel().getSelectedItem();
         if (selected == null) {
-            DialogUtils.showError("No Selection", "Please select a customer to delete.", AppContext.getOwner());
+            DialogUtils.showError("No Selection", "Please select a customer to delete.",
+                    AppContext.getOwner());
             return;
         }
 
         var customer = AppContext.customerDAO.findByEmail(selected.getEmail());
 
         if (customer == null) {
-            DialogUtils.showError("Not Found", "The selected customer could not be found.", AppContext.getOwner());
+            DialogUtils.showError("Not Found", "The selected customer could not be found.",
+                    AppContext.getOwner());
             return;
         }
 
@@ -139,7 +141,8 @@ public class CustomersController {
             DialogUtils.showSuccess("Customer deleted successfully.", AppContext.getOwner());
             loadCustomers();
         } else {
-            DialogUtils.showError("Deletion Failed", "Unable to delete the selected customer.", AppContext.getOwner());
+            DialogUtils.showError("Deletion Failed", "Unable to delete the selected customer.",
+                    AppContext.getOwner());
         }
     }
 
@@ -147,7 +150,8 @@ public class CustomersController {
     private void handleEditCustomer() {
         CustomerRow selected = customerTable.getSelectionModel().getSelectedItem();
         if (selected == null) {
-            DialogUtils.showError("No Selection", "Please select a customer to edit.", AppContext.getOwner());
+            DialogUtils.showError("No Selection", "Please select a customer to edit.",
+                    AppContext.getOwner());
             return;
         }
 
@@ -159,10 +163,8 @@ public class CustomersController {
 
         try {
             Optional<EditCustomerController> controllerOpt = DialogUtils.showModalWithController(
-                    "Edit Customer",
-                    "/layouts/customer/EditCustomerView.fxml",
-                    AppContext.getOwner(),
-                    ctrl -> {
+                    "Edit Customer", "/layouts/customer/EditCustomerView.fxml",
+                    AppContext.getOwner(), ctrl -> {
                         ctrl.setCustomerToEdit(customer);
                         ctrl.setCustomerController(this);
                     });
@@ -171,7 +173,8 @@ public class CustomersController {
                 loadCustomers();
             }
         } catch (Exception e) {
-            DialogUtils.showError("Navigation error", "Could not load Edit Customer view.", AppContext.getOwner());
+            DialogUtils.showError("Navigation error", "Could not load Edit Customer view.",
+                    AppContext.getOwner());
         }
     }
 
@@ -187,13 +190,19 @@ public class CustomersController {
         ObservableList<CustomerRow> filtered = FXCollections.observableArrayList();
 
         for (CustomerRow row : allCustomers) {
-            if ((activeFilters.contains("name") && row.getName().toLowerCase().contains(query)) ||
-                    (activeFilters.contains("surname") && row.getSurname().toLowerCase().contains(query)) ||
-                    (activeFilters.contains("email") && row.getEmail().toLowerCase().contains(query)) ||
-                    (activeFilters.contains("street") && row.getStreet().toLowerCase().contains(query)) ||
-                    (activeFilters.contains("civic") && row.getCivic().toLowerCase().contains(query)) ||
-                    (activeFilters.contains("city") && row.getCity().toLowerCase().contains(query)) ||
-                    (activeFilters.contains("postal") && row.getPostalCode().toLowerCase().contains(query))) {
+            if ((activeFilters.contains("name") && row.getName().toLowerCase().contains(query))
+                    || (activeFilters.contains("surname")
+                            && row.getSurname().toLowerCase().contains(query))
+                    || (activeFilters.contains("email")
+                            && row.getEmail().toLowerCase().contains(query))
+                    || (activeFilters.contains("street")
+                            && row.getStreet().toLowerCase().contains(query))
+                    || (activeFilters.contains("civic")
+                            && row.getCivic().toLowerCase().contains(query))
+                    || (activeFilters.contains("city")
+                            && row.getCity().toLowerCase().contains(query))
+                    || (activeFilters.contains("postal")
+                            && row.getPostalCode().toLowerCase().contains(query))) {
                 filtered.add(row);
             }
         }
@@ -220,8 +229,8 @@ public class CustomersController {
 
         filterMenu = new ContextMenu();
 
-        String[] fields = { "name", "surname", "email", "street", "civic", "city", "postal" };
-        String[] labels = { "Name", "Surname", "Email", "Street", "Civic", "City", "Postal Code" };
+        String[] fields = {"name", "surname", "email", "street", "civic", "city", "postal"};
+        String[] labels = {"Name", "Surname", "Email", "Street", "Civic", "City", "Postal Code"};
 
         for (int i = 0; i < fields.length; i++) {
             String key = fields[i];
@@ -254,7 +263,8 @@ public class CustomersController {
             MainLayoutController.getInstance().restorePreviousTitle();
             MainLayoutController.getInstance().loadCenter("/layouts/customer/CustomersView.fxml");
         } catch (Exception e) {
-            DialogUtils.showError("Navigation error", "Failed to load customer view.", AppContext.getOwner());
+            DialogUtils.showError("Navigation error", "Failed to load customer view.",
+                    AppContext.getOwner());
         }
     }
 
