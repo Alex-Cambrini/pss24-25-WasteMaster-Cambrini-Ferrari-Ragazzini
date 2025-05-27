@@ -39,8 +39,8 @@
 
       <HBox alignment="TOP_RIGHT" minHeight="50.0" prefHeight="100.0" prefWidth="600.0" spacing="10.0">
          <children>
-            <Button mnemonicParsing="false" onAction="#handleEditVehicle" styleClass="accent" text="Edit" />
-            <Button mnemonicParsing="false" onAction="#handleDeleteVehicle" styleClass="danger" text="Delete" />
+            <Button fx:id="editVehicleButton" mnemonicParsing="false" onAction="#handleEditVehicle" styleClass="accent" text="Edit" disable="true"/>
+            <Button fx:id="deleteVehicleButton" mnemonicParsing="false" onAction="#handleDeleteVehicle" styleClass="danger" text="Delete" disable="true"/>
          </children>
          <padding>
             <Insets right="20.0" top="10.0" />
