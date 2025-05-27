@@ -1,3 +1,4 @@
+
 plugins {
     // Apply the java plugin to add support for Java
     java
@@ -5,9 +6,10 @@ plugins {
     // Apply the application plugin to add support for building a CLI application
     // You can run your app via task "run": ./gradlew run
     application
+    checkstyle
 
     /*
-     * Adds tasks to export a runnable jar.
+     * Adds tasks to export a runnable jar
      * In order to create it, launch the "shadowJar" task.
      * The runnable jar will be found in build/libs/projectname-all.jar
      */
@@ -75,7 +77,11 @@ dependencies {
     testImplementation("com.h2database:h2:2.1.214")
 
 
+
 }
+
+
+
 
 tasks.withType<Test> {
     // Enables JUnit 5 Jupiter module
