@@ -39,6 +39,12 @@ public class CustomersController {
     private Button addCustomerButton;
 
     @FXML
+    private Button editCustomerButton;
+
+    @FXML
+    private Button deleteCustomerButton;
+
+    @FXML
     private javafx.scene.control.TextField searchField;
 
     @FXML
@@ -70,7 +76,14 @@ public class CustomersController {
 
         loadCustomers();
         startAutoRefresh();
+
         searchField.textProperty().addListener((obs, oldText, newText) -> handleSearch());
+
+        customerTable.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
+            boolean rowSelected = newVal != null;
+            editCustomerButton.setDisable(!rowSelected);
+            deleteCustomerButton.setDisable(!rowSelected);
+        });
     }
 
     private void startAutoRefresh() {
