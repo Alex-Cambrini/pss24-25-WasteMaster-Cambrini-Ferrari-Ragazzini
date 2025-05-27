@@ -81,37 +81,43 @@ public class ScheduleController {
     @FXML
     private TextField searchField;
 
-    @FXML
-    public void initialize() {
-        wasteNameColumn.setCellValueFactory(new PropertyValueFactory<>("wasteName"));
-        scheduleCategoryColumn.setCellValueFactory(new PropertyValueFactory<>("scheduleCategory"));
-        frequencyColumn.setCellValueFactory(new PropertyValueFactory<>("frequency"));
-        executionDateColumn.setCellValueFactory(new PropertyValueFactory<>("executionDate"));
-        startDateColumn.setCellValueFactory(new PropertyValueFactory<>("startDate"));
-        statusColumn.setCellValueFactory(new PropertyValueFactory<>("status"));
-        customerColumn.setCellValueFactory(new PropertyValueFactory<>("customer"));
-        oneTimeCheckBox.setSelected(true);
-        recurringCheckBox.setSelected(true);
-        showDeletedCheckBox.setSelected(false);
-        showActiveCheckBox.setSelected(true);
-        showPausedCheckBox.setSelected(false);
-        showCompletedCheckBox.setSelected(false);
+@FXML
+public void initialize() {
+    wasteNameColumn.setCellValueFactory(new PropertyValueFactory<>("wasteName"));
+    scheduleCategoryColumn.setCellValueFactory(new PropertyValueFactory<>("scheduleCategory"));
+    frequencyColumn.setCellValueFactory(new PropertyValueFactory<>("frequency"));
+    executionDateColumn.setCellValueFactory(new PropertyValueFactory<>("executionDate"));
+    startDateColumn.setCellValueFactory(new PropertyValueFactory<>("startDate"));
+    statusColumn.setCellValueFactory(new PropertyValueFactory<>("status"));
+    customerColumn.setCellValueFactory(new PropertyValueFactory<>("customer"));
+    oneTimeCheckBox.setSelected(true);
+    recurringCheckBox.setSelected(true);
+    showDeletedCheckBox.setSelected(false);
+    showActiveCheckBox.setSelected(true);
+    showPausedCheckBox.setSelected(false);
+    showCompletedCheckBox.setSelected(false);
 
+    refresh();
+    startAutoRefresh();
+
+    searchField.textProperty().addListener((obs, oldText, newText) -> handleSearch());
+
+    oneTimeCheckBox.selectedProperty().addListener((obs, oldVal, newVal) -> refresh());
+    recurringCheckBox.selectedProperty().addListener((obs, oldVal, newVal) -> refresh());
+    showDeletedCheckBox.selectedProperty().addListener((obs, oldVal, newVal) -> refresh());
+    showActiveCheckBox.selectedProperty().addListener((obs, oldVal, newVal) -> refresh());
+    showPausedCheckBox.selectedProperty().addListener((obs, oldVal, newVal) -> refresh());
+    showCompletedCheckBox.selectedProperty().addListener((obs, oldVal, newVal) -> refresh());
+
+    scheduleTable.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
+        updateButtons(newVal);
+    });
+}
+
+
+    public void refresh() {
         loadSchedules();
-        startAutoRefresh();
-
-        searchField.textProperty().addListener((obs, oldText, newText) -> handleSearch());
-
-        oneTimeCheckBox.selectedProperty().addListener((obs, oldVal, newVal) -> loadSchedules());
-        recurringCheckBox.selectedProperty().addListener((obs, oldVal, newVal) -> loadSchedules());
-        showDeletedCheckBox.selectedProperty().addListener((obs, oldVal, newVal) -> loadSchedules());
-        showActiveCheckBox.selectedProperty().addListener((obs, oldVal, newVal) -> loadSchedules());
-        showPausedCheckBox.selectedProperty().addListener((obs, oldVal, newVal) -> loadSchedules());
-        showCompletedCheckBox.selectedProperty().addListener((obs, oldVal, newVal) -> loadSchedules());
-
-        scheduleTable.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
-            updateButtons(newVal);
-        });
+        handleSearch();
     }
 
     private void updateButtons(ScheduleRow selected) {
@@ -216,7 +222,6 @@ public class ScheduleController {
         }
 
         scheduleTable.setItems(FXCollections.observableArrayList(allSchedules));
-        handleSearch();
     }
 
     @FXML
