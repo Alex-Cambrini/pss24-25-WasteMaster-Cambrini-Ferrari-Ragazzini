@@ -18,6 +18,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
 
 import java.util.List;
+import java.util.Optional;
 
 public class EmployeeController {
 
@@ -27,7 +28,7 @@ public class EmployeeController {
     private Stage owner;
 
     private final ObservableList<String> activeFilters = FXCollections.observableArrayList(
-            "name", "surname", "email", "role", "licence", "city");
+            "name", "surname", "email", "role", "licence", "location");
 
     @FXML
     private Button filterButton;
@@ -51,7 +52,7 @@ public class EmployeeController {
     @FXML
     private TableColumn<EmployeeRow, String> licenceColumn;
     @FXML
-    private TableColumn<EmployeeRow, String> cityColumn;
+    private TableColumn<EmployeeRow, String> locationColumn;
 
     @FXML
     public void initialize() {
@@ -63,7 +64,8 @@ public class EmployeeController {
                 cellData -> new SimpleStringProperty(formatEnum(cellData.getValue().getRole())));
         licenceColumn.setCellValueFactory(
                 cellData -> new SimpleStringProperty(formatEnum(cellData.getValue().getLicence())));
-        cityColumn.setCellValueFactory(new PropertyValueFactory<>("city"));
+        locationColumn.setText("Location");
+        locationColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getFullLocation()));
 
         loadEmployee();
         startAutoRefresh();
@@ -114,11 +116,12 @@ public class EmployeeController {
             if ((activeFilters.contains("name") && row.getName().toLowerCase().contains(query)) ||
                     (activeFilters.contains("surname") && row.getSurname().toLowerCase().contains(query)) ||
                     (activeFilters.contains("email") && row.getEmail().toLowerCase().contains(query)) ||
-                    (activeFilters.contains("role") &&
-                            formatEnumOrNone(row.getRole()).toLowerCase().contains(query))
-                    || (activeFilters.contains("licence") &&
-                            formatEnumOrNone(row.getLicence()).toLowerCase().contains(query))
-                    || (activeFilters.contains("city") && row.getCity().toLowerCase().contains(query))) {
+                    (activeFilters.contains("role") && formatEnumOrNone(row.getRole()).toLowerCase().contains(query)) ||
+                    (activeFilters.contains("licence")
+                            && formatEnumOrNone(row.getLicence()).toLowerCase().contains(query))
+                    ||
+                    (activeFilters.contains("location") && row.getFullLocation().toLowerCase().contains(query))) {
+
                 filtered.add(row);
             }
         }
@@ -153,13 +156,17 @@ public class EmployeeController {
     @FXML
     private void handleAddEmployee() {
         try {
-            MainLayoutController.getInstance().setPageTitle("Add Employee");
+            Optional<AddEmployeeController> controllerOpt = DialogUtils.showModalWithController(
+                    "Add Employee",
+                    "/layouts/employee/AddEmployeeView.fxml",
+                    owner,
+                    ctrl -> {
+                        ctrl.setEmployeeController(this);
+                    });
 
-            AddEmployeeController controller = MainLayoutController.getInstance()
-                    .loadCenterWithController("/layouts/employee/AddEmployeeView.fxml");
-
-            controller.setEmployeeController(this);
-
+            if (controllerOpt.isPresent()) {
+                loadEmployee();
+            }
         } catch (Exception e) {
             e.printStackTrace();
             DialogUtils.showError("Navigation error", "Could not load Add Employee view.", owner);
@@ -181,11 +188,18 @@ public class EmployeeController {
         }
 
         try {
-            MainLayoutController.getInstance().setPageTitle("Edit Employee");
-            EditEmployeeController controller = MainLayoutController.getInstance()
-                    .loadCenterWithController("/layouts/employee/EditEmployeeView.fxml");
-            controller.setEmployeeToEdit(employee);
-            controller.setEmployeeController(this);
+            Optional<EditEmployeeController> controllerOpt = DialogUtils.showModalWithController(
+                    "Edit Employee",
+                    "/layouts/employee/EditEmployeeView.fxml",
+                    owner,
+                    ctrl -> {
+                        ctrl.setEmployeeToEdit(employee);
+                        ctrl.setEmployeeController(this);
+                    });
+
+            if (controllerOpt.isPresent()) {
+                loadEmployee();
+            }
         } catch (Exception e) {
             DialogUtils.showError("Navigation error", "Could not load Edit view.", owner);
         }
@@ -196,7 +210,7 @@ public class EmployeeController {
         searchField.clear();
 
         activeFilters.clear();
-        activeFilters.addAll("name", "surname", "email", "role", "licence", "city");
+        activeFilters.addAll("name", "surname", "email", "role", "licence", "location");
 
         loadEmployee();
     }
@@ -210,8 +224,8 @@ public class EmployeeController {
 
         filterMenu = new ContextMenu();
 
-        String[] fields = { "name", "surname", "email", "role", "licence", "city" };
-        String[] labels = { "Name", "Surname", "Email", "Role", "Licence", "City" };
+        String[] fields = { "name", "surname", "email", "role", "licence", "location" };
+        String[] labels = { "Name", "Surname", "Email", "Role", "Licence", "Location" };
 
         for (int i = 0; i < fields.length; i++) {
             String key = fields[i];
