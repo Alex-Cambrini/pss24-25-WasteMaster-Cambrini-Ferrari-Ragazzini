@@ -71,7 +71,11 @@ public class WasteController {
 			@Override
 			protected void updateItem(DayOfWeek item, boolean empty) {
 				super.updateItem(item, empty);
-				setText(empty || item == null ? "-" : formatEnum(item));
+				if (empty) {
+					setText(null);
+				} else {
+					setText(item == null ? "-" : formatEnum(item));
+				}
 			}
 		});
 
@@ -79,6 +83,9 @@ public class WasteController {
 		startAutoRefresh();
 
 		searchField.textProperty().addListener((obs, oldText, newText) -> handleSearch());
+
+		showRecyclableCheckBox.selectedProperty().addListener((obs, oldVal, newVal) -> handleSearch());
+		showDangerousCheckBox.selectedProperty().addListener((obs, oldVal, newVal) -> handleSearch());
 	}
 
 	private void startAutoRefresh() {
@@ -136,11 +143,33 @@ public class WasteController {
 
 	@FXML
 	private void handleResetSearch() {
-		// TODO
+		searchField.clear();
+		showRecyclableCheckBox.setSelected(false);
+		showDangerousCheckBox.setSelected(false);
+		wasteTable.setItems(FXCollections.observableArrayList(allWastes));
 	}
 
 	private void handleSearch() {
-		// TODO
+		String query = searchField.getText().toLowerCase().trim();
+
+		ObservableList<WasteRow> filtered = FXCollections.observableArrayList();
+
+		for (WasteRow row : allWastes) {
+			boolean matchesName = row.getName().toLowerCase().contains(query);
+			boolean matchesDayOfWeek = row.getDayOfWeek() != null &&
+					formatEnum(row.getDayOfWeek()).toLowerCase().contains(query);
+
+			boolean matchesCheckRecyclable = !showRecyclableCheckBox.isSelected() || row.isRecyclable();
+			boolean matchesCheckDangerous = !showDangerousCheckBox.isSelected() || row.isDangerous();
+
+			if ((query.isEmpty() || matchesName || matchesDayOfWeek)
+					&& matchesCheckRecyclable
+					&& matchesCheckDangerous) {
+				filtered.add(row);
+			}
+		}
+
+		wasteTable.setItems(filtered);
 	}
 
 	private String formatEnum(Enum<?> value) {
