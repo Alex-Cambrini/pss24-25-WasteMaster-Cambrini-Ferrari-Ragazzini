@@ -27,7 +27,7 @@ public final class VehicleDAO extends GenericDAO<Vehicle> {
      */
     public Vehicle findByPlate(final String plate) {
         try {
-            return entityManager
+            return getEntityManager()
                     .createQuery("SELECT v FROM Vehicle v WHERE v.plate = :plate",
                             Vehicle.class)
                     .setParameter("plate", plate).getSingleResult();
@@ -43,7 +43,7 @@ public final class VehicleDAO extends GenericDAO<Vehicle> {
      * @return list of vehicles matching the status
      */
     public List<Vehicle> findByStatus(final Vehicle.VehicleStatus status) {
-        return entityManager
+        return getEntityManager()
                 .createQuery("SELECT v FROM Vehicle v WHERE v.vehicleStatus = :status",
                         Vehicle.class)
                 .setParameter("status", status).getResultList();
@@ -55,7 +55,7 @@ public final class VehicleDAO extends GenericDAO<Vehicle> {
      * @return list of all vehicles
      */
     public List<Vehicle> getAllVehicles() {
-        return entityManager.createQuery("SELECT v FROM Vehicle v", Vehicle.class)
+        return getEntityManager().createQuery("SELECT v FROM Vehicle v", Vehicle.class)
                 .getResultList();
     }
 
@@ -65,7 +65,7 @@ public final class VehicleDAO extends GenericDAO<Vehicle> {
      * @return list of all vehicles with full details
      */
     public List<Vehicle> findVehicleDetails() {
-        return entityManager.createQuery("SELECT v FROM Vehicle v", Vehicle.class)
+        return getEntityManager().createQuery("SELECT v FROM Vehicle v", Vehicle.class)
                 .getResultList();
     }
 }

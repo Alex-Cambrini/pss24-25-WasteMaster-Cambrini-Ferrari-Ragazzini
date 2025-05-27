@@ -26,7 +26,7 @@ public final class CustomerDAO extends GenericDAO<Customer> {
      * @return true if a customer exists with the email, false otherwise
      */
     public boolean existsByEmail(final String email) {
-        Long count = entityManager
+        Long count = getEntityManager()
                 .createQuery("SELECT COUNT(c) FROM Customer c WHERE c.email = :email",
                         Long.class)
                 .setParameter("email", email).getSingleResult();
@@ -40,7 +40,7 @@ public final class CustomerDAO extends GenericDAO<Customer> {
      * @return the Customer if found, or null otherwise
      */
     public Customer findByEmail(final String email) {
-        return entityManager
+        return getEntityManager()
                 .createQuery("SELECT c FROM Customer c WHERE c.email = :email",
                         Customer.class)
                 .setParameter("email", email).getResultStream().findFirst().orElse(null);
@@ -52,7 +52,7 @@ public final class CustomerDAO extends GenericDAO<Customer> {
      * @return list of active customers
      */
     public List<Customer> findCustomerDetails() {
-        return entityManager.createQuery("""
+        return getEntityManager().createQuery("""
                     SELECT c FROM Customer c
                     WHERE c.isDeleted = false
                 """, Customer.class).getResultList();

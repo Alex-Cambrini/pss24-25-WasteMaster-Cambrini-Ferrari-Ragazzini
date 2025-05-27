@@ -25,7 +25,7 @@ public final class WasteDAO extends GenericDAO<Waste> {
      * @return true if a non-deleted waste with that name exists, false otherwise
      */
     public boolean existsByName(final String name) {
-        return entityManager.createQuery(
+        return getEntityManager().createQuery(
                 "SELECT COUNT(w) FROM Waste w WHERE w.name = :name AND w.deleted = false",
                 Long.class).setParameter("name", name).getSingleResult() > 0;
     }
@@ -36,7 +36,7 @@ public final class WasteDAO extends GenericDAO<Waste> {
      * @return list of active (non-deleted) wastes
      */
     public List<Waste> findActiveWastes() {
-        return entityManager.createQuery("""
+        return getEntityManager().createQuery("""
                     SELECT w FROM Waste w
                     WHERE w.deleted = false
                 """, Waste.class).getResultList();
