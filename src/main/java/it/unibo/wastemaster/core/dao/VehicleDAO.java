@@ -3,7 +3,6 @@ package it.unibo.wastemaster.core.dao;
 import it.unibo.wastemaster.core.models.Vehicle;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.NoResultException;
-
 import java.util.List;
 
 /**

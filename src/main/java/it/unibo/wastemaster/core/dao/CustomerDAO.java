@@ -1,8 +1,8 @@
 package it.unibo.wastemaster.core.dao;
 
-import java.util.List;
 import it.unibo.wastemaster.core.models.Customer;
 import jakarta.persistence.EntityManager;
+import java.util.List;
 
 /**
  * DAO for managing Customer entities.
@@ -10,6 +10,7 @@ import jakarta.persistence.EntityManager;
 public final class CustomerDAO extends GenericDAO<Customer> {
 
     /**
+     * 
      * Constructs a CustomerDAO with the given entity manager.
      * 
      * @param entityManager the EntityManager to use
