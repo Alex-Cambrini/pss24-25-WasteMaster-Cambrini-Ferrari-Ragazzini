@@ -1,37 +1,59 @@
 package it.unibo.wastemaster.core.dao;
 
 import java.util.List;
-
 import it.unibo.wastemaster.core.models.Customer;
 import jakarta.persistence.EntityManager;
 
-public class CustomerDAO extends GenericDAO<Customer> {
+/**
+ * DAO for managing Customer entities.
+ */
+public final class CustomerDAO extends GenericDAO<Customer> {
 
-    public CustomerDAO(EntityManager entityManager) {
+    /**
+     * Constructs a CustomerDAO with the given entity manager.
+     * 
+     * @param entityManager the EntityManager to use
+     */
+    public CustomerDAO(final EntityManager entityManager) {
         super(entityManager, Customer.class);
     }
 
-    public boolean existsByEmail(String email) {
+    /**
+     * Checks whether a customer exists with the given email.
+     * 
+     * @param email the email to check
+     * @return true if a customer exists with the email, false otherwise
+     */
+    public boolean existsByEmail(final String email) {
         Long count = entityManager
-                .createQuery("SELECT COUNT(c) FROM Customer c WHERE c.email = :email", Long.class)
-                .setParameter("email", email)
-                .getSingleResult();
+                .createQuery("SELECT COUNT(c) FROM Customer c WHERE c.email = :email",
+                        Long.class)
+                .setParameter("email", email).getSingleResult();
         return count > 0;
     }
 
-    public Customer findByEmail(String email) {
-        return entityManager.createQuery(
-                "SELECT c FROM Customer c WHERE c.email = :email", Customer.class)
-                .setParameter("email", email)
-                .getResultStream()
-                .findFirst()
-                .orElse(null);
+    /**
+     * Finds a customer by their email.
+     * 
+     * @param email the email of the customer
+     * @return the Customer if found, or null otherwise
+     */
+    public Customer findByEmail(final String email) {
+        return entityManager
+                .createQuery("SELECT c FROM Customer c WHERE c.email = :email",
+                        Customer.class)
+                .setParameter("email", email).getResultStream().findFirst().orElse(null);
     }
 
+    /**
+     * Retrieves all non-deleted customers.
+     * 
+     * @return list of active customers
+     */
     public List<Customer> findCustomerDetails() {
         return entityManager.createQuery("""
-                	SELECT c FROM Customer c
-                	WHERE c.isDeleted = false
+                    SELECT c FROM Customer c
+                    WHERE c.isDeleted = false
                 """, Customer.class).getResultList();
     }
 }
