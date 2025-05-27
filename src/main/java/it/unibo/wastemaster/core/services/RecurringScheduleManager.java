@@ -14,28 +14,58 @@ import it.unibo.wastemaster.core.models.WasteSchedule;
 import it.unibo.wastemaster.core.utils.ValidateUtils;
 import it.unibo.wastemaster.core.models.Collection;
 
+/**
+ * Manages recurring schedules: creation, update, and retrieval. Works with DAO,
+ * WasteScheduleManager, and CollectionManager.
+ */
 public class RecurringScheduleManager {
 
-    private RecurringScheduleDAO recurringScheduleDAO;
-    private WasteScheduleManager wasteScheduleManager;
+    private static final String SCHEDULE_NOT_NULL_MSG = "Schedule must not be null";
+
+    private final RecurringScheduleDAO recurringScheduleDAO;
+    private final WasteScheduleManager wasteScheduleManager;
     private CollectionManager collectionManager;
 
-    public RecurringScheduleManager(RecurringScheduleDAO recurringScheduleDAO,
-            WasteScheduleManager wasteScheduleManager) {
+
+    /**
+     * Constructor.
+     * 
+     * @param recurringScheduleDAO DAO for recurring schedules, must not be null
+     * @param wasteScheduleManager Manager for waste schedules, must not be null
+     */
+    public RecurringScheduleManager(final RecurringScheduleDAO recurringScheduleDAO,
+            final WasteScheduleManager wasteScheduleManager) {
         this.wasteScheduleManager = wasteScheduleManager;
         this.recurringScheduleDAO = recurringScheduleDAO;
     }
 
-    public void setCollectionManager(CollectionManager collectionManager) {
+    /**
+     * Sets the collection manager.
+     * 
+     * @param collectionManager the collection manager to set, must not be null
+     */
+    public void setCollectionManager(final CollectionManager collectionManager) {
         this.collectionManager = collectionManager;
     }
 
-    public RecurringSchedule createRecurringSchedule(Customer customer, Waste waste, LocalDate startDate,
-            Frequency frequency) {
+    /**
+     * Creates a new recurring schedule.
+     * 
+     * @param customer the customer, must not be null
+     * @param waste the waste type, must not be null
+     * @param startDate the start date, must be today or later
+     * @param frequency the frequency, must not be null
+     * @return the created RecurringSchedule
+     * @throws IllegalArgumentException if startDate is before today
+     */
+    public RecurringSchedule createRecurringSchedule(final Customer customer,
+            final Waste waste, final LocalDate startDate, final Frequency frequency) {
         if (startDate.isBefore(LocalDate.now())) {
-            throw new IllegalArgumentException("Start Date must be today or in the future");
+            throw new IllegalArgumentException(
+                    "Start Date must be today or in the future");
         }
-        RecurringSchedule schedule = new RecurringSchedule(customer, waste, startDate, frequency);
+        RecurringSchedule schedule =
+                new RecurringSchedule(customer, waste, startDate, frequency);
         LocalDate nextCollectionDate = calculateNextDate(schedule);
         schedule.setNextCollectionDate(nextCollectionDate);
         recurringScheduleDAO.insert(schedule);
@@ -43,9 +73,10 @@ public class RecurringScheduleManager {
         return schedule;
     }
 
-    private LocalDate calculateNextDate(RecurringSchedule schedule) {
-        ValidateUtils.requireArgNotNull(schedule, "Schedule must not be null");
-        ValidateUtils.requireArgNotNull(schedule.getScheduleId(), "Schedule ID must not be null");
+    private LocalDate calculateNextDate(final RecurringSchedule schedule) {
+        ValidateUtils.requireArgNotNull(schedule, SCHEDULE_NOT_NULL_MSG);
+        ValidateUtils.requireArgNotNull(schedule.getScheduleId(),
+                "Schedule ID must not be null");
 
         if (schedule.getNextCollectionDate() == null) {
             return calculateFirstDate(schedule);
@@ -54,15 +85,17 @@ public class RecurringScheduleManager {
         }
     }
 
-    private LocalDate calculateFirstDate(RecurringSchedule schedule) {
-        WasteSchedule scheduleData = wasteScheduleManager.getWasteScheduleByWaste(schedule.getWaste());
+    private LocalDate calculateFirstDate(final RecurringSchedule schedule) {
+        WasteSchedule scheduleData =
+                wasteScheduleManager.getWasteScheduleByWaste(schedule.getWaste());
         LocalDate date = schedule.getStartDate().plusDays(2);
 
         return alignToScheduledDay(date, scheduleData.getDayOfWeek());
     }
 
-    private LocalDate calculateRecurringDate(RecurringSchedule schedule) {
-        WasteSchedule scheduleData = wasteScheduleManager.getWasteScheduleByWaste(schedule.getWaste());
+    private LocalDate calculateRecurringDate(final RecurringSchedule schedule) {
+        WasteSchedule scheduleData =
+                wasteScheduleManager.getWasteScheduleByWaste(schedule.getWaste());
         LocalDate date = schedule.getNextCollectionDate();
         LocalDate today = LocalDate.now();
         do {
@@ -77,19 +110,31 @@ public class RecurringScheduleManager {
         return date;
     }
 
-    private LocalDate alignToScheduledDay(LocalDate date, DayOfWeek scheduledDay) {
-        while (date.getDayOfWeek() != scheduledDay) {
-            date = date.plusDays(1);
+    private LocalDate alignToScheduledDay(final LocalDate date,
+            final DayOfWeek scheduledDay) {
+        LocalDate adjustedDate = date;
+        while (adjustedDate.getDayOfWeek() != scheduledDay) {
+            adjustedDate = adjustedDate.plusDays(1);
         }
-        return date;
+        return adjustedDate;
     }
 
-    public List<RecurringSchedule> getRecurringSchedulesWithoutCollections() {
+    /**
+     * Returns a list of active recurring schedules without future collections.
+     *
+     * @return list of recurring schedules without future collections
+     */
+    public final List<RecurringSchedule> getRecurringSchedulesWithoutCollections() {
         return recurringScheduleDAO.findActiveSchedulesWithoutFutureCollections();
     }
 
-    public void updateNextDates() {
-        List<RecurringSchedule> schedules = recurringScheduleDAO.findActiveSchedulesWithNextDateBeforeToday();
+    /**
+     * Updates the next collection dates for active recurring schedules with next dates
+     * before today, and triggers generation of recurring collections.
+     */
+    public final void updateNextDates() {
+        List<RecurringSchedule> schedules =
+                recurringScheduleDAO.findActiveSchedulesWithNextDateBeforeToday();
         for (RecurringSchedule schedule : schedules) {
             LocalDate nextDate = calculateNextDate(schedule);
             schedule.setNextCollectionDate(nextDate);
@@ -98,17 +143,41 @@ public class RecurringScheduleManager {
         collectionManager.generateRecurringCollections();
     }
 
-    public List<RecurringSchedule> getSchedulesByCustomer(Customer customer) {
+    /**
+     * Returns a list of recurring schedules for the given customer.
+     *
+     * @param customer the customer whose schedules are retrieved
+     * @return list of recurring schedules for the specified customer
+     */
+    public final List<RecurringSchedule> getSchedulesByCustomer(final Customer customer) {
         return recurringScheduleDAO.findSchedulesByCustomer(customer);
     }
 
-    public boolean updateStatusRecurringSchedule(RecurringSchedule schedule, ScheduleStatus newStatus) {
-        ValidateUtils.requireArgNotNull(schedule, "Schedule must not be null");
+    /**
+     * Updates the status of a given recurring schedule if allowed.
+     *
+     * This method returns false if the current status is CANCELLED or COMPLETED. If the
+     * current status is PAUSED, it can be changed to CANCELLED or ACTIVE. If the current
+     * status is ACTIVE, it can be changed to PAUSED or CANCELLED. When switching to
+     * ACTIVE, the method updates the next collection date and generates a new collection.
+     * When switching from ACTIVE to PAUSED or CANCELLED, it soft deletes the associated
+     * collection.
+     *
+     * @param schedule the recurring schedule to update (must not be null)
+     * @param newStatus the new status to set (must not be null)
+     * @return true if the status was successfully updated; false otherwise
+     * @throws IllegalArgumentException if schedule or newStatus is null
+     * @throws IllegalStateException if associated collection is missing when required
+     */
+    public final boolean updateStatusRecurringSchedule(final RecurringSchedule schedule,
+            final ScheduleStatus newStatus) {
+        ValidateUtils.requireArgNotNull(schedule, SCHEDULE_NOT_NULL_MSG);
         ValidateUtils.requireArgNotNull(newStatus, "Status must not be null");
 
         ScheduleStatus currentStatus = schedule.getScheduleStatus();
 
-        if (currentStatus == ScheduleStatus.CANCELLED || currentStatus == ScheduleStatus.COMPLETED) {
+        if (currentStatus == ScheduleStatus.CANCELLED
+                || currentStatus == ScheduleStatus.COMPLETED) {
             return false;
         }
 
@@ -136,14 +205,15 @@ public class RecurringScheduleManager {
                 return false;
             }
             case ACTIVE -> {
-                if (newStatus == ScheduleStatus.PAUSED || newStatus == ScheduleStatus.CANCELLED) {
-                    ;
+                if (newStatus == ScheduleStatus.PAUSED
+                        || newStatus == ScheduleStatus.CANCELLED) {
                     schedule.setScheduleStatus(newStatus);
                     recurringScheduleDAO.update(schedule);
 
                     Collection associatedCollection = collectionManager
                             .getActiveCollectionByRecurringSchedule(schedule);
-                    ValidateUtils.requireStateNotNull(associatedCollection, "Associated collection must not be null");
+                    ValidateUtils.requireStateNotNull(associatedCollection,
+                            "Associated collection must not be null");
                     collectionManager.softDeleteCollection(associatedCollection);
                     return true;
                 }
@@ -155,8 +225,21 @@ public class RecurringScheduleManager {
         }
     }
 
-    public boolean updateFrequency(RecurringSchedule schedule, Frequency newFrequency) {
-        ValidateUtils.requireArgNotNull(schedule, "Schedule must not be null");
+    /**
+     * Updates the frequency of an active recurring schedule.
+     *
+     * If the schedule is not active or the frequency is unchanged, returns false.
+     * Otherwise, sets the new frequency, recalculates the next collection date, updates
+     * the schedule, soft deletes any active collection, and generates a new collection.
+     *
+     * @param schedule the recurring schedule to update (must not be null)
+     * @param newFrequency the new frequency to set (must not be null)
+     * @return true if the frequency was updated; false otherwise
+     * @throws IllegalArgumentException if schedule or newFrequency is null
+     */
+    public final boolean updateFrequency(final RecurringSchedule schedule,
+            final Frequency newFrequency) {
+        ValidateUtils.requireArgNotNull(schedule, SCHEDULE_NOT_NULL_MSG);
         ValidateUtils.requireArgNotNull(newFrequency, "Frequency must not be null");
 
         if (schedule.getScheduleStatus() != ScheduleStatus.ACTIVE) {
@@ -170,8 +253,10 @@ public class RecurringScheduleManager {
         schedule.setFrequency(newFrequency);
 
         LocalDate restartDate = LocalDate.now().plusDays(2);
-        WasteSchedule wasteSchedule = wasteScheduleManager.getWasteScheduleByWaste(schedule.getWaste());
-        LocalDate newNextDate = alignToScheduledDay(restartDate, wasteSchedule.getDayOfWeek());
+        WasteSchedule wasteSchedule =
+                wasteScheduleManager.getWasteScheduleByWaste(schedule.getWaste());
+        LocalDate newNextDate =
+                alignToScheduledDay(restartDate, wasteSchedule.getDayOfWeek());
 
         if (!newNextDate.equals(schedule.getNextCollectionDate())) {
             schedule.setNextCollectionDate(newNextDate);
@@ -179,7 +264,8 @@ public class RecurringScheduleManager {
 
         recurringScheduleDAO.update(schedule);
 
-        Collection activeCollection = collectionManager.getActiveCollectionByRecurringSchedule(schedule);
+        Collection activeCollection =
+                collectionManager.getActiveCollectionByRecurringSchedule(schedule);
         if (activeCollection != null) {
             collectionManager.softDeleteCollection(activeCollection);
         }
