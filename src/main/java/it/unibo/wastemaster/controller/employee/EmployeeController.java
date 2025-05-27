@@ -4,6 +4,7 @@ import it.unibo.wastemaster.controller.main.MainLayoutController;
 import it.unibo.wastemaster.controller.utils.DialogUtils;
 import it.unibo.wastemaster.core.context.AppContext;
 import it.unibo.wastemaster.core.models.Employee;
+import it.unibo.wastemaster.core.models.Employee.Licence;
 import it.unibo.wastemaster.viewmodels.EmployeeRow;
 
 import javafx.animation.KeyFrame;
@@ -18,6 +19,9 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
 
 import java.util.List;
+import java.util.Optional;
+
+import it.unibo.wastemaster.core.models.Employee.Role;
 
 public class EmployeeController {
 
@@ -27,7 +31,7 @@ public class EmployeeController {
     private Stage owner;
 
     private final ObservableList<String> activeFilters = FXCollections.observableArrayList(
-            "name", "surname", "email", "role", "licence", "city");
+            "name", "surname", "email", "role", "licence", "location");
 
     @FXML
     private Button filterButton;
@@ -47,11 +51,11 @@ public class EmployeeController {
     @FXML
     private TableColumn<EmployeeRow, String> emailColumn;
     @FXML
-    private TableColumn<EmployeeRow, String> roleColumn;
+    private TableColumn<EmployeeRow, Role> roleColumn;
     @FXML
-    private TableColumn<EmployeeRow, String> licenceColumn;
+    private TableColumn<EmployeeRow, Licence> licenceColumn;
     @FXML
-    private TableColumn<EmployeeRow, String> cityColumn;
+    private TableColumn<EmployeeRow, String> locationColumn;
 
     @FXML
     public void initialize() {
@@ -59,11 +63,25 @@ public class EmployeeController {
         nameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
         surnameColumn.setCellValueFactory(new PropertyValueFactory<>("surname"));
         emailColumn.setCellValueFactory(new PropertyValueFactory<>("email"));
-        roleColumn.setCellValueFactory(
-                cellData -> new SimpleStringProperty(formatEnum(cellData.getValue().getRole())));
-        licenceColumn.setCellValueFactory(
-                cellData -> new SimpleStringProperty(formatEnum(cellData.getValue().getLicence())));
-        cityColumn.setCellValueFactory(new PropertyValueFactory<>("city"));
+        roleColumn.setCellValueFactory(new PropertyValueFactory<>("role"));
+        licenceColumn.setCellValueFactory(new PropertyValueFactory<>("licence"));
+        roleColumn.setCellFactory(column -> new TableCell<EmployeeRow, Role>() {
+            @Override
+            protected void updateItem(Role item, boolean empty) {
+                super.updateItem(item, empty);
+                setText(empty || item == null ? "" : formatEnumOrNone(item));
+            }
+        });
+
+        licenceColumn.setCellFactory(column -> new TableCell<EmployeeRow, Licence>() {
+            @Override
+            protected void updateItem(Licence item, boolean empty) {
+                super.updateItem(item, empty);
+                setText(empty || item == null ? "" : formatEnumOrNone(item));
+            }
+        });
+        locationColumn.setText("Location");
+        locationColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getFullLocation()));
 
         loadEmployee();
         startAutoRefresh();
@@ -114,11 +132,12 @@ public class EmployeeController {
             if ((activeFilters.contains("name") && row.getName().toLowerCase().contains(query)) ||
                     (activeFilters.contains("surname") && row.getSurname().toLowerCase().contains(query)) ||
                     (activeFilters.contains("email") && row.getEmail().toLowerCase().contains(query)) ||
-                    (activeFilters.contains("role") &&
-                            formatEnumOrNone(row.getRole()).toLowerCase().contains(query))
-                    || (activeFilters.contains("licence") &&
-                            formatEnumOrNone(row.getLicence()).toLowerCase().contains(query))
-                    || (activeFilters.contains("city") && row.getCity().toLowerCase().contains(query))) {
+                    (activeFilters.contains("role") && formatEnumOrNone(row.getRole()).toLowerCase().contains(query)) ||
+                    (activeFilters.contains("licence")
+                            && formatEnumOrNone(row.getLicence()).toLowerCase().contains(query))
+                    ||
+                    (activeFilters.contains("location") && row.getFullLocation().toLowerCase().contains(query))) {
+
                 filtered.add(row);
             }
         }
@@ -153,13 +172,17 @@ public class EmployeeController {
     @FXML
     private void handleAddEmployee() {
         try {
-            MainLayoutController.getInstance().setPageTitle("Add Employee");
+            Optional<AddEmployeeController> controllerOpt = DialogUtils.showModalWithController(
+                    "Add Employee",
+                    "/layouts/employee/AddEmployeeView.fxml",
+                    owner,
+                    ctrl -> {
+                        ctrl.setEmployeeController(this);
+                    });
 
-            AddEmployeeController controller = MainLayoutController.getInstance()
-                    .loadCenterWithController("/layouts/employee/AddEmployeeView.fxml");
-
-            controller.setEmployeeController(this);
-
+            if (controllerOpt.isPresent()) {
+                loadEmployee();
+            }
         } catch (Exception e) {
             e.printStackTrace();
             DialogUtils.showError("Navigation error", "Could not load Add Employee view.", owner);
@@ -181,11 +204,18 @@ public class EmployeeController {
         }
 
         try {
-            MainLayoutController.getInstance().setPageTitle("Edit Employee");
-            EditEmployeeController controller = MainLayoutController.getInstance()
-                    .loadCenterWithController("/layouts/employee/EditEmployeeView.fxml");
-            controller.setEmployeeToEdit(employee);
-            controller.setEmployeeController(this);
+            Optional<EditEmployeeController> controllerOpt = DialogUtils.showModalWithController(
+                    "Edit Employee",
+                    "/layouts/employee/EditEmployeeView.fxml",
+                    owner,
+                    ctrl -> {
+                        ctrl.setEmployeeToEdit(employee);
+                        ctrl.setEmployeeController(this);
+                    });
+
+            if (controllerOpt.isPresent()) {
+                loadEmployee();
+            }
         } catch (Exception e) {
             DialogUtils.showError("Navigation error", "Could not load Edit view.", owner);
         }
@@ -196,7 +226,7 @@ public class EmployeeController {
         searchField.clear();
 
         activeFilters.clear();
-        activeFilters.addAll("name", "surname", "email", "role", "licence", "city");
+        activeFilters.addAll("name", "surname", "email", "role", "licence", "location");
 
         loadEmployee();
     }
@@ -210,8 +240,8 @@ public class EmployeeController {
 
         filterMenu = new ContextMenu();
 
-        String[] fields = { "name", "surname", "email", "role", "licence", "city" };
-        String[] labels = { "Name", "Surname", "Email", "Role", "Licence", "City" };
+        String[] fields = { "name", "surname", "email", "role", "licence", "location" };
+        String[] labels = { "Name", "Surname", "Email", "Role", "Licence", "Location" };
 
         for (int i = 0; i < fields.length; i++) {
             String key = fields[i];
@@ -240,18 +270,14 @@ public class EmployeeController {
     }
 
     private String formatEnumOrNone(Enum<?> value) {
-        if (value == null || value.name().equalsIgnoreCase("none")) {
-            return "None";
-        }
-        return formatEnum(value);
-    }
-
-    private String formatEnum(Enum<?> value) {
         if (value == null) {
             return "";
         }
-        String lower = value.name().toLowerCase().replace("_", " ");
-        return Character.toUpperCase(lower.charAt(0)) + lower.substring(1);
+        if (value.name().equalsIgnoreCase("none")) {
+            return "None";
+        }
+        String str = value.name().toLowerCase().replace("_", " ");
+        return Character.toUpperCase(str.charAt(0)) + str.substring(1);
     }
 
     public void returnToEmployeeView() {

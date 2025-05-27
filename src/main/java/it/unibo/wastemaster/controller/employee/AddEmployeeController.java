@@ -9,11 +9,13 @@ import it.unibo.wastemaster.core.utils.ValidateUtils;
 
 import static it.unibo.wastemaster.controller.utils.DialogUtils.*;
 
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
 
 public class AddEmployeeController {
+
     @FXML
     private TextField nameField;
     @FXML
@@ -51,7 +53,7 @@ public class AddEmployeeController {
     }
 
     @FXML
-    private void handleSaveEmployee() {
+    private void handleSaveEmployee(ActionEvent event) {
         try {
             String name = nameField.getText();
             String surname = surnameField.getText();
@@ -70,12 +72,9 @@ public class AddEmployeeController {
             ValidateUtils.validateAll(employee, address);
 
             AppContext.employeeManager.addEmployee(employee);
-
             showSuccess("Employee saved successfully.", AppContext.getOwner());
+            closeModal(event);
 
-            if (employeeController != null) {
-                employeeController.returnToEmployeeView();
-            }
         } catch (IllegalArgumentException e) {
             showError("Validation error", e.getMessage(), AppContext.getOwner());
         } catch (Exception e) {
@@ -85,9 +84,7 @@ public class AddEmployeeController {
     }
 
     @FXML
-    private void handleAbortEmployeeCreation() {
-        if (employeeController != null) {
-            employeeController.returnToEmployeeView();
-        }
+    private void handleAbortEmployeeCreation(ActionEvent event) {
+        closeModal(event);
     }
 }

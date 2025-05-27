@@ -8,7 +8,6 @@ import it.unibo.wastemaster.viewmodels.VehicleRow;
 
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
-import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -20,6 +19,7 @@ import javafx.util.Duration;
 
 import java.util.Optional;
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.List;
 
 public class VehicleController {
@@ -53,13 +53,13 @@ public class VehicleController {
 	@FXML
 	private TableColumn<VehicleRow, Integer> capacityColumn;
 	@FXML
-	private TableColumn<VehicleRow, String> licenceTypeColumn;
+	private TableColumn<VehicleRow, Vehicle.RequiredLicence> licenceTypeColumn;
 	@FXML
-	private TableColumn<VehicleRow, String> vehicleStatusColumn;
+	private TableColumn<VehicleRow, Vehicle.VehicleStatus> vehicleStatusColumn;
 	@FXML
-	private TableColumn<VehicleRow, String> lastMaintenanceDateColumn;
+	private TableColumn<VehicleRow, LocalDate> lastMaintenanceDateColumn;
 	@FXML
-	private TableColumn<VehicleRow, String> nextMaintenanceDateColumn;
+	private TableColumn<VehicleRow, LocalDate> nextMaintenanceDateColumn;
 
 	@FXML
 	public void initialize() {
@@ -68,12 +68,42 @@ public class VehicleController {
 		modelColumn.setCellValueFactory(new PropertyValueFactory<>("model"));
 		yearColumn.setCellValueFactory(new PropertyValueFactory<>("registrationYear"));
 		capacityColumn.setCellValueFactory(new PropertyValueFactory<>("capacity"));
-		licenceTypeColumn.setCellValueFactory(
-				cellData -> new SimpleStringProperty(formatEnum(cellData.getValue().getLicenceType())));
-		vehicleStatusColumn.setCellValueFactory(
-				cellData -> new SimpleStringProperty(formatEnum(cellData.getValue().getVehicleStatus())));
+		licenceTypeColumn.setCellValueFactory(new PropertyValueFactory<>("licenceType"));
+		vehicleStatusColumn.setCellValueFactory(new PropertyValueFactory<>("vehicleStatus"));
 		lastMaintenanceDateColumn.setCellValueFactory(new PropertyValueFactory<>("lastMaintenanceDate"));
 		nextMaintenanceDateColumn.setCellValueFactory(new PropertyValueFactory<>("nextMaintenanceDate"));
+
+		licenceTypeColumn.setCellFactory(column -> new TableCell<VehicleRow, Vehicle.RequiredLicence>() {
+			@Override
+			protected void updateItem(Vehicle.RequiredLicence item, boolean empty) {
+				super.updateItem(item, empty);
+				setText(empty || item == null ? "" : formatEnum(item));
+			}
+		});
+
+		vehicleStatusColumn.setCellFactory(column -> new TableCell<VehicleRow, Vehicle.VehicleStatus>() {
+			@Override
+			protected void updateItem(Vehicle.VehicleStatus item, boolean empty) {
+				super.updateItem(item, empty);
+				setText(empty || item == null ? "" : formatEnum(item));
+			}
+		});
+
+		lastMaintenanceDateColumn.setCellFactory(column -> new TableCell<VehicleRow, LocalDate>() {
+			@Override
+			protected void updateItem(LocalDate item, boolean empty) {
+				super.updateItem(item, empty);
+				setText(empty || item == null ? "" : item.toString());
+			}
+		});
+
+		nextMaintenanceDateColumn.setCellFactory(column -> new TableCell<VehicleRow, LocalDate>() {
+			@Override
+			protected void updateItem(LocalDate item, boolean empty) {
+				super.updateItem(item, empty);
+				setText(empty || item == null ? "" : item.toString());
+			}
+		});
 
 		loadVehicles();
 		startAutoRefresh();

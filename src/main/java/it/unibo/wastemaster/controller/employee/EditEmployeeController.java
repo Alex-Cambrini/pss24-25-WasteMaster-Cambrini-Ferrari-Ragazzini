@@ -1,14 +1,16 @@
 package it.unibo.wastemaster.controller.employee;
 
-import it.unibo.wastemaster.controller.utils.DialogUtils;
 import it.unibo.wastemaster.core.context.AppContext;
 import it.unibo.wastemaster.core.models.Employee;
 import it.unibo.wastemaster.core.models.Employee.Licence;
 import it.unibo.wastemaster.core.models.Employee.Role;
 
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
+
+import static it.unibo.wastemaster.controller.utils.DialogUtils.*;
 
 public class EditEmployeeController {
 
@@ -22,11 +24,17 @@ public class EditEmployeeController {
 	@FXML
 	private TextField emailField;
 	@FXML
+	private TextField streetField;
+	@FXML
+	private TextField civicField;
+	@FXML
+	private TextField cityField;
+	@FXML
+	private TextField postalCodeField;
+	@FXML
 	private ComboBox<Role> roleComboBox;
 	@FXML
 	private ComboBox<Licence> licenceComboBox;
-	@FXML
-	private TextField cityField;
 
 	public void setEmployeeController(EmployeeController controller) {
 		this.employeeController = controller;
@@ -38,54 +46,64 @@ public class EditEmployeeController {
 		nameField.setText(employee.getName());
 		surnameField.setText(employee.getSurname());
 		emailField.setText(employee.getEmail());
+
+		streetField.setText(employee.getLocation().getStreet());
+		civicField.setText(employee.getLocation().getCivicNumber());
 		cityField.setText(employee.getLocation().getCity());
+		postalCodeField.setText(employee.getLocation().getPostalCode());
 
 		roleComboBox.getItems().setAll(Role.values());
 		roleComboBox.getSelectionModel().select(employee.getRole());
 
 		licenceComboBox.getItems().setAll(Licence.values());
 		licenceComboBox.getSelectionModel().select(employee.getLicence());
-}
-	
+	}
+
 	@FXML
-	private void handleUpdateEmployee() {
+	private void handleSave(ActionEvent event) {
 		try {
 			Employee original = AppContext.employeeDAO.findByEmail(employee.getEmail());
 			if (original == null) {
-				DialogUtils.showError("Error", "Employee not found.", AppContext.getOwner());
+				showError("Error", "Employee not found.", AppContext.getOwner());
 				return;
 			}
 
 			boolean changed = !original.getName().equals(nameField.getText()) ||
 					!original.getSurname().equals(surnameField.getText()) ||
+					!original.getLocation().getStreet().equals(streetField.getText()) ||
+					!original.getLocation().getCivicNumber().equals(civicField.getText()) ||
 					!original.getLocation().getCity().equals(cityField.getText()) ||
+					!original.getLocation().getPostalCode().equals(postalCodeField.getText()) ||
 					original.getRole() != roleComboBox.getValue() ||
 					original.getLicence() != licenceComboBox.getValue();
 
 			if (!changed) {
-				DialogUtils.showError("No changes", "No fields were modified.", AppContext.getOwner());
+				showError("No changes", "No fields were modified.", AppContext.getOwner());
 				return;
 			}
 
 			employee.setName(nameField.getText());
 			employee.setSurname(surnameField.getText());
+			employee.getLocation().setStreet(streetField.getText());
+			employee.getLocation().setCivicNumber(civicField.getText());
+			employee.getLocation().setCity(cityField.getText());
+			employee.getLocation().setPostalCode(postalCodeField.getText());
 			employee.setRole(roleComboBox.getValue());
 			employee.setLicence(licenceComboBox.getValue());
-			employee.getLocation().setCity(cityField.getText());
 
 			AppContext.employeeManager.updateEmployee(employee);
-			DialogUtils.showSuccess("Employee updated successfully.", AppContext.getOwner());
-			employeeController.returnToEmployeeView();
+			showSuccess("Employee updated successfully.", AppContext.getOwner());
+			closeModal(event);
 
 		} catch (IllegalArgumentException e) {
-			DialogUtils.showError("Validation error", e.getMessage(), AppContext.getOwner());
+			showError("Validation error", e.getMessage(), AppContext.getOwner());
 		} catch (Exception e) {
-			DialogUtils.showError("Unexpected error", e.getMessage(), AppContext.getOwner());
+			showError("Unexpected error", e.getMessage(), AppContext.getOwner());
 		}
 	}
 
 	@FXML
-	private void handleAbortEdit() {
-		employeeController.returnToEmployeeView();
+	private void handleAbortEdit(ActionEvent event) {
+		closeModal(event);
 	}
 }
