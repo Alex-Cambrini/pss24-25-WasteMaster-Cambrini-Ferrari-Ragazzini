@@ -13,7 +13,7 @@ public class WasteManager {
         this.wasteDAO = wasteDAO;
     }
 
-    public List<Waste> getAllWastes() {
+    public List<Waste> getActiveWastes() {
         return wasteDAO.findActiveWastes();
     }
 
