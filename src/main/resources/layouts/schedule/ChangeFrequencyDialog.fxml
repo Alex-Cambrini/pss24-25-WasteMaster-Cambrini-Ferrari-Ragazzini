@@ -19,7 +19,7 @@
       <Region VBox.vgrow="ALWAYS" />
       <HBox alignment="CENTER_RIGHT" prefHeight="47.0" prefWidth="300.0" spacing="10.0">
          <children>
-            <Button mnemonicParsing="false" onAction="#handleSave" text="Save">
+            <Button mnemonicParsing="false" onAction="#handleSave" text="Save" styleClass="success">
                <HBox.margin>
                   <Insets bottom="20.0" />
                </HBox.margin></Button>
