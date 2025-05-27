@@ -3,7 +3,7 @@ package it.unibo.wastemaster.controller.waste;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 
-public class WasteOverviewController {
+public class WasteController {
 
 	@FXML
 	private Button addWasteButton;
