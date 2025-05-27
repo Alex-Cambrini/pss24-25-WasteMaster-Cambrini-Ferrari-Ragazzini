@@ -102,6 +102,20 @@ public class WasteController {
 			}
 		});
 
+		changeDayButton.setDisable(true);
+
+		wasteTable.getSelectionModel().selectedItemProperty().addListener((obs, oldRow, newRow) -> {
+			if (newRow != null && newRow.getDayOfWeek() == null) {
+				addProgramButton.setDisable(false);
+				changeDayButton.setDisable(true);
+			} else if (newRow != null) {
+				addProgramButton.setDisable(true);
+				changeDayButton.setDisable(false);
+			} else {
+				addProgramButton.setDisable(true);
+				changeDayButton.setDisable(true);
+			}
+		});
 	}
 
 	private void startAutoRefresh() {
@@ -187,7 +201,37 @@ public class WasteController {
 
 	@FXML
 	private void handleChangeDay() {
-		// TODO
+		WasteRow selectedRow = wasteTable.getSelectionModel().getSelectedItem();
+
+		if (selectedRow == null || selectedRow.getDayOfWeek() == null) {
+			DialogUtils.showError("No Selection", "Please select a waste with a program assigned.",
+					AppContext.getOwner());
+			return;
+		}
+
+		try {
+			WasteSchedule schedule = AppContext.wasteScheduleManager.getWasteScheduleByWaste(selectedRow.getWaste());
+
+			Optional<ChangeDayDialogController> controllerOpt = DialogUtils.showModalWithController(
+					"Change Collection Day",
+					"/layouts/waste/ChangeDayDialog.fxml",
+					(Stage) MainLayoutController.getInstance().getRootPane().getScene().getWindow(),
+					ctrl -> {
+						ctrl.setSchedule(schedule);
+						ctrl.setCurrentDay(schedule.getDayOfWeek());
+					});
+
+			if (controllerOpt.isPresent()) {
+				DayOfWeek newDay = controllerOpt.get().getSelectedDay();
+				if (newDay != null && newDay != schedule.getDayOfWeek()) {
+					AppContext.wasteScheduleManager.changeCollectionDay(schedule, newDay);
+					loadWastes();
+				}
+			}
+		} catch (IOException e) {
+			DialogUtils.showError("Loading Error", "Failed to load the change day dialog.", AppContext.getOwner());
+			e.printStackTrace();
+		}
 	}
 
 	@FXML
