@@ -11,61 +11,62 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class WasteManagerTest extends AbstractDatabaseTest {
 
-	private Waste waste;
+    private Waste waste;
 
-	@BeforeEach
-	public void setUp() {
-		super.setUp();
-		em.getTransaction().begin();
-		waste = new Waste("Plastic", true, false);
-	}
+    @BeforeEach
+    public void setUp() {
+        super.setUp();
+        em.getTransaction().begin();
+        waste = new Waste("Plastic", true, false);
+    }
 
-	@Test
-	void testAddWaste() {
-		Waste saved = wasteManager.addWaste(waste);
-		assertNotNull(saved);
-		assertEquals("Plastic", saved.getWasteName());
+    @Test
+    void testAddWaste() {
+        Waste saved = wasteManager.addWaste(waste);
+        assertNotNull(saved);
+        assertEquals("Plastic", saved.getWasteName());
 
-		Waste duplicate = new Waste("Plastic", false, true);
-		assertThrows(IllegalArgumentException.class, () -> wasteManager.addWaste(duplicate));
+        Waste duplicate = new Waste("Plastic", false, true);
+        assertThrows(IllegalArgumentException.class,
+                () -> wasteManager.addWaste(duplicate));
 
-		assertThrows(IllegalArgumentException.class, () -> wasteManager.addWaste(null));
-		assertThrows(IllegalArgumentException.class, () -> wasteManager.addWaste(new Waste(null, null, null)));
-	}
+        assertThrows(IllegalArgumentException.class, () -> wasteManager.addWaste(null));
+        assertThrows(IllegalArgumentException.class,
+                () -> wasteManager.addWaste(new Waste(null, null, null)));
+    }
 
-	@Test
-	void testGetAllWastes() {
-		assertTrue(wasteManager.getAllWastes().isEmpty());
+    @Test
+    void testGetAllWastes() {
+        assertTrue(wasteManager.getActiveWastes().isEmpty());
 
-		Waste w1 = new Waste("Glass", true, false);
-		Waste w2 = new Waste("Paper", true, false);
-		wasteManager.addWaste(w1);
-		wasteManager.addWaste(w2);
+        Waste w1 = new Waste("Glass", true, false);
+        Waste w2 = new Waste("Paper", true, false);
+        wasteManager.addWaste(w1);
+        wasteManager.addWaste(w2);
 
-		List<Waste> result = wasteManager.getAllWastes();
-		assertEquals(2, result.size());
+        List<Waste> result = wasteManager.getActiveWastes();
+        assertEquals(2, result.size());
 
-		List<String> names = result.stream().map(Waste::getWasteName).toList();
-		assertTrue(names.contains("Glass"));
-		assertTrue(names.contains("Paper"));
-	}
+        List<String> names = result.stream().map(Waste::getWasteName).toList();
+        assertTrue(names.contains("Glass"));
+        assertTrue(names.contains("Paper"));
+    }
 
-	@Test
-	void testSoftDeleteWaste() {
-		Waste saved = wasteManager.addWaste(waste);
-		assertFalse(saved.isDeleted());
+    @Test
+    void testSoftDeleteWaste() {
+        Waste saved = wasteManager.addWaste(waste);
+        assertFalse(saved.isDeleted());
 
-		boolean deleted = wasteManager.softDeleteWaste(saved);
-		assertTrue(deleted);
-		assertTrue(saved.isDeleted());
+        boolean deleted = wasteManager.softDeleteWaste(saved);
+        assertTrue(deleted);
+        assertTrue(saved.isDeleted());
 
-		List<Waste> all = wasteManager.getAllWastes();
-		assertEquals(1, all.size());
-		assertTrue(all.get(0).isDeleted());
+        List<Waste> all = wasteManager.getActiveWastes();
+        assertEquals(0, all.size());
+        assertFalse(wasteManager.softDeleteWaste(null));
 
-		assertFalse(wasteManager.softDeleteWaste(null));
+        Waste temp = new Waste("Organic", true, false);
+        assertFalse(wasteManager.softDeleteWaste(temp));
+    }
 
-		Waste temp = new Waste("Organic", true, false);
-		assertFalse(wasteManager.softDeleteWaste(temp));
-	}
 }
