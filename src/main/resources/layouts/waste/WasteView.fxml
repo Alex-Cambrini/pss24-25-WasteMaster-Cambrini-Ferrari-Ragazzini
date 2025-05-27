@@ -12,7 +12,7 @@
 
 <VBox alignment="TOP_CENTER" prefWidth="640.0"
     xmlns="http://javafx.com/javafx/23.0.1"
-    xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.unibo.wastemaster.controller.waste.WasteOverviewController">
+    xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.unibo.wastemaster.controller.waste.WasteController">
 
     <children>
         <HBox alignment="TOP_CENTER" minHeight="40.0" prefHeight="40.0" prefWidth="600.0" spacing="10.0">
@@ -52,6 +52,7 @@
                 <Button fx:id="changeDayButton" disable="true" mnemonicParsing="false" onAction="#handleChangeDay" styleClass="accent" text="Change Day" />
                 <Region prefHeight="200.0" prefWidth="200.0" HBox.hgrow="ALWAYS" />
                 <Button fx:id="deleteButton" disable="true" mnemonicParsing="false" onAction="#handleDeleteWaste" styleClass="danger" text="Delete" />
+                <Button fx:id="deleteProgramButton" disable="true" mnemonicParsing="false" onAction="#handleDeleteProgramWaste" styleClass="danger" text="Delete Program" />
             </children>
             <padding>
                 <Insets top="10.0" />

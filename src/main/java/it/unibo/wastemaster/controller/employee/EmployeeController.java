@@ -43,6 +43,12 @@ public class EmployeeController {
     private TextField searchField;
 
     @FXML
+    private Button editEmployeeButton;
+
+    @FXML
+    private Button deleteEmployeeButton;
+
+    @FXML
     private TableView<EmployeeRow> employeeTable;
     @FXML
     private TableColumn<EmployeeRow, String> nameColumn;
@@ -60,11 +66,13 @@ public class EmployeeController {
     @FXML
     public void initialize() {
         owner = (Stage) MainLayoutController.getInstance().getRootPane().getScene().getWindow();
+
         nameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
         surnameColumn.setCellValueFactory(new PropertyValueFactory<>("surname"));
         emailColumn.setCellValueFactory(new PropertyValueFactory<>("email"));
         roleColumn.setCellValueFactory(new PropertyValueFactory<>("role"));
         licenceColumn.setCellValueFactory(new PropertyValueFactory<>("licence"));
+
         roleColumn.setCellFactory(column -> new TableCell<EmployeeRow, Role>() {
             @Override
             protected void updateItem(Role item, boolean empty) {
@@ -80,8 +88,18 @@ public class EmployeeController {
                 setText(empty || item == null ? "" : formatEnumOrNone(item));
             }
         });
+
         locationColumn.setText("Location");
         locationColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getFullLocation()));
+
+        editEmployeeButton.setDisable(true);
+        deleteEmployeeButton.setDisable(true);
+
+        employeeTable.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
+            boolean selected = newVal != null;
+            editEmployeeButton.setDisable(!selected);
+            deleteEmployeeButton.setDisable(!selected);
+        });
 
         loadEmployee();
         startAutoRefresh();

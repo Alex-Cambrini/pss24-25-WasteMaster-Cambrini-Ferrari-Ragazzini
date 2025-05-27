@@ -40,6 +40,12 @@ public class VehicleController {
 	private Button filterButton;
 
 	@FXML
+	private Button editVehicleButton;
+
+	@FXML
+	private Button deleteVehicleButton;
+
+	@FXML
 	private TableView<VehicleRow> VehicleTable;
 
 	@FXML
@@ -103,6 +109,15 @@ public class VehicleController {
 				super.updateItem(item, empty);
 				setText(empty || item == null ? "" : item.toString());
 			}
+		});
+
+		editVehicleButton.setDisable(true);
+		deleteVehicleButton.setDisable(true);
+
+		VehicleTable.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
+			boolean selected = newVal != null;
+			editVehicleButton.setDisable(!selected);
+			deleteVehicleButton.setDisable(!selected);
 		});
 
 		loadVehicles();

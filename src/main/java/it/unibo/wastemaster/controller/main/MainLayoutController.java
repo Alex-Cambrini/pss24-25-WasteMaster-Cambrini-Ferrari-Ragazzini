@@ -88,7 +88,7 @@ public class MainLayoutController {
     private void handleWaste() {
         wasteLink.setVisited(false);
         setPageTitle("Waste Management");
-        MainLayoutController.getInstance().loadCenter("/layouts/waste/WasteOverviewView.fxml");
+        MainLayoutController.getInstance().loadCenter("/layouts/waste/WasteView.fxml");
     }
 
     @FXML
