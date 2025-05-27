@@ -4,6 +4,7 @@ import it.unibo.wastemaster.controller.main.MainLayoutController;
 import it.unibo.wastemaster.controller.utils.DialogUtils;
 import it.unibo.wastemaster.core.context.AppContext;
 import it.unibo.wastemaster.core.models.Employee;
+import it.unibo.wastemaster.core.models.Employee.Licence;
 import it.unibo.wastemaster.viewmodels.EmployeeRow;
 
 import javafx.animation.KeyFrame;
@@ -19,6 +20,8 @@ import javafx.stage.Stage;
 
 import java.util.List;
 import java.util.Optional;
+
+import it.unibo.wastemaster.core.models.Employee.Role;
 
 public class EmployeeController {
 
@@ -48,9 +51,9 @@ public class EmployeeController {
     @FXML
     private TableColumn<EmployeeRow, String> emailColumn;
     @FXML
-    private TableColumn<EmployeeRow, String> roleColumn;
+    private TableColumn<EmployeeRow, Role> roleColumn;
     @FXML
-    private TableColumn<EmployeeRow, String> licenceColumn;
+    private TableColumn<EmployeeRow, Licence> licenceColumn;
     @FXML
     private TableColumn<EmployeeRow, String> locationColumn;
 
@@ -60,10 +63,23 @@ public class EmployeeController {
         nameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
         surnameColumn.setCellValueFactory(new PropertyValueFactory<>("surname"));
         emailColumn.setCellValueFactory(new PropertyValueFactory<>("email"));
-        roleColumn.setCellValueFactory(
-                cellData -> new SimpleStringProperty(formatEnum(cellData.getValue().getRole())));
-        licenceColumn.setCellValueFactory(
-                cellData -> new SimpleStringProperty(formatEnum(cellData.getValue().getLicence())));
+        roleColumn.setCellValueFactory(new PropertyValueFactory<>("role"));
+        licenceColumn.setCellValueFactory(new PropertyValueFactory<>("licence"));
+        roleColumn.setCellFactory(column -> new TableCell<EmployeeRow, Role>() {
+            @Override
+            protected void updateItem(Role item, boolean empty) {
+                super.updateItem(item, empty);
+                setText(empty || item == null ? "" : formatEnumOrNone(item));
+            }
+        });
+
+        licenceColumn.setCellFactory(column -> new TableCell<EmployeeRow, Licence>() {
+            @Override
+            protected void updateItem(Licence item, boolean empty) {
+                super.updateItem(item, empty);
+                setText(empty || item == null ? "" : formatEnumOrNone(item));
+            }
+        });
         locationColumn.setText("Location");
         locationColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getFullLocation()));
 
@@ -254,18 +270,14 @@ public class EmployeeController {
     }
 
     private String formatEnumOrNone(Enum<?> value) {
-        if (value == null || value.name().equalsIgnoreCase("none")) {
-            return "None";
-        }
-        return formatEnum(value);
-    }
-
-    private String formatEnum(Enum<?> value) {
         if (value == null) {
             return "";
         }
-        String lower = value.name().toLowerCase().replace("_", " ");
-        return Character.toUpperCase(lower.charAt(0)) + lower.substring(1);
+        if (value.name().equalsIgnoreCase("none")) {
+            return "None";
+        }
+        String str = value.name().toLowerCase().replace("_", " ");
+        return Character.toUpperCase(str.charAt(0)) + str.substring(1);
     }
 
     public void returnToEmployeeView() {
