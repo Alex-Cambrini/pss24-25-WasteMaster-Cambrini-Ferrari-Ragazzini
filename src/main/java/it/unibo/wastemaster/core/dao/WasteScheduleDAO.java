@@ -1,10 +1,10 @@
 package it.unibo.wastemaster.core.dao;
 
-import java.util.List;
 import it.unibo.wastemaster.core.models.Waste;
 import it.unibo.wastemaster.core.models.WasteSchedule;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
+import java.util.List;
 
 /**
  * DAO for managing WasteSchedule entities.

@@ -1,12 +1,11 @@
 package it.unibo.wastemaster.core.dao;
 
-import java.util.List;
-import java.time.LocalDate;
-
 import it.unibo.wastemaster.core.models.Customer;
 import it.unibo.wastemaster.core.models.RecurringSchedule;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
+import java.time.LocalDate;
+import java.util.List;
 
 /**
  * DAO for {@link RecurringSchedule} entities.
