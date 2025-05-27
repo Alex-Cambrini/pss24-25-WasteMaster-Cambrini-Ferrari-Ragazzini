@@ -1,5 +1,7 @@
 package it.unibo.wastemaster.controller.waste;
 
+import it.unibo.wastemaster.controller.main.MainLayoutController;
+import it.unibo.wastemaster.controller.utils.DialogUtils;
 import it.unibo.wastemaster.core.context.AppContext;
 import it.unibo.wastemaster.core.models.Waste;
 import it.unibo.wastemaster.core.models.WasteSchedule;
@@ -11,10 +13,13 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.stage.Stage;
 import javafx.util.Duration;
 
+import java.io.IOException;
 import java.time.DayOfWeek;
 import java.util.List;
+import java.util.Optional;
 
 public class WasteController {
 
@@ -86,6 +91,17 @@ public class WasteController {
 
 		showRecyclableCheckBox.selectedProperty().addListener((obs, oldVal, newVal) -> handleSearch());
 		showDangerousCheckBox.selectedProperty().addListener((obs, oldVal, newVal) -> handleSearch());
+
+		addProgramButton.setDisable(true);
+
+		wasteTable.getSelectionModel().selectedItemProperty().addListener((obs, oldRow, newRow) -> {
+			if (newRow != null && newRow.getDayOfWeek() == null) {
+				addProgramButton.setDisable(false);
+			} else {
+				addProgramButton.setDisable(true);
+			}
+		});
+
 	}
 
 	private void startAutoRefresh() {
@@ -105,7 +121,11 @@ public class WasteController {
 		allWastes.clear();
 
 		for (Waste waste : wastes) {
-			WasteSchedule schedule = AppContext.wasteScheduleManager.getWasteScheduleByWaste(waste);
+			WasteSchedule schedule = null;
+			try {
+				schedule = AppContext.wasteScheduleManager.getWasteScheduleByWaste(waste);
+			} catch (IllegalStateException ignored) {
+			}
 			allWastes.add(new WasteRow(waste, schedule));
 		}
 
@@ -118,12 +138,51 @@ public class WasteController {
 
 	@FXML
 	private void handleAddWaste() {
-		// TODO
+		try {
+			Stage mainStage = (Stage) MainLayoutController.getInstance().getRootPane().getScene().getWindow();
+
+			Optional<AddWasteController> controllerOpt = DialogUtils.showModalWithController(
+					"Add Waste",
+					"/layouts/waste/AddWasteView.fxml",
+					mainStage,
+					ctrl -> {
+					});
+
+			if (controllerOpt.isPresent()) {
+				loadWastes();
+			}
+		} catch (IOException e) {
+			DialogUtils.showError("Navigation error", "Could not load Add Waste view.", AppContext.getOwner());
+			e.printStackTrace();
+		}
 	}
 
 	@FXML
 	private void handleAddProgram() {
-		// TODO
+		try {
+			WasteRow selectedRow = wasteTable.getSelectionModel().getSelectedItem();
+
+			if (selectedRow == null || selectedRow.getDayOfWeek() != null) {
+				return;
+			}
+
+			Waste selectedWaste = selectedRow.getWaste();
+
+			Stage mainStage = (Stage) MainLayoutController.getInstance().getRootPane().getScene().getWindow();
+
+			Optional<AddProgramController> controllerOpt = DialogUtils.showModalWithController(
+					"Add Program",
+					"/layouts/waste/AddProgramView.fxml",
+					mainStage,
+					ctrl -> ctrl.setWaste(selectedWaste));
+
+			if (controllerOpt.isPresent()) {
+				loadWastes();
+			}
+		} catch (IOException e) {
+			DialogUtils.showError("Navigation error", "Could not load Add Program view.", AppContext.getOwner());
+			e.printStackTrace();
+		}
 	}
 
 	@FXML
