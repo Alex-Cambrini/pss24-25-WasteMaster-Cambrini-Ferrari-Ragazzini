@@ -1,10 +1,7 @@
 package it.unibo.wastemaster.core.services;
 
-import java.time.DayOfWeek;
-import java.time.LocalDate;
-import java.util.List;
-
 import it.unibo.wastemaster.core.dao.RecurringScheduleDAO;
+import it.unibo.wastemaster.core.models.Collection;
 import it.unibo.wastemaster.core.models.Customer;
 import it.unibo.wastemaster.core.models.RecurringSchedule;
 import it.unibo.wastemaster.core.models.RecurringSchedule.Frequency;
@@ -12,7 +9,10 @@ import it.unibo.wastemaster.core.models.Schedule.ScheduleStatus;
 import it.unibo.wastemaster.core.models.Waste;
 import it.unibo.wastemaster.core.models.WasteSchedule;
 import it.unibo.wastemaster.core.utils.ValidateUtils;
-import it.unibo.wastemaster.core.models.Collection;
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.util.List;
+
 
 /**
  * Manages recurring schedules: creation, update, and retrieval. Works with DAO,
