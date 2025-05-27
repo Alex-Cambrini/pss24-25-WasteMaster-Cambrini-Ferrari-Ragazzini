@@ -25,7 +25,6 @@ import it.unibo.wastemaster.core.services.TripManager;
 import it.unibo.wastemaster.core.services.VehicleManager;
 import it.unibo.wastemaster.core.services.WasteManager;
 import it.unibo.wastemaster.core.services.WasteScheduleManager;
-import it.unibo.wastemaster.core.utils.DateUtils;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
@@ -56,8 +55,6 @@ public abstract class AbstractDatabaseTest {
     protected VehicleManager vehicleManager;
     protected TripManager tripManager;
 
-    protected DateUtils dateUtils;
-
     @BeforeAll
     public static void init() {
         emf = Persistence.createEntityManagerFactory("test-pu");
@@ -69,7 +66,6 @@ public abstract class AbstractDatabaseTest {
     @BeforeEach
     public void setUp() {
         em = emf.createEntityManager();
-        dateUtils = new DateUtils();
 
         wasteDAO = new WasteDAO(em);
         locationDAO = new GenericDAO<>(em, Location.class);

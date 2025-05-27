@@ -44,8 +44,8 @@ class OneTimeScheduleManagerTest extends AbstractDatabaseTest {
 
 	@Test
 	public void testCreateOneTimeSchedule() {
-		LocalDate invalidDate = dateUtils.getCurrentDate().plusDays(1);
-		LocalDate validDate = dateUtils.getCurrentDate().plusDays(3);
+		LocalDate invalidDate = LocalDate.now().plusDays(1);
+		LocalDate validDate = LocalDate.now().plusDays(3);
 
 		assertThrows(IllegalArgumentException.class, () -> {
 			oneTimeScheduleManager.createOneTimeSchedule(customer, waste, invalidDate);
@@ -63,7 +63,7 @@ class OneTimeScheduleManagerTest extends AbstractDatabaseTest {
 
 	@Test
 	void testSoftDeleteOneTimeSchedule_allCases() {
-		LocalDate validDate = dateUtils.getCurrentDate().plusDays(3);
+		LocalDate validDate = LocalDate.now().plusDays(3);
 
 		// 1) Null args
 		assertThrows(IllegalArgumentException.class, () -> oneTimeScheduleManager.softDeleteOneTimeSchedule(null));

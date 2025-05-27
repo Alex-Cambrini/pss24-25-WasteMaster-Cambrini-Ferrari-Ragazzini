@@ -8,7 +8,6 @@ import it.unibo.wastemaster.core.models.Customer;
 import it.unibo.wastemaster.core.models.OneTimeSchedule;
 import it.unibo.wastemaster.core.models.Schedule.ScheduleStatus;
 import it.unibo.wastemaster.core.models.Waste;
-import it.unibo.wastemaster.core.utils.DateUtils;
 import it.unibo.wastemaster.core.utils.ValidateUtils;
 import it.unibo.wastemaster.core.models.Collection.CollectionStatus;
 
@@ -34,7 +33,7 @@ public class OneTimeScheduleManager {
     }
 
     private boolean isDateValid(LocalDate date, int limitDays) {
-        LocalDate minDate = new DateUtils().getCurrentDate().plusDays(limitDays);
+        LocalDate minDate = LocalDate.now().plusDays(limitDays);
         return !date.isBefore(minDate);
     }
 

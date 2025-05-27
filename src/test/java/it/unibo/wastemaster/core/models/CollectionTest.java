@@ -31,7 +31,7 @@ class CollectionTest extends AbstractDatabaseTest {
         location = new Location("Via Roma", "10", "Bologna", "40100");
         customer = new Customer("Mario", "Rossi", location, "mario.rossi@example.com", "1234567890");
 
-        date = dateUtils.getCurrentDate();
+        date = LocalDate.now();
         plastic = new Waste("PLASTICA", true, false);
 
         schedule = new OneTimeSchedule(customer, plastic, date);

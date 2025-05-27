@@ -14,7 +14,7 @@ public class WasteManager {
     }
 
     public List<Waste> getAllWastes() {
-        return wasteDAO.findAll();
+        return wasteDAO.findActiveWastes();
     }
 
     public Waste addWaste(Waste waste) {
