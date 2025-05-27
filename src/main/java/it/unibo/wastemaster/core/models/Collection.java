@@ -54,7 +54,8 @@ public class Collection {
         PENDING,
         IN_PROGRESS,
         COMPLETED,
-        CANCELLED
+        CANCELLED,
+        FAILED 
     }
 
     public Collection() {
