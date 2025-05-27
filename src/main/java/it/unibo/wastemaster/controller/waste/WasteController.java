@@ -36,6 +36,9 @@ public class WasteController {
 	private Button deleteButton;
 
 	@FXML
+	private Button deleteProgramButton;
+
+	@FXML
 	private Button resetSearchButton;
 
 	@FXML
@@ -76,11 +79,7 @@ public class WasteController {
 			@Override
 			protected void updateItem(DayOfWeek item, boolean empty) {
 				super.updateItem(item, empty);
-				if (empty) {
-					setText(null);
-				} else {
-					setText(item == null ? "-" : formatEnum(item));
-				}
+				setText(empty ? null : (item == null ? "-" : formatEnum(item)));
 			}
 		});
 
@@ -88,33 +87,29 @@ public class WasteController {
 		startAutoRefresh();
 
 		searchField.textProperty().addListener((obs, oldText, newText) -> handleSearch());
-
 		showRecyclableCheckBox.selectedProperty().addListener((obs, oldVal, newVal) -> handleSearch());
 		showDangerousCheckBox.selectedProperty().addListener((obs, oldVal, newVal) -> handleSearch());
 
 		addProgramButton.setDisable(true);
-
-		wasteTable.getSelectionModel().selectedItemProperty().addListener((obs, oldRow, newRow) -> {
-			if (newRow != null && newRow.getDayOfWeek() == null) {
-				addProgramButton.setDisable(false);
-			} else {
-				addProgramButton.setDisable(true);
-			}
-		});
-
 		changeDayButton.setDisable(true);
+		deleteButton.setDisable(true);
+		deleteProgramButton.setDisable(true);
 
 		wasteTable.getSelectionModel().selectedItemProperty().addListener((obs, oldRow, newRow) -> {
-			if (newRow != null && newRow.getDayOfWeek() == null) {
-				addProgramButton.setDisable(false);
-				changeDayButton.setDisable(true);
-			} else if (newRow != null) {
-				addProgramButton.setDisable(true);
-				changeDayButton.setDisable(false);
-			} else {
+			if (newRow == null) {
 				addProgramButton.setDisable(true);
 				changeDayButton.setDisable(true);
+				deleteButton.setDisable(true);
+				deleteProgramButton.setDisable(true);
+				return;
 			}
+
+			boolean hasProgram = newRow.getDayOfWeek() != null;
+
+			addProgramButton.setDisable(hasProgram);
+			changeDayButton.setDisable(!hasProgram);
+			deleteButton.setDisable(false);
+			deleteProgramButton.setDisable(!hasProgram);
 		});
 	}
 
@@ -236,12 +231,42 @@ public class WasteController {
 
 	@FXML
 	private void handleDeleteWaste() {
-		// TODO
+		WasteRow selected = wasteTable.getSelectionModel().getSelectedItem();
+		if (selected == null) {
+			DialogUtils.showError("No Selection", "Please select a waste to delete.", AppContext.getOwner());
+			return;
+		}
+
+		try {
+			if (selected.getDayOfWeek() != null) {
+				WasteSchedule schedule = AppContext.wasteScheduleManager.getWasteScheduleByWaste(selected.getWaste());
+				AppContext.wasteScheduleDAO.delete(schedule);
+			}
+			AppContext.wasteManager.softDeleteWaste(selected.getWaste());
+			loadWastes();
+		} catch (Exception e) {
+			DialogUtils.showError("Error", "Failed to delete waste or its schedule.", AppContext.getOwner());
+			e.printStackTrace();
+		}
 	}
 
 	@FXML
 	private void handleDeleteProgramWaste() {
-		// TODO
+		WasteRow selected = wasteTable.getSelectionModel().getSelectedItem();
+		if (selected == null || selected.getDayOfWeek() == null) {
+			DialogUtils.showError("No Program", "Please select a waste with a program to delete.",
+					AppContext.getOwner());
+			return;
+		}
+
+		try {
+			WasteSchedule schedule = AppContext.wasteScheduleManager.getWasteScheduleByWaste(selected.getWaste());
+			AppContext.wasteScheduleDAO.delete(schedule);
+			loadWastes();
+		} catch (Exception e) {
+			DialogUtils.showError("Error", "Failed to delete the program.", AppContext.getOwner());
+			e.printStackTrace();
+		}
 	}
 
 	@FXML
