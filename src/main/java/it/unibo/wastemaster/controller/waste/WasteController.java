@@ -130,6 +130,11 @@ public class WasteController {
 	}
 
 	@FXML
+	private void handleDeleteProgramWaste() {
+		// TODO
+	}
+
+	@FXML
 	private void handleResetSearch() {
 		// TODO
 	}
