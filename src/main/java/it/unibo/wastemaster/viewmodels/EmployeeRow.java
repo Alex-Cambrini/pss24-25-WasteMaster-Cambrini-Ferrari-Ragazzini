@@ -3,6 +3,7 @@ package it.unibo.wastemaster.viewmodels;
 import it.unibo.wastemaster.core.models.Employee;
 import it.unibo.wastemaster.core.models.Employee.Licence;
 import it.unibo.wastemaster.core.models.Employee.Role;
+import it.unibo.wastemaster.core.models.Location;
 
 public class EmployeeRow {
 	private final String name;
@@ -10,15 +11,15 @@ public class EmployeeRow {
 	private final String email;
 	private final Role role;
 	private final Licence licence;
-	private final String city;
+	private final Employee employee;
 
 	public EmployeeRow(Employee employee) {
+		this.employee = employee;
 		this.name = employee.getName();
 		this.surname = employee.getSurname();
 		this.email = employee.getEmail();
 		this.role = employee.getRole();
 		this.licence = employee.getLicence();
-		this.city = employee.getLocation().getCity();
 	}
 
 	public String getName() {
@@ -41,7 +42,8 @@ public class EmployeeRow {
 		return licence;
 	}
 
-	public String getCity() {
-		return city;
+	public String getFullLocation() {
+		Location loc = employee.getLocation();
+		return loc.getStreet() + " " + loc.getCivicNumber() + ", " + loc.getCity() + " (" + loc.getPostalCode() + ")";
 	}
 }
