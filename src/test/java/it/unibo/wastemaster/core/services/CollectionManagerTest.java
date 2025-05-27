@@ -134,8 +134,8 @@ public class CollectionManagerTest extends AbstractDatabaseTest {
 
         active.setCollectionStatus(CollectionStatus.CANCELLED);
         collectionManager.updateCollection(active);
-        Collection none = collectionManager.getAllCollectionBySchedule(schedule).get(0);
-        assertNull(none);
+        Collection deleted = collectionManager.getAllCollectionBySchedule(schedule).get(0);
+        assertEquals(CollectionStatus.CANCELLED, deleted.getCollectionStatus());
     }
 
     @Test
