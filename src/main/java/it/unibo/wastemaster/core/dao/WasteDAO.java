@@ -1,27 +1,44 @@
 package it.unibo.wastemaster.core.dao;
 
 import java.util.List;
-
 import it.unibo.wastemaster.core.models.Waste;
 import jakarta.persistence.EntityManager;
 
-public class WasteDAO extends GenericDAO<Waste> {
+/**
+ * DAO for managing Waste entities.
+ */
+public final class WasteDAO extends GenericDAO<Waste> {
 
-    public WasteDAO(EntityManager entityManager) {
+    /**
+     * Constructs a WasteDAO with the given entity manager.
+     * 
+     * @param entityManager the EntityManager to use
+     */
+    public WasteDAO(final EntityManager entityManager) {
         super(entityManager, Waste.class);
     }
 
-    public boolean existsByName(String name) {
-        return entityManager
-                .createQuery("SELECT COUNT(w) FROM Waste w WHERE w.name = :name AND w.deleted = false", Long.class)
-                .setParameter("name", name)
-                .getSingleResult() > 0;
+    /**
+     * Checks whether a non-deleted waste with the given name exists.
+     * 
+     * @param name the name of the waste
+     * @return true if a non-deleted waste with that name exists, false otherwise
+     */
+    public boolean existsByName(final String name) {
+        return entityManager.createQuery(
+                "SELECT COUNT(w) FROM Waste w WHERE w.name = :name AND w.deleted = false",
+                Long.class).setParameter("name", name).getSingleResult() > 0;
     }
 
+    /**
+     * Retrieves all non-deleted wastes.
+     * 
+     * @return list of active (non-deleted) wastes
+     */
     public List<Waste> findActiveWastes() {
         return entityManager.createQuery("""
-                	SELECT w FROM Waste w
-                	WHERE w.deleted = false
+                    SELECT w FROM Waste w
+                    WHERE w.deleted = false
                 """, Waste.class).getResultList();
     }
 }
