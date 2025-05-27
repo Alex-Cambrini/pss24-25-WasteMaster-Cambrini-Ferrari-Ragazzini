@@ -25,7 +25,7 @@ public class OneTimeScheduleTest extends AbstractDatabaseTest {
 		Location location = new Location("Via Dante", "5", "Roma", "00100");
 		customer = new Customer("Luca", "Verdi", location, "luca@example.com", "3456789012");
 		organic = new Waste("organic", true, false);
-		pickupDate = dateUtils.getCurrentDate();
+		pickupDate = LocalDate.now();
 		schedule = new OneTimeSchedule(customer, organic, pickupDate);
 	}
 
@@ -41,7 +41,7 @@ public class OneTimeScheduleTest extends AbstractDatabaseTest {
 	@Test
 	public void testInvalidSchedule() {
 		OneTimeSchedule invalid = new OneTimeSchedule();
-		invalid.setPickupDate(dateUtils.getCurrentDate().minusDays(2));
+		invalid.setPickupDate(LocalDate.now().minusDays(2));
 
 		Set<ConstraintViolation<OneTimeSchedule>> violations = ValidateUtils.VALIDATOR.validate(invalid);
 		assertFalse(violations.isEmpty());

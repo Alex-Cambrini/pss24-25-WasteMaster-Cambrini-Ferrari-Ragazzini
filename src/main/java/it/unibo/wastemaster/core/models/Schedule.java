@@ -16,8 +16,6 @@ import jakarta.persistence.Column;
 import java.time.LocalDate;
 import java.util.List;
 
-import it.unibo.wastemaster.core.utils.DateUtils;
-
 @Entity
 
 @jakarta.persistence.Inheritance(strategy = jakarta.persistence.InheritanceType.SINGLE_TABLE)
@@ -77,7 +75,7 @@ public abstract class Schedule {
         this.customer = customer;
         this.waste = waste;
         this.status = ScheduleStatus.ACTIVE;
-        this.creationDate = new DateUtils().getCurrentDate();
+        this.creationDate = LocalDate.now();
     }
 
     public abstract LocalDate getCollectionDate();

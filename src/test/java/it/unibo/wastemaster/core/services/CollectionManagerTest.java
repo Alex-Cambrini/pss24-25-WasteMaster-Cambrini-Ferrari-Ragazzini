@@ -34,7 +34,7 @@ public class CollectionManagerTest extends AbstractDatabaseTest {
 
         Location location = new Location("Via Roma", "10", "Bologna", "40100");
         customer = new Customer("Mario", "Rossi", location, "mario.rossi@example.com", "1234567890");
-        LocalDate futureDate = dateUtils.getCurrentDate().plusDays(3);
+        LocalDate futureDate = LocalDate.now().plusDays(3);
         plastic = new Waste("PLASTIC", true, false);
 
         em.getTransaction().begin();
@@ -65,7 +65,7 @@ public class CollectionManagerTest extends AbstractDatabaseTest {
     @Test
     public void testGenerateCollection() {
 
-        LocalDate futureDate = dateUtils.getCurrentDate().plusDays(5);
+        LocalDate futureDate = LocalDate.now().plusDays(5);
         OneTimeSchedule futureSchedule = new OneTimeSchedule(customer, plastic, futureDate);
         futureSchedule.setScheduleStatus(Schedule.ScheduleStatus.ACTIVE);
 
@@ -73,7 +73,7 @@ public class CollectionManagerTest extends AbstractDatabaseTest {
 
         collectionManager.generateCollection(futureSchedule);
 
-        LocalDate pastDate = dateUtils.getCurrentDate().minusDays(2);
+        LocalDate pastDate = LocalDate.now().minusDays(2);
         OneTimeSchedule pastSchedule = new OneTimeSchedule(customer, plastic, pastDate);
         pastSchedule.setScheduleStatus(Schedule.ScheduleStatus.ACTIVE);
 
@@ -84,7 +84,7 @@ public class CollectionManagerTest extends AbstractDatabaseTest {
 
     @Test
     public void testGenerateOneTimeCollection() {
-        LocalDate futureDate = dateUtils.getCurrentDate().plusDays(7);
+        LocalDate futureDate = LocalDate.now().plusDays(7);
         OneTimeSchedule futureSchedule = new OneTimeSchedule(customer, plastic, futureDate);
         futureSchedule.setScheduleStatus(Schedule.ScheduleStatus.ACTIVE);
 
@@ -124,7 +124,7 @@ public class CollectionManagerTest extends AbstractDatabaseTest {
 
     @Test
     public void testGetAllCollectionBySchedule() {
-        LocalDate date = dateUtils.getCurrentDate().plusDays(3);
+        LocalDate date = LocalDate.now().plusDays(3);
         OneTimeSchedule schedule = oneTimeScheduleManager.createOneTimeSchedule(customer, plastic, date);
 
         Collection active = collectionManager.getAllCollectionBySchedule(schedule).get(0);
@@ -140,7 +140,7 @@ public class CollectionManagerTest extends AbstractDatabaseTest {
 
     @Test
     public void testGetActiveCollectionByRecurringSchedule() {
-        LocalDate date = dateUtils.getCurrentDate().plusDays(5);
+        LocalDate date = LocalDate.now().plusDays(5);
 
         RecurringSchedule schedule = new RecurringSchedule(customer, plastic, date, RecurringSchedule.Frequency.WEEKLY);
         schedule.setScheduleStatus(Schedule.ScheduleStatus.ACTIVE);
