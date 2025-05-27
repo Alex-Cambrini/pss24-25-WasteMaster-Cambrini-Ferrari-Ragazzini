@@ -7,8 +7,14 @@ import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import jakarta.validation.ValidatorFactory;
 
-public class ValidateUtils {
+/**
+ * Utility class for validation.
+ */
+public final class ValidateUtils {
 
+    /**
+     * Shared Validator instance for entity validation.
+     */
     public static final Validator VALIDATOR;
 
     static {
@@ -16,21 +22,56 @@ public class ValidateUtils {
         VALIDATOR = factory.getValidator();
     }
 
-    public static void validateString(String toValidate, String errorMessage) {
+    private ValidateUtils() {
+        // Prevent instantiation
+    }
+
+    /**
+     * Validates that a string is not null or blank.
+     *
+     * @param toValidate the string to validate
+     * @param errorMessage the error message for exception
+     */
+    public static void validateString(final String toValidate,
+            final String errorMessage) {
         if (toValidate == null || toValidate.isBlank()) {
             throw new IllegalArgumentException(errorMessage);
         }
     }
-    
-    public static void requireArgNotNull(Object toValidate, String errorMessage) {
-        if (toValidate==null) throw new IllegalArgumentException(errorMessage);
-    }
-    
-    public static void requireStateNotNull(Object toValidate, String errorMessage) {
-        if (toValidate==null) throw new IllegalStateException(errorMessage);
+
+    /**
+     * Validates that an argument is not null.
+     *
+     * @param toValidate the object to validate
+     * @param errorMessage the error message for exception
+     */
+    public static void requireArgNotNull(final Object toValidate,
+            final String errorMessage) {
+        if (toValidate == null) {
+            throw new IllegalArgumentException(errorMessage);
+        }
     }
 
-    public static <T> void validateEntity(T entity) {
+    /**
+     * Validates that the state argument is not null.
+     *
+     * @param toValidate the object to validate
+     * @param errorMessage the error message for exception
+     */
+    public static void requireStateNotNull(final Object toValidate,
+            final String errorMessage) {
+        if (toValidate == null) {
+            throw new IllegalStateException(errorMessage);
+        }
+    }
+
+    /**
+     * Validates the entity using Jakarta validation.
+     *
+     * @param <T> the type of the entity
+     * @param entity the entity to validate
+     */
+    public static <T> void validateEntity(final T entity) {
         requireArgNotNull(entity, "Entity must not be null");
         Set<ConstraintViolation<T>> violations = VALIDATOR.validate(entity);
         if (!violations.isEmpty()) {
