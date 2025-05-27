@@ -28,7 +28,7 @@ public class CollectionDAO extends GenericDAO<Collection> {
      * @return list of collections matching the schedule
      */
     public final List<Collection> findAllCollectionsBySchedule(final Schedule schedule) {
-        return entityManager
+        return getEntityManager()
                 .createQuery("SELECT c FROM Collection c WHERE c.schedule = :schedule",
                         Collection.class)
                 .setParameter("schedule", schedule).getResultList();
@@ -42,7 +42,7 @@ public class CollectionDAO extends GenericDAO<Collection> {
      */
     public final List<Collection> findCollectionByStatus(
             final Collection.CollectionStatus status) {
-        return entityManager.createQuery(
+        return getEntityManager().createQuery(
                 "SELECT c FROM Collection c WHERE c.collectionStatus = :status",
                 Collection.class).setParameter("status", status).getResultList();
     }
@@ -62,7 +62,7 @@ public class CollectionDAO extends GenericDAO<Collection> {
                         WHERE c.schedule = :schedule
                         AND c.collectionStatus != :cancelledStatus
                     """;
-            return entityManager.createQuery(jpql, Collection.class)
+            return getEntityManager().createQuery(jpql, Collection.class)
                     .setParameter("schedule", schedule).setParameter("cancelledStatus",
                             Collection.CollectionStatus.CANCELLED)
                     .getSingleResult();

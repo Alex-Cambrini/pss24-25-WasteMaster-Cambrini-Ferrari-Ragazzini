@@ -27,7 +27,7 @@ public final class WasteScheduleDAO extends GenericDAO<WasteSchedule> {
      * @return the WasteSchedule if found, or null otherwise
      */
     public WasteSchedule findSchedulebyWaste(final Waste waste) {
-        TypedQuery<WasteSchedule> query = entityManager.createQuery(
+        TypedQuery<WasteSchedule> query = getEntityManager().createQuery(
                 "SELECT ws FROM WasteSchedule ws WHERE ws.waste.name = :wasteName",
                 WasteSchedule.class);
         query.setParameter("wasteName", waste.getWasteName());

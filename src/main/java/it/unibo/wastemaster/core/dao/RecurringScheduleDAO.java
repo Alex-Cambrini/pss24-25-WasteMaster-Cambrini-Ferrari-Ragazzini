@@ -35,7 +35,7 @@ public final class RecurringScheduleDAO extends GenericDAO<RecurringSchedule> {
                     SELECT 1 FROM Collection c
                     WHERE c.schedule = rs AND c.date > :currentDate )
                 """;
-        return entityManager.createQuery(jpql, RecurringSchedule.class)
+        return getEntityManager().createQuery(jpql, RecurringSchedule.class)
                 .setParameter("currentDate", currentDate).getResultList();
     }
 
@@ -51,7 +51,7 @@ public final class RecurringScheduleDAO extends GenericDAO<RecurringSchedule> {
                 WHERE rs.status = 'ACTIVE'
                 AND rs.nextCollectionDate < :currentDate
                 """;
-        return entityManager.createQuery(jpql, RecurringSchedule.class)
+        return getEntityManager().createQuery(jpql, RecurringSchedule.class)
                 .setParameter("currentDate", currentDate).getResultList();
     }
 
@@ -64,7 +64,7 @@ public final class RecurringScheduleDAO extends GenericDAO<RecurringSchedule> {
     public List<RecurringSchedule> findSchedulesByCustomer(final Customer customer) {
         String jpql = "SELECT s FROM Schedule s WHERE s.customer = :customer";
         TypedQuery<RecurringSchedule> query =
-                entityManager.createQuery(jpql, RecurringSchedule.class);
+                getEntityManager().createQuery(jpql, RecurringSchedule.class);
         query.setParameter("customer", customer);
         return query.getResultList();
     }

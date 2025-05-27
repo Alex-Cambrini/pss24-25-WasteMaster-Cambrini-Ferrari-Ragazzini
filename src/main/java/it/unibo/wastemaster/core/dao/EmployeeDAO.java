@@ -25,7 +25,7 @@ public final class EmployeeDAO extends GenericDAO<Employee> {
      * @return true if an employee exists with the email, false otherwise
      */
     public boolean existsByEmail(final String email) {
-        Long count = entityManager
+        Long count = getEntityManager()
                 .createQuery("SELECT COUNT(e) FROM Employee e WHERE e.email = :email",
                         Long.class)
                 .setParameter("email", email).getSingleResult();
@@ -39,7 +39,7 @@ public final class EmployeeDAO extends GenericDAO<Employee> {
      * @return the Employee if found, or null otherwise
      */
     public Employee findByEmail(final String email) {
-        return entityManager
+        return getEntityManager()
                 .createQuery("SELECT e FROM Employee e WHERE e.email = :email",
                         Employee.class)
                 .setParameter("email", email).getResultStream().findFirst().orElse(null);
@@ -51,7 +51,7 @@ public final class EmployeeDAO extends GenericDAO<Employee> {
      * @return list of active employees
      */
     public List<Employee> findEmployeeDetails() {
-        return entityManager.createQuery("""
+        return getEntityManager().createQuery("""
                     SELECT e FROM Employee e
                     WHERE e.isDeleted = false
                 """, Employee.class).getResultList();
