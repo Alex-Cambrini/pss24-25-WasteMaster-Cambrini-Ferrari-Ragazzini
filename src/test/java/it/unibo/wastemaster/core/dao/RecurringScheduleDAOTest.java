@@ -35,7 +35,7 @@ public class RecurringScheduleDAOTest extends AbstractDatabaseTest {
     @BeforeEach
     public void setUp() {
         super.setUp();
-        date = dateUtils.getCurrentDate();
+        date = LocalDate.now();
         waste = new Waste("PLASTICA", true, false);
 
         location1 = new Location("Via Roma", "10", "Bologna", "40100");
@@ -77,7 +77,7 @@ public class RecurringScheduleDAOTest extends AbstractDatabaseTest {
 
     @Test
     void testFindActiveSchedulesWithoutFutureCollections() {
-        LocalDate now = dateUtils.getCurrentDate();
+        LocalDate now = LocalDate.now();
 
         recurringSchedule1.setNextCollectionDate(now.plusDays(2));
         recurringScheduleDAO.update(recurringSchedule1);

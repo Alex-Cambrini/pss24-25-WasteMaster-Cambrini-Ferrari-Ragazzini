@@ -1,5 +1,6 @@
 package it.unibo.wastemaster.core.services;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import it.unibo.wastemaster.core.dao.CollectionDAO;
@@ -8,14 +9,13 @@ import it.unibo.wastemaster.core.models.Collection.CollectionStatus;
 import it.unibo.wastemaster.core.models.OneTimeSchedule;
 import it.unibo.wastemaster.core.models.RecurringSchedule;
 import it.unibo.wastemaster.core.models.Schedule;
-import it.unibo.wastemaster.core.utils.DateUtils;
 import it.unibo.wastemaster.core.utils.ValidateUtils;
 
 public class CollectionManager {
 
     private RecurringScheduleManager recurringScheduleManager;
     private CollectionDAO collectionDAO;
-    private DateUtils dateUtils = new DateUtils();
+
 
     public CollectionManager(CollectionDAO collectionDAO, RecurringScheduleManager recurringScheduleManager) {
         this.collectionDAO = collectionDAO;
@@ -31,7 +31,7 @@ public class CollectionManager {
     }
     
     public void generateCollection(Schedule schedule) {
-        if (schedule.getCollectionDate().isAfter(dateUtils.getCurrentDate())) {
+        if (schedule.getCollectionDate().isAfter(LocalDate.now())) {
             Collection collection = new Collection(schedule);
             collectionDAO.insert(collection);
         }

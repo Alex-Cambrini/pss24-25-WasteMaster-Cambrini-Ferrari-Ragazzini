@@ -38,7 +38,7 @@ public class CollectionDAOTest extends AbstractDatabaseTest {
     public void setUp() {
         super.setUp();
         em.getTransaction().begin();
-        date = dateUtils.getCurrentDate();
+        date = LocalDate.now();
         waste = new Waste("PLASTIC", true, false);
         wasteDAO.insert(waste);
         wasteScheduleManager.setupCollectionRoutine(waste, DayOfWeek.MONDAY);
@@ -77,22 +77,22 @@ public class CollectionDAOTest extends AbstractDatabaseTest {
         collectionDAO.insert(c4);
 
         Collection c5 = new Collection(recurringSchedule);
-        c5.setCollectionDate(dateUtils.getCurrentDate());
+        c5.setCollectionDate(LocalDate.now());
         collectionDAO.insert(c5);
 
         Collection c6 = new Collection(recurringSchedule);
         c6.setCollectionStatus(inProgress);
-        c6.setCollectionDate(dateUtils.getCurrentDate());
+        c6.setCollectionDate(LocalDate.now());
         collectionDAO.insert(c6);
 
         Collection c7 = new Collection(recurringSchedule);
         c7.setCollectionStatus(completed);
-        c7.setCollectionDate(dateUtils.getCurrentDate());
+        c7.setCollectionDate(LocalDate.now());
         collectionDAO.insert(c7);
 
         Collection c8 = new Collection(recurringSchedule);
         c8.setCollectionStatus(cancelled);
-        c8.setCollectionDate(dateUtils.getCurrentDate());
+        c8.setCollectionDate(LocalDate.now());
         collectionDAO.insert(c8);
 
         assertEquals(2, collectionDAO.findCollectionByStatus(pending).size());
@@ -103,7 +103,7 @@ public class CollectionDAOTest extends AbstractDatabaseTest {
 
     @Test
     public void testFindAllCollectionByOneTimeSchedule() {
-        LocalDate newDate = dateUtils.getCurrentDate().plusDays(3);
+        LocalDate newDate = LocalDate.now().plusDays(3);
         OneTimeSchedule schedule = oneTimeScheduleManager.createOneTimeSchedule(customer, waste, newDate);
 
         List<Collection> results = collectionDAO.findAllCollectionsBySchedule(schedule);
@@ -128,7 +128,7 @@ public class CollectionDAOTest extends AbstractDatabaseTest {
 
     @Test
     public void testFindAllCollectionByRecurringSchedule() {
-        LocalDate newDate = dateUtils.getCurrentDate().plusDays(3);
+        LocalDate newDate = LocalDate.now().plusDays(3);
 
         RecurringSchedule schedule = recurringScheduleManager.createRecurringSchedule(customer, waste, newDate,
                 Frequency.WEEKLY);
@@ -153,7 +153,7 @@ public class CollectionDAOTest extends AbstractDatabaseTest {
 
     @Test
     public void testFindActiveCollectionByRecurringSchedule() {
-        LocalDate newDate = dateUtils.getCurrentDate().plusDays(4);
+        LocalDate newDate = LocalDate.now().plusDays(4);
         recurringSchedule.setNextCollectionDate(newDate);
         recurringSchedule.setScheduleStatus(RecurringSchedule.ScheduleStatus.ACTIVE);
         recurringScheduleDAO.update(recurringSchedule);
