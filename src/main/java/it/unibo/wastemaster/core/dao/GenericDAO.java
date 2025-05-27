@@ -47,7 +47,7 @@ public class GenericDAO<T> {
      *
      * @param entity the entity to insert (final)
      */
-    protected void insert(final T entity) {
+    public void insert(final T entity) {
         TransactionHelper.executeTransaction(entityManager,
                 () -> entityManager.persist(entity));
     }
