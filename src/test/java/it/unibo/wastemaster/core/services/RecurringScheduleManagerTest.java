@@ -3,7 +3,6 @@ package it.unibo.wastemaster.core.services;
 import it.unibo.wastemaster.core.models.RecurringSchedule;
 import it.unibo.wastemaster.core.models.RecurringSchedule.Frequency;
 import it.unibo.wastemaster.core.models.Schedule.ScheduleStatus;
-import it.unibo.wastemaster.core.utils.DateUtils;
 import it.unibo.wastemaster.core.utils.ValidateUtils;
 import it.unibo.wastemaster.core.AbstractDatabaseTest;
 import it.unibo.wastemaster.core.models.Collection;
@@ -41,9 +40,9 @@ class RecurringScheduleManagerTest extends AbstractDatabaseTest {
 
     @Test
     void testCreateRecurringSchedule() {
-        recurringScheduleManager.createRecurringSchedule(customer, waste, dateUtils.getCurrentDate(),
+        recurringScheduleManager.createRecurringSchedule(customer, waste, LocalDate.now(),
                 Frequency.WEEKLY);
-        recurringScheduleManager.createRecurringSchedule(customer, waste, dateUtils.getCurrentDate(),
+        recurringScheduleManager.createRecurringSchedule(customer, waste, LocalDate.now(),
                 Frequency.MONTHLY);
 
         List<RecurringSchedule> schedules = recurringScheduleDAO.findSchedulesByCustomer(customer);
@@ -59,7 +58,7 @@ class RecurringScheduleManagerTest extends AbstractDatabaseTest {
         assertEquals(Frequency.MONTHLY, s2.getFrequency());
         assertNotNull(s2.getNextCollectionDate());
 
-        LocalDate pastDate = dateUtils.getCurrentDate().minusDays(1);
+        LocalDate pastDate = LocalDate.now().minusDays(1);
         IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class, () -> {
             recurringScheduleManager.createRecurringSchedule(customer, waste, pastDate, Frequency.WEEKLY);
         });
@@ -67,78 +66,8 @@ class RecurringScheduleManagerTest extends AbstractDatabaseTest {
     }
 
     @Test
-    void testCalculateNextDate_FirstCollection() {
-        LocalDate startDate = LocalDate.of(2025, 4, 24);
-
-        RecurringSchedule schedule = new RecurringSchedule(customer, waste,
-                startDate, Frequency.WEEKLY);
-
-        LocalDate nextDate = recurringScheduleManager.calculateNextDate(schedule);
-
-        LocalDate expectedDate = LocalDate.of(2025, 4, 28);
-        assertEquals(expectedDate, nextDate);
-    }
-
-    @Test
-    void testCalculateNextDate_MonthlyCollection() {
-        LocalDate startDate = LocalDate.of(2025, 4, 24);
-
-        RecurringSchedule schedule = new RecurringSchedule(customer, waste, startDate, Frequency.MONTHLY);
-
-        schedule.setNextCollectionDate(LocalDate.of(2025, 4, 28));
-
-        LocalDate nextDate = recurringScheduleManager.calculateNextDate(schedule);
-
-        LocalDate expectedDate = LocalDate.of(2025, 6, 2);
-        assertEquals(expectedDate, nextDate);
-    }
-
-    @Test
-    void testCalculateNextDate_InThePast() {
-        DateUtils mockDateUtils = new DateUtils() {
-            @Override
-            public LocalDate getCurrentDate() {
-                return LocalDate.of(2025, 5, 1);
-            }
-        };
-
-        recurringScheduleManager.setDateUtils(mockDateUtils);
-
-        LocalDate startDate = LocalDate.of(2025, 4, 1);
-
-        RecurringSchedule schedule = new RecurringSchedule(customer, waste, startDate, Frequency.WEEKLY);
-
-        schedule.setNextCollectionDate(LocalDate.of(2025, 4, 10));
-
-        LocalDate nextDate = recurringScheduleManager.calculateNextDate(schedule);
-
-        LocalDate expectedDate = LocalDate.of(2025, 5, 5);
-
-        assertTrue(nextDate.isAfter(LocalDate.of(2025, 5, 1)));
-        assertEquals(expectedDate, nextDate);
-    }
-
-    @Test
-    void testAlignToScheduledDay() {
-        LocalDate startDate = LocalDate.of(2025, 4, 25);
-        RecurringSchedule schedule = new RecurringSchedule(customer, waste, startDate, Frequency.WEEKLY);
-
-        LocalDate nextDate = recurringScheduleManager.calculateNextDate(schedule);
-        LocalDate expectedDate = LocalDate.of(2025, 4, 28);
-        assertEquals(expectedDate, nextDate);
-
-        schedule.setStartDate(LocalDate.of(2025, 4, 30));
-        schedule.setNextCollectionDate(null);
-
-        nextDate = recurringScheduleManager.calculateNextDate(schedule);
-        expectedDate = LocalDate.of(2025, 5, 5);
-
-        assertEquals(expectedDate, nextDate);
-    }
-
-    @Test
     void testUpdateNextDates() {
-        LocalDate today = dateUtils.getCurrentDate();
+        LocalDate today = LocalDate.now();
         LocalDate startDate = today;
         LocalDate oldNextDate = today.minusDays(2);
 
@@ -160,7 +89,7 @@ class RecurringScheduleManagerTest extends AbstractDatabaseTest {
 
     @Test
     void testUpdateStatusRecurringSchedule() {
-        LocalDate validDate = dateUtils.getCurrentDate().plusDays(3);
+        LocalDate validDate = LocalDate.now().plusDays(3);
 
         // Null arguments throw exception
         assertThrows(IllegalArgumentException.class,
@@ -218,7 +147,7 @@ class RecurringScheduleManagerTest extends AbstractDatabaseTest {
 
     @Test
     void testUpdateFrequency() {
-        LocalDate validDate = dateUtils.getCurrentDate().plusDays(3);
+        LocalDate validDate = LocalDate.now().plusDays(3);
 
         // Null arguments throw exception
         assertThrows(IllegalArgumentException.class,
@@ -227,17 +156,14 @@ class RecurringScheduleManagerTest extends AbstractDatabaseTest {
         assertThrows(IllegalArgumentException.class,
                 () -> recurringScheduleManager.updateFrequency(s0, null));
 
-        // Cannot update frequency if schedule is not ACTIVE
         RecurringSchedule s1 = new RecurringSchedule(customer, waste, validDate, Frequency.WEEKLY);
         s1.setScheduleStatus(ScheduleStatus.PAUSED);
         assertFalse(recurringScheduleManager.updateFrequency(s1, Frequency.MONTHLY));
 
-        // No update if new frequency equals current frequency
         RecurringSchedule s2 = new RecurringSchedule(customer, waste, validDate, Frequency.WEEKLY);
         s2.setScheduleStatus(ScheduleStatus.ACTIVE);
         assertFalse(recurringScheduleManager.updateFrequency(s2, Frequency.WEEKLY));
 
-        // Update frequency successfully
         RecurringSchedule s3 = recurringScheduleManager.createRecurringSchedule(customer, waste, validDate,
                 Frequency.WEEKLY);
         s3.setScheduleStatus(ScheduleStatus.ACTIVE);
@@ -250,12 +176,10 @@ class RecurringScheduleManagerTest extends AbstractDatabaseTest {
         RecurringSchedule reloaded = recurringScheduleDAO.findById(s3.getScheduleId());
         assertEquals(Frequency.MONTHLY, reloaded.getFrequency());
 
-        // Verifica che nextCollectionDate sia >= today+2 (non serve uguaglianza esatta)
-        LocalDate todayPlus2 = dateUtils.getCurrentDate().plusDays(2);
+
+        LocalDate todayPlus2 = LocalDate.now().plusDays(2);
         assertFalse(reloaded.getNextCollectionDate().isBefore(todayPlus2));
 
-        // Verifica che la collection precedente sia stata cancellata e creata una nuova
-        // attiva
         Collection activeCollection = collectionManager.getActiveCollectionByRecurringSchedule(reloaded);
         assertNotNull(activeCollection);
         assertNotEquals(CollectionStatus.CANCELLED, activeCollection.getCollectionStatus());
@@ -263,7 +187,7 @@ class RecurringScheduleManagerTest extends AbstractDatabaseTest {
 
     @Test
     void testGetSchedulesByCustomer() {
-        RecurringSchedule schedule = new RecurringSchedule(customer, waste, dateUtils.getCurrentDate(),
+        RecurringSchedule schedule = new RecurringSchedule(customer, waste, LocalDate.now(),
                 Frequency.WEEKLY);
         recurringScheduleDAO.insert(schedule);
 
@@ -273,4 +197,48 @@ class RecurringScheduleManagerTest extends AbstractDatabaseTest {
         assertEquals(customer, result.get(0).getCustomer());
         assertEquals(waste, result.get(0).getWaste());
     }
+
+    @Test
+    void testCreateRecurringScheduleCalculatesNextCollectionDate() {
+        RecurringSchedule schedule = recurringScheduleManager.createRecurringSchedule(customer, waste, LocalDate.now(),
+                Frequency.WEEKLY);
+        assertNotNull(schedule.getNextCollectionDate());
+        WasteSchedule ws = wasteScheduleDAO.findSchedulebyWaste(waste);
+        LocalDate expectedDate = LocalDate.now().plusDays(2);
+        while (expectedDate.getDayOfWeek() != ws.getDayOfWeek()) {
+            expectedDate = expectedDate.plusDays(1);
+        }
+        assertEquals(expectedDate, schedule.getNextCollectionDate());
+    }
+
+    @Test
+    void testUpdateNextDatesUpdatesSchedulesWithPastNextCollectionDate() {
+        LocalDate pastDate = LocalDate.now().minusDays(5);
+
+        RecurringSchedule schedule = new RecurringSchedule(customer, waste, LocalDate.now(), Frequency.WEEKLY);
+        schedule.setNextCollectionDate(pastDate);
+        schedule.setScheduleStatus(ScheduleStatus.ACTIVE);
+        recurringScheduleDAO.insert(schedule);
+
+        recurringScheduleManager.updateNextDates();
+
+        RecurringSchedule updated = recurringScheduleDAO.findById(schedule.getScheduleId());
+        assertTrue(updated.getNextCollectionDate().isAfter(LocalDate.now()));
+    }
+
+    @Test
+    void testUpdateNextDatesDoesNotChangeFutureNextCollectionDate() {
+        LocalDate futureDate = LocalDate.now().plusDays(10);
+
+        RecurringSchedule schedule = new RecurringSchedule(customer, waste, LocalDate.now(), Frequency.WEEKLY);
+        schedule.setNextCollectionDate(futureDate);
+        schedule.setScheduleStatus(ScheduleStatus.ACTIVE);
+        recurringScheduleDAO.insert(schedule);
+
+        recurringScheduleManager.updateNextDates();
+
+        RecurringSchedule updated = recurringScheduleDAO.findById(schedule.getScheduleId());
+        assertEquals(futureDate, updated.getNextCollectionDate());
+    }
+
 }

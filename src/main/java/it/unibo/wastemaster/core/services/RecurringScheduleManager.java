@@ -11,7 +11,6 @@ import it.unibo.wastemaster.core.models.RecurringSchedule.Frequency;
 import it.unibo.wastemaster.core.models.Schedule.ScheduleStatus;
 import it.unibo.wastemaster.core.models.Waste;
 import it.unibo.wastemaster.core.models.WasteSchedule;
-import it.unibo.wastemaster.core.utils.DateUtils;
 import it.unibo.wastemaster.core.utils.ValidateUtils;
 import it.unibo.wastemaster.core.models.Collection;
 
@@ -20,7 +19,6 @@ public class RecurringScheduleManager {
     private RecurringScheduleDAO recurringScheduleDAO;
     private WasteScheduleManager wasteScheduleManager;
     private CollectionManager collectionManager;
-    private DateUtils dateUtils = new DateUtils();
 
     public RecurringScheduleManager(RecurringScheduleDAO recurringScheduleDAO,
             WasteScheduleManager wasteScheduleManager) {
@@ -30,10 +28,6 @@ public class RecurringScheduleManager {
 
     public void setCollectionManager(CollectionManager collectionManager) {
         this.collectionManager = collectionManager;
-    }
-
-    public void setDateUtils(DateUtils dateUtils) {
-        this.dateUtils = dateUtils;
     }
 
     public RecurringSchedule createRecurringSchedule(Customer customer, Waste waste, LocalDate startDate,
@@ -49,7 +43,7 @@ public class RecurringScheduleManager {
         return schedule;
     }
 
-    protected LocalDate calculateNextDate(RecurringSchedule schedule) {
+    private LocalDate calculateNextDate(RecurringSchedule schedule) {
         ValidateUtils.requireArgNotNull(schedule, "Schedule must not be null");
         ValidateUtils.requireArgNotNull(schedule.getScheduleId(), "Schedule ID must not be null");
 
@@ -70,7 +64,7 @@ public class RecurringScheduleManager {
     private LocalDate calculateRecurringDate(RecurringSchedule schedule) {
         WasteSchedule scheduleData = wasteScheduleManager.getWasteScheduleByWaste(schedule.getWaste());
         LocalDate date = schedule.getNextCollectionDate();
-        LocalDate today = dateUtils.getCurrentDate();
+        LocalDate today = LocalDate.now();
         do {
             if (schedule.getFrequency() == RecurringSchedule.Frequency.WEEKLY) {
                 date = date.plusWeeks(1);
@@ -112,7 +106,6 @@ public class RecurringScheduleManager {
         ValidateUtils.requireArgNotNull(schedule, "Schedule must not be null");
         ValidateUtils.requireArgNotNull(newStatus, "Status must not be null");
 
-        System.err.println(schedule);
         ScheduleStatus currentStatus = schedule.getScheduleStatus();
 
         if (currentStatus == ScheduleStatus.CANCELLED || currentStatus == ScheduleStatus.COMPLETED) {
@@ -127,7 +120,7 @@ public class RecurringScheduleManager {
                     return true;
                 }
                 if (newStatus == ScheduleStatus.ACTIVE) {
-                    LocalDate today = dateUtils.getCurrentDate();
+                    LocalDate today = LocalDate.now();
                     LocalDate nextDate = schedule.getNextCollectionDate();
                     if (nextDate != null && !nextDate.isBefore(today)) {
                         nextDate = schedule.getNextCollectionDate();
@@ -176,7 +169,7 @@ public class RecurringScheduleManager {
 
         schedule.setFrequency(newFrequency);
 
-        LocalDate restartDate = dateUtils.getCurrentDate().plusDays(2);
+        LocalDate restartDate = LocalDate.now().plusDays(2);
         WasteSchedule wasteSchedule = wasteScheduleManager.getWasteScheduleByWaste(schedule.getWaste());
         LocalDate newNextDate = alignToScheduledDay(restartDate, wasteSchedule.getDayOfWeek());
 
