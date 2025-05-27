@@ -1,74 +1,84 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Button?>
 <?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
-<?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.Tooltip?>
 <?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
-
-<VBox alignment="TOP_CENTER" prefWidth="640.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.unibo.wastemaster.controller.collection.CollectionController">
+<VBox alignment="TOP_CENTER"
+      prefWidth="640.0"
+      xmlns="http://javafx.com/javafx/23.0.1"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="it.unibo.wastemaster.controller.collection.CollectionController">
     <children>
-        <HBox alignment="TOP_CENTER" minHeight="40.0" prefHeight="40.0" prefWidth="600.0" spacing="10.0">
-            <children>
-                <Region prefHeight="20" prefWidth="0.0" HBox.hgrow="ALWAYS" />
-                <Button  styleClass="accent" text="Filter ▼" />
-                <TextField  promptText="Search..." />
-                <Button mnemonicParsing="false" styleClass="accent, button-outlined" text="Reset" />
-            </children>
+        <HBox alignment="TOP_CENTER"
+              minHeight="40.0"
+              prefHeight="40.0"
+              prefWidth="600.0"
+              spacing="10.0">
             <VBox.margin>
                 <Insets bottom="10.0" />
             </VBox.margin>
+            <children>
+                <Label fx:id="totalLabel" text="Total: 0" styleClass="title-4, text-bold" />
+                <Label fx:id="completedLabel" text="Completed: 0" styleClass="title-4, text-bold, text, success" />
+                <Label fx:id="cancelledLabel" text="Cancelled: 0" styleClass="title-4, text-bold, text-muted" />
+                <Label fx:id="failedLabel" text="Failed: 0" styleClass="title-4, text-bold, text, danger" />
+                <Label fx:id="inProgressLabel" text="In progress: 0" styleClass="title-4, text-bold, text, accent" />
+                <Label fx:id="pendingLabel" text="Pending: 0" styleClass="title-4, text-bold, text-subtle" />
+            </children>
         </HBox>
         <HBox alignment="CENTER_RIGHT" prefHeight="30.0" prefWidth="30.0" spacing="10.0">
-<children>
-        <CheckBox  mnemonicParsing="false" text="Show Pending">
-            <tooltip>
-                <Tooltip text="Show Active" />
-            </tooltip>
-        </CheckBox>
-        <CheckBox  mnemonicParsing="false" text="Show In Progress">
-            <tooltip>
-                <Tooltip text="Show Paused" />
-            </tooltip>
-        </CheckBox>
-        <CheckBox  mnemonicParsing="false" text="Show Completed">
-            <tooltip>
-                <Tooltip text="Show Completed" />
-            </tooltip>
-        </CheckBox>
-        <CheckBox  text="Show Cancelled">
-            <tooltip>
-                <Tooltip text="Show Deleted" />
-            </tooltip>
-        </CheckBox>
-    </children>
-         <VBox.margin>
-            <Insets bottom="5.0" />
-         </VBox.margin>
+            <children>
+                <CheckBox fx:id="showCompletedCheckBox" mnemonicParsing="false" text="Show Completed">
+                    <tooltip>
+                        <Tooltip text="Show Completed" />
+                    </tooltip>
+                </CheckBox>
+                <CheckBox fx:id="showCancelledCheckBox" mnemonicParsing="false" text="Show Cancelled">
+                    <tooltip>
+                        <Tooltip text="Show Cancelled" />
+                    </tooltip>
+                </CheckBox>
+                <CheckBox fx:id="showFailedCheckBox" mnemonicParsing="false" text="Show Failed">
+                    <tooltip>
+                        <Tooltip text="Show Failed" />
+                    </tooltip>
+                </CheckBox>
+                <CheckBox fx:id="showInProgressCheckBox" mnemonicParsing="false" text="Show In Progress">
+                    <tooltip>
+                        <Tooltip text="Show In Progress" />
+                    </tooltip>
+                </CheckBox>
+                <CheckBox fx:id="showPendingCheckBox" text="Show Pending">
+                    <tooltip>
+                        <Tooltip text="Show Pending" />
+                    </tooltip>
+                </CheckBox>
+            </children>
+            <VBox.margin>
+                <Insets bottom="5.0" />
+            </VBox.margin>
         </HBox>
-        <TableView fx:id="collectionTable" prefHeight="300.0" prefWidth="600.0" styleClass="table-view" VBox.vgrow="ALWAYS">
+        <TableView fx:id="collectionTable"
+                   prefHeight="300.0"
+                   prefWidth="600.0"
+                   styleClass="table-view"
+                   VBox.vgrow="ALWAYS">
             <columns>
                 <TableColumn fx:id="wasteNameColumn" prefWidth="100" text="Waste Name" />
                 <TableColumn fx:id="dateColumn" prefWidth="120" text="Date" />
-                <TableColumn fx:id="ZoneColumn" prefWidth="120" text="Zone" />
+                <TableColumn fx:id="zoneColumn" prefWidth="120" text="Zone" />
                 <TableColumn fx:id="statusColumn" prefWidth="100" text="Status" />
                 <TableColumn fx:id="customerColumn" prefWidth="120" text="Customer" />
             </columns>
-
         </TableView>
         <HBox minHeight="50.0" prefHeight="100.0" prefWidth="600.0" spacing="10.0">
             <padding>
                 <Insets top="10.0" />
             </padding>
-         <children>
-            <Button mnemonicParsing="false" text="Go to trip" />
-            <Button mnemonicParsing="false" text="Go to schedule" />
-         </children>
         </HBox>
     </children>
 </VBox>
