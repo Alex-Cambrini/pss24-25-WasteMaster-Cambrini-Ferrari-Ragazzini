@@ -19,43 +19,58 @@ public final class CollectionController {
 
     @FXML
     private Label totalLabel;
+
     @FXML
     private Label completedLabel;
+
     @FXML
     private Label cancelledLabel;
+
     @FXML
     private Label failedLabel;
+
     @FXML
     private Label inProgressLabel;
+
     @FXML
     private Label pendingLabel;
 
     @FXML
     private TableView<CollectionRow> collectionTable;
+
     @FXML
     private TableColumn<CollectionRow, String> wasteNameColumn;
+
     @FXML
     private TableColumn<CollectionRow, String> dateColumn;
+
     @FXML
     private TableColumn<CollectionRow, String> zoneColumn;
+
     @FXML
     private TableColumn<CollectionRow, String> statusColumn;
+
     @FXML
     private TableColumn<CollectionRow, String> customerColumn;
 
     @FXML
     private CheckBox showCompletedCheckBox;
+
     @FXML
     private CheckBox showCancelledCheckBox;
+
     @FXML
     private CheckBox showFailedCheckBox;
+
     @FXML
     private CheckBox showInProgressCheckBox;
+
     @FXML
     private CheckBox showPendingCheckBox;
 
     private final ObservableList<CollectionRow> allSchedules =
             FXCollections.observableArrayList();
+
     private List<Collection> collections;
 
     /**

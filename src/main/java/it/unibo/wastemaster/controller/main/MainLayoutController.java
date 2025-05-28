@@ -40,14 +40,19 @@ public final class MainLayoutController {
 
     @FXML
     private Hyperlink dashboardLink;
+
     @FXML
     private Hyperlink clientiLink;
+
     @FXML
     private Hyperlink wasteLink;
+
     @FXML
     private Hyperlink scheduleLink;
+
     @FXML
     private Hyperlink veicoliLink;
+
     @FXML
     private Hyperlink employeeLink;
 

@@ -18,18 +18,25 @@ public final class EditCustomerController {
 
     @FXML
     private TextField nameField;
+
     @FXML
     private TextField surnameField;
+
     @FXML
     private TextField emailField;
+
     @FXML
     private TextField phoneField;
+
     @FXML
     private TextField streetField;
+
     @FXML
     private TextField civicField;
+
     @FXML
     private TextField cityField;
+
     @FXML
     private TextField postalCodeField;
 
@@ -120,7 +127,6 @@ public final class EditCustomerController {
     public void setCustomerController(final CustomersController controller) {
         this.customerController = controller;
     }
-
 
     /**
      * Handles the abort of the edit operation.

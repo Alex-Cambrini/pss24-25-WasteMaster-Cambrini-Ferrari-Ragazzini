@@ -19,25 +19,33 @@ public final class AddEmployeeController {
 
     @FXML
     private TextField nameField;
+
     @FXML
     private TextField surnameField;
+
     @FXML
     private TextField emailField;
+
     @FXML
     private TextField phoneField;
+
     @FXML
     private TextField streetField;
+
     @FXML
     private TextField civicField;
+
     @FXML
     private TextField cityField;
+
     @FXML
     private TextField postalCodeField;
+
     @FXML
     private ComboBox<Role> roleComboBox;
+
     @FXML
     private ComboBox<Licence> licenceComboBox;
-
 
     /**
      * Initializes combo boxes with default values.

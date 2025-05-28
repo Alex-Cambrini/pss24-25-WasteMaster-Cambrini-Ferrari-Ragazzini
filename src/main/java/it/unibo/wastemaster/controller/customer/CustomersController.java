@@ -40,36 +40,50 @@ public final class CustomersController {
 
     private Timeline refreshTimeline;
     private ContextMenu filterMenu;
+
     private final ObservableList<CustomerRow> allCustomers =
             FXCollections.observableArrayList();
+
     private final ObservableList<String> activeFilters =
             FXCollections.observableArrayList(FIELD_NAME, FIELD_SURNAME, FIELD_EMAIL,
                     FIELD_STREET, FIELD_CIVIC, FIELD_CITY, FIELD_POSTAL);
 
     @FXML
     private Button filterButton;
+
     @FXML
     private Button addCustomerButton;
+
     @FXML
     private Button editCustomerButton;
+
     @FXML
     private Button deleteCustomerButton;
+
     @FXML
     private javafx.scene.control.TextField searchField;
+
     @FXML
     private TableView<CustomerRow> customerTable;
+
     @FXML
     private TableColumn<CustomerRow, String> nameColumn;
+
     @FXML
     private TableColumn<CustomerRow, String> surnameColumn;
+
     @FXML
     private TableColumn<CustomerRow, String> emailColumn;
+
     @FXML
     private TableColumn<CustomerRow, String> streetColumn;
+
     @FXML
     private TableColumn<CustomerRow, String> civicColumn;
+
     @FXML
     private TableColumn<CustomerRow, String> cityColumn;
+
     @FXML
     private TableColumn<CustomerRow, String> postalColumn;
 
