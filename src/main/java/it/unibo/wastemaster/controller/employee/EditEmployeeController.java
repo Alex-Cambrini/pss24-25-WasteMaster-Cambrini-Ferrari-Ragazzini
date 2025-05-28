@@ -1,109 +1,140 @@
 package it.unibo.wastemaster.controller.employee;
 
+import it.unibo.wastemaster.controller.utils.DialogUtils;
 import it.unibo.wastemaster.core.context.AppContext;
 import it.unibo.wastemaster.core.models.Employee;
 import it.unibo.wastemaster.core.models.Employee.Licence;
 import it.unibo.wastemaster.core.models.Employee.Role;
-
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
 
-import static it.unibo.wastemaster.controller.utils.DialogUtils.*;
-
+/**
+ * Controller for editing an existing employee.
+ * Handles form population and saving of updated data.
+ */
 public class EditEmployeeController {
 
-	private Employee employee;
-	private EmployeeController employeeController;
+    private Employee employee;
 
-	@FXML
-	private TextField nameField;
-	@FXML
-	private TextField surnameField;
-	@FXML
-	private TextField emailField;
-	@FXML
-	private TextField streetField;
-	@FXML
-	private TextField civicField;
-	@FXML
-	private TextField cityField;
-	@FXML
-	private TextField postalCodeField;
-	@FXML
-	private ComboBox<Role> roleComboBox;
-	@FXML
-	private ComboBox<Licence> licenceComboBox;
+    @FXML
+    private TextField nameField;
 
-	public void setEmployeeController(EmployeeController controller) {
-		this.employeeController = controller;
-	}
+    @FXML
+    private TextField surnameField;
 
-	public void setEmployeeToEdit(Employee employee) {
-		this.employee = employee;
+    @FXML
+    private TextField emailField;
 
-		nameField.setText(employee.getName());
-		surnameField.setText(employee.getSurname());
-		emailField.setText(employee.getEmail());
+    @FXML
+    private TextField streetField;
 
-		streetField.setText(employee.getLocation().getStreet());
-		civicField.setText(employee.getLocation().getCivicNumber());
-		cityField.setText(employee.getLocation().getCity());
-		postalCodeField.setText(employee.getLocation().getPostalCode());
+    @FXML
+    private TextField civicField;
 
-		roleComboBox.getItems().setAll(Role.values());
-		roleComboBox.getSelectionModel().select(employee.getRole());
+    @FXML
+    private TextField cityField;
 
-		licenceComboBox.getItems().setAll(Licence.values());
-		licenceComboBox.getSelectionModel().select(employee.getLicence());
-	}
+    @FXML
+    private TextField postalCodeField;
 
-	@FXML
-	private void handleSave(ActionEvent event) {
-		try {
-			Employee original = AppContext.getEmployeeDAO().findByEmail(employee.getEmail());
-			if (original == null) {
-				showError("Error", "Employee not found.", AppContext.getOwner());
-				return;
-			}
+    @FXML
+    private ComboBox<Role> roleComboBox;
 
-			boolean changed = !original.getName().equals(nameField.getText()) ||
-					!original.getSurname().equals(surnameField.getText()) ||
-					!original.getLocation().getStreet().equals(streetField.getText()) ||
-					!original.getLocation().getCivicNumber().equals(civicField.getText()) ||
-					!original.getLocation().getCity().equals(cityField.getText()) ||
-					!original.getLocation().getPostalCode().equals(postalCodeField.getText()) ||
-					original.getRole() != roleComboBox.getValue() ||
-					original.getLicence() != licenceComboBox.getValue();
+    @FXML
+    private ComboBox<Licence> licenceComboBox;
 
-			if (!changed) {
-				showError("No changes", "No fields were modified.", AppContext.getOwner());
-				return;
-			}
+    /**
+     * Sets the employee to be edited and populates the form fields with the employee's
+     * data.
+     *
+     * @param employee the Employee to edit
+     */
+    public final void setEmployeeToEdit(final Employee employee) {
+        this.employee = employee;
 
-			employee.setName(nameField.getText());
-			employee.setSurname(surnameField.getText());
-			employee.getLocation().setStreet(streetField.getText());
-			employee.getLocation().setCivicNumber(civicField.getText());
-			employee.getLocation().setCity(cityField.getText());
-			employee.getLocation().setPostalCode(postalCodeField.getText());
-			employee.setRole(roleComboBox.getValue());
-			employee.setLicence(licenceComboBox.getValue());
+        nameField.setText(employee.getName());
+        surnameField.setText(employee.getSurname());
+        emailField.setText(employee.getEmail());
 
-			AppContext.getEmployeeManager().updateEmployee(employee);
-			showSuccess("Employee updated successfully.", AppContext.getOwner());
-			closeModal(event);
+        streetField.setText(employee.getLocation().getStreet());
+        civicField.setText(employee.getLocation().getCivicNumber());
+        cityField.setText(employee.getLocation().getCity());
+        postalCodeField.setText(employee.getLocation().getPostalCode());
 
-		} catch (IllegalArgumentException e) {
-			showError("Validation error", e.getMessage(), AppContext.getOwner());
-		} catch (Exception e) {
-			showError("Unexpected error", e.getMessage(), AppContext.getOwner());
-		}
-	}
+        roleComboBox.getItems().setAll(Role.values());
+        roleComboBox.getSelectionModel().select(employee.getRole());
 
-	@FXML
-	private void handleAbortEdit(ActionEvent event) {
-		closeModal(event);
-	}
+        licenceComboBox.getItems().setAll(Licence.values());
+        licenceComboBox.getSelectionModel().select(employee.getLicence());
+    }
+
+    /**
+     * Handles the save action triggered by the user.
+     * Validates and updates the employee data.
+     *
+     * @param event the action event
+     */
+    @FXML
+    private void handleSave(final ActionEvent event) {
+        try {
+            Employee original =
+                    AppContext.getEmployeeDAO().findByEmail(employee.getEmail());
+            if (original == null) {
+                DialogUtils.showError("Error", "Employee not found.",
+                        AppContext.getOwner());
+                return;
+            }
+
+            boolean changed = !original.getName().equals(nameField.getText())
+                    || !original.getSurname().equals(surnameField.getText())
+                    || !original.getLocation().getStreet().equals(streetField.getText())
+                    || !original.getLocation().getCivicNumber()
+                            .equals(civicField.getText())
+                    || !original.getLocation().getCity().equals(cityField.getText())
+                    || !original.getLocation().getPostalCode()
+                            .equals(postalCodeField.getText())
+                    || original.getRole() != roleComboBox.getValue()
+                    || original.getLicence() != licenceComboBox.getValue();
+
+            if (!changed) {
+                DialogUtils.showError("No changes", "No fields were modified.",
+                        AppContext.getOwner());
+                return;
+            }
+
+            employee.setName(nameField.getText());
+            employee.setSurname(surnameField.getText());
+            employee.getLocation().setStreet(streetField.getText());
+            employee.getLocation().setCivicNumber(civicField.getText());
+            employee.getLocation().setCity(cityField.getText());
+            employee.getLocation().setPostalCode(postalCodeField.getText());
+            employee.setRole(roleComboBox.getValue());
+            employee.setLicence(licenceComboBox.getValue());
+
+            AppContext.getEmployeeManager().updateEmployee(employee);
+
+            DialogUtils.showSuccess("Employee updated successfully.",
+                    AppContext.getOwner());
+            DialogUtils.closeModal(event);
+
+        } catch (IllegalArgumentException e) {
+            DialogUtils.showError("Validation error", e.getMessage(),
+                    AppContext.getOwner());
+        } catch (Exception e) {
+            DialogUtils.showError("Unexpected error", e.getMessage(),
+                    AppContext.getOwner());
+        }
+    }
+
+    /**
+     * Aborts the edit and closes the modal.
+     *
+     * @param event the action event
+     */
+    @FXML
+    private void handleAbortEdit(final ActionEvent event) {
+        DialogUtils.closeModal(event);
+    }
 }

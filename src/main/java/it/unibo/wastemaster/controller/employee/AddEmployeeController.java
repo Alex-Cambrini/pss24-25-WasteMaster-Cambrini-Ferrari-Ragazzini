@@ -1,20 +1,21 @@
 package it.unibo.wastemaster.controller.employee;
 
+import it.unibo.wastemaster.controller.utils.DialogUtils;
 import it.unibo.wastemaster.core.context.AppContext;
 import it.unibo.wastemaster.core.models.Employee;
 import it.unibo.wastemaster.core.models.Employee.Licence;
 import it.unibo.wastemaster.core.models.Employee.Role;
 import it.unibo.wastemaster.core.models.Location;
 import it.unibo.wastemaster.core.utils.ValidateUtils;
-
-import static it.unibo.wastemaster.controller.utils.DialogUtils.*;
-
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
 
-public class AddEmployeeController {
+/**
+ * Controller for the Add Employee modal view. Handles input validation and saving logic.
+ */
+public final class AddEmployeeController {
 
     @FXML
     private TextField nameField;
@@ -37,12 +38,10 @@ public class AddEmployeeController {
     @FXML
     private ComboBox<Licence> licenceComboBox;
 
-    private EmployeeController employeeController;
 
-    public void setEmployeeController(EmployeeController controller) {
-        this.employeeController = controller;
-    }
-
+    /**
+     * Initializes combo boxes with default values.
+     */
     @FXML
     public void initialize() {
         roleComboBox.getItems().setAll(Role.values());
@@ -52,8 +51,13 @@ public class AddEmployeeController {
         licenceComboBox.getSelectionModel().selectFirst();
     }
 
+    /**
+     * Handles the save operation of the employee.
+     *
+     * @param event the action event triggering the save
+     */
     @FXML
-    private void handleSaveEmployee(ActionEvent event) {
+    private void handleSaveEmployee(final ActionEvent event) {
         try {
             String name = nameField.getText();
             String surname = surnameField.getText();
@@ -67,24 +71,33 @@ public class AddEmployeeController {
             Licence licence = licenceComboBox.getValue();
 
             Location address = new Location(street, civic, city, postalCode);
-            Employee employee = new Employee(name, surname, address, email, phone, role, licence);
+            Employee employee =
+                    new Employee(name, surname, address, email, phone, role, licence);
 
             ValidateUtils.validateAll(employee, address);
 
             AppContext.getEmployeeManager().addEmployee(employee);
-            showSuccess("Employee saved successfully.", AppContext.getOwner());
-            closeModal(event);
+            DialogUtils.showSuccess("Employee saved successfully.",
+                    AppContext.getOwner());
+            DialogUtils.closeModal(event);
 
         } catch (IllegalArgumentException e) {
-            showError("Validation error", e.getMessage(), AppContext.getOwner());
+            DialogUtils.showError("Validation error", e.getMessage(),
+                    AppContext.getOwner());
         } catch (Exception e) {
             e.printStackTrace();
-            showError("Unexpected error", e.getMessage(), AppContext.getOwner());
+            DialogUtils.showError("Unexpected error", e.getMessage(),
+                    AppContext.getOwner());
         }
     }
 
+    /**
+     * Handles aborting the employee creation modal.
+     *
+     * @param event the action event triggering the abort
+     */
     @FXML
-    private void handleAbortEmployeeCreation(ActionEvent event) {
-        closeModal(event);
+    private void handleAbortEmployeeCreation(final ActionEvent event) {
+        DialogUtils.closeModal(event);
     }
 }
