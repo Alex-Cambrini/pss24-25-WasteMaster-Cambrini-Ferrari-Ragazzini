@@ -1,68 +1,117 @@
 package it.unibo.wastemaster.core.services;
 
-import java.time.LocalDate;
-
 import it.unibo.wastemaster.core.dao.VehicleDAO;
 import it.unibo.wastemaster.core.models.Vehicle;
 import it.unibo.wastemaster.core.utils.ValidateUtils;
+import java.time.LocalDate;
 
-public class VehicleManager {
+/**
+ * Service for managing vehicle entities.
+ */
+public final class VehicleManager {
 
-	private final VehicleDAO vehicleDAO;
+    private final VehicleDAO vehicleDAO;
 
-	public VehicleManager(VehicleDAO vehicleDAO) {
-		this.vehicleDAO = vehicleDAO;
-	}
+    /**
+     * Constructs a new VehicleManager.
+     *
+     * @param vehicleDAO DAO for vehicle persistence
+     */
+    public VehicleManager(final VehicleDAO vehicleDAO) {
+        this.vehicleDAO = vehicleDAO;
+    }
 
-	public Vehicle addVehicle(Vehicle vehicle) {
-		ValidateUtils.validateEntity(vehicle);
+    /**
+     * Adds a new vehicle after validation.
+     *
+     * @param vehicle the vehicle to add
+     * @return the persisted vehicle
+     * @throws IllegalArgumentException if plate is already registered
+     */
+    public Vehicle addVehicle(final Vehicle vehicle) {
+        ValidateUtils.validateEntity(vehicle);
 
-		if (isPlateRegistered(vehicle.getPlate())) {
-			throw new IllegalArgumentException(
-					String.format("Cannot add vehicle: the plate '%s' is already registered.", vehicle.getPlate()));
-		}
-		vehicleDAO.insert(vehicle);
-		return vehicle;
-	}
+        if (isPlateRegistered(vehicle.getPlate())) {
+            throw new IllegalArgumentException(
+                String.format(
+                    "Cannot add vehicle: the plate '%s' is already registered.",
+                    vehicle.getPlate()
+                )
+            );
+        }
 
-	public Vehicle findVehicleByPlate(String plate) {
-		if (plate == null) {
-			throw new IllegalArgumentException("Plate cannot be null");
-		}
-		plate = plate.toUpperCase().trim();
-		return vehicleDAO.findByPlate(plate);
-	}
+        vehicleDAO.insert(vehicle);
+        return vehicle;
+    }
 
-	private boolean isPlateRegistered(String plate) {
-		Vehicle vehicle = findVehicleByPlate(plate);
-		return vehicle != null;
-	}
+    /**
+     * Finds a vehicle by its plate.
+     *
+     * @param plate the plate to search for
+     * @return the vehicle or null if not found
+     */
+    public Vehicle findVehicleByPlate(final String plate) {
+        if (plate == null) {
+            throw new IllegalArgumentException("Plate cannot be null");
+        }
+        final String normalizedPlate = plate.toUpperCase().trim();
+        return vehicleDAO.findByPlate(normalizedPlate);
+    }
 
-	public void updateVehicle(Vehicle vehicle) {
-		ValidateUtils.validateEntity(vehicle);
-		vehicleDAO.update(vehicle);
-	}
+    private boolean isPlateRegistered(final String plate) {
+        final Vehicle vehicle = findVehicleByPlate(plate);
+        return vehicle != null;
+    }
 
-	public void markMaintenanceAsComplete(Vehicle vehicle) {
-		ValidateUtils.validateEntity(vehicle);
-		if (vehicle.getVehicleStatus() == Vehicle.VehicleStatus.IN_MAINTENANCE) {
-			vehicle.setVehicleStatus(Vehicle.VehicleStatus.IN_SERVICE);
-			vehicle.setLastMaintenanceDate(LocalDate.now());
-			vehicle.setNextMaintenanceDate(vehicle.getLastMaintenanceDate().plusYears(1));
-			updateVehicle(vehicle);
-		} else {
-			throw new IllegalArgumentException("The vehicle is not in maintenance status.");
-		}
-	}
+    /**
+     * Updates an existing vehicle.
+     *
+     * @param vehicle the vehicle to update
+     */
+    public void updateVehicle(final Vehicle vehicle) {
+        ValidateUtils.validateEntity(vehicle);
+        vehicleDAO.update(vehicle);
+    }
 
-	public boolean deleteVehicle(Vehicle vehicle) {
-		try {
-			ValidateUtils.requireArgNotNull(vehicle, "Vehicle cannot be null");
-			ValidateUtils.requireArgNotNull(vehicle.getPlate(), "Vehicle plate cannot be null");
-			vehicleDAO.delete(vehicle);
-			return true;
-		} catch (IllegalArgumentException e) {
-			return false;
-		}
-	}
+    /**
+     * Marks maintenance as complete and updates dates.
+     *
+     * @param vehicle the vehicle being maintained
+     * @throws IllegalArgumentException if vehicle is not in maintenance
+     */
+    public void markMaintenanceAsComplete(final Vehicle vehicle) {
+        ValidateUtils.validateEntity(vehicle);
+
+        if (vehicle.getVehicleStatus() == Vehicle.VehicleStatus.IN_MAINTENANCE) {
+            vehicle.setVehicleStatus(Vehicle.VehicleStatus.IN_SERVICE);
+            vehicle.setLastMaintenanceDate(LocalDate.now());
+            vehicle.setNextMaintenanceDate(
+                vehicle.getLastMaintenanceDate().plusYears(1)
+            );
+            updateVehicle(vehicle);
+        } else {
+            throw new IllegalArgumentException(
+                "The vehicle is not in maintenance status."
+            );
+        }
+    }
+
+    /**
+     * Deletes the given vehicle if valid.
+     *
+     * @param vehicle the vehicle to delete
+     * @return true if deleted, false if validation fails
+     */
+    public boolean deleteVehicle(final Vehicle vehicle) {
+        try {
+            ValidateUtils.requireArgNotNull(vehicle, "Vehicle cannot be null");
+            ValidateUtils.requireArgNotNull(
+                vehicle.getPlate(), "Vehicle plate cannot be null"
+            );
+            vehicleDAO.delete(vehicle);
+            return true;
+        } catch (IllegalArgumentException e) {
+            return false;
+        }
+    }
 }
