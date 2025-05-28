@@ -41,12 +41,12 @@ final class CustomerDAOTest extends AbstractDatabaseTest {
                 Customer customer = new Customer("Giulia", "Neri", location,
                                 existingEmail, "1234567890");
 
-                customerDAO.insert(customer);
+                getCustomerDAO().insert(customer);
 
-                assertTrue(customerDAO.existsByEmail(existingEmail),
+                assertTrue(getCustomerDAO().existsByEmail(existingEmail),
                                 "Should return true for existing email");
 
-                assertFalse(customerDAO.existsByEmail(nonExistingEmail),
+                assertFalse(getCustomerDAO().existsByEmail(nonExistingEmail),
                                 "Should return false for non-existing email");
         }
 
@@ -61,15 +61,16 @@ final class CustomerDAOTest extends AbstractDatabaseTest {
                 Customer customer = new Customer("Giulia", "Neri", location,
                                 existingEmail, "1234567890");
 
-                customerDAO.insert(customer);
+                getCustomerDAO().insert(customer);
 
-                Customer foundCustomer = customerDAO.findByEmail(existingEmail);
+                Customer foundCustomer = getCustomerDAO().findByEmail(existingEmail);
                 assertNotNull(foundCustomer,
                                 "Customer should be found for existing email");
                 assertEquals(existingEmail, foundCustomer.getEmail(),
                                 "Email should match");
 
-                Customer notFoundCustomer = customerDAO.findByEmail(nonExistingEmail);
+                Customer notFoundCustomer =
+                                getCustomerDAO().findByEmail(nonExistingEmail);
                 assertNull(notFoundCustomer,
                                 "Customer should not be found for non-existing email");
         }
@@ -88,13 +89,13 @@ final class CustomerDAOTest extends AbstractDatabaseTest {
                 Customer deletedCustomer = new Customer("Laura", "Rossi", location,
                                 "laura@example.com", "3333333333");
 
-                customerDAO.insert(customer1);
-                customerDAO.insert(customer2);
-                customerDAO.insert(deletedCustomer);
+                getCustomerDAO().insert(customer1);
+                getCustomerDAO().insert(customer2);
+                getCustomerDAO().insert(deletedCustomer);
                 deletedCustomer.delete();
-                customerDAO.update(deletedCustomer);
+                getCustomerDAO().update(deletedCustomer);
 
-                var result = customerDAO.findCustomerDetails();
+                var result = getCustomerDAO().findCustomerDetails();
 
                 assertTrue(result.stream()
                                 .anyMatch(c -> c.getEmail().equals("marco@example.com")),
