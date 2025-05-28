@@ -26,7 +26,7 @@ public final class MainLayoutController {
     private static final String SCHEDULE_MANAGEMENT = "Schedule Management";
 
     private static MainLayoutController instance;
-
+    private Object currentController;
     private String previousTitle;
 
     @FXML
@@ -89,8 +89,10 @@ public final class MainLayoutController {
      */
     public void loadCenter(final String fxmlPath) {
         try {
+            invokeStopAutoRefresh();
             final FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
             final Pane view = loader.load();
+            currentController = loader.getController();
             centerPane.getChildren().setAll(view);
         } catch (final IOException e) {
             LOGGER.log(Level.SEVERE, ERROR_LOADING_FXML, e);
@@ -106,13 +108,30 @@ public final class MainLayoutController {
      */
     public <T> T loadCenterWithController(final String fxmlPath) {
         try {
+            invokeStopAutoRefresh();
             final FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
             final Pane view = loader.load();
+            T controller = loader.getController();
+            currentController = controller;
+
             centerPane.getChildren().setAll(view);
-            return loader.getController();
+            return controller;
         } catch (final IOException e) {
             LOGGER.log(Level.SEVERE, ERROR_LOADING_FXML, e);
             return null;
+        }
+    }
+
+    private void invokeStopAutoRefresh() {
+        if (currentController != null) {
+            try {
+                currentController.getClass().getMethod("stopAutoRefresh")
+                        .invoke(currentController);
+            } catch (NoSuchMethodException e) {
+                // Method stopAutoRefresh does not exist; safe to ignore.
+            } catch (Exception e) {
+                LOGGER.log(Level.SEVERE, "Error invoking stopAutoRefresh", e);
+            }
         }
     }
 
