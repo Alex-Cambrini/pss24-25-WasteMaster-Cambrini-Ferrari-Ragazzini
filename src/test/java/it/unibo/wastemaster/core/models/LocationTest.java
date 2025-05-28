@@ -1,19 +1,23 @@
 package it.unibo.wastemaster.core.models;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import it.unibo.wastemaster.core.AbstractDatabaseTest;
 import it.unibo.wastemaster.core.utils.ValidateUtils;
 import jakarta.validation.ConstraintViolation;
+import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.util.Set;
-
-import static org.junit.jupiter.api.Assertions.*;
-
-public class LocationTest extends AbstractDatabaseTest {
+class LocationTest extends AbstractDatabaseTest {
 
     private Location location;
 
+    @Override
     @BeforeEach
     public void setUp() {
         super.setUp();
@@ -21,7 +25,7 @@ public class LocationTest extends AbstractDatabaseTest {
     }
 
     @Test
-    public void testGetterSetter() {
+    void testGetterSetter() {
         location.setStreet("Via Milano");
         assertEquals("Via Milano", location.getStreet());
 
@@ -36,46 +40,53 @@ public class LocationTest extends AbstractDatabaseTest {
     }
 
     @Test
-    public void testToString() {
+    void testToString() {
         String expectedString = "Via Roma 10, Milano, 20100";
         assertEquals(expectedString, location.toString());
     }
 
     @Test
-    public void testInvalidLocation() {
+    void testInvalidLocation() {
         Location invalid = new Location("", "", "", "");
 
-        Set<ConstraintViolation<Location>> violations = ValidateUtils.VALIDATOR.validate(invalid);
+        Set<ConstraintViolation<Location>> violations =
+                ValidateUtils.VALIDATOR.validate(invalid);
         assertFalse(violations.isEmpty());
 
-        assertTrue(violations.stream().anyMatch(v -> v.getPropertyPath().toString().equals("street")));
-        assertTrue(violations.stream().anyMatch(v -> v.getPropertyPath().toString().equals("civicNumber")));
-        assertTrue(violations.stream().anyMatch(v -> v.getPropertyPath().toString().equals("city")));
-        assertTrue(violations.stream().anyMatch(v -> v.getPropertyPath().toString().equals("postalCode")));
+        assertTrue(violations.stream()
+                .anyMatch(v -> v.getPropertyPath().toString().equals("street")));
+        assertTrue(violations.stream()
+                .anyMatch(v -> v.getPropertyPath().toString().equals("civicNumber")));
+        assertTrue(violations.stream()
+                .anyMatch(v -> v.getPropertyPath().toString().equals("city")));
+        assertTrue(violations.stream()
+                .anyMatch(v -> v.getPropertyPath().toString().equals("postalCode")));
     }
 
     @Test
-    public void testValidLocation() {
+    void testValidLocation() {
         Location valid = new Location("Via Garibaldi", "15", "Torino", "10100");
 
-        Set<ConstraintViolation<Location>> violations = ValidateUtils.VALIDATOR.validate(valid);
-        assertTrue(violations.isEmpty(), "Expected no validation errors for a valid Location");
+        Set<ConstraintViolation<Location>> violations =
+                ValidateUtils.VALIDATOR.validate(valid);
+        assertTrue(violations.isEmpty(),
+                "Expected no validation errors for a valid Location");
     }
 
     @Test
-    public void testPersistence() {
-        locationDAO.insert(location);
+    void testPersistence() {
+        getLocationDAO().insert(location);
 
         int locationId = location.getId();
-        Location found = locationDAO.findById(locationId);
+        Location found = getLocationDAO().findById(locationId);
         assertNotNull(found);
         assertEquals(location.getStreet(), found.getStreet());
         assertEquals(location.getCivicNumber(), found.getCivicNumber());
         assertEquals(location.getCity(), found.getCity());
         assertEquals(location.getPostalCode(), found.getPostalCode());
 
-        locationDAO.delete(found);
-        Location deleted = locationDAO.findById(locationId);
+        getLocationDAO().delete(found);
+        Location deleted = getLocationDAO().findById(locationId);
         assertNull(deleted);
     }
 }
