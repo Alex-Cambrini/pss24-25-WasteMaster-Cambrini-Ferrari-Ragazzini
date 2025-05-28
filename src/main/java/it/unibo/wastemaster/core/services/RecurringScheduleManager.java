@@ -13,7 +13,6 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.List;
 
-
 /**
  * Manages recurring schedules: creation, update, and retrieval. Works with DAO,
  * WasteScheduleManager, and CollectionManager.
