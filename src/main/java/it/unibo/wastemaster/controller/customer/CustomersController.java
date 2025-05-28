@@ -183,8 +183,6 @@ public final class CustomersController {
 
         boolean success = AppContext.getCustomerManager().softDeleteCustomer(customer);
         if (success) {
-            DialogUtils.showSuccess("Customer deleted successfully.",
-                    AppContext.getOwner());
             loadCustomers();
         } else {
             DialogUtils.showError("Deletion Failed",
