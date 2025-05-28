@@ -1,5 +1,11 @@
 package it.unibo.wastemaster.core.services;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import it.unibo.wastemaster.core.AbstractDatabaseTest;
 import it.unibo.wastemaster.core.models.Collection;
 import it.unibo.wastemaster.core.models.Customer;
@@ -7,83 +13,85 @@ import it.unibo.wastemaster.core.models.Location;
 import it.unibo.wastemaster.core.models.OneTimeSchedule;
 import it.unibo.wastemaster.core.models.Schedule.ScheduleStatus;
 import it.unibo.wastemaster.core.models.Waste;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import java.time.LocalDate;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 class OneTimeScheduleManagerTest extends AbstractDatabaseTest {
 
-	private OneTimeScheduleManager oneTimeScheduleManager;
-	private Customer customer;
-	private Location location;
-	private Waste waste;
+    private Customer customer;
+    private Location location;
+    private Waste waste;
 
-	@BeforeEach
-	public void setUp() {
-		super.setUp();
-		em.getTransaction().begin();
+    @Override
+    @BeforeEach
+    public void setUp() {
+        super.setUp();
+        getEntityManager().getTransaction().begin();
 
-		location = new Location("Via Milano", "22", "Modena", "41100");
-		customer = new Customer("Luca", "Verdi", location, "luca.verdi@example.com", "3334567890");
-		waste = new Waste("plastic", true, false);
+        location = new Location("Via Milano", "22", "Modena", "41100");
+        customer = new Customer("Luca", "Verdi", location, "luca.verdi@example.com",
+                "3334567890");
+        waste = new Waste("plastic", true, false);
 
-		locationDAO.insert(location);
-		customerDAO.insert(customer);
-		wasteDAO.insert(waste);
+        getLocationDAO().insert(location);
+        getCustomerDAO().insert(customer);
+        getWasteDAO().insert(waste);
+    }
 
-		oneTimeScheduleManager = new OneTimeScheduleManager(oneTimeScheduleDAO, collectionManager);
-	}
+    @Test
+    void testCreateOneTimeSchedule() {
+        LocalDate invalidDate = LocalDate.now().plusDays(1);
+        LocalDate validDate = LocalDate.now().plusDays(3);
 
-	@Test
-	public void testCreateOneTimeSchedule() {
-		LocalDate invalidDate = LocalDate.now().plusDays(1);
-		LocalDate validDate = LocalDate.now().plusDays(3);
+        assertThrows(IllegalArgumentException.class, () -> {
+            getOneTimeScheduleManager().createOneTimeSchedule(customer, waste,
+                    invalidDate);
+        });
 
-		assertThrows(IllegalArgumentException.class, () -> {
-			oneTimeScheduleManager.createOneTimeSchedule(customer, waste, invalidDate);
-		});
+        OneTimeSchedule newSchedule = getOneTimeScheduleManager()
+                .createOneTimeSchedule(customer, waste, validDate);
+        assertNotNull(newSchedule);
+        assertEquals(ScheduleStatus.ACTIVE, newSchedule.getScheduleStatus());
 
-		OneTimeSchedule newSchedule = oneTimeScheduleManager.createOneTimeSchedule(customer, waste,
-				validDate);
-		assertNotNull(newSchedule);
-		assertEquals(newSchedule.getScheduleStatus(), ScheduleStatus.ACTIVE);
+        Collection associatedCollection =
+                getCollectionManager().getAllCollectionBySchedule(newSchedule).get(0);
+        assertNotNull(associatedCollection);
+        assertEquals(Collection.CollectionStatus.PENDING,
+                associatedCollection.getCollectionStatus());
+    }
 
-		Collection associatedCollection = collectionManager.getAllCollectionBySchedule(newSchedule).get(0);
-		assertNotNull(associatedCollection);
-		assertEquals(associatedCollection.getCollectionStatus(), Collection.CollectionStatus.PENDING);
-	}
+    @Test
+    void testSoftDeleteOneTimeSchedule() {
+        LocalDate validDate = LocalDate.now().plusDays(3);
 
-	@Test
-	void testSoftDeleteOneTimeSchedule_allCases() {
-		LocalDate validDate = LocalDate.now().plusDays(3);
+        // 1) Null args
+        assertThrows(IllegalArgumentException.class,
+                () -> getOneTimeScheduleManager().softDeleteOneTimeSchedule(null));
 
-		// 1) Null args
-		assertThrows(IllegalArgumentException.class, () -> oneTimeScheduleManager.softDeleteOneTimeSchedule(null));
+        // 2) Already CANCELLED → false
+        OneTimeSchedule cancelledSchedule =
+                new OneTimeSchedule(customer, waste, validDate);
+        cancelledSchedule.setScheduleStatus(ScheduleStatus.CANCELLED);
+        assertFalse(
+                getOneTimeScheduleManager().softDeleteOneTimeSchedule(cancelledSchedule));
 
-		// 2) Already CANCELLED → false
-		OneTimeSchedule cancelledSchedule = new OneTimeSchedule(customer, waste, validDate);
-		cancelledSchedule.setScheduleStatus(ScheduleStatus.CANCELLED);
-		assertFalse(oneTimeScheduleManager.softDeleteOneTimeSchedule(cancelledSchedule));
+        // 3) ACTIVE → CANCELLED
+        OneTimeSchedule activeSchedule = getOneTimeScheduleManager()
+                .createOneTimeSchedule(customer, waste, validDate);
+        boolean deleted =
+                getOneTimeScheduleManager().softDeleteOneTimeSchedule(activeSchedule);
+        assertTrue(deleted);
 
-		// 3) ACTIVE → CANCELLED
-		OneTimeSchedule activeSchedule = oneTimeScheduleManager.createOneTimeSchedule(customer, waste, validDate);
-		boolean deleted = oneTimeScheduleManager.softDeleteOneTimeSchedule(activeSchedule);
-		assertTrue(deleted);
+        // Check collection also cancelled
+        Collection cancelledCollection =
+                getCollectionManager().getAllCollectionBySchedule(activeSchedule).get(0);
+        assertNotNull(cancelledCollection);
+        assertEquals(Collection.CollectionStatus.CANCELLED,
+                cancelledCollection.getCollectionStatus());
 
-		// Check collection also cancelled
-		Collection cancelledCollection = collectionManager.getAllCollectionBySchedule(activeSchedule).get(0);
-		assertNotNull(cancelledCollection);
-		assertEquals(Collection.CollectionStatus.CANCELLED, cancelledCollection.getCollectionStatus());
-
-		// 4) Try to delete again → false
-		assertFalse(oneTimeScheduleManager.softDeleteOneTimeSchedule(activeSchedule));
-	}
+        // 4) Try to delete again → false
+        assertFalse(
+                getOneTimeScheduleManager().softDeleteOneTimeSchedule(activeSchedule));
+    }
 }
