@@ -1,52 +1,61 @@
 package it.unibo.wastemaster.controller.customer;
 
+import it.unibo.wastemaster.controller.main.MainLayoutController;
+import it.unibo.wastemaster.controller.utils.DialogUtils;
 import it.unibo.wastemaster.core.context.AppContext;
 import it.unibo.wastemaster.core.models.Customer;
+import it.unibo.wastemaster.viewmodels.CustomerRow;
+import java.util.List;
+import java.util.Optional;
+import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
-import javafx.util.Duration;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
-import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.CustomMenuItem;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
+import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.util.Duration;
 
-import java.util.List;
-import java.util.Optional;
+/**
+ * Controller for managing the customers view, including search, filters and CRUD
+ * operations.
+ */
+public final class CustomersController {
 
-import it.unibo.wastemaster.controller.main.MainLayoutController;
-import it.unibo.wastemaster.controller.utils.DialogUtils;
-import it.unibo.wastemaster.viewmodels.CustomerRow;
-
-public class CustomersController {
+    private static final String FIELD_NAME = "name";
+    private static final String FIELD_SURNAME = "surname";
+    private static final String FIELD_EMAIL = "email";
+    private static final String FIELD_STREET = "street";
+    private static final String FIELD_CIVIC = "civic";
+    private static final String FIELD_CITY = "city";
+    private static final String FIELD_POSTAL = "postal";
+    private static final String NAVIGATION_ERROR = "Navigation error";
+    private static final int REFRESH_SECONDS = 30;
 
     private Timeline refreshTimeline;
     private ContextMenu filterMenu;
-    private ObservableList<CustomerRow> allCustomers = FXCollections.observableArrayList();
-
-    private final ObservableList<String> activeFilters = FXCollections.observableArrayList("name",
-            "surname", "email", "street", "civic", "city", "postal");
+    private final ObservableList<CustomerRow> allCustomers =
+            FXCollections.observableArrayList();
+    private final ObservableList<String> activeFilters =
+            FXCollections.observableArrayList(FIELD_NAME, FIELD_SURNAME, FIELD_EMAIL,
+                    FIELD_STREET, FIELD_CIVIC, FIELD_CITY, FIELD_POSTAL);
 
     @FXML
     private Button filterButton;
-
     @FXML
     private Button addCustomerButton;
-
     @FXML
     private Button editCustomerButton;
-
     @FXML
     private Button deleteCustomerButton;
-
     @FXML
     private javafx.scene.control.TextField searchField;
-
     @FXML
     private TableView<CustomerRow> customerTable;
     @FXML
@@ -64,49 +73,57 @@ public class CustomersController {
     @FXML
     private TableColumn<CustomerRow, String> postalColumn;
 
+    /**
+     * Initializes the customer view with columns, search and auto-refresh logic.
+     */
     @FXML
     public void initialize() {
-        nameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
-        surnameColumn.setCellValueFactory(new PropertyValueFactory<>("surname"));
-        emailColumn.setCellValueFactory(new PropertyValueFactory<>("email"));
-        streetColumn.setCellValueFactory(new PropertyValueFactory<>("street"));
-        civicColumn.setCellValueFactory(new PropertyValueFactory<>("civic"));
-        cityColumn.setCellValueFactory(new PropertyValueFactory<>("city"));
-        postalColumn.setCellValueFactory(new PropertyValueFactory<>("postalCode"));
+        nameColumn.setCellValueFactory(new PropertyValueFactory<>(FIELD_NAME));
+        surnameColumn.setCellValueFactory(new PropertyValueFactory<>(FIELD_SURNAME));
+        emailColumn.setCellValueFactory(new PropertyValueFactory<>(FIELD_EMAIL));
+        streetColumn.setCellValueFactory(new PropertyValueFactory<>(FIELD_STREET));
+        civicColumn.setCellValueFactory(new PropertyValueFactory<>(FIELD_CIVIC));
+        cityColumn.setCellValueFactory(new PropertyValueFactory<>(FIELD_CITY));
+        postalColumn.setCellValueFactory(new PropertyValueFactory<>(FIELD_POSTAL));
 
         loadCustomers();
         startAutoRefresh();
 
         searchField.textProperty().addListener((obs, oldText, newText) -> handleSearch());
 
-        customerTable.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
-            boolean rowSelected = newVal != null;
-            editCustomerButton.setDisable(!rowSelected);
-            deleteCustomerButton.setDisable(!rowSelected);
-        });
+        customerTable.getSelectionModel().selectedItemProperty()
+                .addListener((obs, oldVal, newVal) -> {
+                    boolean rowSelected = newVal != null;
+                    editCustomerButton.setDisable(!rowSelected);
+                    deleteCustomerButton.setDisable(!rowSelected);
+                });
     }
 
     private void startAutoRefresh() {
-        refreshTimeline =
-                new Timeline(new KeyFrame(Duration.seconds(30), event -> loadCustomers()));
-        refreshTimeline.setCycleCount(Timeline.INDEFINITE);
+        refreshTimeline = new Timeline(new KeyFrame(Duration.seconds(REFRESH_SECONDS),
+                event -> loadCustomers()));
+        refreshTimeline.setCycleCount(Animation.INDEFINITE);
         refreshTimeline.play();
     }
 
+    /**
+     * Stops the automatic refresh of the customer table.
+     */
     public void stopAutoRefresh() {
         if (refreshTimeline != null) {
             refreshTimeline.stop();
         }
     }
 
-    private void loadCustomers() {
+    /**
+     * Loads all customers from the database and updates the customer table.
+     */
+    public void loadCustomers() {
         List<Customer> customers = AppContext.getCustomerDAO().findCustomerDetails();
         allCustomers.clear();
-
         for (Customer customer : customers) {
             allCustomers.add(new CustomerRow(customer));
         }
-
         customerTable.setItems(FXCollections.observableArrayList(allCustomers));
 
         if (!searchField.getText().isBlank()) {
@@ -117,16 +134,17 @@ public class CustomersController {
     @FXML
     private void handleAddCustomer() {
         try {
-            Optional<AddCustomerController> controllerOpt = DialogUtils.showModalWithController(
-                    "Add Customer", "/layouts/customer/AddCustomerView.fxml", AppContext.getOwner(),
-                    ctrl -> {
-                    });
+            Optional<AddCustomerController> controllerOpt =
+                    DialogUtils.showModalWithController("Add Customer",
+                            "/layouts/customer/AddCustomerView.fxml",
+                            AppContext.getOwner(), ctrl -> {
+                            });
 
             if (controllerOpt.isPresent()) {
                 loadCustomers();
             }
         } catch (Exception e) {
-            DialogUtils.showError("Navigation error", "Could not load Add Customer view.",
+            DialogUtils.showError(NAVIGATION_ERROR, "Could not load Add Customer view.",
                     AppContext.getOwner());
             e.printStackTrace();
         }
@@ -144,18 +162,19 @@ public class CustomersController {
         var customer = AppContext.getCustomerDAO().findByEmail(selected.getEmail());
 
         if (customer == null) {
-            DialogUtils.showError("Not Found", "The selected customer could not be found.",
-                    AppContext.getOwner());
+            DialogUtils.showError("Not Found",
+                    "The selected customer could not be found.", AppContext.getOwner());
             return;
         }
 
         boolean success = AppContext.getCustomerManager().softDeleteCustomer(customer);
         if (success) {
-            DialogUtils.showSuccess("Customer deleted successfully.", AppContext.getOwner());
+            DialogUtils.showSuccess("Customer deleted successfully.",
+                    AppContext.getOwner());
             loadCustomers();
         } else {
-            DialogUtils.showError("Deletion Failed", "Unable to delete the selected customer.",
-                    AppContext.getOwner());
+            DialogUtils.showError("Deletion Failed",
+                    "Unable to delete the selected customer.", AppContext.getOwner());
         }
     }
 
@@ -170,23 +189,25 @@ public class CustomersController {
 
         var customer = AppContext.getCustomerDAO().findByEmail(selected.getEmail());
         if (customer == null) {
-            DialogUtils.showError("Not Found", "Customer not found.", AppContext.getOwner());
+            DialogUtils.showError("Not Found", "Customer not found.",
+                    AppContext.getOwner());
             return;
         }
 
         try {
-            Optional<EditCustomerController> controllerOpt = DialogUtils.showModalWithController(
-                    "Edit Customer", "/layouts/customer/EditCustomerView.fxml",
-                    AppContext.getOwner(), ctrl -> {
-                        ctrl.setCustomerToEdit(customer);
-                        ctrl.setCustomerController(this);
-                    });
+            Optional<EditCustomerController> controllerOpt =
+                    DialogUtils.showModalWithController("Edit Customer",
+                            "/layouts/customer/EditCustomerView.fxml",
+                            AppContext.getOwner(), ctrl -> {
+                                ctrl.setCustomerToEdit(customer);
+                                ctrl.setCustomerController(this);
+                            });
 
             if (controllerOpt.isPresent()) {
                 loadCustomers();
             }
         } catch (Exception e) {
-            DialogUtils.showError("Navigation error", "Could not load Edit Customer view.",
+            DialogUtils.showError(NAVIGATION_ERROR, "Could not load Edit Customer view.",
                     AppContext.getOwner());
         }
     }
@@ -201,49 +222,52 @@ public class CustomersController {
         }
 
         ObservableList<CustomerRow> filtered = FXCollections.observableArrayList();
-
         for (CustomerRow row : allCustomers) {
-            if ((activeFilters.contains("name") && row.getName().toLowerCase().contains(query))
-                    || (activeFilters.contains("surname")
-                            && row.getSurname().toLowerCase().contains(query))
-                    || (activeFilters.contains("email")
-                            && row.getEmail().toLowerCase().contains(query))
-                    || (activeFilters.contains("street")
-                            && row.getStreet().toLowerCase().contains(query))
-                    || (activeFilters.contains("civic")
-                            && row.getCivic().toLowerCase().contains(query))
-                    || (activeFilters.contains("city")
-                            && row.getCity().toLowerCase().contains(query))
-                    || (activeFilters.contains("postal")
-                            && row.getPostalCode().toLowerCase().contains(query))) {
+            if (matchesQuery(row, query)) {
                 filtered.add(row);
             }
         }
-
         customerTable.setItems(filtered);
+    }
+
+    private boolean matchesQuery(final CustomerRow row, final String query) {
+        return (activeFilters.contains(FIELD_NAME)
+                && row.getName().toLowerCase().contains(query))
+                || (activeFilters.contains(FIELD_SURNAME)
+                        && row.getSurname().toLowerCase().contains(query))
+                || (activeFilters.contains(FIELD_EMAIL)
+                        && row.getEmail().toLowerCase().contains(query))
+                || (activeFilters.contains(FIELD_STREET)
+                        && row.getStreet().toLowerCase().contains(query))
+                || (activeFilters.contains(FIELD_CIVIC)
+                        && row.getCivic().toLowerCase().contains(query))
+                || (activeFilters.contains(FIELD_CITY)
+                        && row.getCity().toLowerCase().contains(query))
+                || (activeFilters.contains(FIELD_POSTAL)
+                        && row.getPostalCode().toLowerCase().contains(query));
     }
 
     @FXML
     private void handleResetSearch() {
         searchField.clear();
-
         activeFilters.clear();
-        activeFilters.addAll("name", "surname", "email", "street", "civic", "city", "postal");
-
+        activeFilters.addAll(FIELD_NAME, FIELD_SURNAME, FIELD_EMAIL, FIELD_STREET,
+                FIELD_CIVIC, FIELD_CITY, FIELD_POSTAL);
         loadCustomers();
     }
 
     @FXML
-    private void showFilterMenu(javafx.scene.input.MouseEvent event) {
+    private void showFilterMenu(final javafx.scene.input.MouseEvent event) {
         if (filterMenu != null && filterMenu.isShowing()) {
             filterMenu.hide();
             return;
         }
 
         filterMenu = new ContextMenu();
-
-        String[] fields = {"name", "surname", "email", "street", "civic", "city", "postal"};
-        String[] labels = {"Name", "Surname", "Email", "Street", "Civic", "City", "Postal Code"};
+        String[] fields = {FIELD_NAME, FIELD_SURNAME, FIELD_EMAIL, FIELD_STREET,
+                FIELD_CIVIC, FIELD_CITY, FIELD_POSTAL};
+        String[] labels =
+                {"Name", "Surname", "Email", "Street", "Civic", "City", "Postal Code"};
 
         for (int i = 0; i < fields.length; i++) {
             String key = fields[i];
@@ -251,12 +275,9 @@ public class CustomersController {
 
             CheckBox checkBox = new CheckBox(label);
             checkBox.setSelected(activeFilters.contains(key));
-
             checkBox.selectedProperty().addListener((obs, wasSelected, isSelected) -> {
-                if (isSelected) {
-                    if (!activeFilters.contains(key)) {
-                        activeFilters.add(key);
-                    }
+                if (isSelected.booleanValue()) {
+                    activeFilters.add(key);
                 } else {
                     activeFilters.remove(key);
                 }
@@ -271,14 +292,17 @@ public class CustomersController {
         filterMenu.show(filterButton, event.getScreenX(), event.getScreenY());
     }
 
+    /**
+     * Returns to the main customers view from a modal or sub-view.
+     */
     public void returnToCustomerView() {
         try {
             MainLayoutController.getInstance().restorePreviousTitle();
-            MainLayoutController.getInstance().loadCenter("/layouts/customer/CustomersView.fxml");
+            MainLayoutController.getInstance()
+                    .loadCenter("/layouts/customer/CustomersView.fxml");
         } catch (Exception e) {
-            DialogUtils.showError("Navigation error", "Failed to load customer view.",
+            DialogUtils.showError(NAVIGATION_ERROR, "Failed to load customer view.",
                     AppContext.getOwner());
         }
     }
-
 }

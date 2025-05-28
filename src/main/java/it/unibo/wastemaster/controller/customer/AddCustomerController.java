@@ -1,14 +1,13 @@
 package it.unibo.wastemaster.controller.customer;
 
-import it.unibo.wastemaster.core.context.AppContext;
-import it.unibo.wastemaster.core.models.Customer;
-import it.unibo.wastemaster.core.models.Location;
-import it.unibo.wastemaster.core.utils.ValidateUtils;
-
 import static it.unibo.wastemaster.controller.utils.DialogUtils.showError;
 import static it.unibo.wastemaster.controller.utils.DialogUtils.showSuccess;
 
 import it.unibo.wastemaster.controller.utils.DialogUtils;
+import it.unibo.wastemaster.core.context.AppContext;
+import it.unibo.wastemaster.core.models.Customer;
+import it.unibo.wastemaster.core.models.Location;
+import it.unibo.wastemaster.core.utils.ValidateUtils;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.TextField;
