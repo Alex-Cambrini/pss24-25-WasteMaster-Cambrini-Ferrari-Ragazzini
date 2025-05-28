@@ -1,41 +1,48 @@
 package it.unibo.wastemaster.core.dao;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import it.unibo.wastemaster.core.AbstractDatabaseTest;
 import it.unibo.wastemaster.core.models.Waste;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+/**
+ * Unit tests for WasteDAO.
+ */
+final class WasteDAOTest extends AbstractDatabaseTest {
 
-import static org.junit.jupiter.api.Assertions.*;
+    /**
+     * Begins transaction before each test.
+     */
+    @Override
+    @BeforeEach
+    public void setUp() {
+        super.setUp();
+        getEntityManager().getTransaction().begin();
+    }
 
-class WasteDAOTest extends AbstractDatabaseTest {
+    @Test
+    void testExistsByName() {
+        Waste waste = new Waste("Organic", true, false);
+        getWasteDAO().insert(waste);
 
-	@BeforeEach
-	public void setUp() {
-		super.setUp();
-		em.getTransaction().begin();
-	}
+        boolean exists = getWasteDAO().existsByName("Organic");
+        assertTrue(exists);
 
-	@Test
-	void testExistsByName() {
-		Waste waste = new Waste("Organic", true, false);
-		wasteDAO.insert(waste);
+        boolean notExists = getWasteDAO().existsByName("Paper");
+        assertFalse(notExists);
+    }
 
-		boolean exists = wasteDAO.existsByName("Organic");
-		assertTrue(exists);
+    @Test
+    void testExistsByNameIgnoresDeleted() {
+        Waste waste = new Waste("Oil", false, true);
+        getWasteDAO().insert(waste);
+        waste.delete();
+        getWasteDAO().update(waste);
 
-		boolean notExists = wasteDAO.existsByName("Paper");
-		assertFalse(notExists);
-	}
-
-	@Test
-	void testExistsByNameIgnoresDeleted() {
-		Waste waste = new Waste("Oil", false, true);
-		wasteDAO.insert(waste);
-		waste.delete();
-		wasteDAO.update(waste);
-
-		boolean exists = wasteDAO.existsByName("Oil");
-		assertFalse(exists);
-	}
+        boolean exists = getWasteDAO().existsByName("Oil");
+        assertFalse(exists);
+    }
 }
