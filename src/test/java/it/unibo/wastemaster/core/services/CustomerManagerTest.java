@@ -107,66 +107,78 @@ class CustomerManagerTest extends AbstractDatabaseTest {
 
     @Test
     void testAddCustomerInvalid() {
-        Customer customerWithNullEmail =
-                new Customer("Mario", "Rossi", location, null, "1234567890");
+        final Location location1 = new Location("Via Roma", "10", "Bologna", "40100");
+        final Customer customerWithNullEmail =
+                new Customer("Mario", "Rossi", location1, null, "1234567890");
         assertThrows(ConstraintViolationException.class,
                 () -> getCustomerManager().addCustomer(customerWithNullEmail));
 
-        Customer customerWithInvalidEmail =
-                new Customer("Mario", "Rossi", location, "notValidEmail", "1234567890");
+        final Location location2 = new Location("Via Roma", "10", "Bologna", "40100");
+        final Customer customerWithInvalidEmail =
+                new Customer("Mario", "Rossi", location2, "notValidEmail", "1234567890");
         assertThrows(ConstraintViolationException.class,
                 () -> getCustomerManager().addCustomer(customerWithInvalidEmail));
 
-        Customer customerWithInvalidPhone =
-                new Customer("Mario", "Rossi", location, email, "notValidPhone");
+        final Location location3 = new Location("Via Roma", "10", "Bologna", "40100");
+        final Customer customerWithInvalidPhone =
+                new Customer("Mario", "Rossi", location3, email, "notValidPhone");
         assertThrows(ConstraintViolationException.class,
                 () -> getCustomerManager().addCustomer(customerWithInvalidPhone));
 
-        Customer customerWithShortPhone =
-                new Customer("Mario", "Rossi", location, email, "123");
+        final Location location4 = new Location("Via Roma", "10", "Bologna", "40100");
+        final Customer customerWithShortPhone =
+                new Customer("Mario", "Rossi", location4, email, "123");
         assertThrows(ConstraintViolationException.class,
                 () -> getCustomerManager().addCustomer(customerWithShortPhone));
 
-        Customer customerWithLongPhone =
-                new Customer("Mario", "Rossi", location, email, "12345678901234567");
+        final Location location5 = new Location("Via Roma", "10", "Bologna", "40100");
+        final Customer customerWithLongPhone =
+                new Customer("Mario", "Rossi", location5, email, "12345678901234567");
         assertThrows(ConstraintViolationException.class,
                 () -> getCustomerManager().addCustomer(customerWithLongPhone));
 
-        Customer customerWithEmptyFirstName =
-                new Customer("", "Rossi", location, email, "1234567890");
+        final Location location6 = new Location("Via Roma", "10", "Bologna", "40100");
+        final Customer customerWithEmptyFirstName =
+                new Customer("", "Rossi", location6, email, "1234567890");
         assertThrows(ConstraintViolationException.class,
                 () -> getCustomerManager().addCustomer(customerWithEmptyFirstName));
 
-        Customer customerWithEmptyLastName =
-                new Customer("Mario", "", location, email, "1234567890");
+        final Location location7 = new Location("Via Roma", "10", "Bologna", "40100");
+        final Customer customerWithEmptyLastName =
+                new Customer("Mario", "", location7, email, "1234567890");
         assertThrows(ConstraintViolationException.class,
                 () -> getCustomerManager().addCustomer(customerWithEmptyLastName));
 
-        Customer customerWithBlankFirstName =
-                new Customer("   ", "Rossi", location, email, "1234567890");
+        final Location location8 = new Location("Via Roma", "10", "Bologna", "40100");
+        final Customer customerWithBlankFirstName =
+                new Customer("   ", "Rossi", location8, email, "1234567890");
         assertThrows(ConstraintViolationException.class,
                 () -> getCustomerManager().addCustomer(customerWithBlankFirstName));
 
-        Customer customerWithBlankLastName =
-                new Customer("Mario", "   ", location, email, "1234567890");
+        final Location location9 = new Location("Via Roma", "10", "Bologna", "40100");
+        final Customer customerWithBlankLastName =
+                new Customer("Mario", "   ", location9, email, "1234567890");
         assertThrows(ConstraintViolationException.class,
                 () -> getCustomerManager().addCustomer(customerWithBlankLastName));
 
-        Customer customerWithNullFirstName =
-                new Customer(null, "Rossi", location, email, "1234567890");
+        final Location location10 = new Location("Via Roma", "10", "Bologna", "40100");
+        final Customer customerWithNullFirstName =
+                new Customer(null, "Rossi", location10, email, "1234567890");
         assertThrows(ConstraintViolationException.class,
                 () -> getCustomerManager().addCustomer(customerWithNullFirstName));
 
-        Customer customerWithNullLastName =
-                new Customer("Mario", null, location, email, "1234567890");
+        final Location location11 = new Location("Via Roma", "10", "Bologna", "40100");
+        final Customer customerWithNullLastName =
+                new Customer("Mario", null, location11, email, "1234567890");
         assertThrows(ConstraintViolationException.class,
                 () -> getCustomerManager().addCustomer(customerWithNullLastName));
 
-        Customer customerWithNullLocation =
+        final Customer customerWithNullLocation =
                 new Customer("Mario", "Rossi", null, email, "1234567890");
         assertThrows(ConstraintViolationException.class,
                 () -> getCustomerManager().addCustomer(customerWithNullLocation));
     }
+
 
     @Test
     void testGetCustomerInvalidId() {
