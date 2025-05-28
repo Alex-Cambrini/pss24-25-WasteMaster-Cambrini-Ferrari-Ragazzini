@@ -15,26 +15,31 @@ import javafx.scene.control.TextField;
 /**
  * Controller responsible for handling the logic of the "Add Customer" view.
  */
-
 public final class AddCustomerController {
 
     @FXML
     private TextField emailField;
+
     @FXML
     private TextField nameField;
+
     @FXML
     private TextField surnameField;
+
     @FXML
     private TextField phoneField;
+
     @FXML
     private TextField streetField;
+
     @FXML
     private TextField civicField;
+
     @FXML
     private TextField cityField;
+
     @FXML
     private TextField postalCodeField;
-
 
     @FXML
     private void handleSaveCustomer(final ActionEvent event) {

@@ -1,14 +1,18 @@
 package it.unibo.wastemaster.viewmodels;
 
-import java.time.LocalDate;
-
 import it.unibo.wastemaster.core.models.OneTimeSchedule;
 import it.unibo.wastemaster.core.models.RecurringSchedule;
 import it.unibo.wastemaster.core.models.RecurringSchedule.Frequency;
 import it.unibo.wastemaster.core.models.Schedule.ScheduleCategory;
 import it.unibo.wastemaster.core.models.Schedule.ScheduleStatus;
+import java.time.LocalDate;
 
-public class ScheduleRow {
+/**
+ * ViewModel class for displaying schedule information in tables. Supports both one-time
+ * and recurring schedules.
+ */
+public final class ScheduleRow {
+
     private final int id;
     private final String wasteName;
     private final ScheduleCategory scheduleCategory;
@@ -18,7 +22,12 @@ public class ScheduleRow {
     private final ScheduleStatus status;
     private final String customer;
 
-    public ScheduleRow(OneTimeSchedule schedule) {
+    /**
+     * Creates a row from a one-time schedule.
+     *
+     * @param schedule the one-time schedule
+     */
+    public ScheduleRow(final OneTimeSchedule schedule) {
         this.id = schedule.getScheduleId();
         this.wasteName = schedule.getWaste().getWasteName();
         this.scheduleCategory = ScheduleCategory.ONE_TIME;
@@ -26,10 +35,16 @@ public class ScheduleRow {
         this.executionDate = schedule.getPickupDate();
         this.startDate = null;
         this.status = schedule.getScheduleStatus();
-        this.customer = schedule.getCustomer().getName() + " " + schedule.getCustomer().getSurname();
+        this.customer = schedule.getCustomer().getName() + " "
+                + schedule.getCustomer().getSurname();
     }
 
-    public ScheduleRow(RecurringSchedule schedule) {
+    /**
+     * Creates a row from a recurring schedule.
+     *
+     * @param schedule the recurring schedule
+     */
+    public ScheduleRow(final RecurringSchedule schedule) {
         this.id = schedule.getScheduleId();
         this.wasteName = schedule.getWaste().getWasteName();
         this.scheduleCategory = ScheduleCategory.RECURRING;
@@ -37,37 +52,78 @@ public class ScheduleRow {
         this.executionDate = schedule.getNextCollectionDate();
         this.startDate = schedule.getStartDate();
         this.status = schedule.getScheduleStatus();
-        this.customer = schedule.getCustomer().getName() + " " + schedule.getCustomer().getSurname();
+        this.customer = schedule.getCustomer().getName() + " "
+                + schedule.getCustomer().getSurname();
     }
 
+    /**
+     * Gets the schedule ID.
+     *
+     * @return the ID
+     */
     public int getId() {
         return id;
     }
 
+    /**
+     * Gets the name of the waste.
+     *
+     * @return the waste name
+     */
     public String getWasteName() {
         return wasteName;
     }
 
+    /**
+     * Gets the category of the schedule.
+     *
+     * @return the schedule category
+     */
     public ScheduleCategory getScheduleCategory() {
         return scheduleCategory;
     }
 
+    /**
+     * Gets the recurrence frequency.
+     *
+     * @return the frequency, or null if one-time
+     */
     public Frequency getFrequency() {
         return frequency;
     }
 
+    /**
+     * Gets the next execution date.
+     *
+     * @return the execution date
+     */
     public LocalDate getExecutionDate() {
         return executionDate;
     }
 
+    /**
+     * Gets the start date for recurring schedules.
+     *
+     * @return the start date, or null if one-time
+     */
     public LocalDate getStartDate() {
         return startDate;
     }
 
+    /**
+     * Gets the status of the schedule.
+     *
+     * @return the schedule status
+     */
     public ScheduleStatus getStatus() {
         return status;
     }
 
+    /**
+     * Gets the full name of the customer.
+     *
+     * @return the customer's name and surname
+     */
     public String getCustomer() {
         return customer;
     }

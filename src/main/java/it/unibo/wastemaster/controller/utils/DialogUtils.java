@@ -3,7 +3,6 @@ package it.unibo.wastemaster.controller.utils;
 import java.io.IOException;
 import java.util.Optional;
 import java.util.function.Consumer;
-
 import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
@@ -13,66 +12,116 @@ import javafx.scene.control.Alert;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
-public class DialogUtils {
+/**
+ * Utility class for displaying dialog windows in the application.
+ */
+public final class DialogUtils {
 
-	public static void showError(String title, String message, Stage owner) {
-		Alert alert = new Alert(Alert.AlertType.ERROR);
-		alert.initOwner(owner);
-		alert.setTitle(title);
-		alert.setHeaderText("Please fix the following errors:");
-		alert.setContentText(message);
-		Scene scene = alert.getDialogPane().getScene();
-		scene.getStylesheets().addAll(owner.getScene().getStylesheets());
-		alert.showAndWait();
-	}
+    private DialogUtils() {
+        throw new UnsupportedOperationException("Utility class");
+    }
 
-	public static void showSuccess(String message, Stage owner) {
-		Alert alert = new Alert(Alert.AlertType.INFORMATION);
-		alert.initOwner(owner);
-		alert.setTitle("Success");
-		alert.setHeaderText(null);
-		alert.setContentText(message);
-		Scene scene = alert.getDialogPane().getScene();
-		scene.getStylesheets().addAll(owner.getScene().getStylesheets());
-		alert.showAndWait();
-	}
+    /**
+     * Shows an error alert dialog.
+     *
+     * @param title the title of the dialog
+     * @param message the message content
+     * @param owner the parent stage
+     */
+    public static void showError(
+            final String title,
+            final String message,
+            final Stage owner
+    ) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.initOwner(owner);
+        alert.setTitle(title);
+        alert.setHeaderText("Please fix the following errors:");
+        alert.setContentText(message);
+        Scene scene = alert.getDialogPane().getScene();
+        scene.getStylesheets().addAll(owner.getScene().getStylesheets());
+        alert.showAndWait();
+    }
 
-	public static <T> Optional<T> showModalWithController(
-			String title,
-			String fxmlPath,
-			Stage owner,
-			Consumer<T> controllerInitializer) throws IOException {
+    /**
+     * Shows a success alert dialog.
+     *
+     * @param message the message content
+     * @param owner the parent stage
+     */
+    public static void showSuccess(final String message, final Stage owner) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.initOwner(owner);
+        alert.setTitle("Success");
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        Scene scene = alert.getDialogPane().getScene();
+        scene.getStylesheets().addAll(owner.getScene().getStylesheets());
+        alert.showAndWait();
+    }
 
-		FXMLLoader loader = new FXMLLoader(DialogUtils.class.getResource(fxmlPath));
-		Parent root = loader.load();
+    /**
+     * Shows a modal window and returns its controller.
+     *
+     * @param <T> the controller type
+     * @param title the dialog title
+     * @param fxmlPath the path to the FXML file
+     * @param owner the parent stage
+     * @param controllerInitializer logic to initialize the controller
+     * @return the controller wrapped in an Optional
+     * @throws IOException if loading the FXML fails
+     */
+    public static <T> Optional<T> showModalWithController(
+            final String title,
+            final String fxmlPath,
+            final Stage owner,
+            final Consumer<T> controllerInitializer) throws IOException {
 
-		Stage dialogStage = new Stage();
-		dialogStage.setTitle(title);
-		dialogStage.initModality(Modality.APPLICATION_MODAL);
-		dialogStage.initOwner(owner);
-		Scene scene = createSceneWithCss(root, owner);
-		dialogStage.setScene(scene);
+        FXMLLoader loader = new FXMLLoader(DialogUtils.class.getResource(fxmlPath));
+        Parent root = loader.load();
 
-		T controller = loader.getController();
-		controllerInitializer.accept(controller);
+        Stage dialogStage = new Stage();
+        dialogStage.setTitle(title);
+        dialogStage.initModality(Modality.APPLICATION_MODAL);
+        dialogStage.initOwner(owner);
+        Scene scene = createSceneWithCss(root, owner);
+        dialogStage.setScene(scene);
 
-		dialogStage.setOnShown(e -> {
-			dialogStage.setX(owner.getX() + (owner.getWidth() - dialogStage.getWidth()) / 2);
-			dialogStage.setY(owner.getY() + (owner.getHeight() - dialogStage.getHeight()) / 2);
-		});
-		dialogStage.showAndWait();
+        T controller = loader.getController();
+        controllerInitializer.accept(controller);
 
-		return Optional.ofNullable(controller);
-	}
+        dialogStage.setOnShown(e -> {
+            double centerX = owner.getX()
+                + (owner.getWidth() - dialogStage.getWidth()) / 2;
+            double centerY = owner.getY()
+                + (owner.getHeight() - dialogStage.getHeight()) / 2;
+            dialogStage.setX(centerX);
+            dialogStage.setY(centerY);
+        });
+        dialogStage.showAndWait();
 
-	public static Scene createSceneWithCss(Parent root, Stage owner) {
-		Scene scene = new Scene(root);
-		scene.getStylesheets().addAll(owner.getScene().getStylesheets());
-		return scene;
-	}
+        return Optional.ofNullable(controller);
+    }
 
-	public static void closeModal(ActionEvent event) {
-		((Stage) ((Node) event.getSource()).getScene().getWindow()).close();
-	}
+    /**
+     * Creates a Scene applying the current application's styles.
+     *
+     * @param root the root node
+     * @param owner the owner stage for inheriting styles
+     * @return the scene
+     */
+    public static Scene createSceneWithCss(final Parent root, final Stage owner) {
+        Scene scene = new Scene(root);
+        scene.getStylesheets().addAll(owner.getScene().getStylesheets());
+        return scene;
+    }
 
+    /**
+     * Closes the modal window that triggered the given action.
+     *
+     * @param event the action event
+     */
+    public static void closeModal(final ActionEvent event) {
+        ((Stage) ((Node) event.getSource()).getScene().getWindow()).close();
+    }
 }

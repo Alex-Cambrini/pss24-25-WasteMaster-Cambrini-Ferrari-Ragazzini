@@ -44,9 +44,12 @@ public class EmployeeController {
     private static final String ERROR_NAVIGATION = "Navigation error";
 
     private Timeline refreshTimeline;
+
     private ContextMenu filterMenu;
+
     private ObservableList<EmployeeRow> allEmployees =
             FXCollections.observableArrayList();
+
     private Stage owner;
 
     private final ObservableList<String> activeFilters =
@@ -70,16 +73,22 @@ public class EmployeeController {
 
     @FXML
     private TableView<EmployeeRow> employeeTable;
+
     @FXML
     private TableColumn<EmployeeRow, String> nameColumn;
+
     @FXML
     private TableColumn<EmployeeRow, String> surnameColumn;
+
     @FXML
     private TableColumn<EmployeeRow, String> emailColumn;
+
     @FXML
     private TableColumn<EmployeeRow, Role> roleColumn;
+
     @FXML
     private TableColumn<EmployeeRow, Licence> licenceColumn;
+
     @FXML
     private TableColumn<EmployeeRow, String> locationColumn;
 
@@ -271,9 +280,8 @@ public class EmployeeController {
         try {
             Optional<EditEmployeeController> controllerOpt =
                     DialogUtils.showModalWithController("Edit Employee",
-                            "/layouts/employee/EditEmployeeView.fxml", owner, ctrl -> 
-                                ctrl.setEmployeeToEdit(employee)
-                    );
+                            "/layouts/employee/EditEmployeeView.fxml", owner,
+                            ctrl -> ctrl.setEmployeeToEdit(employee));
 
             if (controllerOpt.isPresent()) {
                 loadEmployee();
