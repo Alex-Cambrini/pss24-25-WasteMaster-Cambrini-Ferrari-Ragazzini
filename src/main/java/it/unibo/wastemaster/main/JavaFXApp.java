@@ -3,9 +3,12 @@ package it.unibo.wastemaster.main;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.stage.Stage;
+import javafx.scene.Parent;
+
+
 
 import it.unibo.wastemaster.core.context.AppContext;
 
@@ -23,6 +26,7 @@ public class JavaFXApp extends Application {
 			scene.getStylesheets().add(getClass().getResource("/css/primer-light.css").toExternalForm());
 			primaryStage.setScene(scene);
 			primaryStage.setTitle("WasteMaster");
+			primaryStage.getIcons().add(new Image(getClass().getResourceAsStream("/images/icon.png")));
 			primaryStage.setWidth(1000);
 			primaryStage.setHeight(700);
 			primaryStage.setMinWidth(1000);
