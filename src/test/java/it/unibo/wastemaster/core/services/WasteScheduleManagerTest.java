@@ -1,13 +1,14 @@
 package it.unibo.wastemaster.core.services;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import it.unibo.wastemaster.core.AbstractDatabaseTest;
 import it.unibo.wastemaster.core.models.Waste;
 import it.unibo.wastemaster.core.models.WasteSchedule;
-
-import static org.junit.jupiter.api.Assertions.*;
-
 import java.time.DayOfWeek;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -16,20 +17,22 @@ class WasteScheduleManagerTest extends AbstractDatabaseTest {
     private WasteScheduleManager wasteScheduleManager;
     private Waste waste;
 
+    @Override
     @BeforeEach
     public void setUp() {
         super.setUp();
-        em.getTransaction().begin();
+        getEntityManager().getTransaction().begin();
 
         waste = new Waste("plastic", true, false);
-        wasteDAO.insert(waste);
+        getWasteDAO().insert(waste);
 
-        wasteScheduleManager = new WasteScheduleManager(wasteScheduleDAO);
+        wasteScheduleManager = new WasteScheduleManager(getWasteScheduleDAO());
     }
 
     @Test
     void testSetupCollectionRoutine() {
-        WasteSchedule schedule = wasteScheduleManager.setupCollectionRoutine(waste, DayOfWeek.MONDAY);
+        WasteSchedule schedule =
+                wasteScheduleManager.setupCollectionRoutine(waste, DayOfWeek.MONDAY);
 
         assertNotNull(schedule);
         assertEquals(waste, schedule.getWaste());
@@ -37,23 +40,25 @@ class WasteScheduleManagerTest extends AbstractDatabaseTest {
 
         assertTrue(schedule.getScheduleId() > 0);
 
-        WasteSchedule found = wasteScheduleDAO.findSchedulebyWaste(waste);
+        WasteSchedule found = getWasteScheduleDAO().findSchedulebyWaste(waste);
         assertNotNull(found);
         assertEquals(DayOfWeek.MONDAY, found.getDayOfWeek());
     }
 
     @Test
     void testChangeCollectionDay() {
-        WasteSchedule schedule = wasteScheduleManager.setupCollectionRoutine(waste, DayOfWeek.MONDAY);
+        WasteSchedule schedule =
+                wasteScheduleManager.setupCollectionRoutine(waste, DayOfWeek.MONDAY);
 
-        WasteSchedule updated = wasteScheduleManager.changeCollectionDay(schedule, DayOfWeek.FRIDAY);
+        WasteSchedule updated =
+                wasteScheduleManager.changeCollectionDay(schedule, DayOfWeek.FRIDAY);
 
         assertNotNull(updated);
         assertEquals(DayOfWeek.FRIDAY, updated.getDayOfWeek());
 
         assertEquals(waste, updated.getWaste());
 
-        WasteSchedule found = wasteScheduleDAO.findSchedulebyWaste(waste);
+        WasteSchedule found = getWasteScheduleDAO().findSchedulebyWaste(waste);
         assertEquals(DayOfWeek.FRIDAY, found.getDayOfWeek());
     }
 
@@ -68,7 +73,7 @@ class WasteScheduleManagerTest extends AbstractDatabaseTest {
     }
 
     @Test
-    void testgetWasteScheduleByWaste_NullInput() {
+    void testFindScheduleByWasteWithNull() {
         Exception ex = assertThrows(IllegalArgumentException.class, () -> {
             wasteScheduleManager.getWasteScheduleByWaste(null);
         });
@@ -76,7 +81,7 @@ class WasteScheduleManagerTest extends AbstractDatabaseTest {
     }
 
     @Test
-    void testgetWasteScheduleByWaste_NotFound() {
+    void testFindScheduleByWasteNotFound() {
         Waste glass = new Waste("glass", true, false);
         Exception ex = assertThrows(IllegalStateException.class, () -> {
             wasteScheduleManager.getWasteScheduleByWaste(glass);
