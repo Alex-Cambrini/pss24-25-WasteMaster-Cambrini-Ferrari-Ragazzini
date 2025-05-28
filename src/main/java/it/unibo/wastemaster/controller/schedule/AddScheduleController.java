@@ -66,8 +66,8 @@ public class AddScheduleController {
     @FXML
     public void initialize() {
         frequencyComboBox.setItems(FXCollections.observableArrayList(Frequency.values()));
-        allCustomers = AppContext.customerManager.getAllCustomers();
-        List<Waste> wasteList = AppContext.wasteManager.getActiveWastes();
+        allCustomers = AppContext.getCustomerManager().getAllCustomers();
+        List<Waste> wasteList = AppContext.getWasteManager().getActiveWastes();
 
         if (wasteList.isEmpty()) {
             wasteComboBox.setDisable(true);
@@ -164,10 +164,10 @@ public class AddScheduleController {
 
             if (isRecurring) {
                 Frequency selectedFrequency = frequencyComboBox.getValue();
-                AppContext.recurringScheduleManager.createRecurringSchedule(selectedCustomer, selectedWaste,
+                AppContext.getRecurringScheduleManager().createRecurringSchedule(selectedCustomer, selectedWaste,
                         selectedDate, selectedFrequency);
             } else {
-                AppContext.oneTimeScheduleManager.createOneTimeSchedule(selectedCustomer, selectedWaste, selectedDate);
+                AppContext.getOneTimeScheduleManager().createOneTimeSchedule(selectedCustomer, selectedWaste, selectedDate);
             }
 
             DialogUtils.showSuccess("Schedule saved successfully.", AppContext.getOwner());

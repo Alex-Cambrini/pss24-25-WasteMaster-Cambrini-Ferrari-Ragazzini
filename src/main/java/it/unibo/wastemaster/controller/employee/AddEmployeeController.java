@@ -71,7 +71,7 @@ public class AddEmployeeController {
 
             ValidateUtils.validateAll(employee, address);
 
-            AppContext.employeeManager.addEmployee(employee);
+            AppContext.getEmployeeManager().addEmployee(employee);
             showSuccess("Employee saved successfully.", AppContext.getOwner());
             closeModal(event);
 

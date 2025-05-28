@@ -121,7 +121,7 @@ public class EmployeeController {
     }
 
     private void loadEmployee() {
-        List<Employee> employees = AppContext.employeeDAO.findEmployeeDetails();
+        List<Employee> employees = AppContext.getEmployeeDAO().findEmployeeDetails();
         allEmployees.clear();
 
         for (Employee employee : employees) {
@@ -171,14 +171,14 @@ public class EmployeeController {
             return;
         }
 
-        var employee = AppContext.employeeDAO.findByEmail(selected.getEmail());
+        var employee = AppContext.getEmployeeDAO().findByEmail(selected.getEmail());
 
         if (employee == null) {
             DialogUtils.showError("Not Found", "The selected employee could not be found.", owner);
             return;
         }
 
-        boolean success = AppContext.employeeManager.softDeleteEmployee(employee);
+        boolean success = AppContext.getEmployeeManager().softDeleteEmployee(employee);
         if (success) {
             DialogUtils.showSuccess("Employee deleted successfully.", owner);
             loadEmployee();
@@ -215,7 +215,7 @@ public class EmployeeController {
             return;
         }
 
-        var employee = AppContext.employeeDAO.findByEmail(selected.getEmail());
+        var employee = AppContext.getEmployeeDAO().findByEmail(selected.getEmail());
         if (employee == null) {
             DialogUtils.showError("Not Found", "Employee not found.", owner);
             return;

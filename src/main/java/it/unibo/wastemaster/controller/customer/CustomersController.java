@@ -100,7 +100,7 @@ public class CustomersController {
     }
 
     private void loadCustomers() {
-        List<Customer> customers = AppContext.customerDAO.findCustomerDetails();
+        List<Customer> customers = AppContext.getCustomerDAO().findCustomerDetails();
         allCustomers.clear();
 
         for (Customer customer : customers) {
@@ -141,7 +141,7 @@ public class CustomersController {
             return;
         }
 
-        var customer = AppContext.customerDAO.findByEmail(selected.getEmail());
+        var customer = AppContext.getCustomerDAO().findByEmail(selected.getEmail());
 
         if (customer == null) {
             DialogUtils.showError("Not Found", "The selected customer could not be found.",
@@ -149,7 +149,7 @@ public class CustomersController {
             return;
         }
 
-        boolean success = AppContext.customerManager.softDeleteCustomer(customer);
+        boolean success = AppContext.getCustomerManager().softDeleteCustomer(customer);
         if (success) {
             DialogUtils.showSuccess("Customer deleted successfully.", AppContext.getOwner());
             loadCustomers();
@@ -168,7 +168,7 @@ public class CustomersController {
             return;
         }
 
-        var customer = AppContext.customerDAO.findByEmail(selected.getEmail());
+        var customer = AppContext.getCustomerDAO().findByEmail(selected.getEmail());
         if (customer == null) {
             DialogUtils.showError("Not Found", "Customer not found.", AppContext.getOwner());
             return;

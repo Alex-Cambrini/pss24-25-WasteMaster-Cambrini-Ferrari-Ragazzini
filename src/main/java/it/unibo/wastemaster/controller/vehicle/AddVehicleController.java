@@ -56,7 +56,7 @@ public class AddVehicleController {
 			VehicleStatus status = statusComboBox.getValue();
 
 			Vehicle vehicle = new Vehicle(plate, brand, model, year, licence, status, capacity);
-			AppContext.vehicleManager.addVehicle(vehicle);
+			AppContext.getVehicleManager().addVehicle(vehicle);
 			showSuccess("Vehicle saved successfully.", AppContext.getOwner());
 			closeModal(event);
 

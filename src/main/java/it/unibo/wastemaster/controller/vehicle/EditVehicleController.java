@@ -55,7 +55,7 @@ public class EditVehicleController {
 	@FXML
 	private void handleUpdateVehicle(ActionEvent event) {
 		try {
-			Vehicle original = AppContext.vehicleManager.findVehicleByPlate(vehicle.getPlate());
+			Vehicle original = AppContext.getVehicleManager().findVehicleByPlate(vehicle.getPlate());
 			if (original == null) {
 				showError("Error", "Vehicle not found.", AppContext.getOwner());
 				return;
@@ -80,7 +80,7 @@ public class EditVehicleController {
 			vehicle.setVehicleStatus(statusComboBox.getValue());
 			vehicle.setCapacity(Integer.parseInt(capacityField.getText()));
 
-			AppContext.vehicleManager.updateVehicle(vehicle);
+			AppContext.getVehicleManager().updateVehicle(vehicle);
 			showSuccess("Vehicle updated successfully.", AppContext.getOwner());
 			closeModal(event);
 

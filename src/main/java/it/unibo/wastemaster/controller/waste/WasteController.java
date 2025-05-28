@@ -126,13 +126,13 @@ public class WasteController {
 	}
 
 	private void loadWastes() {
-		List<Waste> wastes = AppContext.wasteManager.getActiveWastes();
+		List<Waste> wastes = AppContext.getWasteManager().getActiveWastes();
 		allWastes.clear();
 
 		for (Waste waste : wastes) {
 			WasteSchedule schedule = null;
 			try {
-				schedule = AppContext.wasteScheduleManager.getWasteScheduleByWaste(waste);
+				schedule = AppContext.getWasteScheduleManager().getWasteScheduleByWaste(waste);
 			} catch (IllegalStateException ignored) {
 			}
 			allWastes.add(new WasteRow(waste, schedule));
@@ -205,7 +205,7 @@ public class WasteController {
 		}
 
 		try {
-			WasteSchedule schedule = AppContext.wasteScheduleManager.getWasteScheduleByWaste(selectedRow.getWaste());
+			WasteSchedule schedule = AppContext.getWasteScheduleManager().getWasteScheduleByWaste(selectedRow.getWaste());
 
 			Optional<ChangeDayDialogController> controllerOpt = DialogUtils.showModalWithController(
 					"Change Collection Day",
@@ -219,7 +219,7 @@ public class WasteController {
 			if (controllerOpt.isPresent()) {
 				DayOfWeek newDay = controllerOpt.get().getSelectedDay();
 				if (newDay != null && newDay != schedule.getDayOfWeek()) {
-					AppContext.wasteScheduleManager.changeCollectionDay(schedule, newDay);
+					AppContext.getWasteScheduleManager().changeCollectionDay(schedule, newDay);
 					loadWastes();
 				}
 			}
@@ -239,10 +239,10 @@ public class WasteController {
 
 		try {
 			if (selected.getDayOfWeek() != null) {
-				WasteSchedule schedule = AppContext.wasteScheduleManager.getWasteScheduleByWaste(selected.getWaste());
-				AppContext.wasteScheduleDAO.delete(schedule);
+				WasteSchedule schedule = AppContext.getWasteScheduleManager().getWasteScheduleByWaste(selected.getWaste());
+				AppContext.getWasteScheduleDAO().delete(schedule);
 			}
-			AppContext.wasteManager.softDeleteWaste(selected.getWaste());
+			AppContext.getWasteManager().softDeleteWaste(selected.getWaste());
 			loadWastes();
 		} catch (Exception e) {
 			DialogUtils.showError("Error", "Failed to delete waste or its schedule.", AppContext.getOwner());
@@ -260,8 +260,8 @@ public class WasteController {
 		}
 
 		try {
-			WasteSchedule schedule = AppContext.wasteScheduleManager.getWasteScheduleByWaste(selected.getWaste());
-			AppContext.wasteScheduleDAO.delete(schedule);
+			WasteSchedule schedule = AppContext.getWasteScheduleManager().getWasteScheduleByWaste(selected.getWaste());
+			AppContext.getWasteScheduleDAO().delete(schedule);
 			loadWastes();
 		} catch (Exception e) {
 			DialogUtils.showError("Error", "Failed to delete the program.", AppContext.getOwner());

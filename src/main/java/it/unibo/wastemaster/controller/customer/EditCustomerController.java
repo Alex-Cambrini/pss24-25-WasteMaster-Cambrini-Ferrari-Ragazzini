@@ -50,7 +50,7 @@ public class EditCustomerController {
     @FXML
     private void handleUpdateCustomer(ActionEvent event) {
         try {
-            Customer original = AppContext.customerManager.getCustomerById(customer.getCustomerId());
+            Customer original = AppContext.getCustomerManager().getCustomerById(customer.getCustomerId());
             if (original == null) {
                 DialogUtils.showError("Error", "Customer not found.", AppContext.getOwner());
                 return;
@@ -80,7 +80,7 @@ public class EditCustomerController {
                     cityField.getText(),
                     postalCodeField.getText()));
 
-            AppContext.customerManager.updateCustomer(customer);
+            AppContext.getCustomerManager().updateCustomer(customer);
             DialogUtils.showSuccess("Customer updated successfully.", AppContext.getOwner());
             DialogUtils.closeModal(event);
 

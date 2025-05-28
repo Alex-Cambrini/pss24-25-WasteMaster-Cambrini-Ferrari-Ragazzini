@@ -37,7 +37,7 @@ public class AddProgramController {
                 throw new IllegalArgumentException("Invalid input.");
             }
 
-            AppContext.wasteScheduleManager.setupCollectionRoutine(selectedWaste, selectedDay);
+            AppContext.getWasteScheduleManager().setupCollectionRoutine(selectedWaste, selectedDay);
 
             showSuccess("Program saved successfully.", AppContext.getOwner());
             closeModal(event);

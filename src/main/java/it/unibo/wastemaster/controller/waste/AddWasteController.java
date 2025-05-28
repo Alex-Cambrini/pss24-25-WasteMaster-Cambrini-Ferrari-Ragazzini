@@ -33,7 +33,7 @@ public class AddWasteController {
 			}
 
 			Waste waste = new Waste(name, recyclable, dangerous);
-			AppContext.wasteManager.addWaste(waste);
+			AppContext.getWasteManager().addWaste(waste);
 			showSuccess("Waste saved successfully.", AppContext.getOwner());
 			closeModal(event);
 

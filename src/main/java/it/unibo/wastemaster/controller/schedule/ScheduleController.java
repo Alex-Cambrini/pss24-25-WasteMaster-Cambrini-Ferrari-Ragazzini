@@ -162,16 +162,16 @@ public void initialize() {
         ScheduleRow selected = scheduleTable.getSelectionModel().getSelectedItem();
         if (selected == null)
             return;
-        RecurringSchedule recurring = AppContext.recurringScheduleDAO.findById(selected.getId());
+        RecurringSchedule recurring = AppContext.getRecurringScheduleDAO().findById(selected.getId());
         ScheduleStatus currentStatus = selected.getStatus();
 
         switch (currentStatus) {
             case ACTIVE:
-                AppContext.recurringScheduleManager.updateStatusRecurringSchedule(recurring, ScheduleStatus.PAUSED);
+                AppContext.getRecurringScheduleManager().updateStatusRecurringSchedule(recurring, ScheduleStatus.PAUSED);
                 toggleStatusButton.setText("Resume");
                 break;
             case PAUSED:
-                AppContext.recurringScheduleManager.updateStatusRecurringSchedule(recurring, ScheduleStatus.ACTIVE);
+                AppContext.getRecurringScheduleManager().updateStatusRecurringSchedule(recurring, ScheduleStatus.ACTIVE);
                 toggleStatusButton.setText("Pause");
                 break;
             default:
@@ -195,7 +195,7 @@ public void initialize() {
 
     private void loadSchedules() {
         allSchedules.clear();
-        List<Schedule> all = AppContext.scheduleDAO.findAll();
+        List<Schedule> all = AppContext.getScheduleDAO().findAll();
 
         for (Schedule s : all) {
             if (s == null || s.getCustomer() == null || s.getWaste() == null || s.getScheduleStatus() == null)
@@ -256,7 +256,7 @@ public void initialize() {
         }
 
         try {
-            RecurringSchedule schedule = AppContext.recurringScheduleDAO.findById(selected.getId());
+            RecurringSchedule schedule = AppContext.getRecurringScheduleDAO().findById(selected.getId());
             if (schedule == null) {
                 DialogUtils.showError("Error", "Schedule not found.", AppContext.getOwner());
                 return;
@@ -275,7 +275,7 @@ public void initialize() {
             if (controllerOpt.isPresent()) {
                 Frequency newFreq = controllerOpt.get().getSelectedFrequency();
                 if (newFreq != null) {
-                    AppContext.recurringScheduleManager.updateFrequency(schedule, newFreq);
+                    AppContext.getRecurringScheduleManager().updateFrequency(schedule, newFreq);
                     loadSchedules();
                 }
             }
@@ -299,16 +299,16 @@ public void initialize() {
         try {
             switch (selected.getScheduleCategory()) {
                 case ONE_TIME -> {
-                    OneTimeSchedule schedule = AppContext.oneTimeScheduleDAO.findById(selected.getId());
+                    OneTimeSchedule schedule = AppContext.getOneTimeScheduleDAO().findById(selected.getId());
                     if (schedule != null) {
-                        success = AppContext.oneTimeScheduleManager.softDeleteOneTimeSchedule(schedule);
+                        success = AppContext.getOneTimeScheduleManager().softDeleteOneTimeSchedule(schedule);
                     }
                 }
 
                 case RECURRING -> {
-                    RecurringSchedule schedule = AppContext.recurringScheduleDAO.findById(selected.getId());
+                    RecurringSchedule schedule = AppContext.getRecurringScheduleDAO().findById(selected.getId());
                     if (schedule != null) {
-                        success = AppContext.recurringScheduleManager
+                        success = AppContext.getRecurringScheduleManager()
                                 .updateStatusRecurringSchedule(schedule, ScheduleStatus.CANCELLED);
                     }
                 }
@@ -378,12 +378,12 @@ public void initialize() {
 
         Schedule schedule;
         if (selected.getScheduleCategory() == ScheduleCategory.ONE_TIME) {
-            schedule = AppContext.oneTimeScheduleDAO.findById(selected.getId());
+            schedule = AppContext.getOneTimeScheduleDAO().findById(selected.getId());
         } else {
-            schedule = AppContext.recurringScheduleDAO.findById(selected.getId());
+            schedule = AppContext.getRecurringScheduleDAO().findById(selected.getId());
         }
 
-        List<Collection> collections = AppContext.collectionManager.getAllCollectionBySchedule(schedule);
+        List<Collection> collections = AppContext.getCollectionManager().getAllCollectionBySchedule(schedule);
 
         try {
             MainLayoutController.getInstance().setPageTitle("Associated Collections");

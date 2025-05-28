@@ -139,7 +139,7 @@ public class VehicleController {
 	}
 
 	private void loadVehicles() {
-		List<Vehicle> vehicles = AppContext.vehicleDAO.findVehicleDetails();
+		List<Vehicle> vehicles = AppContext.getVehicleDAO().findVehicleDetails();
 		allVehicles.clear();
 
 		for (Vehicle vehicle : vehicles) {
@@ -182,7 +182,7 @@ public class VehicleController {
 			return;
 		}
 
-		Vehicle vehicle = AppContext.vehicleManager.findVehicleByPlate(selected.getPlate());
+		Vehicle vehicle = AppContext.getVehicleManager().findVehicleByPlate(selected.getPlate());
 		if (vehicle == null) {
 			DialogUtils.showError("Not Found", "Vehicle not found.", AppContext.getOwner());
 			return;
@@ -212,14 +212,14 @@ public class VehicleController {
 			return;
 		}
 
-		Vehicle vehicle = AppContext.vehicleManager.findVehicleByPlate(selected.getPlate());
+		Vehicle vehicle = AppContext.getVehicleManager().findVehicleByPlate(selected.getPlate());
 
 		if (vehicle == null) {
 			DialogUtils.showError("Not Found", "The selected vehicle could not be found.", AppContext.getOwner());
 			return;
 		}
 
-		boolean success = AppContext.vehicleManager.deleteVehicle(vehicle);
+		boolean success = AppContext.getVehicleManager().deleteVehicle(vehicle);
 
 		if (success) {
 			DialogUtils.showSuccess("Vehicle deleted successfully.", AppContext.getOwner());

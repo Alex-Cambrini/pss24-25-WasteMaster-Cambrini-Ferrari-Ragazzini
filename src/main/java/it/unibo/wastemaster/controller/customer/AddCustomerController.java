@@ -54,11 +54,11 @@ public final class AddCustomerController {
 
             ValidateUtils.validateAll(customer, location);
 
-            if (AppContext.customerDAO.existsByEmail(email)) {
+            if (AppContext.getCustomerDAO().existsByEmail(email)) {
                 throw new IllegalArgumentException("- Email is already in use");
             }
 
-            AppContext.customerManager.addCustomer(customer);
+            AppContext.getCustomerManager().addCustomer(customer);
             showSuccess("Customer saved successfully.", AppContext.getOwner());
             DialogUtils.closeModal(event);
 

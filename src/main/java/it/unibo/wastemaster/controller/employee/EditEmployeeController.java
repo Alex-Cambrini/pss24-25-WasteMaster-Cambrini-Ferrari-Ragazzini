@@ -62,7 +62,7 @@ public class EditEmployeeController {
 	@FXML
 	private void handleSave(ActionEvent event) {
 		try {
-			Employee original = AppContext.employeeDAO.findByEmail(employee.getEmail());
+			Employee original = AppContext.getEmployeeDAO().findByEmail(employee.getEmail());
 			if (original == null) {
 				showError("Error", "Employee not found.", AppContext.getOwner());
 				return;
@@ -91,7 +91,7 @@ public class EditEmployeeController {
 			employee.setRole(roleComboBox.getValue());
 			employee.setLicence(licenceComboBox.getValue());
 
-			AppContext.employeeManager.updateEmployee(employee);
+			AppContext.getEmployeeManager().updateEmployee(employee);
 			showSuccess("Employee updated successfully.", AppContext.getOwner());
 			closeModal(event);
 
