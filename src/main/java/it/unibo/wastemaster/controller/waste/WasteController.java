@@ -126,7 +126,7 @@ public class WasteController {
 	}
 
 	private void loadWastes() {
-		List<Waste> wastes = AppContext.wasteManager.getAllWastes();
+		List<Waste> wastes = AppContext.wasteManager.getActiveWastes();
 		allWastes.clear();
 
 		for (Waste waste : wastes) {

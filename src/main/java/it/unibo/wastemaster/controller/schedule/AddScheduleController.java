@@ -67,7 +67,7 @@ public class AddScheduleController {
     public void initialize() {
         frequencyComboBox.setItems(FXCollections.observableArrayList(Frequency.values()));
         allCustomers = AppContext.customerManager.getAllCustomers();
-        List<Waste> wasteList = AppContext.wasteManager.getAllWastes();
+        List<Waste> wasteList = AppContext.wasteManager.getActiveWastes();
 
         if (wasteList.isEmpty()) {
             wasteComboBox.setDisable(true);
