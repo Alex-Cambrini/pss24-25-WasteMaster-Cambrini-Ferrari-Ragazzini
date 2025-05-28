@@ -1,67 +1,120 @@
 package it.unibo.wastemaster.viewmodels;
 
-import java.time.LocalDate;
-
 import it.unibo.wastemaster.core.models.Vehicle;
 import it.unibo.wastemaster.core.models.Vehicle.RequiredLicence;
 import it.unibo.wastemaster.core.models.Vehicle.VehicleStatus;
+import java.time.LocalDate;
 
-public class VehicleRow {
-	private final String plate;
-	private final String brand;
-	private final String model;
-	private final int registrationYear;
-	private final int capacity;
-	private final RequiredLicence licenceType;
-	private final VehicleStatus vehicleStatus;
-	private final LocalDate lastMaintenanceDate;
-	private final LocalDate nextMaintenanceDate;
+/**
+ * ViewModel class for representing a vehicle in table format.
+ */
+public final class VehicleRow {
 
-	public VehicleRow(Vehicle vehicle) {
-		this.plate = vehicle.getPlate();
-		this.brand = vehicle.getBrand();
-		this.model = vehicle.getModel();
-		this.registrationYear = vehicle.getRegistrationYear();
-		this.capacity = vehicle.getCapacity();
-		this.licenceType = vehicle.getRequiredLicence();
-		this.vehicleStatus = vehicle.getVehicleStatus();
-		this.lastMaintenanceDate = vehicle.getLastMaintenanceDate();
-		this.nextMaintenanceDate = vehicle.getNextMaintenanceDate();
-	}
+    private final String plate;
+    private final String brand;
+    private final String model;
+    private final int registrationYear;
+    private final int capacity;
+    private final RequiredLicence licenceType;
+    private final VehicleStatus vehicleStatus;
+    private final LocalDate lastMaintenanceDate;
+    private final LocalDate nextMaintenanceDate;
 
-	public String getPlate() {
-		return plate;
-	}
+    /**
+     * Constructs a VehicleRow from a Vehicle entity.
+     *
+     * @param vehicle the vehicle to represent
+     */
+    public VehicleRow(final Vehicle vehicle) {
+        this.plate = vehicle.getPlate();
+        this.brand = vehicle.getBrand();
+        this.model = vehicle.getModel();
+        this.registrationYear = vehicle.getRegistrationYear();
+        this.capacity = vehicle.getCapacity();
+        this.licenceType = vehicle.getRequiredLicence();
+        this.vehicleStatus = vehicle.getVehicleStatus();
+        this.lastMaintenanceDate = vehicle.getLastMaintenanceDate();
+        this.nextMaintenanceDate = vehicle.getNextMaintenanceDate();
+    }
 
-	public String getBrand() {
-		return brand;
-	}
+    /**
+     * Gets the vehicle plate.
+     *
+     * @return the plate
+     */
+    public String getPlate() {
+        return plate;
+    }
 
-	public String getModel() {
-		return model;
-	}
+    /**
+     * Gets the brand of the vehicle.
+     *
+     * @return the brand
+     */
+    public String getBrand() {
+        return brand;
+    }
 
-	public int getRegistrationYear() {
-		return registrationYear;
-	}
+    /**
+     * Gets the model of the vehicle.
+     *
+     * @return the model
+     */
+    public String getModel() {
+        return model;
+    }
 
-	public int getCapacity() {
-		return capacity;
-	}
+    /**
+     * Gets the vehicle's registration year.
+     *
+     * @return the registration year
+     */
+    public int getRegistrationYear() {
+        return registrationYear;
+    }
 
-	public RequiredLicence getLicenceType() {
-		return licenceType;
-	}
+    /**
+     * Gets the capacity of the vehicle.
+     *
+     * @return the capacity
+     */
+    public int getCapacity() {
+        return capacity;
+    }
 
-	public VehicleStatus getVehicleStatus() {
-		return vehicleStatus;
-	}
+    /**
+     * Gets the required driving licence for the vehicle.
+     *
+     * @return the licence type
+     */
+    public RequiredLicence getLicenceType() {
+        return licenceType;
+    }
 
-	public LocalDate getLastMaintenanceDate() {
-		return lastMaintenanceDate;
-	}
+    /**
+     * Gets the current status of the vehicle.
+     *
+     * @return the vehicle status
+     */
+    public VehicleStatus getVehicleStatus() {
+        return vehicleStatus;
+    }
 
-	public LocalDate getNextMaintenanceDate() {
-		return nextMaintenanceDate;
-	}
+    /**
+     * Gets the date of last maintenance.
+     *
+     * @return the last maintenance date
+     */
+    public LocalDate getLastMaintenanceDate() {
+        return lastMaintenanceDate;
+    }
+
+    /**
+     * Gets the date of next scheduled maintenance.
+     *
+     * @return the next maintenance date
+     */
+    public LocalDate getNextMaintenanceDate() {
+        return nextMaintenanceDate;
+    }
 }
