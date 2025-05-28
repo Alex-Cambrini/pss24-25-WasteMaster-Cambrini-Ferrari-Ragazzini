@@ -1,123 +1,138 @@
 package it.unibo.wastemaster.core.services;
 
-import static org.junit.jupiter.api.Assertions.*;
-
-import java.time.LocalDate;
-
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import it.unibo.wastemaster.core.AbstractDatabaseTest;
 import it.unibo.wastemaster.core.models.Vehicle;
+import java.time.LocalDate;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-public class VehicleManagerTest extends AbstractDatabaseTest {
+class VehicleManagerTest extends AbstractDatabaseTest {
 
-        private Vehicle v1;
-        private Vehicle v2;
-        private Vehicle v3;
+    private static final int VEHICLE_REGISTRATION_YEAR = 2021;
+    private Vehicle v1;
+    private Vehicle v2;
+    private Vehicle v3;
 
-        @BeforeEach
-        public void setUp() {
-                super.setUp();
-                em.getTransaction().begin();
+    @Override
+    @BeforeEach
+    public void setUp() {
+        super.setUp();
+        getEntityManager().getTransaction().begin();
 
-                v1 = new Vehicle("DD444DD", "Renault", "Master", 2023, Vehicle.RequiredLicence.C1,
-                                Vehicle.VehicleStatus.IN_SERVICE, 3);
-                v2 = new Vehicle("EE555EE", "MAN", "TGE", 2022, Vehicle.RequiredLicence.C,
-                                Vehicle.VehicleStatus.IN_MAINTENANCE, 2);
-                v3 = new Vehicle("FF666FF", "Ford", "Transit", 2021, Vehicle.RequiredLicence.C1,
-                                Vehicle.VehicleStatus.OUT_OF_SERVICE, 3);
+        v1 = new Vehicle("DD444DD", "Renault", "Master", VEHICLE_REGISTRATION_YEAR,
+                Vehicle.RequiredLicence.C1, Vehicle.VehicleStatus.IN_SERVICE, 3);
+        v2 = new Vehicle("EE555EE", "MAN", "TGE", VEHICLE_REGISTRATION_YEAR,
+                Vehicle.RequiredLicence.C, Vehicle.VehicleStatus.IN_MAINTENANCE, 2);
+        v3 = new Vehicle("FF666FF", "Ford", "Transit", VEHICLE_REGISTRATION_YEAR,
+                Vehicle.RequiredLicence.C1, Vehicle.VehicleStatus.OUT_OF_SERVICE, 3);
 
-                vehicleDAO.insert(v1);
-                vehicleDAO.insert(v2);
-                vehicleDAO.insert(v3);
-        }
+        getVehicleDAO().insert(v1);
+        getVehicleDAO().insert(v2);
+        getVehicleDAO().insert(v3);
+    }
 
-        @Test
-        public void testPlateNormalization() {
-                Vehicle vehicleWithLowerCasePlate = new Vehicle("aa111aa", "Fiat", "Panda", 2024,
-                                Vehicle.RequiredLicence.C1, Vehicle.VehicleStatus.IN_SERVICE, 1);
-                vehicleWithLowerCasePlate.setLastMaintenanceDate(LocalDate.now());
-                vehicleWithLowerCasePlate.setNextMaintenanceDate(LocalDate.now().plusYears(1));
+    @Test
+    void testPlateNormalization() {
+        Vehicle vehicleWithLowerCasePlate =
+                new Vehicle("aa111aa", "Fiat", "Panda", VEHICLE_REGISTRATION_YEAR,
+                        Vehicle.RequiredLicence.C1, Vehicle.VehicleStatus.IN_SERVICE, 1);
+        vehicleWithLowerCasePlate.setLastMaintenanceDate(LocalDate.now());
+        vehicleWithLowerCasePlate.setNextMaintenanceDate(LocalDate.now().plusYears(1));
 
-                Vehicle savedVehicle = vehicleManager.addVehicle(vehicleWithLowerCasePlate);
+        Vehicle savedVehicle = getVehicleManager().addVehicle(vehicleWithLowerCasePlate);
 
-                assertEquals("AA111AA", savedVehicle.getPlate());
+        assertEquals("AA111AA", savedVehicle.getPlate());
 
-                Vehicle dbVehicle = vehicleManager.findVehicleByPlate("aa111aa");
-                assertNotNull(dbVehicle);
-                assertEquals("AA111AA", dbVehicle.getPlate());
-        }
+        Vehicle dbVehicle = getVehicleManager().findVehicleByPlate("aa111aa");
+        assertNotNull(dbVehicle);
+        assertEquals("AA111AA", dbVehicle.getPlate());
+    }
 
-        @Test
-        public void testUpdateVehiclePlate() {
-                Vehicle vehicle = new Vehicle("CC333CC", "Toyota", "HiAce", 2026,
-                                Vehicle.RequiredLicence.C, Vehicle.VehicleStatus.IN_SERVICE, 4);
-                vehicleManager.addVehicle(vehicle);
+    @Test
+    void testUpdateVehiclePlate() {
+        Vehicle vehicle =
+                new Vehicle("CC333CC", "Toyota", "HiAce", VEHICLE_REGISTRATION_YEAR,
+                        Vehicle.RequiredLicence.C, Vehicle.VehicleStatus.IN_SERVICE, 4);
+        getVehicleManager().addVehicle(vehicle);
 
-                vehicle.setPlate("cc333cc");
-                vehicleManager.updateVehicle(vehicle);
+        vehicle.setPlate("cc333cc");
+        getVehicleManager().updateVehicle(vehicle);
 
-                Vehicle reloaded = vehicleManager.findVehicleByPlate("CC333CC");
-                assertNotNull(reloaded);
-                assertEquals("CC333CC", reloaded.getPlate());
-        }
+        Vehicle reloaded = getVehicleManager().findVehicleByPlate("CC333CC");
+        assertNotNull(reloaded);
+        assertEquals("CC333CC", reloaded.getPlate());
+    }
 
-        @Test
-        public void testAddVehicle() {
-                Vehicle toAddVehicle = new Vehicle("gg000gg", "Renault", "Master", 2023,
-                                Vehicle.RequiredLicence.C1, Vehicle.VehicleStatus.IN_SERVICE, 3);
-                Vehicle saved = vehicleManager.addVehicle(toAddVehicle);
+    @Test
+    void testAddVehicle() {
+        Vehicle toAddVehicle =
+                new Vehicle("gg000gg", "Renault", "Master", VEHICLE_REGISTRATION_YEAR,
+                        Vehicle.RequiredLicence.C1, Vehicle.VehicleStatus.IN_SERVICE, 3);
+        Vehicle saved = getVehicleManager().addVehicle(toAddVehicle);
 
-                assertNotNull(saved);
-                assertEquals("Renault", saved.getBrand());
+        assertNotNull(saved);
+        assertEquals("Renault", saved.getBrand());
 
-                assertThrows(IllegalArgumentException.class, () -> vehicleManager.addVehicle(null));
+        assertThrows(IllegalArgumentException.class,
+                () -> getVehicleManager().addVehicle(null));
 
-                Vehicle duplicate = new Vehicle("gg000GG", "Renault", "Master", 2023,
-                                Vehicle.RequiredLicence.C1, Vehicle.VehicleStatus.IN_SERVICE, 3);
-                assertThrows(IllegalArgumentException.class, () -> vehicleManager.addVehicle(duplicate));
+        Vehicle duplicate =
+                new Vehicle("gg000GG", "Renault", "Master", VEHICLE_REGISTRATION_YEAR,
+                        Vehicle.RequiredLicence.C1, Vehicle.VehicleStatus.IN_SERVICE, 3);
+        assertThrows(IllegalArgumentException.class,
+                () -> getVehicleManager().addVehicle(duplicate));
 
-                Vehicle withSpaces = new Vehicle("  AA000BB ", "Brand", "Model", 2024,
-                                Vehicle.RequiredLicence.C1, Vehicle.VehicleStatus.IN_SERVICE, 2);
-                vehicleManager.addVehicle(withSpaces);
-                Vehicle savedNoSpaces = vehicleManager.findVehicleByPlate("aa000bb");
-                assertNotNull(savedNoSpaces);
-                assertEquals("AA000BB", savedNoSpaces.getPlate());
-        }
+        Vehicle withSpaces =
+                new Vehicle("  AA000BB ", "Brand", "Model", VEHICLE_REGISTRATION_YEAR,
+                        Vehicle.RequiredLicence.C1, Vehicle.VehicleStatus.IN_SERVICE, 2);
+        getVehicleManager().addVehicle(withSpaces);
+        Vehicle savedNoSpaces = getVehicleManager().findVehicleByPlate("aa000bb");
+        assertNotNull(savedNoSpaces);
+        assertEquals("AA000BB", savedNoSpaces.getPlate());
+    }
 
-        @Test
-        public void testUpdateVehicle() {
-                v1.setModel("Updated");
-                vehicleManager.updateVehicle(v1);
+    @Test
+    void testUpdateVehicle() {
+        v1.setModel("Updated");
+        getVehicleManager().updateVehicle(v1);
 
-                Vehicle updated = vehicleManager.findVehicleByPlate("DD444DD");
-                assertNotNull(updated);
-                assertEquals("Updated", updated.getModel());
+        Vehicle updated = getVehicleManager().findVehicleByPlate("DD444DD");
+        assertNotNull(updated);
+        assertEquals("Updated", updated.getModel());
 
-                assertThrows(IllegalArgumentException.class, () -> vehicleManager.updateVehicle(null));
+        assertThrows(IllegalArgumentException.class,
+                () -> getVehicleManager().updateVehicle(null));
 
-                Vehicle ghost = new Vehicle("ZZ999ZZ", "Ghost", "Model", 2024,
-                                Vehicle.RequiredLicence.C1, Vehicle.VehicleStatus.IN_SERVICE, 1);
-                assertDoesNotThrow(() -> vehicleManager.updateVehicle(ghost));
+        Vehicle ghost =
+                new Vehicle("ZZ999ZZ", "Ghost", "Model", VEHICLE_REGISTRATION_YEAR,
+                        Vehicle.RequiredLicence.C1, Vehicle.VehicleStatus.IN_SERVICE, 1);
+        assertDoesNotThrow(() -> getVehicleManager().updateVehicle(ghost));
 
-                v1.setBrand(null);
-                assertThrows(IllegalArgumentException.class, () -> vehicleManager.updateVehicle(v1));
-        }
+        v1.setBrand(null);
+        assertThrows(IllegalArgumentException.class,
+                () -> getVehicleManager().updateVehicle(v1));
+    }
 
-        @Test
-        public void testMarkMaintenanceAsComplete() {
-                assertEquals(Vehicle.VehicleStatus.IN_MAINTENANCE, v2.getVehicleStatus());
+    @Test
+    void testMarkMaintenanceAsComplete() {
+        assertEquals(Vehicle.VehicleStatus.IN_MAINTENANCE, v2.getVehicleStatus());
 
-                vehicleManager.markMaintenanceAsComplete(v2);
-                Vehicle updated = vehicleManager.findVehicleByPlate("EE555EE");
+        getVehicleManager().markMaintenanceAsComplete(v2);
+        Vehicle updated = getVehicleManager().findVehicleByPlate("EE555EE");
 
-                assertNotNull(updated);
-                assertEquals(Vehicle.VehicleStatus.IN_SERVICE, updated.getVehicleStatus());
-                assertEquals(LocalDate.now(), updated.getLastMaintenanceDate());
-                assertEquals(LocalDate.now().plusYears(1), updated.getNextMaintenanceDate());
+        assertNotNull(updated);
+        assertEquals(Vehicle.VehicleStatus.IN_SERVICE, updated.getVehicleStatus());
+        assertEquals(LocalDate.now(), updated.getLastMaintenanceDate());
+        assertEquals(LocalDate.now().plusYears(1), updated.getNextMaintenanceDate());
 
-                assertThrows(IllegalArgumentException.class, () -> vehicleManager.markMaintenanceAsComplete(null));
-                assertThrows(IllegalArgumentException.class, () -> vehicleManager.markMaintenanceAsComplete(v1));
-        }
+        assertThrows(IllegalArgumentException.class,
+                () -> getVehicleManager().markMaintenanceAsComplete(null));
+        assertThrows(IllegalArgumentException.class,
+                () -> getVehicleManager().markMaintenanceAsComplete(v1));
+    }
 }
