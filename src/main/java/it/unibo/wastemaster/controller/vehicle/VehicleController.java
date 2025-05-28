@@ -5,323 +5,391 @@ import it.unibo.wastemaster.controller.utils.DialogUtils;
 import it.unibo.wastemaster.core.context.AppContext;
 import it.unibo.wastemaster.core.models.Vehicle;
 import it.unibo.wastemaster.viewmodels.VehicleRow;
-
+import java.io.IOException;
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Optional;
+import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.ContextMenu;
+import javafx.scene.control.CustomMenuItem;
+import javafx.scene.control.TableCell;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
+import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
-import java.util.Optional;
-import java.io.IOException;
-import java.time.LocalDate;
-import java.util.List;
-
+/**
+ * Controller for managing the vehicle view.
+ * 
+ * Handles loading, displaying, searching, filtering, adding, editing, and deleting
+ * vehicles.
+ * 
+ * Supports periodic automatic refresh of the vehicle list and interaction with the JavaFX
+ * UI.
+ */
 public class VehicleController {
 
-	private Timeline refreshTimeline;
-	private ContextMenu filterMenu;
+    private static final int REFRESH_INTERVAL_SECONDS = 30;
+    private static final String PLATE = "plate";
+    private static final String BRAND = "brand";
+    private static final String MODEL = "model";
+    private static final String YEAR = "year";
+    private static final String LICENCE_TYPE = "licenceType";
+    private static final String VEHICLE_STATUS = "vehicleStatus";
+    private static final String LAST_MAINTENANCE_DATE = "lastMaintenanceDate";
+    private static final String NEXT_MAINTENANCE_DATE = "nextMaintenanceDate";
+    private static final String REGISTRATION_YEAR = "registrationYear";
+    private static final String CAPACITY = "capacity";
 
-	private ObservableList<VehicleRow> allVehicles = FXCollections.observableArrayList();
+    private Timeline refreshTimeline;
+    private ContextMenu filterMenu;
+    private ObservableList<VehicleRow> allVehicles = FXCollections.observableArrayList();
+    private final ObservableList<String> activeFilters =
+            FXCollections.observableArrayList(PLATE, BRAND, MODEL, YEAR, LICENCE_TYPE,
+                    VEHICLE_STATUS, LAST_MAINTENANCE_DATE, NEXT_MAINTENANCE_DATE);
 
-	private final ObservableList<String> activeFilters = FXCollections.observableArrayList(
-			"plate", "brand", "model", "year", "licenceType", "vehicleStatus", "lastMaintenanceDate",
-			"nextMaintenanceDate");
+    @FXML
+    private TextField searchField;
 
-	@FXML
-	private TextField searchField;
+    @FXML
+    private Button filterButton;
 
-	@FXML
-	private Button filterButton;
+    @FXML
+    private Button editVehicleButton;
 
-	@FXML
-	private Button editVehicleButton;
+    @FXML
+    private Button deleteVehicleButton;
 
-	@FXML
-	private Button deleteVehicleButton;
+    @FXML
+    private TableView<VehicleRow> vehicleTable;
 
-	@FXML
-	private TableView<VehicleRow> VehicleTable;
+    @FXML
+    private TableColumn<VehicleRow, String> plateColumn;
 
-	@FXML
-	private TableColumn<VehicleRow, String> plateColumn;
-	@FXML
-	private TableColumn<VehicleRow, String> brandColumn;
-	@FXML
-	private TableColumn<VehicleRow, String> modelColumn;
-	@FXML
-	private TableColumn<VehicleRow, Integer> yearColumn;
-	@FXML
-	private TableColumn<VehicleRow, Integer> capacityColumn;
-	@FXML
-	private TableColumn<VehicleRow, Vehicle.RequiredLicence> licenceTypeColumn;
-	@FXML
-	private TableColumn<VehicleRow, Vehicle.VehicleStatus> vehicleStatusColumn;
-	@FXML
-	private TableColumn<VehicleRow, LocalDate> lastMaintenanceDateColumn;
-	@FXML
-	private TableColumn<VehicleRow, LocalDate> nextMaintenanceDateColumn;
+    @FXML
+    private TableColumn<VehicleRow, String> brandColumn;
 
-	@FXML
-	public void initialize() {
-		plateColumn.setCellValueFactory(new PropertyValueFactory<>("plate"));
-		brandColumn.setCellValueFactory(new PropertyValueFactory<>("brand"));
-		modelColumn.setCellValueFactory(new PropertyValueFactory<>("model"));
-		yearColumn.setCellValueFactory(new PropertyValueFactory<>("registrationYear"));
-		capacityColumn.setCellValueFactory(new PropertyValueFactory<>("capacity"));
-		licenceTypeColumn.setCellValueFactory(new PropertyValueFactory<>("licenceType"));
-		vehicleStatusColumn.setCellValueFactory(new PropertyValueFactory<>("vehicleStatus"));
-		lastMaintenanceDateColumn.setCellValueFactory(new PropertyValueFactory<>("lastMaintenanceDate"));
-		nextMaintenanceDateColumn.setCellValueFactory(new PropertyValueFactory<>("nextMaintenanceDate"));
+    @FXML
+    private TableColumn<VehicleRow, String> modelColumn;
 
-		licenceTypeColumn.setCellFactory(column -> new TableCell<VehicleRow, Vehicle.RequiredLicence>() {
-			@Override
-			protected void updateItem(Vehicle.RequiredLicence item, boolean empty) {
-				super.updateItem(item, empty);
-				setText(empty || item == null ? "" : formatEnum(item));
-			}
-		});
+    @FXML
+    private TableColumn<VehicleRow, Integer> yearColumn;
 
-		vehicleStatusColumn.setCellFactory(column -> new TableCell<VehicleRow, Vehicle.VehicleStatus>() {
-			@Override
-			protected void updateItem(Vehicle.VehicleStatus item, boolean empty) {
-				super.updateItem(item, empty);
-				setText(empty || item == null ? "" : formatEnum(item));
-			}
-		});
+    @FXML
+    private TableColumn<VehicleRow, Integer> capacityColumn;
 
-		lastMaintenanceDateColumn.setCellFactory(column -> new TableCell<VehicleRow, LocalDate>() {
-			@Override
-			protected void updateItem(LocalDate item, boolean empty) {
-				super.updateItem(item, empty);
-				setText(empty || item == null ? "" : item.toString());
-			}
-		});
+    @FXML
+    private TableColumn<VehicleRow, Vehicle.RequiredLicence> licenceTypeColumn;
 
-		nextMaintenanceDateColumn.setCellFactory(column -> new TableCell<VehicleRow, LocalDate>() {
-			@Override
-			protected void updateItem(LocalDate item, boolean empty) {
-				super.updateItem(item, empty);
-				setText(empty || item == null ? "" : item.toString());
-			}
-		});
+    @FXML
+    private TableColumn<VehicleRow, Vehicle.VehicleStatus> vehicleStatusColumn;
 
-		editVehicleButton.setDisable(true);
-		deleteVehicleButton.setDisable(true);
+    @FXML
+    private TableColumn<VehicleRow, LocalDate> lastMaintenanceDateColumn;
 
-		VehicleTable.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
-			boolean selected = newVal != null;
-			editVehicleButton.setDisable(!selected);
-			deleteVehicleButton.setDisable(!selected);
-		});
+    @FXML
+    private TableColumn<VehicleRow, LocalDate> nextMaintenanceDateColumn;
 
-		loadVehicles();
-		startAutoRefresh();
+    @FXML
+    private void initialize() {
+        plateColumn.setCellValueFactory(new PropertyValueFactory<>(PLATE));
+        brandColumn.setCellValueFactory(new PropertyValueFactory<>(BRAND));
+        modelColumn.setCellValueFactory(new PropertyValueFactory<>(MODEL));
+        yearColumn.setCellValueFactory(new PropertyValueFactory<>(REGISTRATION_YEAR));
+        capacityColumn.setCellValueFactory(new PropertyValueFactory<>(CAPACITY));
+        licenceTypeColumn.setCellValueFactory(new PropertyValueFactory<>(LICENCE_TYPE));
+        vehicleStatusColumn
+                .setCellValueFactory(new PropertyValueFactory<>(VEHICLE_STATUS));
+        lastMaintenanceDateColumn
+                .setCellValueFactory(new PropertyValueFactory<>(LAST_MAINTENANCE_DATE));
+        nextMaintenanceDateColumn
+                .setCellValueFactory(new PropertyValueFactory<>(NEXT_MAINTENANCE_DATE));
 
-		searchField.textProperty().addListener((obs, oldText, newText) -> handleSearch());
-	}
+        setLicenceTypeCellFactory();
+        setVehicleStatusCellFactory();
+        setLastMaintenanceDateCellFactory();
+        setNextMaintenanceDateCellFactory();
 
-	private void startAutoRefresh() {
-		refreshTimeline = new Timeline(new KeyFrame(Duration.seconds(30), event -> loadVehicles()));
-		refreshTimeline.setCycleCount(Timeline.INDEFINITE);
-		refreshTimeline.play();
-	}
+        editVehicleButton.setDisable(true);
+        deleteVehicleButton.setDisable(true);
 
-	public void stopAutoRefresh() {
-		if (refreshTimeline != null) {
-			refreshTimeline.stop();
-		}
-	}
+        vehicleTable.getSelectionModel().selectedItemProperty()
+                .addListener((obs, oldVal, newVal) -> {
+                    boolean selected = newVal != null;
+                    editVehicleButton.setDisable(!selected);
+                    deleteVehicleButton.setDisable(!selected);
+                });
 
-	private void loadVehicles() {
-		List<Vehicle> vehicles = AppContext.getVehicleDAO().findVehicleDetails();
-		allVehicles.clear();
+        loadVehicles();
+        startAutoRefresh();
 
-		for (Vehicle vehicle : vehicles) {
-			allVehicles.add(new VehicleRow(vehicle));
-		}
+        searchField.textProperty().addListener((obs, oldText, newText) -> handleSearch());
+    }
 
-		VehicleTable.setItems(FXCollections.observableArrayList(allVehicles));
+    private void setLicenceTypeCellFactory() {
+        licenceTypeColumn.setCellFactory(
+                column -> new TableCell<VehicleRow, Vehicle.RequiredLicence>() {
 
-		if (!searchField.getText().isBlank()) {
-			handleSearch();
-		}
-	}
+                    @Override
+                    protected void updateItem(final Vehicle.RequiredLicence item,
+                            final boolean empty) {
+                        super.updateItem(item, empty);
+                        setText(empty || item == null ? "" : formatEnum(item));
+                    }
+                });
+    }
 
-	@FXML
-	private void handleAddVehicle() {
-		try {
-			Stage mainStage = (Stage) MainLayoutController.getInstance().getRootPane().getScene().getWindow();
+    private void setVehicleStatusCellFactory() {
+        vehicleStatusColumn.setCellFactory(
+                column -> new TableCell<VehicleRow, Vehicle.VehicleStatus>() {
 
-			Optional<AddVehicleController> controllerOpt = DialogUtils.showModalWithController(
-					"Add Vehicle",
-					"/layouts/vehicle/AddVehicleView.fxml",
-					mainStage,
-					ctrl -> {
-					});
+                    @Override
+                    protected void updateItem(final Vehicle.VehicleStatus item,
+                            final boolean empty) {
+                        super.updateItem(item, empty);
+                        setText(empty || item == null ? "" : formatEnum(item));
+                    }
+                });
+    }
 
-			if (controllerOpt.isPresent()) {
-				loadVehicles();
-			}
-		} catch (IOException e) {
-			DialogUtils.showError("Navigation error", "Could not load Add Vehicle view.", AppContext.getOwner());
-			e.printStackTrace();
-		}
-	}
+    private void setLastMaintenanceDateCellFactory() {
+        lastMaintenanceDateColumn
+                .setCellFactory(column -> new TableCell<VehicleRow, LocalDate>() {
 
-	@FXML
-	private void handleEditVehicle() {
-		VehicleRow selected = VehicleTable.getSelectionModel().getSelectedItem();
-		if (selected == null) {
-			DialogUtils.showError("No Selection", "Please select a vehicle to edit.", AppContext.getOwner());
-			return;
-		}
+                    @Override
+                    protected void updateItem(final LocalDate item, final boolean empty) {
+                        super.updateItem(item, empty);
+                        setText(empty || item == null ? "" : item.toString());
+                    }
+                });
+    }
 
-		Vehicle vehicle = AppContext.getVehicleManager().findVehicleByPlate(selected.getPlate());
-		if (vehicle == null) {
-			DialogUtils.showError("Not Found", "Vehicle not found.", AppContext.getOwner());
-			return;
-		}
+    private void setNextMaintenanceDateCellFactory() {
+        nextMaintenanceDateColumn
+                .setCellFactory(column -> new TableCell<VehicleRow, LocalDate>() {
 
-		try {
-			Optional<EditVehicleController> controllerOpt = DialogUtils.showModalWithController(
-					"Edit Vehicle",
-					"/layouts/vehicle/EditVehicleView.fxml",
-					AppContext.getOwner(),
-					ctrl -> ctrl.setVehicleToEdit(vehicle));
+                    @Override
+                    protected void updateItem(final LocalDate item, final boolean empty) {
+                        super.updateItem(item, empty);
+                        setText(empty || item == null ? "" : item.toString());
+                    }
+                });
+    }
 
-			if (controllerOpt.isPresent()) {
-				loadVehicles();
-			}
-		} catch (Exception e) {
-			DialogUtils.showError("Navigation error", "Could not load Edit view.", AppContext.getOwner());
-			e.printStackTrace();
-		}
-	}
+    private void startAutoRefresh() {
+        refreshTimeline =
+                new Timeline(new KeyFrame(Duration.seconds(REFRESH_INTERVAL_SECONDS),
+                        event -> loadVehicles()));
+        refreshTimeline.setCycleCount(Animation.INDEFINITE);
+        refreshTimeline.play();
+    }
 
-	@FXML
-	private void handleDeleteVehicle() {
-		VehicleRow selected = VehicleTable.getSelectionModel().getSelectedItem();
-		if (selected == null) {
-			DialogUtils.showError("No Selection", "Please select a vehicle to delete.", AppContext.getOwner());
-			return;
-		}
+    private void stopAutoRefresh() {
+        if (refreshTimeline != null) {
+            refreshTimeline.stop();
+        }
+    }
 
-		Vehicle vehicle = AppContext.getVehicleManager().findVehicleByPlate(selected.getPlate());
+    private void loadVehicles() {
+        List<Vehicle> vehicles = AppContext.getVehicleDAO().findVehicleDetails();
+        allVehicles.clear();
 
-		if (vehicle == null) {
-			DialogUtils.showError("Not Found", "The selected vehicle could not be found.", AppContext.getOwner());
-			return;
-		}
+        for (Vehicle vehicle : vehicles) {
+            allVehicles.add(new VehicleRow(vehicle));
+        }
 
-		boolean success = AppContext.getVehicleManager().deleteVehicle(vehicle);
+        vehicleTable.setItems(FXCollections.observableArrayList(allVehicles));
 
-		if (success) {
-			DialogUtils.showSuccess("Vehicle deleted successfully.", AppContext.getOwner());
-			loadVehicles();
-		} else {
-			DialogUtils.showError("Deletion Failed", "Unable to delete the selected vehicle.", AppContext.getOwner());
-		}
-	}
+        if (!searchField.getText().isBlank()) {
+            handleSearch();
+        }
+    }
 
-	@FXML
-	private void handleSearch() {
-		String query = searchField.getText().toLowerCase().trim();
+    @FXML
+    private void handleAddVehicle() {
+        try {
+            Stage mainStage = (Stage) MainLayoutController.getInstance().getRootPane()
+                    .getScene().getWindow();
 
-		if (query.isEmpty()) {
-			VehicleTable.setItems(FXCollections.observableArrayList(allVehicles));
-			return;
-		}
+            Optional<AddVehicleController> controllerOpt =
+                    DialogUtils.showModalWithController("Add Vehicle",
+                            "/layouts/vehicle/AddVehicleView.fxml", mainStage, ctrl -> {
+                            });
 
-		ObservableList<VehicleRow> filtered = FXCollections.observableArrayList();
+            if (controllerOpt.isPresent()) {
+                loadVehicles();
+            }
+        } catch (IOException e) {
+            DialogUtils.showError("Navigation error", "Could not load Add Vehicle view.",
+                    AppContext.getOwner());
+            e.printStackTrace();
+        }
+    }
 
-		for (VehicleRow row : allVehicles) {
-			if ((activeFilters.contains("plate") && row.getPlate().toLowerCase().contains(query)) ||
-					(activeFilters.contains("brand") && row.getBrand().toLowerCase().contains(query)) ||
-					(activeFilters.contains("model") && row.getModel().toLowerCase().contains(query)) ||
-					(activeFilters.contains("year") && String.valueOf(row.getRegistrationYear()).contains(query)) ||
-					(activeFilters.contains("licenceType") && row.getLicenceType().name().equalsIgnoreCase(query)) ||
-					(activeFilters.contains("vehicleStatus")
-							&& formatEnum(row.getVehicleStatus()).toLowerCase().contains(query))
-					||
-					(activeFilters.contains("lastMaintenanceDate")
-							&& row.getLastMaintenanceDate().toString().toLowerCase().contains(query))
-					||
-					(activeFilters.contains("nextMaintenanceDate")
-							&& row.getNextMaintenanceDate().toString().toLowerCase().contains(query))) {
-				filtered.add(row);
-			}
-		}
+    @FXML
+    private void handleEditVehicle() {
+        VehicleRow selected = vehicleTable.getSelectionModel().getSelectedItem();
+        if (selected == null) {
+            DialogUtils.showError("No Selection", "Please select a vehicle to edit.",
+                    AppContext.getOwner());
+            return;
+        }
 
-		VehicleTable.setItems(filtered);
-	}
+        Vehicle vehicle =
+                AppContext.getVehicleManager().findVehicleByPlate(selected.getPlate());
+        if (vehicle == null) {
+            DialogUtils.showError("Not Found", "Vehicle not found.",
+                    AppContext.getOwner());
+            return;
+        }
 
-	@FXML
-	private void handleResetSearch() {
-		searchField.clear();
+        try {
+            Optional<EditVehicleController> controllerOpt =
+                    DialogUtils.showModalWithController("Edit Vehicle",
+                            "/layouts/vehicle/EditVehicleView.fxml",
+                            AppContext.getOwner(),
+                            ctrl -> ctrl.setVehicleToEdit(vehicle));
 
-		activeFilters.clear();
-		activeFilters.addAll(
-				"plate", "brand", "model", "year",
-				"licenceType", "vehicleStatus",
-				"lastMaintenanceDate", "nextMaintenanceDate");
+            if (controllerOpt.isPresent()) {
+                loadVehicles();
+            }
+        } catch (Exception e) {
+            DialogUtils.showError("Navigation error", "Could not load Edit view.",
+                    AppContext.getOwner());
+            e.printStackTrace();
+        }
+    }
 
-		loadVehicles();
-	}
+    @FXML
+    private void handleDeleteVehicle() {
+        VehicleRow selected = vehicleTable.getSelectionModel().getSelectedItem();
+        if (selected == null) {
+            DialogUtils.showError("No Selection", "Please select a vehicle to delete.",
+                    AppContext.getOwner());
+            return;
+        }
 
-	@FXML
-	private void showFilterMenu(MouseEvent event) {
-		if (filterMenu != null && filterMenu.isShowing()) {
-			filterMenu.hide();
-			return;
-		}
+        Vehicle vehicle =
+                AppContext.getVehicleManager().findVehicleByPlate(selected.getPlate());
 
-		filterMenu = new ContextMenu();
+        if (vehicle == null) {
+            DialogUtils.showError("Not Found", "The selected vehicle could not be found.",
+                    AppContext.getOwner());
+            return;
+        }
 
-		String[] fields = {
-				"plate", "brand", "model", "year", "licenceType",
-				"vehicleStatus", "lastMaintenanceDate", "nextMaintenanceDate"
-		};
-		String[] labels = {
-				"Plate", "Brand", "Model", "Year", "Licence",
-				"Status", "Last Maint.", "Next Maint."
-		};
+        boolean success = AppContext.getVehicleManager().deleteVehicle(vehicle);
 
-		for (int i = 0; i < fields.length; i++) {
-			String key = fields[i];
-			String label = labels[i];
+        if (success) {
+            DialogUtils.showSuccess("Vehicle deleted successfully.",
+                    AppContext.getOwner());
+            loadVehicles();
+        } else {
+            DialogUtils.showError("Deletion Failed",
+                    "Unable to delete the selected vehicle.", AppContext.getOwner());
+        }
+    }
 
-			CheckBox checkBox = new CheckBox(label);
-			checkBox.setSelected(activeFilters.contains(key));
+    @FXML
+    private void handleSearch() {
+        String query = searchField.getText().toLowerCase().trim();
+        if (query.isEmpty()) {
+            vehicleTable.setItems(FXCollections.observableArrayList(allVehicles));
+            return;
+        }
+        ObservableList<VehicleRow> filtered = FXCollections.observableArrayList();
 
-			checkBox.selectedProperty().addListener((obs, wasSelected, isSelected) -> {
-				if (isSelected) {
-					if (!activeFilters.contains(key)) {
-						activeFilters.add(key);
-					}
-				} else {
-					activeFilters.remove(key);
-				}
-				handleSearch();
-			});
+        for (VehicleRow row : allVehicles) {
+            if ((activeFilters.contains(PLATE)
+                    && row.getPlate().toLowerCase().contains(query))
+                    || (activeFilters.contains(BRAND)
+                            && row.getBrand().toLowerCase().contains(query))
+                    || (activeFilters.contains(MODEL)
+                            && row.getModel().toLowerCase().contains(query))
+                    || (activeFilters.contains(YEAR)
+                            && String.valueOf(row.getRegistrationYear()).contains(query))
+                    || (activeFilters.contains(LICENCE_TYPE)
+                            && row.getLicenceType().name().equalsIgnoreCase(query))
+                    || (activeFilters.contains(VEHICLE_STATUS)
+                            && formatEnum(row.getVehicleStatus()).toLowerCase()
+                                    .contains(query))
+                    || (activeFilters.contains(LAST_MAINTENANCE_DATE)
+                            && row.getLastMaintenanceDate().toString().toLowerCase()
+                                    .contains(query))
+                    || (activeFilters.contains(NEXT_MAINTENANCE_DATE)
+                            && row.getNextMaintenanceDate().toString().toLowerCase()
+                                    .contains(query))) {
+                filtered.add(row);
+            }
+        }
+        vehicleTable.setItems(filtered);
+    }
 
-			CustomMenuItem item = new CustomMenuItem(checkBox);
-			item.setHideOnClick(false);
-			filterMenu.getItems().add(item);
-		}
+    @FXML
+    private void handleResetSearch() {
+        searchField.clear();
+        activeFilters.clear();
+        activeFilters.addAll(PLATE, BRAND, MODEL, YEAR, LICENCE_TYPE, VEHICLE_STATUS,
+                LAST_MAINTENANCE_DATE, NEXT_MAINTENANCE_DATE);
+        loadVehicles();
+    }
 
-		filterMenu.show(filterButton, event.getScreenX(), event.getScreenY());
-	}
 
-	private String formatEnum(Enum<?> value) {
-		if (value == null)
-			return "";
-		String lower = value.name().toLowerCase().replace("_", " ");
-		return Character.toUpperCase(lower.charAt(0)) + lower.substring(1);
-	}
+    @FXML
+    private void showFilterMenu(final MouseEvent event) {
+        if (filterMenu != null && filterMenu.isShowing()) {
+            filterMenu.hide();
+            return;
+        }
+
+        filterMenu = new ContextMenu();
+
+        String[] fields = {PLATE, BRAND, MODEL, YEAR, LICENCE_TYPE,
+                VEHICLE_STATUS, LAST_MAINTENANCE_DATE, NEXT_MAINTENANCE_DATE};
+        String[] labels = {PLATE, BRAND, MODEL, YEAR, LICENCE_TYPE, VEHICLE_STATUS,
+                LAST_MAINTENANCE_DATE, NEXT_MAINTENANCE_DATE};
+
+        for (int i = 0; i < fields.length; i++) {
+            String key = fields[i];
+            String label = labels[i];
+
+            CheckBox checkBox = new CheckBox(label);
+            checkBox.setSelected(activeFilters.contains(key));
+
+            checkBox.selectedProperty().addListener((obs, wasSelected, isSelected) -> {
+                if (isSelected != null && isSelected) {
+                    if (!activeFilters.contains(key)) {
+                        activeFilters.add(key);
+                    }
+                } else {
+                    activeFilters.remove(key);
+                }
+                handleSearch();
+            });
+
+            CustomMenuItem item = new CustomMenuItem(checkBox);
+            item.setHideOnClick(false);
+            filterMenu.getItems().add(item);
+        }
+
+        filterMenu.show(filterButton, event.getScreenX(), event.getScreenY());
+    }
+
+    private String formatEnum(final Enum<?> value) {
+        if (value == null) {
+            return "";
+        }
+        String lower = value.name().toLowerCase().replace("_", " ");
+        return Character.toUpperCase(lower.charAt(0)) + lower.substring(1);
+    }
 }
