@@ -1,5 +1,9 @@
 package it.unibo.wastemaster.controller.vehicle;
 
+import static it.unibo.wastemaster.controller.utils.DialogUtils.closeModal;
+import static it.unibo.wastemaster.controller.utils.DialogUtils.showError;
+import static it.unibo.wastemaster.controller.utils.DialogUtils.showSuccess;
+
 import it.unibo.wastemaster.core.context.AppContext;
 import it.unibo.wastemaster.core.models.Vehicle;
 import it.unibo.wastemaster.core.models.Vehicle.RequiredLicence;
@@ -9,90 +13,102 @@ import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
 
-import static it.unibo.wastemaster.controller.utils.DialogUtils.*;
+/**
+ * Controller for the view to edit an existing vehicle. Manages loading the vehicle data
+ * into fields, updating the modified data, and handling UI events.
+ */
+public final class EditVehicleController {
 
-public class EditVehicleController {
+    private Vehicle vehicle;
 
-	private Vehicle vehicle;
+    @FXML
+    private TextField plateField;
 
-	@FXML
-	private TextField plateField;
+    @FXML
+    private TextField brandField;
 
-	@FXML
-	private TextField brandField;
+    @FXML
+    private TextField modelField;
 
-	@FXML
-	private TextField modelField;
+    @FXML
+    private TextField yearField;
 
-	@FXML
-	private TextField yearField;
+    @FXML
+    private TextField capacityField;
 
-	@FXML
-	private TextField capacityField;
+    @FXML
+    private ComboBox<RequiredLicence> licenceComboBox;
 
-	@FXML
-	private ComboBox<RequiredLicence> licenceComboBox;
+    @FXML
+    private ComboBox<VehicleStatus> statusComboBox;
 
-	@FXML
-	private ComboBox<VehicleStatus> statusComboBox;
+    /**
+     * Sets the vehicle to be edited. Subclasses overriding this method must call
+     * super.setVehicleToEdit().
+     *
+     * @param vehicle the vehicle to edit
+     */
+    public void setVehicleToEdit(final Vehicle vehicle) {
+        this.vehicle = vehicle;
 
-	public void setVehicleToEdit(Vehicle vehicle) {
-		this.vehicle = vehicle;
+        plateField.setText(vehicle.getPlate());
+        brandField.setText(vehicle.getBrand());
+        modelField.setText(vehicle.getModel());
+        yearField.setText(String.valueOf(vehicle.getRegistrationYear()));
+        capacityField.setText(String.valueOf(vehicle.getCapacity()));
 
-		plateField.setText(vehicle.getPlate());
-		brandField.setText(vehicle.getBrand());
-		modelField.setText(vehicle.getModel());
-		yearField.setText(String.valueOf(vehicle.getRegistrationYear()));
-		capacityField.setText(String.valueOf(vehicle.getCapacity()));
+        licenceComboBox.getItems().setAll(RequiredLicence.values());
+        licenceComboBox.getSelectionModel().select(vehicle.getRequiredLicence());
 
-		licenceComboBox.getItems().setAll(RequiredLicence.values());
-		licenceComboBox.getSelectionModel().select(vehicle.getRequiredLicence());
+        statusComboBox.getItems().setAll(VehicleStatus.values());
+        statusComboBox.getSelectionModel().select(vehicle.getVehicleStatus());
+    }
 
-		statusComboBox.getItems().setAll(VehicleStatus.values());
-		statusComboBox.getSelectionModel().select(vehicle.getVehicleStatus());
-	}
+    @FXML
+    private void handleUpdateVehicle(final ActionEvent event) {
+        try {
+            Vehicle original =
+                    AppContext.getVehicleManager().findVehicleByPlate(vehicle.getPlate());
+            if (original == null) {
+                showError("Error", "Vehicle not found.", AppContext.getOwner());
+                return;
+            }
 
-	@FXML
-	private void handleUpdateVehicle(ActionEvent event) {
-		try {
-			Vehicle original = AppContext.getVehicleManager().findVehicleByPlate(vehicle.getPlate());
-			if (original == null) {
-				showError("Error", "Vehicle not found.", AppContext.getOwner());
-				return;
-			}
+            boolean changed = !original.getBrand().equals(brandField.getText())
+                    || !original.getModel().equals(modelField.getText())
+                    || original.getRegistrationYear() != Integer
+                            .parseInt(yearField.getText())
+                    || original.getRequiredLicence() != licenceComboBox.getValue()
+                    || original.getVehicleStatus() != statusComboBox.getValue()
+                    || original.getCapacity() != Integer
+                            .parseInt(capacityField.getText());
 
-			boolean changed = !original.getBrand().equals(brandField.getText()) ||
-					!original.getModel().equals(modelField.getText()) ||
-					original.getRegistrationYear() != Integer.parseInt(yearField.getText()) ||
-					original.getRequiredLicence() != licenceComboBox.getValue() ||
-					original.getVehicleStatus() != statusComboBox.getValue() ||
-					original.getCapacity() != Integer.parseInt(capacityField.getText());
+            if (!changed) {
+                showError("No changes", "No fields were modified.",
+                        AppContext.getOwner());
+                return;
+            }
 
-			if (!changed) {
-				showError("No changes", "No fields were modified.", AppContext.getOwner());
-				return;
-			}
+            vehicle.setBrand(brandField.getText());
+            vehicle.setModel(modelField.getText());
+            vehicle.setRegistrationYear(Integer.parseInt(yearField.getText()));
+            vehicle.setRequiredLicence(licenceComboBox.getValue());
+            vehicle.setVehicleStatus(statusComboBox.getValue());
+            vehicle.setCapacity(Integer.parseInt(capacityField.getText()));
 
-			vehicle.setBrand(brandField.getText());
-			vehicle.setModel(modelField.getText());
-			vehicle.setRegistrationYear(Integer.parseInt(yearField.getText()));
-			vehicle.setRequiredLicence(licenceComboBox.getValue());
-			vehicle.setVehicleStatus(statusComboBox.getValue());
-			vehicle.setCapacity(Integer.parseInt(capacityField.getText()));
+            AppContext.getVehicleManager().updateVehicle(vehicle);
+            showSuccess("Vehicle updated successfully.", AppContext.getOwner());
+            closeModal(event);
 
-			AppContext.getVehicleManager().updateVehicle(vehicle);
-			showSuccess("Vehicle updated successfully.", AppContext.getOwner());
-			closeModal(event);
+        } catch (IllegalArgumentException e) {
+            showError("Validation error", e.getMessage(), AppContext.getOwner());
+        } catch (Exception e) {
+            showError("Unexpected error", e.getMessage(), AppContext.getOwner());
+        }
+    }
 
-		} catch (IllegalArgumentException e) {
-			showError("Validation error", e.getMessage(), AppContext.getOwner());
-		} catch (Exception e) {
-			showError("Unexpected error", e.getMessage(), AppContext.getOwner());
-		}
-	}
-
-	@FXML
-	private void handleAbortVehicleEdit(ActionEvent event) {
-		closeModal(event);
-	}
+    @FXML
+    private void handleAbortVehicleEdit(final ActionEvent event) {
+        closeModal(event);
+    }
 }
