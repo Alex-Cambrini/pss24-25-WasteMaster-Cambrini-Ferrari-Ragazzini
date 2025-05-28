@@ -23,7 +23,7 @@
          </children>
       </HBox>
 
-      <TableView fx:id="VehicleTable" prefHeight="300.0" prefWidth="600.0" styleClass="table-view" VBox.vgrow="ALWAYS">
+      <TableView fx:id="vehicleTable" prefHeight="300.0" prefWidth="600.0" styleClass="table-view" VBox.vgrow="ALWAYS">
          <columns>
             <TableColumn fx:id="plateColumn" prefWidth="80.0" text="Plate" />
             <TableColumn fx:id="brandColumn" prefWidth="120.0" text="Brand" />
