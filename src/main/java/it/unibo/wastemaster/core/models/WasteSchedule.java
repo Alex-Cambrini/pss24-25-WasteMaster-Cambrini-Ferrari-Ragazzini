@@ -2,8 +2,8 @@ package it.unibo.wastemaster.core.models;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -12,8 +12,11 @@ import jakarta.persistence.ManyToOne;
 import jakarta.validation.constraints.NotNull;
 import java.time.DayOfWeek;
 
+/**
+ * Represents a weekly collection schedule for a specific type of waste.
+ */
 @Entity
-public class WasteSchedule {
+public final class WasteSchedule {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -29,45 +32,59 @@ public class WasteSchedule {
     @NotNull(message = "dayOfWeek must not be null")
     private DayOfWeek dayOfWeek;
 
-    
-    // DayOfWeek enum (java.time.DayOfWeek) mapping:
-     
-    // monday    -> 1
-    // tuesday   -> 2
-    // wednesday -> 3
-    // thursday  -> 4
-    // friday    -> 5
-    // saturday  -> 6
-    // sunday    -> 7
-    
-
-
+    /**
+     * Default constructor.
+     */
     public WasteSchedule() {
     }
 
-    public WasteSchedule(Waste waste, DayOfWeek dayOfWeek) {
+    /**
+     * Constructs a schedule with specified waste and day.
+     *
+     * @param waste the associated waste
+     * @param dayOfWeek the day of collection
+     */
+    public WasteSchedule(final Waste waste, final DayOfWeek dayOfWeek) {
         this.waste = waste;
         this.dayOfWeek = dayOfWeek;
     }
 
+    /**
+     * @return the ID of the schedule
+     */
     public int getScheduleId() {
         return scheduleId;
     }
 
+    /**
+     * @return the associated waste
+     */
     public Waste getWaste() {
         return waste;
     }
 
-    public void setWaste(Waste waste) {
+    /**
+     * Sets the associated waste.
+     *
+     * @param waste the waste to set
+     */
+    public void setWaste(final Waste waste) {
         this.waste = waste;
     }
 
+    /**
+     * @return the day of collection
+     */
     public DayOfWeek getDayOfWeek() {
         return dayOfWeek;
     }
 
-    public void setDayOfWeek(DayOfWeek dayOfWeek) {
+    /**
+     * Sets the collection day.
+     *
+     * @param dayOfWeek the day to set
+     */
+    public void setDayOfWeek(final DayOfWeek dayOfWeek) {
         this.dayOfWeek = dayOfWeek;
     }
-
 }

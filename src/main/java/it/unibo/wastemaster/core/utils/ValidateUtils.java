@@ -74,9 +74,11 @@ public final class ValidateUtils {
         requireArgNotNull(entity, "Entity must not be null");
         Set<ConstraintViolation<T>> violations = VALIDATOR.validate(entity);
         if (!violations.isEmpty()) {
+            StringBuilder errorMessage = new StringBuilder("Validation failed:");
             for (ConstraintViolation<T> violation : violations) {
-                throw new IllegalArgumentException(violation.getMessage());
+                errorMessage.append(" ").append(violation.getMessage()).append(";");
             }
+            throw new IllegalArgumentException(errorMessage.toString());
         }
     }
 }
