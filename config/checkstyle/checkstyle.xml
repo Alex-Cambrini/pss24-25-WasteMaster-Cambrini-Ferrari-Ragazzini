@@ -85,7 +85,7 @@
         <module name="RedundantImport"/>
         <module name="UnusedImports"/>
         <module name="ImportOrder">
-            <property name="separated" value="false"/>
+            <property name="separated" value="true"/>
             <property name="sortStaticImportsAlphabetically" value="true"/>
             <property name="option" value="top"/>
         </module>
