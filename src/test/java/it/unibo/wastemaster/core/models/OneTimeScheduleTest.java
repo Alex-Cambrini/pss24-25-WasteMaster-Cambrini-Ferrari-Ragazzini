@@ -1,86 +1,97 @@
 package it.unibo.wastemaster.core.models;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import it.unibo.wastemaster.core.AbstractDatabaseTest;
 import it.unibo.wastemaster.core.utils.ValidateUtils;
 import jakarta.validation.ConstraintViolation;
-
+import java.time.LocalDate;
+import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.time.LocalDate;
-import java.util.Set;
+class OneTimeScheduleTest extends AbstractDatabaseTest {
 
-import static org.junit.jupiter.api.Assertions.*;
+    private OneTimeSchedule schedule;
+    private Customer customer;
+    private LocalDate pickupDate;
+    private Waste organic;
 
-public class OneTimeScheduleTest extends AbstractDatabaseTest {
+    @Override
+    @BeforeEach
+    public void setUp() {
+        super.setUp();
+        Location location = new Location("Via Dante", "5", "Roma", "00100");
+        customer =
+                new Customer("Luca", "Verdi", location, "luca@example.com", "3456789012");
+        organic = new Waste("organic", true, false);
+        pickupDate = LocalDate.now();
+        schedule = new OneTimeSchedule(customer, organic, pickupDate);
+    }
 
-	private OneTimeSchedule schedule;
-	private Customer customer;
-	private LocalDate pickupDate;
-	private Waste organic;
+    @Test
+    void testGetterAndSetter() {
+        assertEquals(pickupDate, schedule.getPickupDate());
 
-	@BeforeEach
-	public void setUp() {
-		super.setUp();
-		Location location = new Location("Via Dante", "5", "Roma", "00100");
-		customer = new Customer("Luca", "Verdi", location, "luca@example.com", "3456789012");
-		organic = new Waste("organic", true, false);
-		pickupDate = LocalDate.now();
-		schedule = new OneTimeSchedule(customer, organic, pickupDate);
-	}
+        LocalDate newDate = pickupDate.plusDays(1);
+        schedule.setPickupDate(newDate);
+        assertEquals(newDate, schedule.getPickupDate());
+    }
 
-	@Test
-	public void testGetterAndSetter() {
-		assertEquals(pickupDate, schedule.getPickupDate());
+    @Test
+    void testInvalidSchedule() {
+        OneTimeSchedule invalid = new OneTimeSchedule();
+        invalid.setPickupDate(LocalDate.now().minusDays(2));
 
-		LocalDate newDate = pickupDate.plusDays(1);
-		schedule.setPickupDate(newDate);
-		assertEquals(newDate, schedule.getPickupDate());
-	}
+        Set<ConstraintViolation<OneTimeSchedule>> violations =
+                ValidateUtils.VALIDATOR.validate(invalid);
+        assertFalse(violations.isEmpty());
 
-	@Test
-	public void testInvalidSchedule() {
-		OneTimeSchedule invalid = new OneTimeSchedule();
-		invalid.setPickupDate(LocalDate.now().minusDays(2));
+        assertTrue(violations.stream()
+                .anyMatch(v -> v.getPropertyPath().toString().equals("customer")));
+        assertTrue(violations.stream()
+                .anyMatch(v -> v.getPropertyPath().toString().equals("waste")));
+        assertTrue(violations.stream()
+                .anyMatch(v -> v.getPropertyPath().toString().equals("status")));
+        assertTrue(violations.stream()
+                .anyMatch(v -> v.getPropertyPath().toString().equals("pickupDate")));
+    }
 
-		Set<ConstraintViolation<OneTimeSchedule>> violations = ValidateUtils.VALIDATOR.validate(invalid);
-		assertFalse(violations.isEmpty());
+    @Test
+    void testValidSchedule() {
+        Set<ConstraintViolation<OneTimeSchedule>> violations =
+                ValidateUtils.VALIDATOR.validate(schedule);
+        assertTrue(violations.isEmpty(),
+                "Expected no validation errors for a valid OneTimeSchedule");
+    }
 
-		assertTrue(violations.stream().anyMatch(v -> v.getPropertyPath().toString().equals("customer")));
-		assertTrue(violations.stream().anyMatch(v -> v.getPropertyPath().toString().equals("waste")));
-		assertTrue(violations.stream().anyMatch(v -> v.getPropertyPath().toString().equals("status")));
-		assertTrue(violations.stream().anyMatch(v -> v.getPropertyPath().toString().equals("pickupDate")));
-	}
+    @Test
+    void testPersistence() {
+        getCustomerDAO().insert(customer);
+        getWasteDAO().insert(organic);
+        getOneTimeScheduleDAO().insert(schedule);
+        int scheduleId = schedule.getScheduleId();
+        OneTimeSchedule found = getOneTimeScheduleDAO().findById(scheduleId);
+        assertNotNull(found);
+        assertEquals(pickupDate, found.getPickupDate());
+        assertEquals(customer.getEmail(), found.getCustomer().getEmail());
 
-	@Test
-	public void testValidSchedule() {
-		Set<ConstraintViolation<OneTimeSchedule>> violations = ValidateUtils.VALIDATOR.validate(schedule);
-		assertTrue(violations.isEmpty(), "Expected no validation errors for a valid OneTimeSchedule");
-	}
+        getOneTimeScheduleDAO().delete(found);
+        OneTimeSchedule deleted = getOneTimeScheduleDAO().findById(scheduleId);
+        assertNull(deleted);
+    }
 
-	@Test
-	public void testPersistence() {
-		customerDAO.insert(customer);
-		wasteDAO.insert(organic);
-		oneTimeScheduleDAO.insert(schedule);
-		int scheduleId = schedule.getScheduleId();
-		OneTimeSchedule found = oneTimeScheduleDAO.findById(scheduleId);
-		assertNotNull(found);
-		assertEquals(pickupDate, found.getPickupDate());
-		assertEquals(customer.getEmail(), found.getCustomer().getEmail());
-
-		oneTimeScheduleDAO.delete(found);
-		OneTimeSchedule deleted = oneTimeScheduleDAO.findById(scheduleId);
-		assertNull(deleted);
-	}
-
-	@Test
-	public void testToString() {
-		String toStringOutput = schedule.toString();
-		assertNotNull(toStringOutput);
-		assertTrue(toStringOutput.contains("ONE_TIME Schedule"));
-		assertTrue(toStringOutput.contains(customer.getName()));
-		assertTrue(toStringOutput.contains(organic.getWasteName()));
-		assertTrue(toStringOutput.contains(pickupDate.toString()));
-	}
+    @Test
+    void testToString() {
+        String toStringOutput = schedule.toString();
+        assertNotNull(toStringOutput);
+        assertTrue(toStringOutput.contains("ONE_TIME Schedule"));
+        assertTrue(toStringOutput.contains(customer.getName()));
+        assertTrue(toStringOutput.contains(organic.getWasteName()));
+        assertTrue(toStringOutput.contains(pickupDate.toString()));
+    }
 }
