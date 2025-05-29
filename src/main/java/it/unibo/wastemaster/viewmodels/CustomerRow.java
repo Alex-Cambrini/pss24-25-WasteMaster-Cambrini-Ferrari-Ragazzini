@@ -93,4 +93,13 @@ public final class CustomerRow {
     public String getPostalCode() {
         return postalCode;
     }
+
+    /**
+     * Gets the full location as a formatted string.
+     *
+     * @return the full location string
+     */
+    public String getFullLocation() {
+        return street + " " + civic + ", " + city + " (" + postalCode + ")";
+    }
 }
