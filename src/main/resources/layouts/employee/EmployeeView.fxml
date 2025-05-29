@@ -32,7 +32,7 @@
                 <TableColumn fx:id="emailColumn" prefWidth="150.0" text="Email"/>
                 <TableColumn fx:id="roleColumn" prefWidth="100.0" text="Role"/>
                 <TableColumn fx:id="licenceColumn" prefWidth="120.0" text="Licence"/>
-                <TableColumn fx:id="locationColumn" text="Location" minWidth="180.0" prefWidth="220.0" maxWidth="400.0"/>
+                <TableColumn fx:id="locationColumn" minWidth="180.0" prefWidth="220.0" maxWidth="400.0" text="Location"/>
             </columns>
         </TableView>
 
