@@ -16,6 +16,11 @@ plugins {
     id("com.github.johnrengelman.shadow") version "8.1.1"
 }
 
+checkstyle {
+    toolVersion = "10.24"
+}
+
+
 repositories {
     mavenCentral()
 }
@@ -38,7 +43,7 @@ dependencies {
     // implementation("com.google.guava:guava:28.1-jre")
 
     // JavaFX: comment out if you do not need them
-    val javaFxVersion = 15
+    val javaFxVersion = 21
     for (platform in supportedPlatforms) {
         for (module in javaFXModules) {
             implementation("org.openjfx:javafx-$module:$javaFxVersion:$platform")
