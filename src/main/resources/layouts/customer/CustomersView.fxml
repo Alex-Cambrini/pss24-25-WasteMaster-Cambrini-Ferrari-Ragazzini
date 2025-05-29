@@ -30,10 +30,7 @@
                 <TableColumn fx:id="nameColumn" prefWidth="100.0" text="Name" />
                 <TableColumn fx:id="surnameColumn" prefWidth="100.0" text="Surname" />
                 <TableColumn fx:id="emailColumn" prefWidth="150.0" text="Email" />
-                <TableColumn fx:id="streetColumn" prefWidth="100.0" text="Street" />
-                <TableColumn fx:id="civicColumn" prefWidth="60.0" text="Civic n." />
-                <TableColumn fx:id="cityColumn" prefWidth="100.0" text="City" />
-                <TableColumn fx:id="postalColumn" prefWidth="90.0" text="Postal Code" />
+                <TableColumn fx:id="locationColumn" minWidth="180.0" prefWidth="220.0" maxWidth="400.0" text="Location" />
             </columns>
         </TableView>
 
