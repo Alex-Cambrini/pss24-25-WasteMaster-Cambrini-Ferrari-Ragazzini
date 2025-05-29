@@ -42,19 +42,19 @@ public final class MainLayoutController {
     private Hyperlink dashboardLink;
 
     @FXML
-    private Hyperlink clientiLink;
+    private Hyperlink customersLink;
 
     @FXML
     private Hyperlink wasteLink;
 
     @FXML
-    private Hyperlink scheduleLink;
+    private Hyperlink schedulesLink;
 
     @FXML
-    private Hyperlink veicoliLink;
+    private Hyperlink vehiclesLink;
 
     @FXML
-    private Hyperlink employeeLink;
+    private Hyperlink employeesLink;
 
     /**
      * Initializes the controller after its root element has been completely processed.
@@ -137,7 +137,7 @@ public final class MainLayoutController {
 
     @FXML
     private void handleCustomers() {
-        clientiLink.setVisited(false);
+        customersLink.setVisited(false);
         setPageTitle(CUSTOMER_MANAGEMENT);
         loadCenter("/layouts/customer/CustomersView.fxml");
     }
@@ -156,21 +156,21 @@ public final class MainLayoutController {
 
     @FXML
     private void handleVehicle() {
-        veicoliLink.setVisited(false);
+        vehiclesLink.setVisited(false);
         setPageTitle(VEHICLE_MANAGEMENT);
         loadCenter("/layouts/vehicle/VehicleView.fxml");
     }
 
     @FXML
     private void handleEmployee() {
-        employeeLink.setVisited(false);
+        employeesLink.setVisited(false);
         setPageTitle(EMPLOYEE_MANAGEMENT);
         loadCenter("/layouts/employee/EmployeeView.fxml");
     }
 
     @FXML
     private void handleSchedule() {
-        scheduleLink.setVisited(false);
+        schedulesLink.setVisited(false);
         setPageTitle(SCHEDULE_MANAGEMENT);
         loadCenter("/layouts/schedule/ScheduleView.fxml");
     }
