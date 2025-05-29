@@ -14,7 +14,7 @@ import javafx.scene.control.TextField;
  * Controller for editing an existing employee.
  * Handles form population and saving of updated data.
  */
-public class EditEmployeeController {
+public final class EditEmployeeController {
 
     private Employee employee;
 
@@ -51,7 +51,7 @@ public class EditEmployeeController {
      *
      * @param employee the Employee to edit
      */
-    public final void setEmployeeToEdit(final Employee employee) {
+    public void setEmployeeToEdit(final Employee employee) {
         this.employee = employee;
 
         nameField.setText(employee.getName());
