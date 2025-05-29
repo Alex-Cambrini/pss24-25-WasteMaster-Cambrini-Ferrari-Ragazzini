@@ -92,30 +92,10 @@ public class Collection {
     private Trip trip;
 
     /**
-     * Possible statuses of the collection.
-     */
-    public enum CollectionStatus {
-        /** Pending status. */
-        PENDING,
-
-        /** In progress status. */
-        IN_PROGRESS,
-
-        /** Completed status. */
-        COMPLETED,
-
-        /** Cancelled status. */
-        CANCELLED,
-
-        /** Failed status. */
-        FAILED
-    }
-
-
-    /**
      * Default constructor required by JPA.
      */
-    public Collection() { }
+    public Collection() {
+    }
 
     /**
      * Constructs a Collection based on a Schedule. Sets the date, waste type, and
@@ -134,39 +114,18 @@ public class Collection {
         this.cancelLimitDays = CANCEL_LIMIT_DAYS;
     }
 
-    /** @return the unique collection identifier */
+    /**
+     * @return the unique collection identifier
+     */
     public int getCollectionId() {
         return collectionId;
     }
 
-    /** @return the scheduled collection date */
+    /**
+     * @return the scheduled collection date
+     */
     public LocalDate getCollectionDate() {
         return date;
-    }
-
-    /** @return the customer associated with the collection */
-    public Customer getCustomer() {
-        return customer;
-    }
-
-    /** @return the waste type */
-    public Waste getWaste() {
-        return waste;
-    }
-
-    /** @return the current status of the collection */
-    public CollectionStatus getCollectionStatus() {
-        return collectionStatus;
-    }
-
-    /** @return the cancellation limit days */
-    public int getCancelLimitDays() {
-        return cancelLimitDays;
-    }
-
-    /** @return the schedule linked to the collection */
-    public Schedule getSchedule() {
-        return schedule;
     }
 
     /**
@@ -179,12 +138,33 @@ public class Collection {
     }
 
     /**
+     * @return the customer associated with the collection
+     */
+    public Customer getCustomer() {
+        return customer;
+    }
+
+    /**
+     * @return the waste type
+     */
+    public Waste getWaste() {
+        return waste;
+    }
+
+    /**
      * Sets the waste type.
      *
      * @param waste the new waste type
      */
     public void setWaste(final Waste waste) {
         this.waste = waste;
+    }
+
+    /**
+     * @return the current status of the collection
+     */
+    public CollectionStatus getCollectionStatus() {
+        return collectionStatus;
     }
 
     /**
@@ -197,6 +177,13 @@ public class Collection {
     }
 
     /**
+     * @return the cancellation limit days
+     */
+    public int getCancelLimitDays() {
+        return cancelLimitDays;
+    }
+
+    /**
      * Sets the cancellation limit days.
      *
      * @param cancelLimitDays the new cancellation limit
@@ -206,8 +193,15 @@ public class Collection {
     }
 
     /**
+     * @return the schedule linked to the collection
+     */
+    public Schedule getSchedule() {
+        return schedule;
+    }
+
+    /**
      * Returns a string representation of the collection.
-     * 
+     * <p>
      * Subclasses overriding this method should call super.toString() and append their
      * additional information to maintain consistency.
      *
@@ -216,12 +210,42 @@ public class Collection {
     @Override
     public String toString() {
         return String.format("""
-                Collection {ID: %d, Customer: %s, Date: %s, Waste: %s, Status: %s,
-                Cancel Limit Days: %d, Schedule ID: %s, Schedule Category: %s}""",
+                        Collection {ID: %d, Customer: %s, Date: %s, Waste: %s, Status: %s,
+                        Cancel Limit Days: %d, Schedule ID: %s, Schedule Category: %s}""",
                 collectionId, customer != null ? customer.getName() : "N/A", date,
                 waste != null ? waste.getWasteName() : "N/A", collectionStatus,
                 cancelLimitDays, schedule != null ? schedule.getScheduleId() : "N/A",
                 schedule != null ? schedule.getScheduleCategory() : "N/A");
+    }
+
+    /**
+     * Possible statuses of the collection.
+     */
+    public enum CollectionStatus {
+        /**
+         * Pending status.
+         */
+        PENDING,
+
+        /**
+         * In progress status.
+         */
+        IN_PROGRESS,
+
+        /**
+         * Completed status.
+         */
+        COMPLETED,
+
+        /**
+         * Cancelled status.
+         */
+        CANCELLED,
+
+        /**
+         * Failed status.
+         */
+        FAILED
     }
 
 }

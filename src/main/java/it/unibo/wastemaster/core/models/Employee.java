@@ -18,63 +18,28 @@ import jakarta.validation.constraints.NotNull;
 @Table(name = "employee")
 public class Employee extends Person {
 
-    /** Unique identifier for the employee, auto-generated. */
+    /**
+     * Unique identifier for the employee, auto-generated.
+     */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer employeeId;
 
-    /** Role of the employee. Cannot be null. */
+    /**
+     * Role of the employee. Cannot be null.
+     */
     @NotNull(message = "Role cannot be null")
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Role role;
 
-    /** Licence held by the employee. Cannot be null. */
+    /**
+     * Licence held by the employee. Cannot be null.
+     */
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     @NotNull(message = "Licence cannot be null")
     private Licence licence;
-
-    /**
-     * Enum representing the employee's licence category.
-     */
-    public enum Licence {
-        /** No licence. */
-        NONE("None"),
-        /** Licence for vehicles up to 3.5 tons. */
-        B("Fino a 3.5 t"),
-        /** Licence for vehicles between 3.5 and 7.5 tons. */
-        C1("3.5 t - 7.5 t"),
-        /** Licence for vehicles over 7.5 tons. */
-        C("Oltre 7.5 t");
-
-        private final String licenceDescription;
-
-        Licence(final String licenceDescription) {
-            this.licenceDescription = licenceDescription;
-        }
-
-        /**
-         * Returns the human-readable description of the licence.
-         *
-         * @return licence description.
-         */
-        public String getLicenceDescription() {
-            return licenceDescription;
-        }
-    }
-
-    /**
-     * Enum representing possible roles of an employee.
-     */
-    public enum Role {
-        /** Administrator role. */
-        ADMINISTRATOR,
-        /** Office worker role. */
-        OFFICE_WORKER,
-        /** Operator role. */
-        OPERATOR
-    }
 
     /**
      * Constructs an Employee with the specified details.
@@ -88,8 +53,8 @@ public class Employee extends Person {
      * @param licence employee's licence.
      */
     public Employee(final String name, final String surname, final Location address,
-            final String email, final String phone, final Role role,
-            final Licence licence) {
+                    final String email, final String phone, final Role role,
+                    final Licence licence) {
         super(name, surname, address, email, phone);
         this.role = role;
         this.licence = licence;
@@ -156,9 +121,64 @@ public class Employee extends Person {
     @Override
     public String toString() {
         return String.format("""
-                Employee {ID: %d, Name: %s %s, Email: %s,
-                Phone: %s, Location: %s, Role: %s, Licence: %s}
-                """, employeeId, getName(), getSurname(), getEmail(), getPhone(),
+                        Employee {ID: %d, Name: %s %s, Email: %s,
+                        Phone: %s, Location: %s, Role: %s, Licence: %s}
+                        """, employeeId, getName(), getSurname(), getEmail(), getPhone(),
                 getLocation() != null ? getLocation().toString() : "N/A", role, licence);
+    }
+
+    /**
+     * Enum representing the employee's licence category.
+     */
+    public enum Licence {
+        /**
+         * No licence.
+         */
+        NONE("None"),
+        /**
+         * Licence for vehicles up to 3.5 tons.
+         */
+        B("Fino a 3.5 t"),
+        /**
+         * Licence for vehicles between 3.5 and 7.5 tons.
+         */
+        C1("3.5 t - 7.5 t"),
+        /**
+         * Licence for vehicles over 7.5 tons.
+         */
+        C("Oltre 7.5 t");
+
+        private final String licenceDescription;
+
+        Licence(final String licenceDescription) {
+            this.licenceDescription = licenceDescription;
+        }
+
+        /**
+         * Returns the human-readable description of the licence.
+         *
+         * @return licence description.
+         */
+        public String getLicenceDescription() {
+            return licenceDescription;
+        }
+    }
+
+    /**
+     * Enum representing possible roles of an employee.
+     */
+    public enum Role {
+        /**
+         * Administrator role.
+         */
+        ADMINISTRATOR,
+        /**
+         * Office worker role.
+         */
+        OFFICE_WORKER,
+        /**
+         * Operator role.
+         */
+        OPERATOR
     }
 }

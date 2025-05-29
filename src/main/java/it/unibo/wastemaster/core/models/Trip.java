@@ -1,6 +1,18 @@
 package it.unibo.wastemaster.core.models;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -8,10 +20,6 @@ import java.util.List;
 @Entity
 @Table(name = "trip")
 public class Trip {
-
-    public enum TripStatus {
-        PENDING, IN_PROGRESS, COMPLETED, CANCELED
-    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -26,9 +34,9 @@ public class Trip {
 
     @ManyToMany
     @JoinTable(
-        name = "trip_operators",
-        joinColumns = @JoinColumn(name = "trip_id"),
-        inverseJoinColumns = @JoinColumn(name = "employee_id")
+            name = "trip_operators",
+            joinColumns = @JoinColumn(name = "trip_id"),
+            inverseJoinColumns = @JoinColumn(name = "employee_id")
     )
     private List<Employee> operators;
 
@@ -51,12 +59,14 @@ public class Trip {
     private List<Collection> collections;
 
     public Trip() {
-        
+
     }
+
     public Trip(String postalCode, Vehicle assignedVehicle,
-            List<Employee> operators, LocalDateTime departureTime,
-            LocalDateTime expectedReturnTime, TripStatus status, List<Collection> collections) {
-       
+                List<Employee> operators, LocalDateTime departureTime,
+                LocalDateTime expectedReturnTime, TripStatus status,
+                List<Collection> collections) {
+
         this.postalCode = postalCode;
         this.assignedVehicle = assignedVehicle;
         this.operators = operators;
@@ -129,7 +139,8 @@ public class Trip {
     @Override
     public String toString() {
         return String.format(
-                "Trip {ID: %d, PostalCode: %s, Vehicle: %s, Operators: %s, Departure: %s, ExpectedReturn: %s, Status: %s, CollectionIDs: %s}",
+                "Trip {ID: %d, PostalCode: %s, Vehicle: %s, Operators: %s, Departure: "
+                        + "%s, ExpectedReturn: %s, Status: %s, CollectionIDs: %s}",
                 tripId,
                 postalCode != null ? postalCode : "N/A",
                 assignedVehicle != null ? assignedVehicle.getPlate() : "N/A",
@@ -142,5 +153,9 @@ public class Trip {
                 collections != null ? collections.stream()
                         .map(c -> String.valueOf(c.getCollectionId()))
                         .reduce((a, b) -> a + ", " + b).orElse("None") : "N/A");
+    }
+
+    public enum TripStatus {
+        PENDING, IN_PROGRESS, COMPLETED, CANCELED
     }
 }

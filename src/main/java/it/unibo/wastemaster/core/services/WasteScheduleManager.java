@@ -30,12 +30,11 @@ public final class WasteScheduleManager {
      * @return the created WasteSchedule
      */
     public WasteSchedule setupCollectionRoutine(final Waste waste,
-            final DayOfWeek dayOfWeek) {
+                                                final DayOfWeek dayOfWeek) {
         WasteSchedule wasteSchedule = new WasteSchedule(waste, dayOfWeek);
         wasteScheduleDAO.insert(wasteSchedule);
         return wasteSchedule;
     }
-
 
     /**
      * Changes the collection day of an existing schedule.
@@ -45,7 +44,7 @@ public final class WasteScheduleManager {
      * @return the updated WasteSchedule
      */
     public WasteSchedule changeCollectionDay(final WasteSchedule wasteSchedule,
-            final DayOfWeek newDayOfWeek) {
+                                             final DayOfWeek newDayOfWeek) {
         wasteSchedule.setDayOfWeek(newDayOfWeek);
         wasteScheduleDAO.update(wasteSchedule);
         return wasteSchedule;

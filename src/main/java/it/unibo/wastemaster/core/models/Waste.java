@@ -13,44 +13,55 @@ import jakarta.validation.constraints.NotNull;
 @Entity
 public class Waste {
 
-    /** Unique identifier for the waste. */
+    /**
+     * Unique identifier for the waste.
+     */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer wasteId;
 
-    /** Name of the waste type. Cannot be null. */
+    /**
+     * Name of the waste type. Cannot be null.
+     */
     @Column(nullable = false)
     @NotNull(message = "Waste type must not be null")
     private String name;
 
-    /** Indicates if the waste is recyclable. Cannot be null. */
+    /**
+     * Indicates if the waste is recyclable. Cannot be null.
+     */
     @Column(nullable = false)
     @NotNull(message = "isRecyclable must not be null")
     private Boolean isRecyclable;
 
-    /** Indicates if the waste is dangerous. Cannot be null. */
+    /**
+     * Indicates if the waste is dangerous. Cannot be null.
+     */
     @Column(nullable = false)
     @NotNull(message = "isDangerous must not be null")
     private Boolean isDangerous;
 
-    /** Flag indicating if the waste is deleted. */
+    /**
+     * Flag indicating if the waste is deleted.
+     */
     @Column(nullable = false)
     private boolean deleted = false;
 
     /**
      * Default constructor required by JPA.
      */
-    public Waste() { }
+    public Waste() {
+    }
 
     /**
      * Constructs a Waste with specified name, recyclability, and danger status.
-     * 
+     *
      * @param name the name of the waste
      * @param isRecyclable whether the waste is recyclable
      * @param isDangerous whether the waste is dangerous
      */
     public Waste(final String name, final Boolean isRecyclable,
-            final Boolean isDangerous) {
+                 final Boolean isDangerous) {
         this.name = name;
         this.isRecyclable = isRecyclable;
         this.isDangerous = isDangerous;
@@ -58,7 +69,7 @@ public class Waste {
 
     /**
      * Gets the waste ID.
-     * 
+     *
      * @return waste ID
      */
     public Integer getWasteId() {
@@ -67,7 +78,7 @@ public class Waste {
 
     /**
      * Gets the name of the waste.
-     * 
+     *
      * @return waste name
      */
     public String getWasteName() {
@@ -76,7 +87,7 @@ public class Waste {
 
     /**
      * Sets the name of the waste.
-     * 
+     *
      * @param name new waste name
      */
     public void setWasteName(final String name) {
@@ -85,7 +96,7 @@ public class Waste {
 
     /**
      * Returns whether the waste is recyclable.
-     * 
+     *
      * @return true if recyclable, false otherwise
      */
     public Boolean getIsRecyclable() {
@@ -94,7 +105,7 @@ public class Waste {
 
     /**
      * Sets the recyclability status.
-     * 
+     *
      * @param isRecyclable new recyclability status
      */
     public void setIsRecyclable(final Boolean isRecyclable) {
@@ -103,7 +114,7 @@ public class Waste {
 
     /**
      * Returns whether the waste is dangerous.
-     * 
+     *
      * @return true if dangerous, false otherwise
      */
     public Boolean getIsDangerous() {
@@ -112,7 +123,7 @@ public class Waste {
 
     /**
      * Sets the dangerous status.
-     * 
+     *
      * @param isDangerous new dangerous status
      */
     public void setIsDangerous(final Boolean isDangerous) {
@@ -121,7 +132,7 @@ public class Waste {
 
     /**
      * Checks if the waste is marked as deleted.
-     * 
+     *
      * @return true if deleted, false otherwise
      */
     public boolean isDeleted() {

@@ -35,7 +35,7 @@ public final class ValidateUtils {
      * @throws IllegalArgumentException if string is null or blank
      */
     public static void validateString(final String toValidate,
-            final String errorMessage) {
+                                      final String errorMessage) {
         if (toValidate == null || toValidate.isBlank()) {
             throw new IllegalArgumentException(errorMessage);
         }
@@ -49,7 +49,7 @@ public final class ValidateUtils {
      * @throws IllegalArgumentException if argument is null
      */
     public static void requireArgNotNull(final Object toValidate,
-            final String errorMessage) {
+                                         final String errorMessage) {
         if (toValidate == null) {
             throw new IllegalArgumentException(errorMessage);
         }
@@ -63,7 +63,7 @@ public final class ValidateUtils {
      * @throws IllegalStateException if argument is null
      */
     public static void requireStateNotNull(final Object toValidate,
-            final String errorMessage) {
+                                           final String errorMessage) {
         if (toValidate == null) {
             throw new IllegalStateException(errorMessage);
         }

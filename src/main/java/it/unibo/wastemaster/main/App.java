@@ -2,9 +2,9 @@ package it.unibo.wastemaster.main;
 
 /**
  * Main application entry point.
- * 
  */
 public final class App {
+
     private App() {
         // Prevent instantiation
     }

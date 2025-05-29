@@ -11,7 +11,7 @@ public final class EmployeeDAO extends GenericDAO<Employee> {
 
     /**
      * Constructs an EmployeeDAO with the given entity manager.
-     * 
+     *
      * @param entityManager the EntityManager to use
      */
     public EmployeeDAO(final EntityManager entityManager) {
@@ -20,7 +20,7 @@ public final class EmployeeDAO extends GenericDAO<Employee> {
 
     /**
      * Checks whether an employee exists with the given email.
-     * 
+     *
      * @param email the email to check
      * @return true if an employee exists with the email, false otherwise
      */
@@ -34,7 +34,7 @@ public final class EmployeeDAO extends GenericDAO<Employee> {
 
     /**
      * Finds an employee by their email.
-     * 
+     *
      * @param email the email of the employee
      * @return the Employee if found, or null otherwise
      */
@@ -47,7 +47,7 @@ public final class EmployeeDAO extends GenericDAO<Employee> {
 
     /**
      * Retrieves all non-deleted employees.
-     * 
+     *
      * @return list of active employees
      */
     public List<Employee> findEmployeeDetails() {
