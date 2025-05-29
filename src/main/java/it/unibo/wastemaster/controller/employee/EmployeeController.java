@@ -32,7 +32,7 @@ import javafx.util.Duration;
  * Controller for managing the employee view. Handles loading, filtering, adding, editing,
  * and deleting employees, as well as managing the table and search functionalities.
  */
-public class EmployeeController {
+public final class EmployeeController {
 
     private static final String FILTER_NAME = "name";
     private static final String FILTER_SURNAME = "surname";
@@ -47,7 +47,7 @@ public class EmployeeController {
 
     private ContextMenu filterMenu;
 
-    private ObservableList<EmployeeRow> allEmployees =
+    private final ObservableList<EmployeeRow> allEmployees =
             FXCollections.observableArrayList();
 
     private Stage owner;
@@ -97,7 +97,7 @@ public class EmployeeController {
      * automatic refresh. This method is called automatically after the FXML is loaded.
      */
     @FXML
-    public final void initialize() {
+    public void initialize() {
         owner = (Stage) MainLayoutController.getInstance().getRootPane().getScene()
                 .getWindow();
 
@@ -156,7 +156,7 @@ public class EmployeeController {
      * Stops the automatic refresh of the employee table, if it is currently active. This
      * is typically used when the view is being closed or refreshed manually.
      */
-    public final void stopAutoRefresh() {
+    public void stopAutoRefresh() {
         if (refreshTimeline != null) {
             refreshTimeline.stop();
         }
@@ -357,7 +357,7 @@ public class EmployeeController {
      * previous title and loads the employee management screen. Displays an error dialog
      * if the view fails to load.
      */
-    public final void returnToEmployeeView() {
+    public void returnToEmployeeView() {
         try {
             MainLayoutController.getInstance().restorePreviousTitle();
             MainLayoutController.getInstance()
@@ -367,5 +367,4 @@ public class EmployeeController {
                     owner);
         }
     }
-
 }
