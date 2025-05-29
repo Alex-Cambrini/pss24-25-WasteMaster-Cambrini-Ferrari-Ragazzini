@@ -32,12 +32,9 @@ public final class VehicleManager {
         ValidateUtils.validateEntity(vehicle);
 
         if (isPlateRegistered(vehicle.getPlate())) {
-            throw new IllegalArgumentException(
-                String.format(
+            throw new IllegalArgumentException(String.format(
                     "Cannot add vehicle: the plate '%s' is already registered.",
-                    vehicle.getPlate()
-                )
-            );
+                    vehicle.getPlate()));
         }
 
         vehicleDAO.insert(vehicle);
@@ -64,14 +61,28 @@ public final class VehicleManager {
     }
 
     /**
-     * Updates an existing vehicle.
+     * Updates an existing vehicle after validation.
      *
      * @param vehicle the vehicle to update
+     * @throws IllegalArgumentException if the new plate is already used by another
+     *         vehicle
      */
     public void updateVehicle(final Vehicle vehicle) {
         ValidateUtils.validateEntity(vehicle);
+
+        final String normalizedPlate = vehicle.getPlate().toUpperCase().trim();
+        final Vehicle existing = findVehicleByPlate(normalizedPlate);
+
+        if (existing != null && existing.getVehicleId() != vehicle.getVehicleId()) {
+            throw new IllegalArgumentException(String.format(
+                    "Cannot update vehicle: the plate '%s' is already registered to another vehicle.",
+                    normalizedPlate));
+        }
+
+        vehicle.setPlate(normalizedPlate);
         vehicleDAO.update(vehicle);
     }
+
 
     /**
      * Marks maintenance as complete and updates dates.
@@ -85,14 +96,11 @@ public final class VehicleManager {
         if (vehicle.getVehicleStatus() == Vehicle.VehicleStatus.IN_MAINTENANCE) {
             vehicle.setVehicleStatus(Vehicle.VehicleStatus.IN_SERVICE);
             vehicle.setLastMaintenanceDate(LocalDate.now());
-            vehicle.setNextMaintenanceDate(
-                vehicle.getLastMaintenanceDate().plusYears(1)
-            );
+            vehicle.setNextMaintenanceDate(vehicle.getLastMaintenanceDate().plusYears(1));
             updateVehicle(vehicle);
         } else {
             throw new IllegalArgumentException(
-                "The vehicle is not in maintenance status."
-            );
+                    "The vehicle is not in maintenance status.");
         }
     }
 
@@ -105,9 +113,8 @@ public final class VehicleManager {
     public boolean deleteVehicle(final Vehicle vehicle) {
         try {
             ValidateUtils.requireArgNotNull(vehicle, "Vehicle cannot be null");
-            ValidateUtils.requireArgNotNull(
-                vehicle.getPlate(), "Vehicle plate cannot be null"
-            );
+            ValidateUtils.requireArgNotNull(vehicle.getPlate(),
+                    "Vehicle plate cannot be null");
             vehicleDAO.delete(vehicle);
             return true;
         } catch (IllegalArgumentException e) {
