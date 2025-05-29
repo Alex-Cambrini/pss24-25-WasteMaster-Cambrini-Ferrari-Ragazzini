@@ -74,14 +74,16 @@ public final class EditVehicleController {
                 return;
             }
 
-            boolean changed = !original.getBrand().equals(brandField.getText())
-                    || !original.getModel().equals(modelField.getText())
-                    || original.getRegistrationYear() != Integer
-                            .parseInt(yearField.getText())
-                    || original.getRequiredLicence() != licenceComboBox.getValue()
-                    || original.getVehicleStatus() != statusComboBox.getValue()
-                    || original.getCapacity() != Integer
-                            .parseInt(capacityField.getText());
+            boolean changed =
+                    !original.getPlate().equalsIgnoreCase(plateField.getText().trim())
+                            || !original.getBrand().equals(brandField.getText())
+                            || !original.getModel().equals(modelField.getText())
+                            || original.getRegistrationYear() != Integer
+                                    .parseInt(yearField.getText())
+                            || original.getRequiredLicence() != licenceComboBox.getValue()
+                            || original.getVehicleStatus() != statusComboBox.getValue()
+                            || original.getCapacity() != Integer
+                                    .parseInt(capacityField.getText());
 
             if (!changed) {
                 showError("No changes", "No fields were modified.",
@@ -89,6 +91,7 @@ public final class EditVehicleController {
                 return;
             }
 
+            vehicle.setPlate(plateField.getText().trim().toUpperCase());
             vehicle.setBrand(brandField.getText());
             vehicle.setModel(modelField.getText());
             vehicle.setRegistrationYear(Integer.parseInt(yearField.getText()));

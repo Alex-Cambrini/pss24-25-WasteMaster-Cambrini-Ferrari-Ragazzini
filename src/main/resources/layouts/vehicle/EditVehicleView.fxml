@@ -31,7 +31,7 @@
             </rowConstraints>
             <children>
                 <Label text="Plate" GridPane.columnIndex="0" GridPane.rowIndex="0" />
-                <TextField fx:id="plateField" GridPane.columnIndex="1" GridPane.rowIndex="0" editable="false" />
+                <TextField fx:id="plateField" GridPane.columnIndex="1" GridPane.rowIndex="0" />
                 <Label text="Brand" GridPane.columnIndex="0" GridPane.rowIndex="1" />
                 <TextField fx:id="brandField" GridPane.columnIndex="1" GridPane.rowIndex="1" />
                 <Label text="Model" GridPane.columnIndex="0" GridPane.rowIndex="2" />
