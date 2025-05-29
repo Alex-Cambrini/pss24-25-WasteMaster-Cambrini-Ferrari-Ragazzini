@@ -24,7 +24,8 @@ public class OneTimeSchedule extends Schedule {
     /**
      * No-args constructor required by JPA.
      */
-    public OneTimeSchedule() { }
+    public OneTimeSchedule() {
+    }
 
     /**
      * Constructs a OneTimeSchedule with the given customer, waste, and pickup date.
@@ -34,7 +35,7 @@ public class OneTimeSchedule extends Schedule {
      * @param pickupDate the scheduled pickup date (today or future)
      */
     public OneTimeSchedule(final Customer customer, final Waste waste,
-            final LocalDate pickupDate) {
+                           final LocalDate pickupDate) {
         super(customer, waste);
         this.pickupDate = pickupDate;
         this.setScheduleCategory(ScheduleCategory.ONE_TIME);

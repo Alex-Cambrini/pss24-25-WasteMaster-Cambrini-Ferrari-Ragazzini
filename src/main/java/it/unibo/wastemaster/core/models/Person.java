@@ -80,7 +80,7 @@ public abstract class Person {
      * @param phone the phone number (final)
      */
     protected Person(final String name, final String surname, final Location location,
-            final String email, final String phone) {
+                     final String email, final String phone) {
         this.name = name;
         this.surname = surname;
         this.location = location;
@@ -91,31 +91,87 @@ public abstract class Person {
     /**
      * Default constructor required by JPA.
      */
-    protected Person() { }
+    protected Person() {
+    }
 
-    /** @return the person's first name */
+    /**
+     * @return the person's first name
+     */
     public String getName() {
         return name;
     }
 
-    /** @return the person's surname */
+    /**
+     * Sets the person's first name.
+     *
+     * @param name the new first name (final)
+     */
+    public void setName(final String name) {
+        this.name = name;
+    }
+
+    /**
+     * @return the person's surname
+     */
     public String getSurname() {
         return surname;
     }
 
-    /** @return the person's location */
+    /**
+     * Sets the person's surname.
+     *
+     * @param surname the new surname (final)
+     */
+    public void setSurname(final String surname) {
+        this.surname = surname;
+    }
+
+    /**
+     * @return the person's location
+     */
     public Location getLocation() {
         return location;
     }
 
-    /** @return the person's email */
+    /**
+     * Sets the person's location.
+     *
+     * @param location the new location (final)
+     */
+    public void setLocation(final Location location) {
+        this.location = location;
+    }
+
+    /**
+     * @return the person's email
+     */
     public String getEmail() {
         return email;
     }
 
-    /** @return the person's phone number */
+    /**
+     * Sets the person's email.
+     *
+     * @param email the new email (final)
+     */
+    public void setEmail(final String email) {
+        this.email = email;
+    }
+
+    /**
+     * @return the person's phone number
+     */
     public String getPhone() {
         return phone;
+    }
+
+    /**
+     * Sets the person's phone number.
+     *
+     * @param phone the new phone number (final)
+     */
+    public void setPhone(final String phone) {
+        this.phone = phone;
     }
 
     /**
@@ -140,51 +196,6 @@ public abstract class Person {
     }
 
     /**
-     * Sets the person's first name.
-     *
-     * @param name the new first name (final)
-     */
-    public void setName(final String name) {
-        this.name = name;
-    }
-
-    /**
-     * Sets the person's surname.
-     *
-     * @param surname the new surname (final)
-     */
-    public void setSurname(final String surname) {
-        this.surname = surname;
-    }
-
-    /**
-     * Sets the person's location.
-     *
-     * @param location the new location (final)
-     */
-    public void setLocation(final Location location) {
-        this.location = location;
-    }
-
-    /**
-     * Sets the person's email.
-     *
-     * @param email the new email (final)
-     */
-    public void setEmail(final String email) {
-        this.email = email;
-    }
-
-    /**
-     * Sets the person's phone number.
-     *
-     * @param phone the new phone number (final)
-     */
-    public void setPhone(final String phone) {
-        this.phone = phone;
-    }
-
-    /**
      * Returns a string representation of the person.
      *
      * @return formatted string with person details
@@ -192,9 +203,10 @@ public abstract class Person {
     @Override
     public String toString() {
         return String.format("""
-                Person {Name: %s, Surname: %s, Address: %s,
-                    Email: %s, Phone: %s, Deleted: %s }
-                """, name, surname, location != null ? location.toString() : "N/A", email,
+                        Person {Name: %s, Surname: %s, Address: %s,
+                            Email: %s, Phone: %s, Deleted: %s }
+                        """, name, surname, location != null ? location.toString() : "N"
+                        + "/A", email,
                 phone, isDeleted ? "Yes" : "No");
     }
 }

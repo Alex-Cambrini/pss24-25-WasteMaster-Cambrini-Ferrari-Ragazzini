@@ -10,6 +10,7 @@ import java.util.List;
  * @param <T> the entity type
  */
 public class GenericDAO<T> {
+
     private final EntityManager entityManager;
     private final Class<T> entityClass;
 

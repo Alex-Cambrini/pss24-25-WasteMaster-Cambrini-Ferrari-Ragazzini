@@ -26,82 +26,69 @@ import java.util.List;
         discriminatorType = jakarta.persistence.DiscriminatorType.STRING)
 public abstract class Schedule {
 
-    /** Unique identifier for the schedule. */
+    /**
+     * Unique identifier for the schedule.
+     */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    /** Customer associated with the schedule. Cannot be null. */
+    /**
+     * Customer associated with the schedule. Cannot be null.
+     */
     @ManyToOne
     @JoinColumn(name = "customer_id", nullable = false)
     @NotNull(message = "Customer cannot be null")
     private Customer customer;
 
-    /** Waste type to be collected. Cannot be null. */
+    /**
+     * Waste type to be collected. Cannot be null.
+     */
     @ManyToOne
     @JoinColumn(name = "waste_id", nullable = false)
     @NotNull(message = "WasteType cannot be null")
     private Waste waste;
 
-    /** Status of the schedule. Cannot be null. */
+    /**
+     * Status of the schedule. Cannot be null.
+     */
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     @NotNull(message = "Status cannot be null")
     private ScheduleStatus status;
 
-    /** Date when the schedule was created. Cannot be null. */
+    /**
+     * Date when the schedule was created. Cannot be null.
+     */
     @Column(nullable = false)
     @NotNull(message = "CreationDate cannot be null")
     private LocalDate creationDate;
 
-    /** Collections linked to this schedule. */
+    /**
+     * Collections linked to this schedule.
+     */
     @Valid
     @OneToMany(mappedBy = "schedule")
     private List<Collection> collections;
 
-    /** Category of the schedule (one-time or recurring). Cannot be null. */
+    /**
+     * Category of the schedule (one-time or recurring). Cannot be null.
+     */
     @Enumerated(EnumType.STRING)
     @NotNull(message = "Schedule category cannot be null")
     @Column(nullable = false)
     private ScheduleCategory scheduleCategory;
 
     /**
-     * Enum representing schedule categories.
-     */
-    public enum ScheduleCategory {
-        /** One-time schedule category. */
-        ONE_TIME,
-
-        /** Recurring schedule category. */
-        RECURRING
-    }
-
-    /**
-     * Enum representing possible statuses of a schedule.
-     */
-    public enum ScheduleStatus {
-        /** Schedule is active and ongoing. */
-        ACTIVE,
-
-        /** Schedule has been cancelled. */
-        CANCELLED,
-
-        /** Schedule is temporarily paused. */
-        PAUSED,
-
-        /** Schedule is completed. */
-        COMPLETED
-    }
-
-    /**
      * Default constructor required by JPA.
      */
-    protected Schedule() { }
+    protected Schedule() {
+    }
 
     /**
      * Constructs a Schedule with the given customer and waste. Initializes status to
      * ACTIVE and creationDate to now.
-     * 
+     *
      * @param customer the customer associated with the schedule
      * @param waste the type of waste to be collected
      */
@@ -115,14 +102,14 @@ public abstract class Schedule {
     /**
      * Abstract method to get the scheduled collection date. Must be implemented by
      * subclasses.
-     * 
+     *
      * @return the collection date
      */
     public abstract LocalDate getCollectionDate();
 
     /**
      * Gets the schedule's unique ID.
-     * 
+     *
      * @return schedule ID
      */
     public int getScheduleId() {
@@ -131,7 +118,7 @@ public abstract class Schedule {
 
     /**
      * Gets the associated customer.
-     * 
+     *
      * @return customer
      */
     public Customer getCustomer() {
@@ -140,7 +127,7 @@ public abstract class Schedule {
 
     /**
      * Sets the associated customer.
-     * 
+     *
      * @param customer new customer
      */
     public void setCustomer(final Customer customer) {
@@ -149,7 +136,7 @@ public abstract class Schedule {
 
     /**
      * Gets the waste type.
-     * 
+     *
      * @return waste
      */
     public Waste getWaste() {
@@ -158,7 +145,7 @@ public abstract class Schedule {
 
     /**
      * Sets the waste type.
-     * 
+     *
      * @param waste new waste type
      */
     public void setWaste(final Waste waste) {
@@ -167,7 +154,7 @@ public abstract class Schedule {
 
     /**
      * Gets the schedule status.
-     * 
+     *
      * @return schedule status
      */
     public ScheduleStatus getScheduleStatus() {
@@ -176,7 +163,7 @@ public abstract class Schedule {
 
     /**
      * Sets the schedule status.
-     * 
+     *
      * @param status new schedule status
      */
     public void setScheduleStatus(final ScheduleStatus status) {
@@ -185,7 +172,7 @@ public abstract class Schedule {
 
     /**
      * Gets the creation date of the schedule.
-     * 
+     *
      * @return creation date
      */
     public LocalDate getCreationDate() {
@@ -194,7 +181,7 @@ public abstract class Schedule {
 
     /**
      * Sets the creation date of the schedule.
-     * 
+     *
      * @param creationDate new creation date
      */
     public void setCreationDate(final LocalDate creationDate) {
@@ -203,7 +190,7 @@ public abstract class Schedule {
 
     /**
      * Gets the list of collections associated with this schedule.
-     * 
+     *
      * @return list of collections
      */
     public List<Collection> getCollections() {
@@ -212,7 +199,7 @@ public abstract class Schedule {
 
     /**
      * Sets the list of collections associated with this schedule.
-     * 
+     *
      * @param collections new list of collections
      */
     public void setCollections(final List<Collection> collections) {
@@ -221,7 +208,7 @@ public abstract class Schedule {
 
     /**
      * Gets the schedule category.
-     * 
+     *
      * @return schedule category
      */
     public ScheduleCategory getScheduleCategory() {
@@ -230,7 +217,7 @@ public abstract class Schedule {
 
     /**
      * Sets the schedule category.
-     * 
+     *
      * @param scheduleCategory new schedule category
      */
     public void setScheduleCategory(final ScheduleCategory scheduleCategory) {
@@ -246,9 +233,10 @@ public abstract class Schedule {
     @Override
     public String toString() {
         return String.format("""
-                %s Schedule {Customer: %s, WasteType: %s,
-                Status: %s, CreationDate: %s, CollectionIDs: %s}
-                """, scheduleCategory != null ? scheduleCategory.name() : "Unknown",
+                        %s Schedule {Customer: %s, WasteType: %s,
+                        Status: %s, CreationDate: %s, CollectionIDs: %s}
+                        """, scheduleCategory != null ? scheduleCategory.name() :
+                        "Unknown",
                 customer != null ? customer.getName() : "N/A",
                 waste != null ? waste.getWasteName() : "N/A",
                 status != null ? status.name() : "N/A",
@@ -256,5 +244,45 @@ public abstract class Schedule {
                 collections != null && !collections.isEmpty() ? collections.stream()
                         .map(c -> String.valueOf(c.getCollectionId()))
                         .reduce((a, b) -> a + ", " + b).orElse("N/A") : "None");
+    }
+
+    /**
+     * Enum representing schedule categories.
+     */
+    public enum ScheduleCategory {
+        /**
+         * One-time schedule category.
+         */
+        ONE_TIME,
+
+        /**
+         * Recurring schedule category.
+         */
+        RECURRING
+    }
+
+    /**
+     * Enum representing possible statuses of a schedule.
+     */
+    public enum ScheduleStatus {
+        /**
+         * Schedule is active and ongoing.
+         */
+        ACTIVE,
+
+        /**
+         * Schedule has been cancelled.
+         */
+        CANCELLED,
+
+        /**
+         * Schedule is temporarily paused.
+         */
+        PAUSED,
+
+        /**
+         * Schedule is completed.
+         */
+        COMPLETED
     }
 }

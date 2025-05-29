@@ -68,7 +68,7 @@ public class EmployeeManager {
      *
      * @param toUpdateEmployee the employee to update
      * @throws IllegalArgumentException if the ID is null or email is used by another
-     *         employee
+     * employee
      */
     public void updateEmployee(final Employee toUpdateEmployee) {
         ValidateUtils.validateEntity(toUpdateEmployee);

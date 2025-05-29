@@ -12,7 +12,7 @@ public final class VehicleDAO extends GenericDAO<Vehicle> {
 
     /**
      * Constructs a VehicleDAO with the given entity manager.
-     * 
+     *
      * @param entityManager the EntityManager to use
      */
     public VehicleDAO(final EntityManager entityManager) {
@@ -21,7 +21,7 @@ public final class VehicleDAO extends GenericDAO<Vehicle> {
 
     /**
      * Finds a vehicle by its plate.
-     * 
+     *
      * @param plate the vehicle plate
      * @return the Vehicle if found, null otherwise
      */
@@ -38,7 +38,7 @@ public final class VehicleDAO extends GenericDAO<Vehicle> {
 
     /**
      * Retrieves all vehicles with the given status.
-     * 
+     *
      * @param status the vehicle status
      * @return list of vehicles matching the status
      */
@@ -51,7 +51,7 @@ public final class VehicleDAO extends GenericDAO<Vehicle> {
 
     /**
      * Retrieves all vehicles.
-     * 
+     *
      * @return list of all vehicles
      */
     public List<Vehicle> getAllVehicles() {
@@ -61,7 +61,7 @@ public final class VehicleDAO extends GenericDAO<Vehicle> {
 
     /**
      * Retrieves all vehicle details.
-     * 
+     *
      * @return list of all vehicles with full details
      */
     public List<Vehicle> findVehicleDetails() {
