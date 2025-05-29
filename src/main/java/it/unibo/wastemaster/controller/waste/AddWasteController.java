@@ -17,10 +17,10 @@ public final class AddWasteController {
     private TextField nameField;
 
     @FXML
-    private CheckBox recyclableCheck;
+    private CheckBox recyclableCheckBox;
 
     @FXML
-    private CheckBox dangerousCheck;
+    private CheckBox dangerousCheckBox;
 
     /**
      * Saves the waste entry if valid.
@@ -31,8 +31,8 @@ public final class AddWasteController {
     private void handleSaveWaste(final ActionEvent event) {
         try {
             String name = nameField.getText().trim();
-            boolean recyclable = recyclableCheck.isSelected();
-            boolean dangerous = dangerousCheck.isSelected();
+            boolean recyclable = recyclableCheckBox.isSelected();
+            boolean dangerous = dangerousCheckBox.isSelected();
 
             if (name.isBlank()) {
                 throw new IllegalArgumentException("Waste name cannot be empty.");
