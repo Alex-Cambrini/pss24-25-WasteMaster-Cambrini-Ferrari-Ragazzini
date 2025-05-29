@@ -9,8 +9,7 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
-<?import javafx.scene.layout.Pane?>
-<?import javafx.scene.text.Font?>
+
 
 <StackPane fx:id="rootPane" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.unibo.wastemaster.controller.main.MainLayoutController">
     <children>
@@ -42,11 +41,11 @@
                     </padding>
                     <children>
                         <Hyperlink fx:id="dashboardLink" onAction="#handleDashboard" text="Dashboard" />
-                        <Hyperlink fx:id="clientiLink" onAction="#handleCustomers" text="Customers" />
+                        <Hyperlink fx:id="customersLink" onAction="#handleCustomers" text="Customers" />
                         <Hyperlink fx:id="wasteLink" onAction="#handleWaste" text="Waste" />
-                        <Hyperlink fx:id="scheduleLink" onAction="#handleSchedule" text="Schedule" />
-                        <Hyperlink fx:id="veicoliLink" onAction="#handleVehicle" text="Vehicle" />
-                        <Hyperlink fx:id="employeeLink" onAction="#handleEmployee" text="Employee" />
+                        <Hyperlink fx:id="schedulesLink" onAction="#handleSchedule" text="Schedule" />
+                        <Hyperlink fx:id="vehiclesLink" onAction="#handleVehicle" text="Vehicle" />
+                        <Hyperlink fx:id="employeesLink" onAction="#handleEmployee" text="Employee" />
                     </children>
                 </VBox>
 
