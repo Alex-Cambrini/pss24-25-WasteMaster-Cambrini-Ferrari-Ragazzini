@@ -10,6 +10,7 @@ import java.util.Optional;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -31,10 +32,7 @@ public final class CustomersController {
     private static final String FIELD_NAME = "name";
     private static final String FIELD_SURNAME = "surname";
     private static final String FIELD_EMAIL = "email";
-    private static final String FIELD_STREET = "street";
-    private static final String FIELD_CIVIC = "civic";
-    private static final String FIELD_CITY = "city";
-    private static final String FIELD_POSTAL = "postal";
+    private static final String FILTER_LOCATION = "location";
     private static final String NAVIGATION_ERROR = "Navigation error";
     private static final int REFRESH_SECONDS = 30;
 
@@ -45,8 +43,7 @@ public final class CustomersController {
             FXCollections.observableArrayList();
 
     private final ObservableList<String> activeFilters =
-            FXCollections.observableArrayList(FIELD_NAME, FIELD_SURNAME, FIELD_EMAIL,
-                    FIELD_STREET, FIELD_CIVIC, FIELD_CITY, FIELD_POSTAL);
+            FXCollections.observableArrayList(FIELD_NAME, FIELD_SURNAME, FIELD_EMAIL, FILTER_LOCATION);
 
     @FXML
     private Button filterButton;
@@ -76,16 +73,7 @@ public final class CustomersController {
     private TableColumn<CustomerRow, String> emailColumn;
 
     @FXML
-    private TableColumn<CustomerRow, String> streetColumn;
-
-    @FXML
-    private TableColumn<CustomerRow, String> civicColumn;
-
-    @FXML
-    private TableColumn<CustomerRow, String> cityColumn;
-
-    @FXML
-    private TableColumn<CustomerRow, String> postalColumn;
+    private TableColumn<CustomerRow, String> locationColumn;
 
     /**
      * Initializes the customer view with columns, search and auto-refresh logic.
@@ -95,10 +83,9 @@ public final class CustomersController {
         nameColumn.setCellValueFactory(new PropertyValueFactory<>(FIELD_NAME));
         surnameColumn.setCellValueFactory(new PropertyValueFactory<>(FIELD_SURNAME));
         emailColumn.setCellValueFactory(new PropertyValueFactory<>(FIELD_EMAIL));
-        streetColumn.setCellValueFactory(new PropertyValueFactory<>(FIELD_STREET));
-        civicColumn.setCellValueFactory(new PropertyValueFactory<>(FIELD_CIVIC));
-        cityColumn.setCellValueFactory(new PropertyValueFactory<>(FIELD_CITY));
-        postalColumn.setCellValueFactory(new PropertyValueFactory<>(FIELD_POSTAL));
+        locationColumn.setText("Location");
+        locationColumn.setCellValueFactory(cellData -> new SimpleStringProperty(
+                cellData.getValue().getFullLocation()));
 
         loadCustomers();
         startAutoRefresh();
@@ -249,22 +236,15 @@ public final class CustomersController {
                         && row.getSurname().toLowerCase().contains(query))
                 || (activeFilters.contains(FIELD_EMAIL)
                         && row.getEmail().toLowerCase().contains(query))
-                || (activeFilters.contains(FIELD_STREET)
-                        && row.getStreet().toLowerCase().contains(query))
-                || (activeFilters.contains(FIELD_CIVIC)
-                        && row.getCivic().toLowerCase().contains(query))
-                || (activeFilters.contains(FIELD_CITY)
-                        && row.getCity().toLowerCase().contains(query))
-                || (activeFilters.contains(FIELD_POSTAL)
-                        && row.getPostalCode().toLowerCase().contains(query));
+                || (activeFilters.contains(FILTER_LOCATION)
+                && row.getFullLocation().toLowerCase().contains(query));
     }
 
     @FXML
     private void handleResetSearch() {
         searchField.clear();
         activeFilters.clear();
-        activeFilters.addAll(FIELD_NAME, FIELD_SURNAME, FIELD_EMAIL, FIELD_STREET,
-                FIELD_CIVIC, FIELD_CITY, FIELD_POSTAL);
+        activeFilters.addAll(FIELD_NAME, FIELD_SURNAME, FIELD_EMAIL, FILTER_LOCATION);
         loadCustomers();
     }
 
@@ -276,10 +256,8 @@ public final class CustomersController {
         }
 
         filterMenu = new ContextMenu();
-        String[] fields = {FIELD_NAME, FIELD_SURNAME, FIELD_EMAIL, FIELD_STREET,
-                FIELD_CIVIC, FIELD_CITY, FIELD_POSTAL};
-        String[] labels =
-                {"Name", "Surname", "Email", "Street", "Civic", "City", "Postal Code"};
+        String[] fields = {FIELD_NAME, FIELD_SURNAME, FIELD_EMAIL, FILTER_LOCATION};
+        String[] labels = {"Name", "Surname", "Email", "Location"};
 
         for (int i = 0; i < fields.length; i++) {
             String key = fields[i];
