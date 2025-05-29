@@ -58,7 +58,8 @@ public abstract class Person {
      */
     @NotNull(message = "phone cannot be null")
     @NotBlank(message = "phone must not be blank")
-    @Pattern(regexp = "^[+]?\\d{10,15}$")
+    @Pattern(regexp = "^[+]?\\d{10,15}$",
+            message = "Phone must be between 10 and 15 digits, optional '+' prefix")
     @Column(nullable = false)
     private String phone;
 
