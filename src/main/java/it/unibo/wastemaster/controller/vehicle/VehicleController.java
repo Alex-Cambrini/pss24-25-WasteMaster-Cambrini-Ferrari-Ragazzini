@@ -30,14 +30,12 @@ import javafx.util.Duration;
 
 /**
  * Controller for managing the vehicle view.
- * 
  * Handles loading, displaying, searching, filtering, adding, editing, and deleting
  * vehicles.
- * 
  * Supports periodic automatic refresh of the vehicle list and interaction with the JavaFX
  * UI.
  */
-public class VehicleController {
+public final class VehicleController {
 
     private static final int REFRESH_INTERVAL_SECONDS = 30;
     private static final String PLATE = "plate";
@@ -53,7 +51,7 @@ public class VehicleController {
 
     private Timeline refreshTimeline;
     private ContextMenu filterMenu;
-    private ObservableList<VehicleRow> allVehicles = FXCollections.observableArrayList();
+    private final ObservableList<VehicleRow> allVehicles = FXCollections.observableArrayList();
     private final ObservableList<String> activeFilters =
             FXCollections.observableArrayList(PLATE, BRAND, MODEL, YEAR, LICENCE_TYPE,
                     VEHICLE_STATUS, LAST_MAINTENANCE_DATE, NEXT_MAINTENANCE_DATE);
