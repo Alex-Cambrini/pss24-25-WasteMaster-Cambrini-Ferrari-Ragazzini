@@ -11,7 +11,7 @@ import org.mindrot.jbcrypt.BCrypt;
  */
 public class AccountManager {
 
-    private AccountDAO accountDAO;
+    private final AccountDAO accountDAO;
 
     /**
      * Constructs an AccountManager with the given AccountDAO.
@@ -31,10 +31,25 @@ public class AccountManager {
      * @return the created Account entity
      */
     public Account createAccount(final Employee employee, final String rawPassword) {
-        String passwordHash = hashPassword(rawPassword);
-        Account newAccount = new Account(passwordHash, employee);
-        accountDAO.insert(newAccount);
-        return newAccount;
+        if (rawPassword == null || rawPassword.trim().isEmpty()) {
+            throw new IllegalArgumentException("Password cannot be blank.");
+        }
+
+        String passwordPattern = "^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d]{8,}$";
+        if (!rawPassword.matches(passwordPattern)) {
+            throw new IllegalArgumentException(
+                    "Password must be at least 8 characters long and include at least "
+                            + "one letter and one number.");
+        }
+
+        try {
+            String passwordHash = hashPassword(rawPassword);
+            Account newAccount = new Account(passwordHash, employee);
+            accountDAO.insert(newAccount);
+            return newAccount;
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to create account: " + e.getMessage(), e);
+        }
     }
 
     /**
