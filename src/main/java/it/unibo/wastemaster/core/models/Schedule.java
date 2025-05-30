@@ -235,8 +235,8 @@ public abstract class Schedule {
         return String.format("""
                         %s Schedule {Customer: %s, WasteType: %s,
                         Status: %s, CreationDate: %s, CollectionIDs: %s}
-                        """, scheduleCategory != null ? scheduleCategory.name() :
-                        "Unknown",
+                        """,
+                scheduleCategory != null ? scheduleCategory.name() : "Unknown",
                 customer != null ? customer.getName() : "N/A",
                 waste != null ? waste.getWasteName() : "N/A",
                 status != null ? status.name() : "N/A",
