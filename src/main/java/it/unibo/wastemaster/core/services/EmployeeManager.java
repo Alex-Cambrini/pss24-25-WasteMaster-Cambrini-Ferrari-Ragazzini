@@ -44,7 +44,7 @@ public class EmployeeManager {
      */
     public Employee addEmployee(Employee employee, String rawPassword) {
         ValidateUtils.requireArgNotNull(employee, EMPLOYEE_NULL_MSG);
-        ValidateUtils.requireArgNotNull(rawPassword, "Password cannot be null or empty");
+        ValidateUtils.requireArgNotNull(rawPassword, "Password cannot be null");
         ValidateUtils.validateEntity(employee);
 
         if (isEmailRegistered(employee.getEmail())) {
