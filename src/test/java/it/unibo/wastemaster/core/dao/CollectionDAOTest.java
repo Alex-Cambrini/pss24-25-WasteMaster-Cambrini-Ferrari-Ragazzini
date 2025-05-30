@@ -116,14 +116,14 @@ class CollectionDAOTest extends AbstractDatabaseTest {
     @Test
     void testFindAllCollectionByOneTimeSchedule() {
         LocalDate newDate = LocalDate.now().plusDays(3);
-        OneTimeSchedule schedule = getOneTimeScheduleManager()
-                .createOneTimeSchedule(customer, waste, newDate);
+        OneTimeSchedule schedule =
+                getOneTimeScheduleManager().createOneTimeSchedule(customer, waste,
+                        newDate);
 
         List<Collection> results =
                 getCollectionDAO().findAllCollectionsBySchedule(schedule);
-        Collection active = results.stream().filter(
-                        c -> c.getCollectionStatus() != Collection.CollectionStatus.CANCELLED)
-                .findFirst().orElse(null);
+        Collection active = results.stream().filter(c -> c.getCollectionStatus()
+                != Collection.CollectionStatus.CANCELLED).findFirst().orElse(null);
 
         assertNotNull(active);
         assertEquals(Collection.CollectionStatus.PENDING, active.getCollectionStatus());
@@ -131,9 +131,8 @@ class CollectionDAOTest extends AbstractDatabaseTest {
         active.setCollectionStatus(cancelled);
 
         results = getCollectionDAO().findAllCollectionsBySchedule(schedule);
-        active = results.stream().filter(
-                        c -> c.getCollectionStatus() != Collection.CollectionStatus.CANCELLED)
-                .findFirst().orElse(null);
+        active = results.stream().filter(c -> c.getCollectionStatus()
+                != Collection.CollectionStatus.CANCELLED).findFirst().orElse(null);
 
         assertNull(active);
     }
@@ -145,8 +144,9 @@ class CollectionDAOTest extends AbstractDatabaseTest {
     void testFindAllCollectionByRecurringSchedule() {
         LocalDate newDate = LocalDate.now().plusDays(3);
 
-        RecurringSchedule schedule = getRecurringScheduleManager()
-                .createRecurringSchedule(customer, waste, newDate, Frequency.WEEKLY);
+        RecurringSchedule schedule =
+                getRecurringScheduleManager().createRecurringSchedule(customer, waste,
+                        newDate, Frequency.WEEKLY);
 
         getRecurringScheduleManager().updateStatusRecurringSchedule(schedule,
                 RecurringSchedule.ScheduleStatus.PAUSED);
@@ -157,12 +157,10 @@ class CollectionDAOTest extends AbstractDatabaseTest {
                 getCollectionDAO().findAllCollectionsBySchedule(schedule);
         assertEquals(2, collections.size());
 
-        long cancelledCount = collections.stream().filter(
-                        c -> c.getCollectionStatus() == Collection.CollectionStatus.CANCELLED)
-                .count();
-        long activeCount = collections.stream().filter(
-                        c -> c.getCollectionStatus() != Collection.CollectionStatus.CANCELLED)
-                .count();
+        long cancelledCount = collections.stream().filter(c -> c.getCollectionStatus()
+                == Collection.CollectionStatus.CANCELLED).count();
+        long activeCount = collections.stream().filter(c -> c.getCollectionStatus()
+                != Collection.CollectionStatus.CANCELLED).count();
 
         assertEquals(1, cancelledCount);
         assertEquals(1, activeCount);
@@ -184,16 +182,18 @@ class CollectionDAOTest extends AbstractDatabaseTest {
         collection.setCollectionStatus(Collection.CollectionStatus.PENDING);
         getCollectionDAO().insert(collection);
 
-        Collection result = getCollectionDAO()
-                .findActiveCollectionByRecurringSchedule(recurringSchedule);
+        Collection result = getCollectionDAO().findActiveCollectionByRecurringSchedule(
+                recurringSchedule);
         assertNotNull(result);
         assertEquals(Collection.CollectionStatus.PENDING, result.getCollectionStatus());
 
         result.setCollectionStatus(Collection.CollectionStatus.CANCELLED);
         getCollectionDAO().update(result);
 
-        Collection nullResult = getCollectionDAO()
-                .findActiveCollectionByRecurringSchedule(recurringSchedule);
+        Collection nullResult =
+                getCollectionDAO().findActiveCollectionByRecurringSchedule(
+                        recurringSchedule);
         assertNull(nullResult);
     }
 }
+
