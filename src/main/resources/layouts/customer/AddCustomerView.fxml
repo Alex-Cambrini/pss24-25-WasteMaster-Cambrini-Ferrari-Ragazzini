@@ -1,10 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<?import javafx.geometry.Insets?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
 
-<VBox xmlns="http://javafx.com/javafx/23.0.1"
-    xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.unibo.wastemaster.controller.customer.AddCustomerController" styleClass="center-pane, modal-pane" prefWidth="600" prefHeight="400">
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox prefHeight="400" prefWidth="600" styleClass="center-pane, modal-pane" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.unibo.wastemaster.controller.customer.AddCustomerController">
 
     <padding>
         <Insets left="20.0" right="20.0" />
@@ -22,8 +28,8 @@
                 <RowConstraints prefHeight="30.0" vgrow="SOMETIMES" />
                 <RowConstraints prefHeight="30.0" vgrow="SOMETIMES" />
                 <RowConstraints prefHeight="30.0" vgrow="SOMETIMES" />
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
             </rowConstraints>
-
             <children>
                 <Label text="Name" GridPane.columnIndex="0" GridPane.rowIndex="0" />
                 <TextField fx:id="nameField" GridPane.columnIndex="1" GridPane.rowIndex="0" />
@@ -52,22 +58,39 @@
                         </VBox>
                     </children>
                 </HBox>
-
                 <Label text="Email" GridPane.columnIndex="0" GridPane.rowIndex="3" />
                 <TextField fx:id="emailField" GridPane.columnIndex="1" GridPane.rowIndex="3" />
-
                 <Label text="Phone" GridPane.columnIndex="0" GridPane.rowIndex="4" />
                 <TextField fx:id="phoneField" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+            <Label layoutX="10.0" layoutY="305.0" text="Password" GridPane.rowIndex="5" />
+            <HBox spacing="20.0" GridPane.columnIndex="1" GridPane.rowIndex="5">
+               <children>
+                  <VBox>
+                     <children>
+                        <Label text="Insert Pasword" />
+                        <TextField fx:id="passwordField" />
+                     </children>
+                  </VBox>
+                  <VBox>
+                     <children>
+                        <Label text="Repeat Password" />
+                        <TextField fx:id="passwordCheckField" />
+                     </children>
+                  </VBox>
+                  <VBox />
+                  <VBox />
+               </children>
+            </HBox>
             </children>
         </GridPane>
 
-        <HBox alignment="TOP_RIGHT" spacing="10.0" prefHeight="100.0">
+        <HBox alignment="TOP_RIGHT" prefHeight="100.0" spacing="10.0">
             <padding>
                 <Insets right="20.0" top="10.0" />
             </padding>
             <children>
-                <Button text="Cancel" onAction="#handleAbortCustomerCreation" styleClass="danger" />
-                <Button text="Save" onAction="#handleSaveCustomer" styleClass="success" />
+                <Button onAction="#handleAbortCustomerCreation" styleClass="danger" text="Cancel" />
+                <Button onAction="#handleSaveCustomer" styleClass="success" text="Save" />
             </children>
         </HBox>
     </children>

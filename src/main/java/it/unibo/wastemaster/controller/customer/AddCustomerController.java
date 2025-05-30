@@ -18,6 +18,12 @@ import javafx.scene.control.TextField;
 public final class AddCustomerController {
 
     @FXML
+    private TextField passwordField;
+
+    @FXML
+    private TextField passwordCheckField;
+
+    @FXML
     private TextField emailField;
 
     @FXML
