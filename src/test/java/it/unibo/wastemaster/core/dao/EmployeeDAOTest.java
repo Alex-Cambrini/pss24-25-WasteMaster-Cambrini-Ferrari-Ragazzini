@@ -19,7 +19,7 @@ import org.junit.jupiter.api.Test;
 /**
  * Unit tests for EmployeeDAO.
  */
-final class EmployeeDAOTest extends AbstractDatabaseTest {
+class EmployeeDAOTest extends AbstractDatabaseTest {
 
         private Location location;
 
