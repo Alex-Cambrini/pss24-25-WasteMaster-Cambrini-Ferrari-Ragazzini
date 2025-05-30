@@ -112,6 +112,7 @@ public abstract class AbstractDatabaseTest {
         wasteDAO = new WasteDAO(em);
         locationDAO = new GenericDAO<>(em, Location.class);
         customerDAO = new CustomerDAO(em);
+        accountDAO = new AccountDAO(em);
         employeeDAO = new EmployeeDAO(em);
         wasteScheduleDAO = new WasteScheduleDAO(em);
         oneTimeScheduleDAO = new OneTimeScheduleDAO(em);
