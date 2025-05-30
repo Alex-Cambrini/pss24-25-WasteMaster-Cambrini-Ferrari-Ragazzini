@@ -330,4 +330,22 @@ public abstract class AbstractDatabaseTest {
     protected TripManager getTripManager() {
         return tripManager;
     }
+
+    /**
+     * Returns the DAO for Account entities.
+     *
+     * @return the AccountDAO instance
+     */
+    protected AccountDAO getAccountDAO() {
+        return accountDAO;
+    }
+
+    /**
+     * Returns the AccountManager for managing account-related operations.
+     *
+     * @return the AccountManager instance
+     */
+    protected AccountManager getAccountManager() {
+        return accountManager;
+    }
 }

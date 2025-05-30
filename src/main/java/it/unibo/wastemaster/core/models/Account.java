@@ -28,6 +28,7 @@ public final class Account {
     @Column(nullable = false)
     private String passwordHash;
 
+    @NotNull(message = "Employee cannot be null")
     @OneToOne
     @JoinColumn(name = "employee_id", nullable = false, unique = true)
     private Employee employee;
