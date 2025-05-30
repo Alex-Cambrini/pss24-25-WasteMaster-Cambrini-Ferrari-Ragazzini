@@ -1,5 +1,6 @@
 package it.unibo.wastemaster.core;
 
+import it.unibo.wastemaster.core.dao.AccountDAO;
 import it.unibo.wastemaster.core.dao.CollectionDAO;
 import it.unibo.wastemaster.core.dao.CustomerDAO;
 import it.unibo.wastemaster.core.dao.EmployeeDAO;
@@ -11,6 +12,7 @@ import it.unibo.wastemaster.core.dao.VehicleDAO;
 import it.unibo.wastemaster.core.dao.WasteDAO;
 import it.unibo.wastemaster.core.dao.WasteScheduleDAO;
 import it.unibo.wastemaster.core.models.Location;
+import it.unibo.wastemaster.core.services.AccountManager;
 import it.unibo.wastemaster.core.services.CollectionManager;
 import it.unibo.wastemaster.core.services.CustomerManager;
 import it.unibo.wastemaster.core.services.EmployeeManager;
@@ -47,6 +49,7 @@ public abstract class AbstractDatabaseTest {
 
     // DAO instances for database access
     private GenericDAO<Location> locationDAO;
+    private AccountDAO accountDAO;
     private EmployeeDAO employeeDAO;
     private WasteDAO wasteDAO;
     private CustomerDAO customerDAO;
@@ -58,6 +61,7 @@ public abstract class AbstractDatabaseTest {
     private TripDAO tripDAO;
 
     // Service managers for business logic
+    private AccountManager accountManager;
     private EmployeeManager employeeManager;
     private WasteManager wasteManager;
     private CustomerManager customerManager;
@@ -118,7 +122,8 @@ public abstract class AbstractDatabaseTest {
 
         wasteManager = new WasteManager(wasteDAO);
         customerManager = new CustomerManager(customerDAO);
-        employeeManager = new EmployeeManager(employeeDAO);
+        accountManager = new AccountManager(accountDAO);
+        employeeManager = new EmployeeManager(employeeDAO, em, accountManager);
         wasteScheduleManager = new WasteScheduleManager(wasteScheduleDAO);
 
         recurringScheduleManager =
