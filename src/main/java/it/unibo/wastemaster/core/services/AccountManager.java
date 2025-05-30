@@ -1,0 +1,49 @@
+package it.unibo.wastemaster.core.services;
+
+import it.unibo.wastemaster.core.dao.AccountDAO;
+import it.unibo.wastemaster.core.models.Account;
+import it.unibo.wastemaster.core.models.Employee;
+import org.mindrot.jbcrypt.BCrypt;
+
+/**
+ * Service class responsible for managing Account entities,
+ * including account creation and password hashing.
+ */
+public class AccountManager {
+
+    private AccountDAO accountDAO;
+
+    /**
+     * Constructs an AccountManager with the given AccountDAO.
+     *
+     * @param accountDAO the DAO used for account persistence operations
+     */
+    public AccountManager(final AccountDAO accountDAO) {
+        this.accountDAO = accountDAO;
+    }
+
+    /**
+     * Creates a new Account for the given Employee with the raw password.
+     * The password is hashed using BCrypt before storing.
+     *
+     * @param employee the employee to associate with the new account
+     * @param rawPassword the plain text password to hash and store
+     * @return the created Account entity
+     */
+    public Account createAccount(final Employee employee, final String rawPassword) {
+        String passwordHash = hashPassword(rawPassword);
+        Account newAccount = new Account(passwordHash, employee);
+        accountDAO.insert(newAccount);
+        return newAccount;
+    }
+
+    /**
+     * Hashes the raw password using BCrypt.
+     *
+     * @param rawPassword the plain text password
+     * @return the hashed password
+     */
+    private String hashPassword(final String rawPassword) {
+        return BCrypt.hashpw(rawPassword, BCrypt.gensalt());
+    }
+}
