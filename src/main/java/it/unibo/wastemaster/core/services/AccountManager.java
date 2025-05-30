@@ -35,7 +35,7 @@ public class AccountManager {
             throw new IllegalArgumentException("Password cannot be blank.");
         }
 
-        String passwordPattern = "^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d]{8,}$";
+        String passwordPattern = "^(?=.*[A-Za-z])(?=.*\\d).{8,}$";
         if (!rawPassword.matches(passwordPattern)) {
             throw new IllegalArgumentException(
                     "Password must be at least 8 characters long and include at least "
