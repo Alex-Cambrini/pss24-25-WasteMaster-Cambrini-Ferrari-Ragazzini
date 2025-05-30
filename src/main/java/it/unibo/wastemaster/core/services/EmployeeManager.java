@@ -3,7 +3,9 @@ package it.unibo.wastemaster.core.services;
 import it.unibo.wastemaster.core.dao.EmployeeDAO;
 import it.unibo.wastemaster.core.models.Employee;
 import it.unibo.wastemaster.core.models.Vehicle;
+import it.unibo.wastemaster.core.utils.TransactionHelper;
 import it.unibo.wastemaster.core.utils.ValidateUtils;
+import jakarta.persistence.EntityManager;
 
 /**
  * Manages operations related to employees such as creation, update, deletion and
@@ -13,33 +15,46 @@ public class EmployeeManager {
 
     private static final String EMPLOYEE_NULL_MSG = "Employee cannot be null";
     private final EmployeeDAO employeeDAO;
+    private final EntityManager entityManager;
+    private final AccountManager accountManager;
 
     /**
-     * Constructs an EmployeeManager with the given DAO.
+     * Constructs an EmployeeManager with the given dependencies.
      *
      * @param employeeDAO the DAO used for employee persistence
+     * @param entityManager the EntityManager used for transaction management
+     * @param accountManager the manager responsible for account operations
      */
-    public EmployeeManager(final EmployeeDAO employeeDAO) {
+    public EmployeeManager(final EmployeeDAO employeeDAO,
+                           final EntityManager entityManager,
+                           final AccountManager accountManager) {
         this.employeeDAO = employeeDAO;
+        this.entityManager = entityManager;
+        this.accountManager = accountManager;
     }
 
     /**
-     * Adds a new employee after validation and email uniqueness check.
+     * Adds a new employee along with an associated account after validation and
+     * email uniqueness check.
      *
      * @param employee the employee to add
+     * @param rawPassword the plain text password for the new account
      * @return the added employee
-     * @throws IllegalArgumentException if email is already in use or employee is invalid
+     * @throws IllegalArgumentException if the email is already registered or inputs are invalid
      */
-    public Employee addEmployee(final Employee employee) {
+    public Employee addEmployee(Employee employee, String rawPassword) {
         ValidateUtils.requireArgNotNull(employee, EMPLOYEE_NULL_MSG);
+        ValidateUtils.requireArgNotNull(rawPassword, "Password cannot be null or empty");
         ValidateUtils.validateEntity(employee);
 
         if (isEmailRegistered(employee.getEmail())) {
-            throw new IllegalArgumentException(String.format(
-                    "Cannot add employee: the email address '%s' is already in use.",
-                    employee.getEmail()));
+            throw new IllegalArgumentException("Email already registered");
         }
-        employeeDAO.insert(employee);
+
+        TransactionHelper.executeTransaction(entityManager, () -> {
+            employeeDAO.insert(employee);
+            accountManager.createAccount(employee, rawPassword);
+        });
         return employee;
     }
 
