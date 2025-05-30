@@ -25,8 +25,8 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-
 class RecurringScheduleManagerTest extends AbstractDatabaseTest {
+
     private Location location;
     private Customer customer;
     private Waste waste;
@@ -208,7 +208,6 @@ class RecurringScheduleManagerTest extends AbstractDatabaseTest {
         RecurringSchedule reloaded =
                 getRecurringScheduleDAO().findById(s3.getScheduleId());
         assertEquals(Frequency.MONTHLY, reloaded.getFrequency());
-
 
         LocalDate todayPlus2 = LocalDate.now().plusDays(2);
         assertFalse(reloaded.getNextCollectionDate().isBefore(todayPlus2));

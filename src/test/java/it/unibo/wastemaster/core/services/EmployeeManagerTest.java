@@ -18,6 +18,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 class EmployeeManagerTest extends AbstractDatabaseTest {
+
     private Location location;
     private Employee employee;
     private String email;

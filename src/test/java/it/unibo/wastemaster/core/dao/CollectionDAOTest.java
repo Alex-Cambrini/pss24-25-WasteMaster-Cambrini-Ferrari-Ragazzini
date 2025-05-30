@@ -122,7 +122,7 @@ class CollectionDAOTest extends AbstractDatabaseTest {
         List<Collection> results =
                 getCollectionDAO().findAllCollectionsBySchedule(schedule);
         Collection active = results.stream().filter(
-                c -> c.getCollectionStatus() != Collection.CollectionStatus.CANCELLED)
+                        c -> c.getCollectionStatus() != Collection.CollectionStatus.CANCELLED)
                 .findFirst().orElse(null);
 
         assertNotNull(active);
@@ -132,7 +132,7 @@ class CollectionDAOTest extends AbstractDatabaseTest {
 
         results = getCollectionDAO().findAllCollectionsBySchedule(schedule);
         active = results.stream().filter(
-                c -> c.getCollectionStatus() != Collection.CollectionStatus.CANCELLED)
+                        c -> c.getCollectionStatus() != Collection.CollectionStatus.CANCELLED)
                 .findFirst().orElse(null);
 
         assertNull(active);
@@ -158,10 +158,10 @@ class CollectionDAOTest extends AbstractDatabaseTest {
         assertEquals(2, collections.size());
 
         long cancelledCount = collections.stream().filter(
-                c -> c.getCollectionStatus() == Collection.CollectionStatus.CANCELLED)
+                        c -> c.getCollectionStatus() == Collection.CollectionStatus.CANCELLED)
                 .count();
         long activeCount = collections.stream().filter(
-                c -> c.getCollectionStatus() != Collection.CollectionStatus.CANCELLED)
+                        c -> c.getCollectionStatus() != Collection.CollectionStatus.CANCELLED)
                 .count();
 
         assertEquals(1, cancelledCount);
