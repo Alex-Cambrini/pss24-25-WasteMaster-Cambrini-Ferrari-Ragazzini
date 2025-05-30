@@ -13,7 +13,7 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-final public class GenericDAOTest extends AbstractDatabaseTest {
+public class GenericDAOTest extends AbstractDatabaseTest {
 
     private Location location1;
     private Location location2;

@@ -16,7 +16,7 @@ import org.junit.jupiter.api.Test;
 /**
  * Unit tests for VehicleDAO.
  */
-final class VehicleDAOTest extends AbstractDatabaseTest {
+class VehicleDAOTest extends AbstractDatabaseTest {
 
     private Vehicle v1;
     private Vehicle v2;
