@@ -30,7 +30,7 @@ class EmployeeManagerTest extends AbstractDatabaseTest {
         super.setUp();
         getEntityManager().getTransaction().begin();
         email = "test@test.it";
-        rawPassword = "MfE&475DK4GRHAi";
+        rawPassword = "Test1234";
         location = new Location("Via Roma", "10", "Bologna", "40100");
         employee = new Employee("Mario", "Rossi", location, email, "1234567890",
                 Role.ADMINISTRATOR, Licence.NONE);
