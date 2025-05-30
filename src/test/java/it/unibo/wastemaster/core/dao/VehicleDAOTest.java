@@ -47,7 +47,6 @@ class VehicleDAOTest extends AbstractDatabaseTest {
         getVehicleDAO().insert(v3);
     }
 
-
     @Test
     void testFindByPlate() {
         final String plate1 = "AA111AA";

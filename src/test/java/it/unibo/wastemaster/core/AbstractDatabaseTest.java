@@ -80,6 +80,25 @@ public abstract class AbstractDatabaseTest {
     }
 
     /**
+     * Closes the EntityManagerFactory after all tests are completed.
+     */
+    @AfterAll
+    public static void cleanUp() {
+        if (emf != null) {
+            emf.close();
+        }
+    }
+
+    /**
+     * Returns the shared EntityManagerFactory for all tests.
+     *
+     * @return the EntityManagerFactory instance
+     */
+    protected static EntityManagerFactory getEntityManagerFactory() {
+        return emf;
+    }
+
+    /**
      * Sets up the EntityManager, DAOs, and service managers before each test.
      */
     @BeforeEach
@@ -127,27 +146,8 @@ public abstract class AbstractDatabaseTest {
     }
 
     /**
-     * Closes the EntityManagerFactory after all tests are completed.
-     */
-    @AfterAll
-    public static void cleanUp() {
-        if (emf != null) {
-            emf.close();
-        }
-    }
-
-    /**
-     * Returns the shared EntityManagerFactory for all tests.
-     * 
-     * @return the EntityManagerFactory instance
-     */
-    protected static EntityManagerFactory getEntityManagerFactory() {
-        return emf;
-    }
-
-    /**
      * Returns the EntityManager for the current test.
-     * 
+     *
      * @return the EntityManager instance
      */
     protected EntityManager getEntityManager() {
@@ -156,7 +156,7 @@ public abstract class AbstractDatabaseTest {
 
     /**
      * Returns the DAO for Location entities.
-     * 
+     *
      * @return the Location GenericDAO instance
      */
     protected GenericDAO<Location> getLocationDAO() {
@@ -165,7 +165,7 @@ public abstract class AbstractDatabaseTest {
 
     /**
      * Returns the DAO for Employee entities.
-     * 
+     *
      * @return the EmployeeDAO instance
      */
     protected EmployeeDAO getEmployeeDAO() {
@@ -174,7 +174,7 @@ public abstract class AbstractDatabaseTest {
 
     /**
      * Returns the DAO for Waste entities.
-     * 
+     *
      * @return the WasteDAO instance
      */
     protected WasteDAO getWasteDAO() {
@@ -183,7 +183,7 @@ public abstract class AbstractDatabaseTest {
 
     /**
      * Returns the DAO for Customer entities.
-     * 
+     *
      * @return the CustomerDAO instance
      */
     protected CustomerDAO getCustomerDAO() {
@@ -192,7 +192,7 @@ public abstract class AbstractDatabaseTest {
 
     /**
      * Returns the DAO for WasteSchedule entities.
-     * 
+     *
      * @return the WasteScheduleDAO instance
      */
     protected WasteScheduleDAO getWasteScheduleDAO() {
@@ -201,7 +201,7 @@ public abstract class AbstractDatabaseTest {
 
     /**
      * Returns the DAO for RecurringSchedule entities.
-     * 
+     *
      * @return the RecurringScheduleDAO instance
      */
     protected RecurringScheduleDAO getRecurringScheduleDAO() {
@@ -210,7 +210,7 @@ public abstract class AbstractDatabaseTest {
 
     /**
      * Returns the DAO for Collection entities.
-     * 
+     *
      * @return the CollectionDAO instance
      */
     protected CollectionDAO getCollectionDAO() {
@@ -219,7 +219,7 @@ public abstract class AbstractDatabaseTest {
 
     /**
      * Returns the DAO for OneTimeSchedule entities.
-     * 
+     *
      * @return the OneTimeScheduleDAO instance
      */
     protected OneTimeScheduleDAO getOneTimeScheduleDAO() {
@@ -228,7 +228,7 @@ public abstract class AbstractDatabaseTest {
 
     /**
      * Returns the DAO for Vehicle entities.
-     * 
+     *
      * @return the VehicleDAO instance
      */
     protected VehicleDAO getVehicleDAO() {
@@ -237,7 +237,7 @@ public abstract class AbstractDatabaseTest {
 
     /**
      * Returns the DAO for Trip entities.
-     * 
+     *
      * @return the TripDAO instance
      */
     protected TripDAO getTripDAO() {
@@ -246,7 +246,7 @@ public abstract class AbstractDatabaseTest {
 
     /**
      * Returns the manager for Employee-related operations.
-     * 
+     *
      * @return the EmployeeManager instance
      */
     protected EmployeeManager getEmployeeManager() {
@@ -255,7 +255,7 @@ public abstract class AbstractDatabaseTest {
 
     /**
      * Returns the manager for Waste-related operations.
-     * 
+     *
      * @return the WasteManager instance
      */
     protected WasteManager getWasteManager() {
@@ -264,7 +264,7 @@ public abstract class AbstractDatabaseTest {
 
     /**
      * Returns the manager for Customer-related operations.
-     * 
+     *
      * @return the CustomerManager instance
      */
     protected CustomerManager getCustomerManager() {
@@ -273,7 +273,7 @@ public abstract class AbstractDatabaseTest {
 
     /**
      * Returns the manager for WasteSchedule-related operations.
-     * 
+     *
      * @return the WasteScheduleManager instance
      */
     protected WasteScheduleManager getWasteScheduleManager() {
@@ -282,7 +282,7 @@ public abstract class AbstractDatabaseTest {
 
     /**
      * Returns the manager for RecurringSchedule-related operations.
-     * 
+     *
      * @return the RecurringScheduleManager instance
      */
     protected RecurringScheduleManager getRecurringScheduleManager() {
@@ -291,7 +291,7 @@ public abstract class AbstractDatabaseTest {
 
     /**
      * Returns the manager for OneTimeSchedule-related operations.
-     * 
+     *
      * @return the OneTimeScheduleManager instance
      */
     protected OneTimeScheduleManager getOneTimeScheduleManager() {
@@ -300,7 +300,7 @@ public abstract class AbstractDatabaseTest {
 
     /**
      * Returns the manager for Collection-related operations.
-     * 
+     *
      * @return the CollectionManager instance
      */
     protected CollectionManager getCollectionManager() {
@@ -309,7 +309,7 @@ public abstract class AbstractDatabaseTest {
 
     /**
      * Returns the manager for Vehicle-related operations.
-     * 
+     *
      * @return the VehicleManager instance
      */
     protected VehicleManager getVehicleManager() {
@@ -318,7 +318,7 @@ public abstract class AbstractDatabaseTest {
 
     /**
      * Returns the manager for Trip-related operations.
-     * 
+     *
      * @return the TripManager instance
      */
     protected TripManager getTripManager() {

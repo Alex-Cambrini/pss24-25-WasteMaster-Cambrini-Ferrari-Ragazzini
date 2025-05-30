@@ -19,8 +19,8 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-
 class CollectionManagerTest extends AbstractDatabaseTest {
+
     private Customer customer;
     private Waste plastic;
     private Collection collection;
