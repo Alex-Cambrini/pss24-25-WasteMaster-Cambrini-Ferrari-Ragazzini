@@ -1,4 +1,3 @@
-
 plugins {
     // Apply the java plugin to add support for Java
     java
@@ -43,7 +42,7 @@ dependencies {
     // implementation("com.google.guava:guava:28.1-jre")
 
     // JavaFX: comment out if you do not need them
-    val javaFxVersion = 15
+    val javaFxVersion = 21
     for (platform in supportedPlatforms) {
         for (module in javaFXModules) {
             implementation("org.openjfx:javafx-$module:$javaFxVersion:$platform")
@@ -54,8 +53,6 @@ dependencies {
     // JUnit API and testing engine
     testImplementation("org.junit.jupiter:junit-jupiter-api:$jUnitVersion")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:$jUnitVersion")
-    
-
 
 
     // Hibernate Core per la gestione della persistenza
@@ -63,7 +60,7 @@ dependencies {
     implementation("org.hibernate.orm:hibernate-hikaricp:6.2.0.Final")
 
     // Hibernate Validator
-    implementation ("org.hibernate.validator:hibernate-validator:7.0.0.Final")
+    implementation("org.hibernate.validator:hibernate-validator:7.0.0.Final")
     // Jakarta Bean Validation API
     implementation("jakarta.validation:jakarta.validation-api:3.0.2")
     // Jakarta Persistence API
@@ -83,24 +80,19 @@ dependencies {
     // Dipendenza H2 per il database in memoria durante i test
     testImplementation("com.h2database:h2:2.1.214")
 
-
-
 }
-
-
-
 
 tasks.withType<Test> {
     // Enables JUnit 5 Jupiter module
     useJUnitPlatform()
     testLogging {
-		showStandardStreams = true
-	}
+        showStandardStreams = true
+    }
     jvmArgs = listOf(
-		"-Djava.util.logging.config.file=${project.projectDir}/src/test/resources/logging.properties",
-		"-Dorg.slf4j.simpleLogger.defaultLogLevel=off",
-		"-Dorg.slf4j.simpleLogger.log.it.unibo.wastemaster=info"
-	)
+        "-Djava.util.logging.config.file=${project.projectDir}/src/test/resources/logging.properties",
+        "-Dorg.slf4j.simpleLogger.defaultLogLevel=off",
+        "-Dorg.slf4j.simpleLogger.log.it.unibo.wastemaster=info"
+    )
 }
 
 application {
