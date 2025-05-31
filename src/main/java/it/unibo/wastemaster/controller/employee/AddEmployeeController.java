@@ -70,7 +70,7 @@ public final class AddEmployeeController {
      *
      * @param event the action event triggering the save
      */
-
+    @FXML
     private void handleSaveEmployee(final ActionEvent event) {
         String password = passwordField.getText();
         String passwordCheck = passwordCheckField.getText();
