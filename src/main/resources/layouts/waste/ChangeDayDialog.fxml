@@ -9,7 +9,7 @@
 <?import javafx.scene.layout.VBox?>
 
 <VBox alignment="TOP_CENTER" maxHeight="150.0" maxWidth="300.0" prefHeight="150.0" prefWidth="300.0" spacing="10.0"
-	xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1"
+	xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
 	fx:controller="it.unibo.wastemaster.controller.waste.ChangeDayDialogController">
 	<children>
 		<Label text="Change Collection Day">

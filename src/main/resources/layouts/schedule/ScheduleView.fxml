@@ -11,7 +11,7 @@
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox alignment="TOP_CENTER" prefWidth="640.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.unibo.wastemaster.controller.schedule.ScheduleController">
+<VBox alignment="TOP_CENTER" prefWidth="640.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.unibo.wastemaster.controller.schedule.ScheduleController">
     <children>
         <HBox alignment="TOP_CENTER" minHeight="40.0" prefHeight="40.0" prefWidth="600.0" spacing="10.0">
             <children>

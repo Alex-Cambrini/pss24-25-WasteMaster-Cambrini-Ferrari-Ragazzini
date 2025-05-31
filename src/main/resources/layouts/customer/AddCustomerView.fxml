@@ -10,7 +10,7 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox prefHeight="400" prefWidth="600" styleClass="center-pane, modal-pane" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.unibo.wastemaster.controller.customer.AddCustomerController">
+<VBox prefHeight="400" prefWidth="600" styleClass="center-pane, modal-pane" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.unibo.wastemaster.controller.customer.AddCustomerController">
 
     <padding>
         <Insets left="20.0" right="20.0" />

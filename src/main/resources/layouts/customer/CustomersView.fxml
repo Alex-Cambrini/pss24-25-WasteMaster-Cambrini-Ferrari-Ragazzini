@@ -10,7 +10,7 @@
 <?import javafx.scene.layout.VBox?>
 
 <VBox alignment="TOP_CENTER" prefWidth="640.0"
-    xmlns="http://javafx.com/javafx/23.0.1"
+    xmlns="http://javafx.com/javafx/21"
     xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.unibo.wastemaster.controller.customer.CustomersController" stylesheets="@style.css">
 
     <children>

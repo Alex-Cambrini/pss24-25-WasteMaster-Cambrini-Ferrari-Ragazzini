@@ -4,7 +4,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<VBox xmlns="http://javafx.com/javafx/23.0.1"
+<VBox xmlns="http://javafx.com/javafx/21"
 	xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.unibo.wastemaster.controller.employee.EditEmployeeController" styleClass="center-pane, modal-pane" prefWidth="600.0" prefHeight="400.0">
 
 	<padding>
