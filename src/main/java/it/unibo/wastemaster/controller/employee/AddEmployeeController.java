@@ -18,6 +18,12 @@ import javafx.scene.control.TextField;
 public final class AddEmployeeController {
 
     @FXML
+    private TextField passwordField;
+
+    @FXML
+    private TextField passwordCheckField;
+
+    @FXML
     private TextField nameField;
 
     @FXML
@@ -64,8 +70,18 @@ public final class AddEmployeeController {
      *
      * @param event the action event triggering the save
      */
-    @FXML
+
     private void handleSaveEmployee(final ActionEvent event) {
+        String password = passwordField.getText();
+        String passwordCheck = passwordCheckField.getText();
+
+        if (!password.equals(passwordCheck)) {
+            DialogUtils.showError("Password mismatch",
+                    "The two passwords do not match.",
+                    AppContext.getOwner());
+            return;
+        }
+
         try {
             String name = nameField.getText();
             String surname = surnameField.getText();
@@ -84,7 +100,7 @@ public final class AddEmployeeController {
 
             ValidateUtils.validateAll(employee, address);
 
-            AppContext.getEmployeeManager().addEmployee(employee);
+            AppContext.getEmployeeManager().addEmployee(employee, password);
             DialogUtils.showSuccess("Employee saved successfully.",
                     AppContext.getOwner());
             DialogUtils.closeModal(event);
