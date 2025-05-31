@@ -17,6 +17,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 class CustomerManagerTest extends AbstractDatabaseTest {
+
     private Location location;
     private Customer customer;
     private String email;
@@ -178,7 +179,6 @@ class CustomerManagerTest extends AbstractDatabaseTest {
         assertThrows(ConstraintViolationException.class,
                 () -> getCustomerManager().addCustomer(customerWithNullLocation));
     }
-
 
     @Test
     void testGetCustomerInvalidId() {

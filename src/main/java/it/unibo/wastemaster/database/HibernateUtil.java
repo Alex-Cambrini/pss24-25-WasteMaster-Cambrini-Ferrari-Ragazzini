@@ -17,7 +17,7 @@ public final class HibernateUtil {
 
     /**
      * Returns the singleton EntityManagerFactory instance.
-     * 
+     *
      * @return the EntityManagerFactory
      */
     public static EntityManagerFactory getEntityManagerFactory() {

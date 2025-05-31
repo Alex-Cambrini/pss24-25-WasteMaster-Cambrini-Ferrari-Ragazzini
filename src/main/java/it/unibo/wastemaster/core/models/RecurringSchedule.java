@@ -14,34 +14,19 @@ import java.time.LocalDate;
 @DiscriminatorValue("RECURRING")
 public class RecurringSchedule extends Schedule {
 
-    /**
-     * Frequency options for recurring waste collection.
-     */
-    public enum Frequency {
-        /**
-         * Collection occurs every week.
-         */
-        WEEKLY,
-
-        /**
-         * Collection occurs every month.
-         */
-        MONTHLY
-    }
-
     @Enumerated(EnumType.STRING)
     @NotNull(message = "Frequency cannot be null")
     private Frequency frequency;
 
     @NotNull(message = "Start Date cannot be null")
     private LocalDate startDate;
-
     private LocalDate nextCollectionDate;
 
     /**
      * Default constructor for JPA.
      */
-    public RecurringSchedule() { }
+    public RecurringSchedule() {
+    }
 
     /**
      * Constructs a RecurringSchedule with specified customer, waste, start date and
@@ -53,7 +38,7 @@ public class RecurringSchedule extends Schedule {
      * @param frequency how often the collection recurs
      */
     public RecurringSchedule(final Customer customer, final Waste waste,
-            final LocalDate startDate, final Frequency frequency) {
+                             final LocalDate startDate, final Frequency frequency) {
         super(customer, waste);
         this.startDate = startDate;
         this.frequency = frequency;
@@ -137,5 +122,20 @@ public class RecurringSchedule extends Schedule {
                 startDate != null ? startDate.toString() : "N/A",
                 frequency != null ? frequency.name() : "N/A",
                 nextCollectionDate != null ? nextCollectionDate.toString() : "N/A");
+    }
+
+    /**
+     * Frequency options for recurring waste collection.
+     */
+    public enum Frequency {
+        /**
+         * Collection occurs every week.
+         */
+        WEEKLY,
+
+        /**
+         * Collection occurs every month.
+         */
+        MONTHLY
     }
 }

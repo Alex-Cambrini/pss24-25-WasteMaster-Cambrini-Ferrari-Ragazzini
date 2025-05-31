@@ -25,7 +25,7 @@ public class OneTimeScheduleManager {
      * @param collectionManager the manager handling related collection logic
      */
     public OneTimeScheduleManager(final OneTimeScheduleDAO oneTimeScheduleDAO,
-            final CollectionManager collectionManager) {
+                                  final CollectionManager collectionManager) {
         this.oneTimeScheduleDAO = oneTimeScheduleDAO;
         this.collectionManager = collectionManager;
     }
@@ -40,7 +40,8 @@ public class OneTimeScheduleManager {
      * @throws IllegalArgumentException if the pickup date is too soon
      */
     public OneTimeSchedule createOneTimeSchedule(final Customer customer,
-            final Waste waste, final LocalDate pickupDate) {
+                                                 final Waste waste,
+                                                 final LocalDate pickupDate) {
         if (!isDateValid(pickupDate, Collection.CANCEL_LIMIT_DAYS)) {
             throw new IllegalArgumentException("The pickup date must be at least "
                     + Collection.CANCEL_LIMIT_DAYS + " days from now.");

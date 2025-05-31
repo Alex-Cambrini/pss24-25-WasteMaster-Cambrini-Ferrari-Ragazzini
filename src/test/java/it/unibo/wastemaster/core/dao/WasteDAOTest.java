@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test;
 /**
  * Unit tests for WasteDAO.
  */
-final class WasteDAOTest extends AbstractDatabaseTest {
+class WasteDAOTest extends AbstractDatabaseTest {
 
     /**
      * Begins transaction before each test.

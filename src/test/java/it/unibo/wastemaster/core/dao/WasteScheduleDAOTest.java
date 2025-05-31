@@ -13,7 +13,7 @@ import org.junit.jupiter.api.Test;
 /**
  * Unit tests for WasteScheduleDAO.
  */
-final class WasteScheduleDAOTest extends AbstractDatabaseTest {
+class WasteScheduleDAOTest extends AbstractDatabaseTest {
 
     private Waste plastic;
     private Waste paper;

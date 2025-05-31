@@ -18,7 +18,7 @@ public final class TransactionHelper {
      * @param operation the operation to execute
      */
     public static void executeTransaction(final EntityManager entityManager,
-            final Runnable operation) {
+                                          final Runnable operation) {
         boolean startedHere = false;
 
         try {

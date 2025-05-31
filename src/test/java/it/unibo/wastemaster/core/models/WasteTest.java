@@ -41,9 +41,9 @@ class WasteTest extends AbstractDatabaseTest {
     @Test
     void testToString() {
         String expected = """
-            Waste Name: plastic
-            Recyclable: Yes
-            Dangerous: No""";
+                Waste Name: plastic
+                Recyclable: Yes
+                Dangerous: No""";
         assertEquals(expected, waste.toString());
     }
 
@@ -71,13 +71,13 @@ class WasteTest extends AbstractDatabaseTest {
     void testValidation() {
         Waste invalidWaste = new Waste(null, null, null);
         Set<ConstraintViolation<Waste>> violations =
-            ValidateUtils.VALIDATOR.validate(invalidWaste);
+                ValidateUtils.VALIDATOR.validate(invalidWaste);
         assertFalse(violations.isEmpty());
         assertTrue(violations.stream().anyMatch(
-            v -> v.getMessage().contains("Waste type must not be null")));
+                v -> v.getMessage().contains("Waste type must not be null")));
         assertTrue(violations.stream().anyMatch(
-            v -> v.getMessage().contains("isRecyclable must not be null")));
+                v -> v.getMessage().contains("isRecyclable must not be null")));
         assertTrue(violations.stream().anyMatch(
-            v -> v.getMessage().contains("isDangerous must not be null")));
+                v -> v.getMessage().contains("isDangerous must not be null")));
     }
 }

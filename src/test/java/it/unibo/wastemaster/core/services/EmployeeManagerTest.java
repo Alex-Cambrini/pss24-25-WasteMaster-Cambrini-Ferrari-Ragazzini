@@ -18,9 +18,11 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 class EmployeeManagerTest extends AbstractDatabaseTest {
+
     private Location location;
     private Employee employee;
     private String email;
+    private String rawPassword;
 
     @Override
     @BeforeEach
@@ -28,9 +30,44 @@ class EmployeeManagerTest extends AbstractDatabaseTest {
         super.setUp();
         getEntityManager().getTransaction().begin();
         email = "test@test.it";
+        rawPassword = "Test1234";
         location = new Location("Via Roma", "10", "Bologna", "40100");
         employee = new Employee("Mario", "Rossi", location, email, "1234567890",
                 Role.ADMINISTRATOR, Licence.NONE);
+    }
+
+    @Test
+    void testAddEmployeeNullOrEmptyEmail() {
+        Employee nullEmailEmployee = new Employee("Mario", "Rossi", location, null,
+                "1234567890", Employee.Role.ADMINISTRATOR, Employee.Licence.NONE);
+        assertThrows(IllegalArgumentException.class,
+                () -> getEmployeeManager().addEmployee(nullEmailEmployee, rawPassword));
+
+        Employee emptyEmailEmployee = new Employee("Mario", "Rossi", location, "",
+                "1234567890", Employee.Role.ADMINISTRATOR, Employee.Licence.NONE);
+        assertThrows(IllegalArgumentException.class,
+                () -> getEmployeeManager().addEmployee(emptyEmailEmployee, rawPassword));
+    }
+
+    @Test
+    void testAddEmployeeSuccessAndFailures() {
+        Employee saved = assertDoesNotThrow(
+                () -> getEmployeeManager().addEmployee(employee, rawPassword));
+        assertNotNull(saved);
+        assertEquals(employee.getEmail(), saved.getEmail());
+
+        Employee duplicateEmail = new Employee("Test2", "User2", location, email,
+                "0987654321", Employee.Role.OPERATOR, Employee.Licence.B);
+        assertThrows(IllegalArgumentException.class,
+                () -> getEmployeeManager().addEmployee(duplicateEmail, rawPassword));
+
+        Employee employee2 = new Employee("Test3", "User3", location, "test3@test.it",
+                "1111111111", Employee.Role.OPERATOR, Employee.Licence.B);
+        assertThrows(IllegalArgumentException.class,
+                () -> getEmployeeManager().addEmployee(employee2, null));
+
+        assertThrows(IllegalArgumentException.class,
+                () -> getEmployeeManager().addEmployee(null, rawPassword));
     }
 
     @Test
@@ -42,14 +79,14 @@ class EmployeeManagerTest extends AbstractDatabaseTest {
                 "email@example.com", "1234567890", Employee.Role.ADMINISTRATOR, null);
 
         assertThrows(IllegalArgumentException.class,
-                () -> getEmployeeManager().addEmployee(invalidRoleEmployee));
-        assertThrows(IllegalArgumentException.class,
-                () -> getEmployeeManager().addEmployee(invalidLicenceEmployee));
+                () -> getEmployeeManager().addEmployee(invalidRoleEmployee, rawPassword));
+        assertThrows(IllegalArgumentException.class, () -> getEmployeeManager()
+                .addEmployee(invalidLicenceEmployee, rawPassword));
     }
 
     @Test
     void testGetEmployeeById() {
-        Employee saved = getEmployeeManager().addEmployee(employee);
+        Employee saved = getEmployeeManager().addEmployee(employee, rawPassword);
         int savedId = saved.getEmployeeId();
 
         Employee found = getEmployeeManager().getEmployeeById(savedId);
@@ -72,7 +109,7 @@ class EmployeeManagerTest extends AbstractDatabaseTest {
 
     @Test
     void testUpdateEmployee() {
-        Employee saved = getEmployeeManager().addEmployee(employee);
+        Employee saved = getEmployeeManager().addEmployee(employee, rawPassword);
         String newPhone = "0000000000";
         String newName = "Francesco";
         Licence newLicence = Licence.C1;
@@ -93,7 +130,7 @@ class EmployeeManagerTest extends AbstractDatabaseTest {
 
     @Test
     void testSoftDeleteEmploye() {
-        Employee saved = getEmployeeManager().addEmployee(employee);
+        Employee saved = getEmployeeManager().addEmployee(employee, rawPassword);
         int savedId = saved.getEmployeeId();
 
         assertNotNull(saved);
@@ -140,7 +177,7 @@ class EmployeeManagerTest extends AbstractDatabaseTest {
 
     @Test
     void testUpdateEmployeeNoChange() {
-        getEmployeeManager().addEmployee(employee);
+        getEmployeeManager().addEmployee(employee, rawPassword);
         assertDoesNotThrow(() -> getEmployeeManager().updateEmployee(employee));
     }
 

@@ -63,7 +63,7 @@ public class CustomerManager {
      *
      * @param toUpdateCustomer the customer with updated data
      * @throws IllegalArgumentException if the customer is invalid or the email is used by
-     *         another customer
+     * another customer
      */
     public void updateCustomer(final Customer toUpdateCustomer) {
         ValidateUtils.validateEntity(toUpdateCustomer);
