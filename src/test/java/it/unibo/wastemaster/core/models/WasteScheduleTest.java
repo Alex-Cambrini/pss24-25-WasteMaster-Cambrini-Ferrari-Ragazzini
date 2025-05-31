@@ -44,22 +44,22 @@ class WasteScheduleTest extends AbstractDatabaseTest {
     void testInvalidWasteSchedule() {
         WasteSchedule invalid = new WasteSchedule();
         Set<ConstraintViolation<WasteSchedule>> violations =
-            ValidateUtils.VALIDATOR.validate(invalid);
+                ValidateUtils.VALIDATOR.validate(invalid);
 
         assertFalse(violations.isEmpty());
         assertTrue(violations.stream()
-            .anyMatch(v -> v.getPropertyPath().toString().equals("waste")));
+                .anyMatch(v -> v.getPropertyPath().toString().equals("waste")));
         assertTrue(violations.stream()
-            .anyMatch(v -> v.getPropertyPath().toString().equals("dayOfWeek")));
+                .anyMatch(v -> v.getPropertyPath().toString().equals("dayOfWeek")));
     }
 
     @Test
     void testValidWasteSchedule() {
         Set<ConstraintViolation<WasteSchedule>> violations =
-            ValidateUtils.VALIDATOR.validate(schedule);
+                ValidateUtils.VALIDATOR.validate(schedule);
         assertTrue(
-            violations.isEmpty(),
-            "Expected no validation errors for a valid WasteSchedule"
+                violations.isEmpty(),
+                "Expected no validation errors for a valid WasteSchedule"
         );
     }
 

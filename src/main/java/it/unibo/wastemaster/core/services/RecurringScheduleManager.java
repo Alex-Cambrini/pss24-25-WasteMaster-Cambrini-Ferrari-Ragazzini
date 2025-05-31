@@ -25,22 +25,21 @@ public class RecurringScheduleManager {
     private final WasteScheduleManager wasteScheduleManager;
     private CollectionManager collectionManager;
 
-
     /**
      * Constructor.
-     * 
+     *
      * @param recurringScheduleDAO DAO for recurring schedules, must not be null
      * @param wasteScheduleManager Manager for waste schedules, must not be null
      */
     public RecurringScheduleManager(final RecurringScheduleDAO recurringScheduleDAO,
-            final WasteScheduleManager wasteScheduleManager) {
+                                    final WasteScheduleManager wasteScheduleManager) {
         this.wasteScheduleManager = wasteScheduleManager;
         this.recurringScheduleDAO = recurringScheduleDAO;
     }
 
     /**
      * Sets the collection manager.
-     * 
+     *
      * @param collectionManager the collection manager to set, must not be null
      */
     public void setCollectionManager(final CollectionManager collectionManager) {
@@ -49,7 +48,7 @@ public class RecurringScheduleManager {
 
     /**
      * Creates a new recurring schedule.
-     * 
+     *
      * @param customer the customer, must not be null
      * @param waste the waste type, must not be null
      * @param startDate the start date, must be today or later
@@ -58,7 +57,9 @@ public class RecurringScheduleManager {
      * @throws IllegalArgumentException if startDate is before today
      */
     public RecurringSchedule createRecurringSchedule(final Customer customer,
-            final Waste waste, final LocalDate startDate, final Frequency frequency) {
+                                                     final Waste waste,
+                                                     final LocalDate startDate,
+                                                     final Frequency frequency) {
         if (startDate.isBefore(LocalDate.now())) {
             throw new IllegalArgumentException(
                     "Start Date must be today or in the future");
@@ -110,7 +111,7 @@ public class RecurringScheduleManager {
     }
 
     private LocalDate alignToScheduledDay(final LocalDate date,
-            final DayOfWeek scheduledDay) {
+                                          final DayOfWeek scheduledDay) {
         LocalDate adjustedDate = date;
         while (adjustedDate.getDayOfWeek() != scheduledDay) {
             adjustedDate = adjustedDate.plusDays(1);
@@ -154,7 +155,7 @@ public class RecurringScheduleManager {
 
     /**
      * Updates the status of a given recurring schedule if allowed.
-     *
+     * <p>
      * This method returns false if the current status is CANCELLED or COMPLETED. If the
      * current status is PAUSED, it can be changed to CANCELLED or ACTIVE. If the current
      * status is ACTIVE, it can be changed to PAUSED or CANCELLED. When switching to
@@ -169,7 +170,7 @@ public class RecurringScheduleManager {
      * @throws IllegalStateException if associated collection is missing when required
      */
     public final boolean updateStatusRecurringSchedule(final RecurringSchedule schedule,
-            final ScheduleStatus newStatus) {
+                                                       final ScheduleStatus newStatus) {
         ValidateUtils.requireArgNotNull(schedule, SCHEDULE_NOT_NULL_MSG);
         ValidateUtils.requireArgNotNull(newStatus, "Status must not be null");
 
@@ -226,7 +227,7 @@ public class RecurringScheduleManager {
 
     /**
      * Updates the frequency of an active recurring schedule.
-     *
+     * <p>
      * If the schedule is not active or the frequency is unchanged, returns false.
      * Otherwise, sets the new frequency, recalculates the next collection date, updates
      * the schedule, soft deletes any active collection, and generates a new collection.
@@ -237,7 +238,7 @@ public class RecurringScheduleManager {
      * @throws IllegalArgumentException if schedule or newFrequency is null
      */
     public final boolean updateFrequency(final RecurringSchedule schedule,
-            final Frequency newFrequency) {
+                                         final Frequency newFrequency) {
         ValidateUtils.requireArgNotNull(schedule, SCHEDULE_NOT_NULL_MSG);
         ValidateUtils.requireArgNotNull(newFrequency, "Frequency must not be null");
 

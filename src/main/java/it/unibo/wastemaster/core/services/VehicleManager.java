@@ -65,7 +65,7 @@ public final class VehicleManager {
      *
      * @param vehicle the vehicle to update
      * @throws IllegalArgumentException if the new plate is already used by another
-     *         vehicle
+     * vehicle
      */
     public void updateVehicle(final Vehicle vehicle) {
         ValidateUtils.validateEntity(vehicle);
@@ -75,14 +75,14 @@ public final class VehicleManager {
 
         if (existing != null && existing.getVehicleId() != vehicle.getVehicleId()) {
             throw new IllegalArgumentException(String.format(
-                    "Cannot update vehicle: the plate '%s' is already registered to another vehicle.",
+                    "Cannot update vehicle: the plate '%s' is already registered to "
+                            + "another vehicle.",
                     normalizedPlate));
         }
 
         vehicle.setPlate(normalizedPlate);
         vehicleDAO.update(vehicle);
     }
-
 
     /**
      * Marks maintenance as complete and updates dates.

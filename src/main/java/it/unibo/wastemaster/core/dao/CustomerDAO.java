@@ -10,9 +10,8 @@ import java.util.List;
 public final class CustomerDAO extends GenericDAO<Customer> {
 
     /**
-     * 
      * Constructs a CustomerDAO with the given entity manager.
-     * 
+     *
      * @param entityManager the EntityManager to use
      */
     public CustomerDAO(final EntityManager entityManager) {
@@ -21,7 +20,7 @@ public final class CustomerDAO extends GenericDAO<Customer> {
 
     /**
      * Checks whether a customer exists with the given email.
-     * 
+     *
      * @param email the email to check
      * @return true if a customer exists with the email, false otherwise
      */
@@ -35,7 +34,7 @@ public final class CustomerDAO extends GenericDAO<Customer> {
 
     /**
      * Finds a customer by their email.
-     * 
+     *
      * @param email the email of the customer
      * @return the Customer if found, or null otherwise
      */
@@ -48,7 +47,7 @@ public final class CustomerDAO extends GenericDAO<Customer> {
 
     /**
      * Retrieves all non-deleted customers.
-     * 
+     *
      * @return list of active customers
      */
     public List<Customer> findCustomerDetails() {

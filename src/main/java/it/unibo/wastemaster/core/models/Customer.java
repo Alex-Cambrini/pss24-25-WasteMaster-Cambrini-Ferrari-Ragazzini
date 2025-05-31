@@ -14,7 +14,9 @@ import jakarta.persistence.Table;
 @Table(name = "customer")
 public class Customer extends Person {
 
-    /** Unique identifier for the customer, auto-generated. */
+    /**
+     * Unique identifier for the customer, auto-generated.
+     */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer customerId;
@@ -29,14 +31,15 @@ public class Customer extends Person {
      * @param phone the customer's phone number
      */
     public Customer(final String name, final String surname, final Location location,
-            final String email, final String phone) {
+                    final String email, final String phone) {
         super(name, surname, location, email, phone);
     }
 
     /**
      * Default no-argument constructor required by JPA.
      */
-    public Customer() { }
+    public Customer() {
+    }
 
     /**
      * Returns the unique identifier of this customer.

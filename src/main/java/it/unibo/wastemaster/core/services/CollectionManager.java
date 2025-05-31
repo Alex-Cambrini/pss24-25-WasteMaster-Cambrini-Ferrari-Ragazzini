@@ -25,7 +25,7 @@ public class CollectionManager {
      * @param recurringScheduleManager Manager for recurring schedule logic
      */
     public CollectionManager(final CollectionDAO collectionDAO,
-            final RecurringScheduleManager recurringScheduleManager) {
+                             final RecurringScheduleManager recurringScheduleManager) {
         this.collectionDAO = collectionDAO;
         this.recurringScheduleManager = recurringScheduleManager;
     }

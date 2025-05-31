@@ -13,7 +13,7 @@ public final class WasteScheduleDAO extends GenericDAO<WasteSchedule> {
 
     /**
      * Constructs a WasteScheduleDAO with the given entity manager.
-     * 
+     *
      * @param entityManager the EntityManager to use
      */
     public WasteScheduleDAO(final EntityManager entityManager) {
@@ -22,7 +22,7 @@ public final class WasteScheduleDAO extends GenericDAO<WasteSchedule> {
 
     /**
      * Finds the schedule associated with the given waste.
-     * 
+     *
      * @param waste the Waste entity to look up
      * @return the WasteSchedule if found, or null otherwise
      */

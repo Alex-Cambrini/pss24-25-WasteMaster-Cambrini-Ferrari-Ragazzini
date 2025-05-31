@@ -17,7 +17,7 @@ plugins {
 }
 
 checkstyle {
-    toolVersion = "10.24"
+    toolVersion = "10.24.0"
 }
 
 
@@ -43,7 +43,7 @@ dependencies {
     // implementation("com.google.guava:guava:28.1-jre")
 
     // JavaFX: comment out if you do not need them
-    val javaFxVersion = 21
+    val javaFxVersion = 15
     for (platform in supportedPlatforms) {
         for (module in javaFXModules) {
             implementation("org.openjfx:javafx-$module:$javaFxVersion:$platform")
@@ -77,6 +77,8 @@ dependencies {
     implementation("com.zaxxer:HikariCP:5.1.0")
 
     implementation("org.slf4j:slf4j-simple:2.0.9")
+
+    implementation("org.mindrot:jbcrypt:0.4")
 
     // Dipendenza H2 per il database in memoria durante i test
     testImplementation("com.h2database:h2:2.1.214")
