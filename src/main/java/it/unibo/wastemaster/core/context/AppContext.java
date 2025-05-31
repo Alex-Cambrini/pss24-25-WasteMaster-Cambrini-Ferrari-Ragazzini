@@ -1,5 +1,6 @@
 package it.unibo.wastemaster.core.context;
 
+import it.unibo.wastemaster.core.dao.AccountDAO;
 import it.unibo.wastemaster.core.dao.CollectionDAO;
 import it.unibo.wastemaster.core.dao.CustomerDAO;
 import it.unibo.wastemaster.core.dao.EmployeeDAO;
@@ -9,6 +10,7 @@ import it.unibo.wastemaster.core.dao.ScheduleDAO;
 import it.unibo.wastemaster.core.dao.VehicleDAO;
 import it.unibo.wastemaster.core.dao.WasteDAO;
 import it.unibo.wastemaster.core.dao.WasteScheduleDAO;
+import it.unibo.wastemaster.core.services.AccountManager;
 import it.unibo.wastemaster.core.services.CollectionManager;
 import it.unibo.wastemaster.core.services.CustomerManager;
 import it.unibo.wastemaster.core.services.EmployeeManager;
@@ -33,6 +35,7 @@ public final class AppContext {
     private static Stage owner;
 
     // DAOs
+    private static AccountDAO accountDAO;
     private static EmployeeDAO employeeDAO;
     private static WasteDAO wasteDAO;
     private static CustomerDAO customerDAO;
@@ -44,6 +47,7 @@ public final class AppContext {
     private static VehicleDAO vehicleDAO;
 
     // Services
+    private static AccountManager accountManager;
     private static EmployeeManager employeeManager;
     private static WasteManager wasteManager;
     private static CustomerManager customerManager;
@@ -84,6 +88,7 @@ public final class AppContext {
         em = emf.createEntityManager();
 
         // Initialize DAOs
+        accountDAO = new AccountDAO(em);
         employeeDAO = new EmployeeDAO(em);
         wasteDAO = new WasteDAO(em);
         customerDAO = new CustomerDAO(em);
@@ -95,7 +100,8 @@ public final class AppContext {
         vehicleDAO = new VehicleDAO(em);
 
         // Initialize Services
-        employeeManager = new EmployeeManager(employeeDAO);
+        accountManager = new AccountManager(accountDAO);
+        employeeManager = new EmployeeManager(employeeDAO, em, accountManager);
         wasteManager = new WasteManager(wasteDAO);
         customerManager = new CustomerManager(customerDAO);
         wasteScheduleManager = new WasteScheduleManager(wasteScheduleDAO);
