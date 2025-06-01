@@ -1,6 +1,7 @@
 package it.unibo.wastemaster.controller.main;
 
 import it.unibo.wastemaster.core.context.AppContext;
+import it.unibo.wastemaster.core.models.Employee;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -65,6 +66,19 @@ public final class MainLayoutController {
         MainLayoutController.setInstance(this);
         String accountName = AppContext.getCurrentAccount().getEmployee().getName();
         setPageTitle("Welcome back " + accountName);
+        Employee.Role role = AppContext.getCurrentAccount().getEmployee().getRole();
+        switch (role) {
+            case OFFICE_WORKER -> {
+                employeesLink.setDisable(true);
+                vehiclesLink.setDisable(true);
+            }
+            case OPERATOR -> {
+                customersLink.setDisable(true);
+                employeesLink.setDisable(true);
+                vehiclesLink.setDisable(true);
+                schedulesLink.setDisable(true);
+            }
+        }
     }
 
     private static void setInstance(final MainLayoutController controller) {
