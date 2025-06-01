@@ -2,7 +2,9 @@ package it.unibo.wastemaster.controller.login;
 
 import it.unibo.wastemaster.core.context.AppContext;
 import it.unibo.wastemaster.core.dao.AccountDAO;
+import it.unibo.wastemaster.core.models.Account;
 import it.unibo.wastemaster.core.services.LoginService;
+import java.util.Optional;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -39,7 +41,10 @@ public class LoginController {
         String email = emailField.getText();
         String password = passwordField.getText();
 
-        if (loginService.authenticate(email, password)) {
+        Optional<Account> authenticated = loginService.authenticate(email, password);
+        if (authenticated.isPresent()) {
+            Account account = authenticated.get();
+            AppContext.setCurrentAccount(account);
             try {
                 FXMLLoader loader = new FXMLLoader(
                         getClass().getResource("/layouts/main/MainLayout.fxml"));
