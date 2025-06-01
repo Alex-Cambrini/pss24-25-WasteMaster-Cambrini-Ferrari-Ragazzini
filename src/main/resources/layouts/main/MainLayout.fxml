@@ -1,15 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Hyperlink?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Menu?>
 <?import javafx.scene.control.MenuBar?>
 <?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
-
 
 <StackPane fx:id="rootPane" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.unibo.wastemaster.controller.main.MainLayoutController">
     <children>
@@ -37,7 +38,7 @@
             <HBox fx:id="mainHBox" spacing="0" VBox.vgrow="always">
                 <VBox fx:id="sideMenu" prefWidth="180" spacing="20.0" styleClass="side-menu">
                     <padding>
-                        <Insets top="20" left="20" right="20" bottom="20"/>
+                        <Insets bottom="20" left="20" right="20" top="20" />
                     </padding>
                     <children>
                         <Hyperlink fx:id="dashboardLink" onAction="#handleDashboard" text="Dashboard" />
@@ -49,13 +50,19 @@
                     </children>
                 </VBox>
 
-                <VBox fx:id="contentVBox" spacing="10" HBox.hgrow="always" styleClass="central-box">
+                <VBox fx:id="contentVBox" spacing="10" styleClass="central-box" HBox.hgrow="always">
                     <padding>
-                        <Insets top="20" left="20" right="20" bottom="20"/>
+                        <Insets bottom="20" left="20" right="20" top="20" />
                     </padding>
                     <children>
-                        <Label fx:id="pageTitleLabel" text="MAIN_TITLE" styleClass="title-1" />
-                        <StackPane fx:id="centerPane" VBox.vgrow="always" styleClass="center-pane"/>
+                  <HBox prefHeight="100.0" prefWidth="200.0">
+                     <children>
+                              <Label fx:id="pageTitleLabel" styleClass="title-1" text="MAIN_TITLE" />
+                        <Region prefHeight="100.0" prefWidth="56.0" HBox.hgrow="ALWAYS" />
+                        <Button mnemonicParsing="false" text="Logout" styleClass="accent, button-outlined" />
+                     </children>
+                  </HBox>
+                        <StackPane fx:id="centerPane" styleClass="center-pane" VBox.vgrow="always" />
                     </children>
                 </VBox>
             </HBox>
