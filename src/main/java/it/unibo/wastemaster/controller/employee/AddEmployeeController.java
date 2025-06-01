@@ -10,6 +10,7 @@ import it.unibo.wastemaster.core.utils.ValidateUtils;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 
 /**
@@ -18,10 +19,10 @@ import javafx.scene.control.TextField;
 public final class AddEmployeeController {
 
     @FXML
-    private TextField passwordField;
+    private PasswordField passwordField;
 
     @FXML
-    private TextField passwordCheckField;
+    private PasswordField passwordCheckField;
 
     @FXML
     private TextField nameField;
