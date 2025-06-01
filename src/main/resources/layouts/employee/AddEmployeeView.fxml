@@ -10,6 +10,7 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.control.PasswordField?>
 <VBox prefWidth="600.0" styleClass="center-pane, modal-pane" xmlns="http://javafx.com/javafx/21"
       xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="it.unibo.wastemaster.controller.employee.AddEmployeeController">
@@ -81,13 +82,13 @@
                         <VBox>
                             <children>
                                 <Label text="Insert Pasword"/>
-                                <TextField fx:id="passwordField"/>
+                                <PasswordField fx:id="passwordField"/>
                             </children>
                         </VBox>
                         <VBox>
                             <children>
                                 <Label text="Repeat Password"/>
-                                <TextField fx:id="passwordCheckField"/>
+                                <PasswordField fx:id="passwordCheckField"/>
                             </children>
                         </VBox>
                         <VBox/>
