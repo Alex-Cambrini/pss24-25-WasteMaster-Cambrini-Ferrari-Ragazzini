@@ -10,6 +10,7 @@ import it.unibo.wastemaster.core.dao.ScheduleDAO;
 import it.unibo.wastemaster.core.dao.VehicleDAO;
 import it.unibo.wastemaster.core.dao.WasteDAO;
 import it.unibo.wastemaster.core.dao.WasteScheduleDAO;
+import it.unibo.wastemaster.core.models.Account;
 import it.unibo.wastemaster.core.models.Employee;
 import it.unibo.wastemaster.core.models.Location;
 import it.unibo.wastemaster.core.services.AccountManager;
@@ -35,6 +36,7 @@ public final class AppContext {
     private static EntityManagerFactory emf;
     private static EntityManager em;
     private static Stage owner;
+    private static Account currentAccount;
 
     // DAOs
     private static AccountDAO accountDAO;
@@ -82,6 +84,24 @@ public final class AppContext {
     }
 
     /**
+     * Sets the currently logged-in account.
+     *
+     * @param account the current account
+     */
+    public static void setCurrentAccount(Account account) {
+        currentAccount = account;
+    }
+
+    /**
+     * Returns the currently logged-in account.
+     *
+     * @return the current account
+     */
+    public static Account getCurrentAccount() {
+        return currentAccount;
+    }
+
+    /**
      * Initializes the persistence context, DAOs, and services. Must be called once at
      * application startup.
      */
@@ -121,7 +141,8 @@ public final class AppContext {
     }
 
     private static void createDefaultAccount() {
-        boolean exists = accountDAO.findAccountByEmployeeEmail("admin@admin.com").isPresent();
+        boolean exists =
+                accountDAO.findAccountByEmployeeEmail("admin@admin.com").isPresent();
         if (!exists) {
             Employee admin = new Employee(
                     "Admin", "Admin",
