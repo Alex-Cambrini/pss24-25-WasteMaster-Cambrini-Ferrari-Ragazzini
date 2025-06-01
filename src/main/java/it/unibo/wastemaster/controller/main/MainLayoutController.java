@@ -1,5 +1,6 @@
 package it.unibo.wastemaster.controller.main;
 
+import it.unibo.wastemaster.core.context.AppContext;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -62,7 +63,8 @@ public final class MainLayoutController {
     @FXML
     public void initialize() {
         MainLayoutController.setInstance(this);
-        setPageTitle("Welcome back");
+        String accountName = AppContext.getCurrentAccount().getEmployee().getName();
+        setPageTitle("Welcome back " + accountName);
     }
 
     private static void setInstance(final MainLayoutController controller) {
