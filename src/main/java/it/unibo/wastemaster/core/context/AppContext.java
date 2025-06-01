@@ -10,6 +10,8 @@ import it.unibo.wastemaster.core.dao.ScheduleDAO;
 import it.unibo.wastemaster.core.dao.VehicleDAO;
 import it.unibo.wastemaster.core.dao.WasteDAO;
 import it.unibo.wastemaster.core.dao.WasteScheduleDAO;
+import it.unibo.wastemaster.core.models.Employee;
+import it.unibo.wastemaster.core.models.Location;
 import it.unibo.wastemaster.core.services.AccountManager;
 import it.unibo.wastemaster.core.services.CollectionManager;
 import it.unibo.wastemaster.core.services.CustomerManager;
@@ -115,6 +117,22 @@ public final class AppContext {
 
         // Link dependencies
         recurringScheduleManager.setCollectionManager(collectionManager);
+        createDefaultAccount();
+    }
+
+    private static void createDefaultAccount() {
+        boolean exists = accountDAO.findAccountByEmployeeEmail("admin@admin.com").isPresent();
+        if (!exists) {
+            Employee admin = new Employee(
+                    "Admin", "Admin",
+                    new Location("Default", "0", "Default", "12345"),
+                    "admin@admin.com",
+                    "0000000000",
+                    Employee.Role.ADMINISTRATOR,
+                    Employee.Licence.NONE
+            );
+            employeeManager.addEmployee(admin, "admin123");
+        }
     }
 
     /**
@@ -291,5 +309,4 @@ public final class AppContext {
     public static VehicleManager getVehicleManager() {
         return vehicleManager;
     }
-
 }
