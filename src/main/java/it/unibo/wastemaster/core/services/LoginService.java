@@ -13,13 +13,14 @@ public class LoginService {
         this.accountDAO = accountDAO;
     }
 
-    public boolean authenticate(String email, String rawPassword) {
+    public Optional<Account> authenticate(String email, String rawPassword) {
         Optional<Account> accountOpt = accountDAO.findAccountByEmployeeEmail(email);
-        if (accountOpt.isEmpty()) {
-            return false;
+        if (accountOpt.isPresent()) {
+            Account account = accountOpt.get();
+            if (BCrypt.checkpw(rawPassword, account.getPasswordHash())) {
+                return Optional.of(account); // Qui c'è accesso a employee → ruolo
+            }
         }
-
-        Account account = accountOpt.get();
-        return BCrypt.checkpw(rawPassword, account.getPasswordHash());
+        return Optional.empty();
     }
 }
