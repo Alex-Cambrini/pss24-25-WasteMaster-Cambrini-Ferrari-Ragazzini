@@ -4,16 +4,17 @@ import it.unibo.wastemaster.controller.utils.DialogUtils;
 import it.unibo.wastemaster.core.context.AppContext;
 import it.unibo.wastemaster.core.models.Employee;
 import java.io.IOException;
+import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 /**
@@ -21,6 +22,8 @@ import javafx.stage.Stage;
  */
 public final class MainLayoutController {
 
+    private static final int LOGIN_WINDOW_WIDTH = 400;
+    private static final int LOGIN_WINDOW_HEIGHT = 300;
     private static final Logger LOGGER =
             Logger.getLogger(MainLayoutController.class.getName());
 
@@ -86,7 +89,7 @@ public final class MainLayoutController {
     public void initialize() {
         MainLayoutController.setInstance(this);
         String accountName = AppContext.getCurrentAccount().getEmployee().getName();
-        setPageTitle("Welcome back " + accountName);
+        setPageTitle(String.format("Welcome back %s", accountName));
         Employee.Role role = AppContext.getCurrentAccount().getEmployee().getRole();
         switch (role) {
             case OFFICE_WORKER -> {
@@ -98,6 +101,9 @@ public final class MainLayoutController {
                 employeesLink.setDisable(true);
                 vehiclesLink.setDisable(true);
                 schedulesLink.setDisable(true);
+            }
+            default -> {
+                // Do nothing
             }
         }
     }
@@ -225,29 +231,30 @@ public final class MainLayoutController {
         return rootPane;
     }
 
-    /**
-     * Returns the center pane of the layout.
-     *
-     * @return the center pane
-     */
     @FXML
     private void handleLogout() {
         if (DialogUtils.showLogoutConfirmation(AppContext.getOwner())) {
             try {
                 AppContext.setCurrentAccount(null);
 
-                FXMLLoader loader = new FXMLLoader(getClass().getResource("/layouts/login/LoginView.fxml"));
+                FXMLLoader loader = new FXMLLoader(getClass()
+                        .getResource("/layouts/login/LoginView.fxml"));
                 Parent loginRoot = loader.load();
 
                 Scene loginScene = new Scene(loginRoot);
+                loginScene.getStylesheets().add(
+                        Objects.requireNonNull(getClass()
+                                        .getResource("/css/primer-light.css"))
+                                .toExternalForm()
+                );
 
                 Stage stage = AppContext.getOwner();
                 stage.setScene(loginScene);
                 stage.setTitle("WasteMaster - Login");
-                stage.setWidth(400);
-                stage.setHeight(300);
-                stage.setMinWidth(400);
-                stage.setMinHeight(300);
+                stage.setWidth(LOGIN_WINDOW_WIDTH);
+                stage.setHeight(LOGIN_WINDOW_HEIGHT);
+                stage.setMinWidth(LOGIN_WINDOW_WIDTH);
+                stage.setMinHeight(LOGIN_WINDOW_HEIGHT);
 
             } catch (IOException e) {
                 LOGGER.log(Level.SEVERE, "Error during logout", e);
