@@ -1,5 +1,6 @@
 package it.unibo.wastemaster.controller.main;
 
+import it.unibo.wastemaster.controller.utils.DialogUtils;
 import it.unibo.wastemaster.core.context.AppContext;
 import it.unibo.wastemaster.core.models.Employee;
 import java.io.IOException;
@@ -11,6 +12,9 @@ import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.stage.Stage;
 
 /**
  * Controller for the main layout of the application.
@@ -59,6 +63,23 @@ public final class MainLayoutController {
     private Hyperlink employeesLink;
 
     /**
+     * Returns the singleton instance of this controller.
+     *
+     * @return the controller instance
+     * @throws IllegalStateException if the controller has not been initialized
+     */
+    public static MainLayoutController getInstance() {
+        if (instance == null) {
+            throw new IllegalStateException("MainLayoutController not initialized");
+        }
+        return instance;
+    }
+
+    private static void setInstance(final MainLayoutController controller) {
+        MainLayoutController.instance = controller;
+    }
+
+    /**
      * Initializes the controller after its root element has been completely processed.
      */
     @FXML
@@ -79,23 +100,6 @@ public final class MainLayoutController {
                 schedulesLink.setDisable(true);
             }
         }
-    }
-
-    private static void setInstance(final MainLayoutController controller) {
-        MainLayoutController.instance = controller;
-    }
-
-    /**
-     * Returns the singleton instance of this controller.
-     *
-     * @return the controller instance
-     * @throws IllegalStateException if the controller has not been initialized
-     */
-    public static MainLayoutController getInstance() {
-        if (instance == null) {
-            throw new IllegalStateException("MainLayoutController not initialized");
-        }
-        return instance;
     }
 
     /**
@@ -219,5 +223,35 @@ public final class MainLayoutController {
      */
     public StackPane getRootPane() {
         return rootPane;
+    }
+
+    /**
+     * Returns the center pane of the layout.
+     *
+     * @return the center pane
+     */
+    @FXML
+    private void handleLogout() {
+        if (DialogUtils.showLogoutConfirmation(AppContext.getOwner())) {
+            try {
+                AppContext.setCurrentAccount(null);
+
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("/layouts/login/LoginView.fxml"));
+                Parent loginRoot = loader.load();
+
+                Scene loginScene = new Scene(loginRoot);
+
+                Stage stage = AppContext.getOwner();
+                stage.setScene(loginScene);
+                stage.setTitle("WasteMaster - Login");
+                stage.setWidth(400);
+                stage.setHeight(300);
+                stage.setMinWidth(400);
+                stage.setMinHeight(300);
+
+            } catch (IOException e) {
+                LOGGER.log(Level.SEVERE, "Error during logout", e);
+            }
+        }
     }
 }
