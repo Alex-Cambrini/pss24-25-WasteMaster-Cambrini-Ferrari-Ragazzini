@@ -126,17 +126,24 @@ public final class DialogUtils {
     }
 
     /**
-     * Shows a confirmation alert asking the user to confirm logout.
+     * Shows a generic confirmation alert dialog.
      *
+     * @param title the dialog title
+     * @param message the message content
      * @param owner the parent stage
      * @return true if the user confirmed, false otherwise
      */
-    public static boolean showLogoutConfirmation(final Stage owner) {
+    public static boolean showConfirmationDialog(
+            final String title,
+            final String message,
+            final Stage owner) {
+
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.initOwner(owner);
-        alert.setTitle("Logout Confirmation");
+        alert.setTitle(title);
         alert.setHeaderText(null);
-        alert.setContentText("Are you sure you want to logout?");
+        alert.setContentText(message);
+
         Scene scene = alert.getDialogPane().getScene();
         scene.getStylesheets().addAll(owner.getScene().getStylesheets());
 
