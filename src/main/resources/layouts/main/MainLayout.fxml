@@ -59,7 +59,7 @@
                      <children>
                               <Label fx:id="pageTitleLabel" styleClass="title-1" text="MAIN_TITLE" />
                         <Region prefHeight="100.0" prefWidth="56.0" HBox.hgrow="ALWAYS" />
-                        <Button mnemonicParsing="false" text="Logout" styleClass="accent, button-outlined" />
+                        <Button mnemonicParsing="false" text="Logout" onAction="#handleLogout" styleClass="accent, button-outlined" />
                      </children>
                   </HBox>
                         <StackPane fx:id="centerPane" styleClass="center-pane" VBox.vgrow="always" />
