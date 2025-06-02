@@ -24,8 +24,7 @@
 
     <HBox alignment="CENTER">
         <StackPane prefWidth="200" minWidth="200" maxWidth="200">
-            <StackPane fx:id="togglePasswordStack"
-                       prefWidth="200" minWidth="200" maxWidth="200">
+            <StackPane prefWidth="200" minWidth="200" maxWidth="200">
                 <PasswordField fx:id="passwordField" promptText="Password"
                                prefWidth="200" minWidth="200" maxWidth="200"/>
                 <TextField fx:id="passwordTextField" promptText="Password"
@@ -39,7 +38,7 @@
                        maxWidth="200" prefWidth="200" minWidth="200"
                        style="-fx-cursor: hand;" pickOnBounds="false">
                 <padding>
-                    <Insets top="0" right="8" bottom="0" left="0"/>
+                    <Insets right="8"/>
                 </padding>
             </StackPane>
         </StackPane>
