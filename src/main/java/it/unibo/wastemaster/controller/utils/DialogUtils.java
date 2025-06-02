@@ -124,4 +124,23 @@ public final class DialogUtils {
     public static void closeModal(final ActionEvent event) {
         ((Stage) ((Node) event.getSource()).getScene().getWindow()).close();
     }
+
+    /**
+     * Shows a confirmation alert asking the user to confirm logout.
+     *
+     * @param owner the parent stage
+     * @return true if the user confirmed, false otherwise
+     */
+    public static boolean showLogoutConfirmation(final Stage owner) {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.initOwner(owner);
+        alert.setTitle("Logout Confirmation");
+        alert.setHeaderText(null);
+        alert.setContentText("Are you sure you want to logout?");
+        Scene scene = alert.getDialogPane().getScene();
+        scene.getStylesheets().addAll(owner.getScene().getStylesheets());
+
+        Optional<javafx.scene.control.ButtonType> result = alert.showAndWait();
+        return result.isPresent() && result.get() == javafx.scene.control.ButtonType.OK;
+    }
 }
