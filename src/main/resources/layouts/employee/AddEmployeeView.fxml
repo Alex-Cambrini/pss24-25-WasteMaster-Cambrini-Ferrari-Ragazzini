@@ -81,7 +81,7 @@
                     <children>
                         <VBox>
                             <children>
-                                <Label text="Insert Pasword"/>
+                                <Label text="Insert Password"/>
                                 <PasswordField fx:id="passwordField"/>
                             </children>
                         </VBox>
