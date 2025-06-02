@@ -123,7 +123,12 @@ public final class AddScheduleController {
 
             wasteComboBox.valueProperty().addListener((obs, oldWaste, newWaste) -> {
                 if (newWaste != null) {
-                    wasteDetailsInfo.setText(newWaste.toString());
+                    wasteDetailsInfo.setText(String.format(
+                            "Name: %s%nRecyclable: %s%nDangerous: %s",
+                            newWaste.getWasteName(),
+                            newWaste.getIsRecyclable() ? "Yes" : "No",
+                            newWaste.getIsDangerous() ? "Yes" : "No"
+                    ));
                 } else {
                     wasteDetailsInfo.setText("No Waste selected.");
                 }
