@@ -5,9 +5,13 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.PasswordField?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
+
 <VBox spacing="10.0" alignment="CENTER" xmlns="http://javafx.com/javafx"
-      xmlns:fx="http://javafx.com/fxml" fx:controller="it.unibo.wastemaster.controller.login.LoginController">
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="it.unibo.wastemaster.controller.login.LoginController">
 
     <padding>
         <Insets top="30" right="30" bottom="30" left="30"/>
@@ -15,11 +19,36 @@
 
     <Label text="Login" style="-fx-font-size: 18px; -fx-font-weight: bold;"/>
 
-    <TextField fx:id="emailField" promptText="Email" maxWidth="200"/>
-    <PasswordField fx:id="passwordField" promptText="Password" maxWidth="200"/>
+    <TextField fx:id="emailField" promptText="Email"
+               maxWidth="200" prefWidth="200" minWidth="200"/>
 
-    <Button text="Login" onAction="#handleLogin" maxWidth="200" styleClass="accent"/>
+    <HBox alignment="CENTER">
+        <StackPane prefWidth="200" minWidth="200" maxWidth="200">
+            <StackPane fx:id="togglePasswordStack"
+                       prefWidth="200" minWidth="200" maxWidth="200">
+                <PasswordField fx:id="passwordField" promptText="Password"
+                               prefWidth="200" minWidth="200" maxWidth="200"/>
+                <TextField fx:id="passwordTextField" promptText="Password"
+                           prefWidth="200" minWidth="200" maxWidth="200"
+                           visible="false" managed="false"/>
+            </StackPane>
 
-    <Label fx:id="errorLabel" visible="false" styleClass="text, danger"/>
+            <StackPane fx:id="togglePasswordIcon"
+                       onMouseClicked="#togglePasswordVisibility"
+                       alignment="CENTER_RIGHT"
+                       maxWidth="200" prefWidth="200" minWidth="200"
+                       style="-fx-cursor: hand;" pickOnBounds="false">
+                <padding>
+                    <Insets top="0" right="8" bottom="0" left="0"/>
+                </padding>
+            </StackPane>
+        </StackPane>
+    </HBox>
+
+    <Button text="Login" onAction="#handleLogin"
+            maxWidth="200" prefWidth="200" minWidth="200"
+            styleClass="accent"/>
+
+    <Label fx:id="errorLabel" visible="false" styleClass="text danger"/>
 
 </VBox>
