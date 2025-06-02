@@ -233,7 +233,10 @@ public final class MainLayoutController {
 
     @FXML
     private void handleLogout() {
-        if (DialogUtils.showLogoutConfirmation(AppContext.getOwner())) {
+        if (DialogUtils.showConfirmationDialog(
+                "Logout Confirmation",
+                "Are you sure you want to logout?",
+                AppContext.getOwner())) {
             try {
                 AppContext.setCurrentAccount(null);
 

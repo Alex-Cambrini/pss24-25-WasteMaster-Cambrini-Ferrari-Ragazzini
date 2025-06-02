@@ -43,7 +43,8 @@ public final class CustomersController {
             FXCollections.observableArrayList();
 
     private final ObservableList<String> activeFilters =
-            FXCollections.observableArrayList(FIELD_NAME, FIELD_SURNAME, FIELD_EMAIL, FILTER_LOCATION);
+            FXCollections.observableArrayList(FIELD_NAME, FIELD_SURNAME,
+                    FIELD_EMAIL, FILTER_LOCATION);
 
     @FXML
     private Button filterButton;
@@ -155,13 +156,22 @@ public final class CustomersController {
     private void handleDeleteCustomer() {
         CustomerRow selected = customerTable.getSelectionModel().getSelectedItem();
         if (selected == null) {
-            DialogUtils.showError("No Selection", "Please select a customer to delete.",
-                    AppContext.getOwner());
+            DialogUtils.showError("No Selection",
+                    "Please select a customer to delete.", AppContext.getOwner());
+            return;
+        }
+
+        boolean confirmed = DialogUtils.showConfirmationDialog(
+                "Confirm Deletion",
+                "Are you sure you want to delete this customer?",
+                AppContext.getOwner()
+        );
+
+        if (!confirmed) {
             return;
         }
 
         var customer = AppContext.getCustomerDAO().findByEmail(selected.getEmail());
-
         if (customer == null) {
             DialogUtils.showError("Not Found",
                     "The selected customer could not be found.", AppContext.getOwner());
@@ -181,7 +191,8 @@ public final class CustomersController {
     private void handleEditCustomer() {
         CustomerRow selected = customerTable.getSelectionModel().getSelectedItem();
         if (selected == null) {
-            DialogUtils.showError("No Selection", "Please select a customer to edit.",
+            DialogUtils.showError("No Selection",
+                    "Please select a customer to edit.",
                     AppContext.getOwner());
             return;
         }

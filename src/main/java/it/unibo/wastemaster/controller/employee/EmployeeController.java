@@ -220,13 +220,22 @@ public final class EmployeeController {
     private void handleDeleteEmployee() {
         EmployeeRow selected = employeeTable.getSelectionModel().getSelectedItem();
         if (selected == null) {
-            DialogUtils.showError("No Selection", "Please select an employee to delete.",
-                    owner);
+            DialogUtils.showError("No Selection",
+                    "Please select an employee to delete.", owner);
+            return;
+        }
+
+        boolean confirmed = DialogUtils.showConfirmationDialog(
+                "Confirm Deletion",
+                "Are you sure you want to delete this employee?",
+                owner
+        );
+
+        if (!confirmed) {
             return;
         }
 
         var employee = AppContext.getEmployeeDAO().findByEmail(selected.getEmail());
-
         if (employee == null) {
             DialogUtils.showError("Not Found",
                     "The selected employee could not be found.", owner);
@@ -248,7 +257,8 @@ public final class EmployeeController {
         try {
             Optional<AddEmployeeController> controllerOpt =
                     DialogUtils.showModalWithController("Add Employee",
-                            "/layouts/employee/AddEmployeeView.fxml", owner, ctrl -> {
+                            "/layouts/employee/AddEmployeeView.fxml", owner,
+                            ctrl -> {
                                 // You can initialize the controller here if needed
                             });
 
@@ -257,7 +267,8 @@ public final class EmployeeController {
             }
         } catch (Exception e) {
             e.printStackTrace();
-            DialogUtils.showError(ERROR_NAVIGATION, "Could not load Add Employee view.",
+            DialogUtils.showError(ERROR_NAVIGATION,
+                    "Could not load Add Employee view.",
                     owner);
         }
     }
@@ -266,14 +277,16 @@ public final class EmployeeController {
     private void handleEditEmployee() {
         EmployeeRow selected = employeeTable.getSelectionModel().getSelectedItem();
         if (selected == null) {
-            DialogUtils.showError("No Selection", "Please select an employee to edit.",
+            DialogUtils.showError("No Selection",
+                    "Please select an employee to edit.",
                     owner);
             return;
         }
 
         var employee = AppContext.getEmployeeDAO().findByEmail(selected.getEmail());
         if (employee == null) {
-            DialogUtils.showError("Not Found", "Employee not found.", owner);
+            DialogUtils.showError("Not Found",
+                    "Employee not found.", owner);
             return;
         }
 
@@ -287,7 +300,8 @@ public final class EmployeeController {
                 loadEmployee();
             }
         } catch (Exception e) {
-            DialogUtils.showError(ERROR_NAVIGATION, "Could not load Edit view.", owner);
+            DialogUtils.showError(ERROR_NAVIGATION, "Could not load Edit view.",
+                    owner);
         }
     }
 
@@ -322,7 +336,9 @@ public final class EmployeeController {
             CheckBox checkBox = new CheckBox(label);
             checkBox.setSelected(activeFilters.contains(key));
 
-            checkBox.selectedProperty().addListener((obs, wasSelected, isSelected) -> {
+            checkBox.selectedProperty().addListener((obs,
+                                                     wasSelected,
+                                                     isSelected) -> {
                 if (isSelected != null && isSelected) {
                     if (!activeFilters.contains(key)) {
                         activeFilters.add(key);
@@ -363,7 +379,8 @@ public final class EmployeeController {
             MainLayoutController.getInstance()
                     .loadCenter("/layouts/employee/EmployeeView.fxml");
         } catch (Exception e) {
-            DialogUtils.showError(ERROR_NAVIGATION, "Failed to load employee view.",
+            DialogUtils.showError(ERROR_NAVIGATION,
+                    "Failed to load employee view.",
                     owner);
         }
     }

@@ -338,26 +338,33 @@ public final class WasteController {
         WasteRow selected = wasteTable.getSelectionModel().getSelectedItem();
         if (selected == null) {
             DialogUtils.showError(
-                "No Selection", "Please select a waste to delete.",
+                    "No Selection", "Please select a waste to delete.",
                     AppContext.getOwner());
+            return;
+        }
+
+        boolean confirmed = DialogUtils.showConfirmationDialog(
+                "Confirm Deletion",
+                "Are you sure you want to delete this waste?",
+                AppContext.getOwner()
+        );
+
+        if (!confirmed) {
             return;
         }
 
         try {
             if (selected.getDayOfWeek() != null) {
                 WasteSchedule schedule = AppContext
-                .getWasteScheduleManager()
-                    .getWasteScheduleByWaste(
-                        selected.getWaste()
-                    );
-                AppContext.getWasteScheduleDAO()
-                    .delete(schedule);
+                        .getWasteScheduleManager()
+                        .getWasteScheduleByWaste(selected.getWaste());
+                AppContext.getWasteScheduleDAO().delete(schedule);
             }
             AppContext.getWasteManager().softDeleteWaste(selected.getWaste());
             loadWastes();
         } catch (Exception e) {
             DialogUtils.showError(
-                ERROR_TITLE, "Failed to delete waste or its schedule.",
+                    ERROR_TITLE, "Failed to delete waste or its schedule.",
                     AppContext.getOwner());
             e.printStackTrace();
         }
@@ -373,14 +380,25 @@ public final class WasteController {
             return;
         }
 
+        boolean confirmed = DialogUtils.showConfirmationDialog(
+                "Confirm Deletion",
+                "Are you sure you want to delete the collection program for this waste?",
+                AppContext.getOwner()
+        );
+
+        if (!confirmed) {
+            return;
+        }
+
         try {
-            WasteSchedule schedule = AppContext.getWasteScheduleManager()
+            WasteSchedule schedule = AppContext
+                    .getWasteScheduleManager()
                     .getWasteScheduleByWaste(selected.getWaste());
             AppContext.getWasteScheduleDAO().delete(schedule);
             loadWastes();
         } catch (Exception e) {
-            DialogUtils.showError(ERROR_TITLE,
-             "Failed to delete the program.",
+            DialogUtils.showError(
+                    ERROR_TITLE, "Failed to delete the program.",
                     AppContext.getOwner());
             e.printStackTrace();
         }

@@ -51,7 +51,8 @@ public final class VehicleController {
 
     private Timeline refreshTimeline;
     private ContextMenu filterMenu;
-    private final ObservableList<VehicleRow> allVehicles = FXCollections.observableArrayList();
+    private final ObservableList<VehicleRow> allVehicles = FXCollections
+            .observableArrayList();
     private final ObservableList<String> activeFilters =
             FXCollections.observableArrayList(PLATE, BRAND, MODEL, YEAR, LICENCE_TYPE,
                     VEHICLE_STATUS, LAST_MAINTENANCE_DATE, NEXT_MAINTENANCE_DATE);
@@ -272,16 +273,27 @@ public final class VehicleController {
     private void handleDeleteVehicle() {
         VehicleRow selected = vehicleTable.getSelectionModel().getSelectedItem();
         if (selected == null) {
-            DialogUtils.showError("No Selection", "Please select a vehicle to delete.",
-                    AppContext.getOwner());
+            DialogUtils.showError("No Selection",
+                    "Please select a vehicle to delete.", AppContext.getOwner());
             return;
         }
 
-        Vehicle vehicle =
-                AppContext.getVehicleManager().findVehicleByPlate(selected.getPlate());
+        boolean confirmed = DialogUtils.showConfirmationDialog(
+                "Confirm Deletion",
+                "Are you sure you want to delete this vehicle?",
+                AppContext.getOwner()
+        );
+
+        if (!confirmed) {
+            return;
+        }
+
+        Vehicle vehicle = AppContext.getVehicleManager()
+                .findVehicleByPlate(selected.getPlate());
 
         if (vehicle == null) {
-            DialogUtils.showError("Not Found", "The selected vehicle could not be found.",
+            DialogUtils.showError("Not Found",
+                    "The selected vehicle could not be found.",
                     AppContext.getOwner());
             return;
         }
@@ -294,7 +306,8 @@ public final class VehicleController {
             loadVehicles();
         } else {
             DialogUtils.showError("Deletion Failed",
-                    "Unable to delete the selected vehicle.", AppContext.getOwner());
+                    "Unable to delete the selected vehicle.",
+                    AppContext.getOwner());
         }
     }
 

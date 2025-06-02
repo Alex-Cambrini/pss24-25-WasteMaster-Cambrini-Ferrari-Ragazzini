@@ -364,6 +364,16 @@ public final class ScheduleController {
             return;
         }
 
+        boolean confirmed = DialogUtils.showConfirmationDialog(
+                "Confirm Deletion",
+                "Are you sure you want to cancel this schedule?",
+                AppContext.getOwner()
+        );
+
+        if (!confirmed) {
+            return;
+        }
+
         boolean success = false;
 
         try {
@@ -383,7 +393,6 @@ public final class ScheduleController {
                                     ScheduleStatus.CANCELLED);
                 }
             } else {
-                // Optionally handle unexpected schedule categories
                 DialogUtils.showError("Unknown Schedule Category",
                         "The selected schedule has an unknown category.",
                         AppContext.getOwner());
