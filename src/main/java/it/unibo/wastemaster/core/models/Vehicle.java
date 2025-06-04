@@ -13,78 +13,109 @@ import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
-
 import java.time.LocalDate;
 
+/**
+ * Represents a vehicle used for waste collection.
+ */
 @Entity
-public class Vehicle {
+public final class Vehicle {
 
+    /**
+     * Unique identifier of the vehicle.
+     */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int vehicleId;
 
+    /**
+     * License plate of the vehicle.
+     */
     @Column(length = 10, nullable = false, unique = true)
     @NotBlank(message = "Plate must not be blank")
-    @Pattern(regexp = "^[a-zA-Z0-9\\-\\s]{5,10}$", message = "Plate must contain 5 to 10 alphanumeric characters (letters, digits, dashes or spaces)")
+    @Pattern(regexp = "^[a-zA-Z0-9\\-\\s]{5,10}$",
+            message = "Plate must contain 5 to 10 alphanumeric characters")
     private String plate;
 
+    /**
+     * Brand of the vehicle.
+     */
     @Column(nullable = false)
     @NotBlank(message = "Brand must not be blank")
     private String brand;
 
+    /**
+     * Model of the vehicle.
+     */
     @Column(nullable = false)
     @NotBlank(message = "Model must not be blank")
     private String model;
 
+    /**
+     * Year the vehicle was registered.
+     */
     @Column(nullable = false)
     @NotNull(message = "Registration year is required")
     private int registrationYear;
 
+    /**
+     * Driving licence required to operate the vehicle.
+     */
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
-    @NotNull(message = "Licence type is required")
-    private LicenceType licenceType;
+    @NotNull(message = "Required licence is required")
+    private RequiredLicence requiredLicence;
 
+    /**
+     * Load capacity of the vehicle.
+     */
+    @Column(nullable = false)
+    @NotNull(message = "Vehicle capacity is required")
+    private int capacity;
+
+    /**
+     * Operational status of the vehicle.
+     */
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     @NotNull(message = "Vehicle status is required")
     private VehicleStatus vehicleStatus;
 
+    /**
+     * Date of last maintenance.
+     */
     @Column(nullable = false)
     @NotNull(message = "Last maintenance date is required")
     private LocalDate lastMaintenanceDate;
 
+    /**
+     * Date of next scheduled maintenance.
+     */
     @Column(nullable = false)
     @NotNull(message = "Next maintenance date is required")
     @FutureOrPresent(message = "Next maintenance date cannot be in the past")
     private LocalDate nextMaintenanceDate;
 
-    public enum LicenceType {
-        C1(3),
-        C(2);
-
-        private final int capacity;
-
-        LicenceType(int capacity) {
-            this.capacity = capacity;
-        }
-
-        public int getCapacity() {
-            return capacity;
-        }
-    }
-
-    public enum VehicleStatus {
-        IN_SERVICE,
-        IN_MAINTENANCE,
-        OUT_OF_SERVICE
-    }
-
+    /**
+     * Default constructor.
+     */
     public Vehicle() {
     }
 
-    public Vehicle(String plate, String brand, String model, int registrationYear,
-            LicenceType licenceType, VehicleStatus vehicleStatus) {
+    /**
+     * Constructs a vehicle with all required attributes.
+     *
+     * @param plate license plate
+     * @param brand vehicle brand
+     * @param model vehicle model
+     * @param registrationYear year of registration
+     * @param requiredLicence licence needed to drive
+     * @param vehicleStatus current vehicle status
+     * @param capacity vehicle load capacity
+     */
+    public Vehicle(final String plate, final String brand, final String model,
+                   final int registrationYear, final RequiredLicence requiredLicence,
+                   final VehicleStatus vehicleStatus, final int capacity) {
         if (plate == null) {
             throw new IllegalArgumentException("Plate must not be null");
         }
@@ -92,8 +123,9 @@ public class Vehicle {
         this.brand = brand;
         this.model = model;
         this.registrationYear = registrationYear;
-        this.licenceType = licenceType;
+        this.requiredLicence = requiredLicence;
         this.vehicleStatus = vehicleStatus;
+        this.capacity = capacity;
         this.lastMaintenanceDate = LocalDate.now();
         this.nextMaintenanceDate = lastMaintenanceDate.plusYears(1);
     }
@@ -106,94 +138,195 @@ public class Vehicle {
         }
     }
 
+    /**
+     * @return vehicle ID
+     */
     public int getVehicleId() {
         return vehicleId;
     }
 
+    /**
+     * @return license plate
+     */
     public String getPlate() {
         return plate;
     }
 
+    /**
+     * @param plate the plate to set
+     */
+    public void setPlate(final String plate) {
+        this.plate = plate;
+    }
+
+    /**
+     * @return vehicle brand
+     */
     public String getBrand() {
         return brand;
     }
 
+    /**
+     * @param brand the brand to set
+     */
+    public void setBrand(final String brand) {
+        this.brand = brand;
+    }
+
+    /**
+     * @return vehicle model
+     */
     public String getModel() {
         return model;
     }
 
+    /**
+     * @param model the model to set
+     */
+    public void setModel(final String model) {
+        this.model = model;
+    }
+
+    /**
+     * @return registration year
+     */
     public int getRegistrationYear() {
         return registrationYear;
     }
 
-    public LicenceType getLicenceType() {
-        return licenceType;
+    /**
+     * @param registrationYear the registration year to set
+     */
+    public void setRegistrationYear(final int registrationYear) {
+        this.registrationYear = registrationYear;
     }
 
+    /**
+     * @return required driving licence
+     */
+    public RequiredLicence getRequiredLicence() {
+        return requiredLicence;
+    }
+
+    /**
+     * @param requiredLicence the licence to set
+     */
+    public void setRequiredLicence(final RequiredLicence requiredLicence) {
+        this.requiredLicence = requiredLicence;
+    }
+
+    /**
+     * @return operational status
+     */
     public VehicleStatus getVehicleStatus() {
         return vehicleStatus;
     }
 
-    public int getCapacity() {
-        return licenceType.getCapacity();
+    /**
+     * @param vehicleStatus the status to set
+     */
+    public void setVehicleStatus(final VehicleStatus vehicleStatus) {
+        this.vehicleStatus = vehicleStatus;
     }
 
+    /**
+     * @return vehicle load capacity
+     */
+    public int getCapacity() {
+        return capacity;
+    }
+
+    /**
+     * @param capacity the load capacity to set
+     */
+    public void setCapacity(final int capacity) {
+        this.capacity = capacity;
+    }
+
+    /**
+     * @return date of last maintenance
+     */
     public LocalDate getLastMaintenanceDate() {
         return lastMaintenanceDate;
     }
 
+    /**
+     * @param lastMaintenanceDate the last maintenance date
+     */
+    public void setLastMaintenanceDate(final LocalDate lastMaintenanceDate) {
+        this.lastMaintenanceDate = lastMaintenanceDate;
+    }
+
+    /**
+     * @return date of next maintenance
+     */
     public LocalDate getNextMaintenanceDate() {
         return nextMaintenanceDate;
     }
 
-    public void setPlate(String plate) {
-        this.plate = plate;
-    }
-
-    public void setBrand(String brand) {
-        this.brand = brand;
-    }
-
-    public void setModel(String model) {
-        this.model = model;
-    }
-
-    public void setRegistrationYear(int registrationYear) {
-        this.registrationYear = registrationYear;
-    }
-
-    public void setLicenceType(LicenceType licenceType) {
-        this.licenceType = licenceType;
-    }
-
-    public void setVehicleStatus(VehicleStatus vehicleStatus) {
-        this.vehicleStatus = vehicleStatus;
-    }
-
-    public void setLastMaintenanceDate(LocalDate lastMaintenanceDate) {
-        this.lastMaintenanceDate = lastMaintenanceDate;
-    }
-
-    public void setNextMaintenanceDate(LocalDate nextMaintenanceDate) {
+    /**
+     * @param nextMaintenanceDate the next maintenance date
+     */
+    public void setNextMaintenanceDate(final LocalDate nextMaintenanceDate) {
         this.nextMaintenanceDate = nextMaintenanceDate;
     }
 
-    public void updateStatus(VehicleStatus vehicleStatus) {
+    /**
+     * Updates the vehicle's status.
+     *
+     * @param vehicleStatus the new status
+     */
+    public void updateStatus(final VehicleStatus vehicleStatus) {
         this.vehicleStatus = vehicleStatus;
     }
 
     @Override
     public String toString() {
         return String.format(
-                "Vehicle {Plate: %s, Brand: %s, Model: %s, Year: %d, Licence: %s, Capacity: %d, Status: %s, LastMaint: %s, NextMaint: %s}",
-                plate != null ? plate : "N/A",
-                brand != null ? brand : "N/A",
-                model != null ? model : "N/A",
-                registrationYear,
-                licenceType != null ? licenceType.name() : "N/A",
-                getCapacity(),
+                "Vehicle {Plate: %s, Brand: %s, Model: %s, Year: %d,%n"
+                        + "RequiredLicence: %s, Capacity: %d, Status: %s,%n"
+                        + "LastMaint: %s, NextMaint: %s}",
+                plate != null ? plate : "N/A", brand != null ? brand : "N/A",
+                model != null ? model : "N/A", registrationYear,
+                requiredLicence != null ? requiredLicence.name() : "N/A", capacity,
                 vehicleStatus != null ? vehicleStatus.name() : "N/A",
                 lastMaintenanceDate != null ? lastMaintenanceDate.toString() : "N/A",
                 nextMaintenanceDate != null ? nextMaintenanceDate.toString() : "N/A");
+    }
+
+    /**
+     * Required driving licences for operating the vehicle.
+     */
+    public enum RequiredLicence {
+        /**
+         * Standard car licence.
+         */
+        B,
+        /**
+         * Light truck licence.
+         */
+        C1,
+        /**
+         * Heavy truck licence.
+         */
+        C
+    }
+
+    /**
+     * Operational status of the vehicle.
+     */
+    public enum VehicleStatus {
+        /**
+         * Vehicle is in regular service.
+         */
+        IN_SERVICE,
+        /**
+         * Vehicle is under maintenance.
+         */
+        IN_MAINTENANCE,
+        /**
+         * Vehicle is not in use.
+         */
+        OUT_OF_SERVICE
     }
 }

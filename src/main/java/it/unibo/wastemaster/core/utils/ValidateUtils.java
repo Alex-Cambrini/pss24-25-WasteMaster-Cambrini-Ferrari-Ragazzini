@@ -1,14 +1,21 @@
 package it.unibo.wastemaster.core.utils;
 
-import java.util.Set;
-
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import jakarta.validation.ValidatorFactory;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
-public class ValidateUtils {
+/**
+ * Utility class for validation of entities and arguments. Provides static methods to
+ * validate strings, arguments, state, and Jakarta Bean Validation for entities.
+ */
+public final class ValidateUtils {
 
+    /**
+     * Shared Validator instance for entity validation.
+     */
     public static final Validator VALIDATOR;
 
     static {
@@ -16,27 +23,89 @@ public class ValidateUtils {
         VALIDATOR = factory.getValidator();
     }
 
-    public static void validateString(String toValidate, String errorMessage) {
+    private ValidateUtils() {
+        // Prevent instantiation
+    }
+
+    /**
+     * Validates that a string is not null or blank.
+     *
+     * @param toValidate the string to validate
+     * @param errorMessage the error message to throw if invalid
+     * @throws IllegalArgumentException if string is null or blank
+     */
+    public static void validateString(final String toValidate,
+                                      final String errorMessage) {
         if (toValidate == null || toValidate.isBlank()) {
             throw new IllegalArgumentException(errorMessage);
         }
     }
-    
-    public static void requireArgNotNull(Object toValidate, String errorMessage) {
-        if (toValidate==null) throw new IllegalArgumentException(errorMessage);
-    }
-    
-    public static void requireStateNotNull(Object toValidate, String errorMessage) {
-        if (toValidate==null) throw new IllegalStateException(errorMessage);
+
+    /**
+     * Validates that an argument is not null.
+     *
+     * @param toValidate the object to check
+     * @param errorMessage the error message to throw if null
+     * @throws IllegalArgumentException if argument is null
+     */
+    public static void requireArgNotNull(final Object toValidate,
+                                         final String errorMessage) {
+        if (toValidate == null) {
+            throw new IllegalArgumentException(errorMessage);
+        }
     }
 
-    public static <T> void validateEntity(T entity) {
+    /**
+     * Validates that a state argument is not null.
+     *
+     * @param toValidate the object to check
+     * @param errorMessage the error message to throw if null
+     * @throws IllegalStateException if argument is null
+     */
+    public static void requireStateNotNull(final Object toValidate,
+                                           final String errorMessage) {
+        if (toValidate == null) {
+            throw new IllegalStateException(errorMessage);
+        }
+    }
+
+    /**
+     * Validates the entity using Jakarta Bean Validation.
+     *
+     * @param <T> the entity type
+     * @param entity the entity to validate
+     * @throws IllegalArgumentException if entity is null or validation fails
+     */
+    public static <T> void validateEntity(final T entity) {
         requireArgNotNull(entity, "Entity must not be null");
         Set<ConstraintViolation<T>> violations = VALIDATOR.validate(entity);
         if (!violations.isEmpty()) {
+            StringBuilder errorMessage = new StringBuilder("Validation failed:");
             for (ConstraintViolation<T> violation : violations) {
-                throw new IllegalArgumentException(violation.getMessage());
+                errorMessage.append(" ").append(violation.getMessage()).append(";");
             }
+            throw new IllegalArgumentException(errorMessage.toString());
+        }
+    }
+
+    /**
+     * Validates multiple entities at once using Jakarta Bean Validation. Collects all
+     * violation messages from all entities.
+     *
+     * @param entities the entities to validate
+     * @throws IllegalArgumentException if any validation violations are found
+     */
+    public static void validateAll(final Object... entities) {
+        LinkedHashSet<String> errorMessages = new LinkedHashSet<>();
+
+        for (Object entity : entities) {
+            Set<ConstraintViolation<Object>> violations = VALIDATOR.validate(entity);
+            for (ConstraintViolation<?> violation : violations) {
+                errorMessages.add("- " + violation.getMessage());
+            }
+        }
+        if (!errorMessages.isEmpty()) {
+            throw new IllegalArgumentException(String.join("\n", errorMessages));
         }
     }
 }
