@@ -2,28 +2,41 @@ package it.unibo.wastemaster.core.utils;
 
 import jakarta.persistence.EntityManager;
 
-public class TransactionHelper {
+/**
+ * Utility class to execute JPA transactions safely.
+ */
+public final class TransactionHelper {
 
-	public static void executeTransaction(EntityManager entityManager, Runnable operation) {
-        
-		boolean startedHere = false;
+    private TransactionHelper() {
+        // Prevent instantiation
+    }
 
-		try {
-			if (!entityManager.getTransaction().isActive()) {
-				entityManager.getTransaction().begin();
-				startedHere = true;
-			}
+    /**
+     * Executes a transactional operation using the given EntityManager.
+     *
+     * @param entityManager the EntityManager to use
+     * @param operation the operation to execute
+     */
+    public static void executeTransaction(final EntityManager entityManager,
+                                          final Runnable operation) {
+        boolean startedHere = false;
 
-			operation.run();
+        try {
+            if (!entityManager.getTransaction().isActive()) {
+                entityManager.getTransaction().begin();
+                startedHere = true;
+            }
 
-			if (startedHere) {
-				entityManager.getTransaction().commit();
-			}
-		} catch (Exception e) {
-			if (entityManager.getTransaction().isActive()) {
-				entityManager.getTransaction().rollback();
-			}
-			throw e;
-		}
-	}
+            operation.run();
+
+            if (startedHere) {
+                entityManager.getTransaction().commit();
+            }
+        } catch (Exception e) {
+            if (entityManager.getTransaction().isActive()) {
+                entityManager.getTransaction().rollback();
+            }
+            throw e;
+        }
+    }
 }

@@ -3,18 +3,33 @@ package it.unibo.wastemaster.database;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
 
-public class HibernateUtil {
+/**
+ * Utility class to manage the Hibernate EntityManagerFactory.
+ */
+public final class HibernateUtil {
 
-    private static final EntityManagerFactory entityManagerFactory = 
-        Persistence.createEntityManagerFactory("myJpaUnit");
+    private static final EntityManagerFactory ENTITY_MANAGER_FACTORY = Persistence
+            .createEntityManagerFactory("myJpaUnit");
 
-    public static EntityManagerFactory getEntityManagerFactory() {
-        return entityManagerFactory;
+    private HibernateUtil() {
+        // Prevent instantiation
     }
 
+    /**
+     * Returns the singleton EntityManagerFactory instance.
+     *
+     * @return the EntityManagerFactory
+     */
+    public static EntityManagerFactory getEntityManagerFactory() {
+        return ENTITY_MANAGER_FACTORY;
+    }
+
+    /**
+     * Closes the EntityManagerFactory if it is open.
+     */
     public static void shutdown() {
-        if (entityManagerFactory != null && entityManagerFactory.isOpen()) {
-            entityManagerFactory.close();
+        if (ENTITY_MANAGER_FACTORY != null && ENTITY_MANAGER_FACTORY.isOpen()) {
+            ENTITY_MANAGER_FACTORY.close();
         }
     }
 }
