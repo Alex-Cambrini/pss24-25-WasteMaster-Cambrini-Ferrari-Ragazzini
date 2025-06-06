@@ -41,7 +41,28 @@ public class InvoiceManager {
     private List<Invoice> generateInvoicesForPeriod(LocalDate startDate, LocalDate endDate) {
         List<Collection> collections = collectionDAO.findByDateRange(startDate, endDate);
 
+        Map<Customer, List<Collection>> customerCollectionsMap = new HashMap<>();
+        for (Collection c : collections) {
+            if (c.getCollectionStatus() == Collection.CollectionStatus.COMPLETED) {
+                customerCollectionsMap.computeIfAbsent(c.getCustomer(), k -> new ArrayList<>()).add(c);
+            }
+        }
+
+        List<Invoice> invoices = new ArrayList<>();
+
         
+        for (Map.Entry<Customer, List<Collection>> entry : customerCollectionsMap.entrySet()) {
+            List<Collection> customerCollections = entry.getValue();
+
+            for (Collection collection : customerCollections) {
+                Invoice invoice = new Invoice(collection);
+                invoice.setAmount(FIXED_FEE);
+                invoiceDAO.insert(invoice);
+                invoices.add(invoice);
+            }
+        }
+        return invoices;
+
        
     }
 }
