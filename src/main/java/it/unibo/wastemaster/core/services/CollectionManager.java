@@ -124,4 +124,16 @@ public class CollectionManager {
             final RecurringSchedule schedule) {
         return collectionDAO.findActiveCollectionByRecurringSchedule(schedule);
     }
+
+    public List<Collection> getFirstHalfCollections(int year) {
+        LocalDate start = LocalDate.of(year, 1, 1);
+        LocalDate end = LocalDate.of(year, 6, 30);
+        return collectionDAO.findByDateRange(start, end);
+    }
+
+    public List<Collection> getSecondHalfCollections(int year) {
+        LocalDate start = LocalDate.of(year, 7, 1);
+        LocalDate end = LocalDate.of(year, 12, 31);
+        return collectionDAO.findByDateRange(start, end);
+    }
 }
