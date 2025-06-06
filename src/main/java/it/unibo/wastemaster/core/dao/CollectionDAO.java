@@ -5,6 +5,8 @@ import it.unibo.wastemaster.core.models.RecurringSchedule;
 import it.unibo.wastemaster.core.models.Schedule;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.NoResultException;
+
+import java.time.LocalDate;
 import java.util.List;
 
 /**
@@ -69,5 +71,17 @@ public class CollectionDAO extends GenericDAO<Collection> {
         } catch (NoResultException e) {
             return null;
         }
+
+
+    }
+
+    public List<Collection> findByDateRange(LocalDate start, LocalDate end) {
+        return getEntityManager().createQuery("""
+                SELECT c FROM Collection c
+                WHERE c.date BETWEEN :start AND :end
+                """, Collection.class)
+            .setParameter("start", start)
+            .setParameter("end", end)
+            .getResultList();
     }
 }
