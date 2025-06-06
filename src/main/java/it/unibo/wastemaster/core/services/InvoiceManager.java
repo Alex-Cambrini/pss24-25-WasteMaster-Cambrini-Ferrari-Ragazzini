@@ -24,6 +24,24 @@ public class InvoiceManager {
         this.collectionDAO = collectionDAO;
     }
 
-    
+   public List<Invoice> generateInvoicesForFirstHalf(int year) {
+        return generateInvoicesForPeriod(
+            LocalDate.of(year, Month.JANUARY, 1),
+            LocalDate.of(year, Month.JUNE, 30)
+        );
+    }
 
+    public List<Invoice> generateInvoicesForSecondHalf(int year) {
+        return generateInvoicesForPeriod(
+            LocalDate.of(year, Month.JULY, 1),
+            LocalDate.of(year, Month.DECEMBER, 31)
+        );
+    }
+
+    private List<Invoice> generateInvoicesForPeriod(LocalDate startDate, LocalDate endDate) {
+        List<Collection> collections = collectionDAO.findByDateRange(startDate, endDate);
+
+        
+       
+    }
 }
