@@ -11,9 +11,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Positive;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Entity
@@ -39,17 +37,23 @@ public class Invoice {
     @Column(nullable = false)
     @NotNull(message = "The payment status cannot be null")
     private PaymentStatus paymentStatus;
+      
+    @Column(nullable = false)
+    private double amount;
 
-    public Invoice() {
+    public enum PaymentStatus {
+        PAID,
+        UNPAID,
+        PENDING
     }
 
-    public Invoice() {}
-
-    public Invoice(Collection collection, BigDecimal amount, LocalDate issueDate, PaymentStatus paymentStatus) {
+    public Invoice(Collection collection) {
+        if (collection == null || collection.getCollectionStatus() != Collection.CollectionStatus.COMPLETED) {
+            throw new IllegalArgumentException("Cannot create invoice for null or non-completed collection.");
+        }
         this.collection = collection;
-        
-        this.issueDate = issueDate;
-        this.paymentStatus = paymentStatus;
+        this.issueDate = LocalDate.now();
+        this.paymentStatus = PaymentStatus.UNPAID;
     }
 
     public int getInvoiceId() {
@@ -64,7 +68,6 @@ public class Invoice {
         this.collection = collection;
     }
 
-   
     public LocalDate getIssueDate() {
         return issueDate;
     }
@@ -81,23 +84,26 @@ public class Invoice {
         this.paymentStatus = paymentStatus;
     }
 
-    @Override
-    public String toString() {
-    return String.format(
-        "Invoice {ID: %d, CollectionID: %s, Customer: %s, Waste: %s, Amount: %s, IssueDate: %s, Status: %s}",
-        invoiceId,
-        collection != null ? collection.getCollectionId() : "N/A",
-        collection != null && collection.getCustomer() != null ? collection.getCustomer().getName() : "N/A",
-        collection != null && collection.getWaste() != null ? collection.getWaste().getWasteName() : "N/A",
-        amount != null ? amount.toString() : "N/A",
-        issueDate != null ? issueDate.toString() : "N/A",
-        paymentStatus != null ? paymentStatus.name() : "N/A"
-    );
+    public double getAmount() {
+        return amount;
     }
 
-    public enum PaymentStatus {
-        PAID,
-        UNPAID,
-        PENDING
+    public void setAmount(double amount) {
+        this.amount = amount;
     }
+
+    @Override
+    public String toString() {
+        return String.format(
+            "Invoice {ID: %d, CollectionID: %s, Customer: %s, Waste: %s, Amount: %.2f, IssueDate: %s, Status: %s}",
+            invoiceId,
+            collection != null ? collection.getCollectionId() : "N/A",
+            collection != null && collection.getCustomer() != null ? collection.getCustomer().getName() : "N/A",
+            collection != null && collection.getWaste() != null ? collection.getWaste().getWasteName() : "N/A",
+            amount,
+            issueDate != null ? issueDate.toString() : "N/A",
+            paymentStatus != null ? paymentStatus.name() : "N/A"
+        );
+    }
+    
 }
