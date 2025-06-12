@@ -14,6 +14,7 @@
         <class>it.unibo.wastemaster.core.models.Waste</class>
         <class>it.unibo.wastemaster.core.models.WasteSchedule</class>
         <class>it.unibo.wastemaster.core.models.Trip</class>
+        <class>it.unibo.wastemaster.core.models.Invoice</class>
         <properties>
             <property name="jakarta.persistence.jdbc.driver" value="com.mysql.cj.jdbc.Driver" />
             <property name="jakarta.persistence.jdbc.url" value="jdbc:mysql://localhost:3306/wastemaster_db" />

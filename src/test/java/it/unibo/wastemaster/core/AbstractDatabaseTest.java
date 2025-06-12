@@ -8,6 +8,7 @@ import it.unibo.wastemaster.core.dao.GenericDAO;
 import it.unibo.wastemaster.core.dao.OneTimeScheduleDAO;
 import it.unibo.wastemaster.core.dao.RecurringScheduleDAO;
 import it.unibo.wastemaster.core.dao.TripDAO;
+import it.unibo.wastemaster.core.dao.InvoiceDAO;
 import it.unibo.wastemaster.core.dao.VehicleDAO;
 import it.unibo.wastemaster.core.dao.WasteDAO;
 import it.unibo.wastemaster.core.dao.WasteScheduleDAO;
@@ -22,6 +23,7 @@ import it.unibo.wastemaster.core.services.TripManager;
 import it.unibo.wastemaster.core.services.VehicleManager;
 import it.unibo.wastemaster.core.services.WasteManager;
 import it.unibo.wastemaster.core.services.WasteScheduleManager;
+import it.unibo.wastemaster.core.services.InvoiceManager;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
@@ -59,6 +61,7 @@ public abstract class AbstractDatabaseTest {
     private OneTimeScheduleDAO oneTimeScheduleDAO;
     private VehicleDAO vehicleDAO;
     private TripDAO tripDAO;
+    private InvoiceDAO invoiceDAO;
 
     // Service managers for business logic
     private AccountManager accountManager;
@@ -71,6 +74,7 @@ public abstract class AbstractDatabaseTest {
     private CollectionManager collectionManager;
     private VehicleManager vehicleManager;
     private TripManager tripManager;
+    private InvoiceManager invoiceManager;
 
     /**
      * Initializes the EntityManagerFactory before any test runs.
