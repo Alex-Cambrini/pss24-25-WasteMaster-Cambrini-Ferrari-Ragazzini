@@ -255,6 +255,15 @@ public abstract class AbstractDatabaseTest {
     }
 
     /**
+     * Returns the DAO for Invoice entities.
+     *
+     * @return the InvoiceDAO instance
+     */
+    protected InvoiceDAO getInvoiceDAO() {
+        return invoiceDAO;
+    }
+
+    /**
      * Returns the manager for Employee-related operations.
      *
      * @return the EmployeeManager instance
@@ -333,6 +342,15 @@ public abstract class AbstractDatabaseTest {
      */
     protected TripManager getTripManager() {
         return tripManager;
+    }
+
+    /**
+     * Returns the DaoManager instance.
+     *
+     * @return the DaoManager instance
+     */
+    protected InvoiceManager getInvoiceManager() {
+        return invoiceManager;
     }
 
     /**
