@@ -40,4 +40,43 @@ class InvoiceTest extends AbstractDatabaseTest {
     }
 
    
+    // @Test
+    // void testGetterSetter() {
+    //     invoice.setAmount(200.0);
+    //     invoice.setPaymentStatus(Invoice.PaymentStatus.UNPAID);
+    //     assertEquals(200.0, invoice.getAmount());
+    //     assertEquals(Invoice.PaymentStatus.UNPAID, invoice.getPaymentStatus());
+    //     assertEquals(collection, invoice.getCollection());
+    // }
+
+    // @Test
+    // void testToString() {
+    //     String output = invoice.toString();
+    //     assertNotNull(output);
+    //     assertTrue(output.contains("Invoice"));
+    //     assertTrue(output.contains(String.valueOf(invoice.getAmount())));
+    //     assertTrue(output.contains(invoice.getPaymentStatus().name()));
+    // }
+
+    // @Test
+    // void testPersistence() {
+    //     getEntityManager().getTransaction().begin();
+    //     getInvoiceDAO().insert(invoice);
+    //     getEntityManager().getTransaction().commit();
+
+    //     Invoice found = getInvoiceDAO().findById(invoice.getInvoiceId());
+    //     assertNotNull(found);
+    //     assertEquals(invoice.getAmount(), found.getAmount());
+    //     assertEquals(invoice.getCollection().getCollectionId(), found.getCollection().getCollectionId());
+
+    //     int foundId = found.getInvoiceId();
+    //     getEntityManager().getTransaction().begin();
+    //     getInvoiceDAO().delete(found);
+    //     getEntityManager().getTransaction().commit();
+
+    //     Invoice deleted = getInvoiceDAO().findById(foundId);
+    //     assertNull(deleted);
+    // }
+
+
 }
