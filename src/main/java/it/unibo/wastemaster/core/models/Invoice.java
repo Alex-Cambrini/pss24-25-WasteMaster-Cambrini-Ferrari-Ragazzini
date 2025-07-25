@@ -18,6 +18,10 @@ import java.time.LocalDate;
 @Table(name = "invoices")
 public class Invoice {
 
+    public Invoice() {
+        // empty constructor required by Hibernate
+    }
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int invoiceId;
@@ -27,7 +31,7 @@ public class Invoice {
     @NotNull(message = "The collection cannot be null")
     private Collection collection;
 
-   
+
 
     @Column(nullable = false)
     @NotNull(message = "The issue date cannot be null")
@@ -37,19 +41,19 @@ public class Invoice {
     @Column(nullable = false)
     @NotNull(message = "The payment status cannot be null")
     private PaymentStatus paymentStatus;
-      
+
     @Column(nullable = false)
     private double amount;
 
     public enum PaymentStatus {
-        PAID,
-        UNPAID,
-        PENDING
+        PAID, UNPAID, PENDING
     }
 
     public Invoice(Collection collection) {
-        if (collection == null || collection.getCollectionStatus() != Collection.CollectionStatus.COMPLETED) {
-            throw new IllegalArgumentException("Cannot create invoice for null or non-completed collection.");
+        if (collection == null || collection
+                .getCollectionStatus() != Collection.CollectionStatus.COMPLETED) {
+            throw new IllegalArgumentException(
+                    "Cannot create invoice for null or non-completed collection.");
         }
         this.collection = collection;
         this.issueDate = LocalDate.now();
@@ -95,15 +99,16 @@ public class Invoice {
     @Override
     public String toString() {
         return String.format(
-            "Invoice {ID: %d, CollectionID: %s, Customer: %s, Waste: %s, Amount: %.2f, IssueDate: %s, Status: %s}",
-            invoiceId,
-            collection != null ? collection.getCollectionId() : "N/A",
-            collection != null && collection.getCustomer() != null ? collection.getCustomer().getName() : "N/A",
-            collection != null && collection.getWaste() != null ? collection.getWaste().getWasteName() : "N/A",
-            amount,
-            issueDate != null ? issueDate.toString() : "N/A",
-            paymentStatus != null ? paymentStatus.name() : "N/A"
-        );
+                "Invoice {ID: %d, CollectionID: %s, Customer: %s, Waste: %s, Amount: %.2f, IssueDate: %s, Status: %s}",
+                invoiceId, collection != null ? collection.getCollectionId() : "N/A",
+                collection != null && collection.getCustomer() != null
+                        ? collection.getCustomer().getName()
+                        : "N/A",
+                collection != null && collection.getWaste() != null
+                        ? collection.getWaste().getWasteName()
+                        : "N/A",
+                amount, issueDate != null ? issueDate.toString() : "N/A",
+                paymentStatus != null ? paymentStatus.name() : "N/A");
     }
-    
+
 }
