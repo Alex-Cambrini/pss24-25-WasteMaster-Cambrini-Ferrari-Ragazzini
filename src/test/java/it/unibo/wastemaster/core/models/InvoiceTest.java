@@ -3,8 +3,8 @@ package it.unibo.wastemaster.core.models;
 import static org.junit.jupiter.api.Assertions.*;
 
 import it.unibo.wastemaster.core.AbstractDatabaseTest;
+import it.unibo.wastemaster.core.models.Collection.CollectionStatus;
 import java.time.LocalDate;
-import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -32,6 +32,8 @@ class InvoiceTest extends AbstractDatabaseTest {
         getWasteDAO().insert(waste);
         getOneTimeScheduleDAO().insert(schedule);
         getCollectionDAO().insert(collection);
+        collection.setCollectionStatus(CollectionStatus.COMPLETED);
+        getCollectionDAO().update(collection);
 
         invoice = new Invoice(collection);
         invoice.setAmount(100.0);
@@ -40,43 +42,41 @@ class InvoiceTest extends AbstractDatabaseTest {
     }
 
    
-    // @Test
-    // void testGetterSetter() {
-    //     invoice.setAmount(200.0);
-    //     invoice.setPaymentStatus(Invoice.PaymentStatus.UNPAID);
-    //     assertEquals(200.0, invoice.getAmount());
-    //     assertEquals(Invoice.PaymentStatus.UNPAID, invoice.getPaymentStatus());
-    //     assertEquals(collection, invoice.getCollection());
-    // }
+    @Test
+    void testGetterSetter() {
+        invoice.setAmount(200.0);
+        invoice.setPaymentStatus(Invoice.PaymentStatus.UNPAID);
+        assertEquals(200.0, invoice.getAmount());
+        assertEquals(Invoice.PaymentStatus.UNPAID, invoice.getPaymentStatus());
+        assertEquals(collection, invoice.getCollection());
+    }
 
-    // @Test
-    // void testToString() {
-    //     String output = invoice.toString();
-    //     assertNotNull(output);
-    //     assertTrue(output.contains("Invoice"));
-    //     assertTrue(output.contains(String.valueOf(invoice.getAmount())));
-    //     assertTrue(output.contains(invoice.getPaymentStatus().name()));
-    // }
+    @Test
+    void testToString() {
+        String output = invoice.toString();
+        assertNotNull(output);
+        assertTrue(output.contains("Invoice"));
+        assertTrue(output.contains(String.format("%.2f", invoice.getAmount())));
+        assertTrue(output.contains(invoice.getPaymentStatus().name()));
+    }
 
-    // @Test
-    // void testPersistence() {
-    //     getEntityManager().getTransaction().begin();
-    //     getInvoiceDAO().insert(invoice);
-    //     getEntityManager().getTransaction().commit();
+    @Test
+    void testPersistence() {
+        getEntityManager().getTransaction().begin();
+        getInvoiceDAO().insert(invoice);
+        getEntityManager().getTransaction().commit();
 
-    //     Invoice found = getInvoiceDAO().findById(invoice.getInvoiceId());
-    //     assertNotNull(found);
-    //     assertEquals(invoice.getAmount(), found.getAmount());
-    //     assertEquals(invoice.getCollection().getCollectionId(), found.getCollection().getCollectionId());
+        Invoice found = getInvoiceDAO().findById(invoice.getInvoiceId());
+        assertNotNull(found);
+        assertEquals(invoice.getAmount(), found.getAmount());
+        assertEquals(invoice.getCollection().getCollectionId(), found.getCollection().getCollectionId());
 
-    //     int foundId = found.getInvoiceId();
-    //     getEntityManager().getTransaction().begin();
-    //     getInvoiceDAO().delete(found);
-    //     getEntityManager().getTransaction().commit();
+        int foundId = found.getInvoiceId();
+        getEntityManager().getTransaction().begin();
+        getInvoiceDAO().delete(found);
+        getEntityManager().getTransaction().commit();
 
-    //     Invoice deleted = getInvoiceDAO().findById(foundId);
-    //     assertNull(deleted);
-    // }
-
-
+        Invoice deleted = getInvoiceDAO().findById(foundId);
+        assertNull(deleted);
+    }
 }
