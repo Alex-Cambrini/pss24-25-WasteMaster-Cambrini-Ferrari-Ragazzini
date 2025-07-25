@@ -124,6 +124,7 @@ public abstract class AbstractDatabaseTest {
         collectionDAO = new CollectionDAO(em);
         vehicleDAO = new VehicleDAO(em);
         tripDAO = new TripDAO(em);
+        invoiceDAO = new InvoiceDAO(em);
 
         wasteManager = new WasteManager(wasteDAO);
         customerManager = new CustomerManager(customerDAO);
@@ -140,6 +141,7 @@ public abstract class AbstractDatabaseTest {
                 new OneTimeScheduleManager(oneTimeScheduleDAO, collectionManager);
         vehicleManager = new VehicleManager(vehicleDAO);
         tripManager = new TripManager(tripDAO);
+        invoiceManager = new InvoiceManager(invoiceDAO, collectionDAO);
     }
 
     /**
