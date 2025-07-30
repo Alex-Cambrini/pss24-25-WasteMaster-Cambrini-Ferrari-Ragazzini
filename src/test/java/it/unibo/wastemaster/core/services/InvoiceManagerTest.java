@@ -52,6 +52,28 @@ class InvoiceManagerTest extends AbstractDatabaseTest {
     }
 
     
+    @Test
+    void testGenerateInvoicesForFirstHalf() {
+        int year = FUTURE_TEST_YEAR;
+        
+        insertCompletedCollection(LocalDate.of(year, 3, 15));
+        
+        
+        insertCompletedCollection(LocalDate.of(year, 9, 10));
 
+        List<Invoice> invoices = getInvoiceManager().generateInvoicesForFirstHalf(year);
+        
+        assertEquals(1, invoices.size(), "Exactly 1 invoice should be generated for the first half of the future year.");        assertNotNull(invoices.get(0));
+        assertEquals(30.0, invoices.get(0).getAmount(), 0.001);
+        assertEquals(Invoice.PaymentStatus.UNPAID, invoices.get(0).getPaymentStatus());
+    }
    
+
+    @Test
+    void testNoInvoicesForEmptyPeriod() {
+        int yearForEmptyPeriod = FUTURE_TEST_YEAR + 1; 
+        List<Invoice> invoices = getInvoiceManager().generateInvoicesForFirstHalf(yearForEmptyPeriod);
+        assertTrue(invoices.isEmpty(), "There should be no invoices for a period with no collections.");  
+    }
+
 }
