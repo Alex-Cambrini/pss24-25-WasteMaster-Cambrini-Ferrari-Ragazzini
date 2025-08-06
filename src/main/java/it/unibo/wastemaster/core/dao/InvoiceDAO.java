@@ -1,8 +1,7 @@
 package it.unibo.wastemaster.core.dao;
 
-import jakarta.persistence.EntityManager;
 import it.unibo.wastemaster.core.models.Invoice;
-
+import jakarta.persistence.EntityManager;
 
 /**
  * DAO class for managing Invoice entities.
