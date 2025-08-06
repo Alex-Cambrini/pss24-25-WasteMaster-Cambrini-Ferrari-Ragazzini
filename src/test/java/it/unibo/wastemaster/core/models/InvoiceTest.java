@@ -1,6 +1,9 @@
 package it.unibo.wastemaster.core.models;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import it.unibo.wastemaster.core.AbstractDatabaseTest;
 import it.unibo.wastemaster.core.models.Collection.CollectionStatus;
@@ -9,6 +12,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 class InvoiceTest extends AbstractDatabaseTest {
+
+    private static final double TEST_AMOUNT = 200.0;
 
     private Invoice invoice;
     private Collection collection;
@@ -25,7 +30,9 @@ class InvoiceTest extends AbstractDatabaseTest {
             "1234567890"
         );
         Waste waste = new Waste("Organico", true, false);
-        OneTimeSchedule schedule = new OneTimeSchedule(customer, waste, LocalDate.now().plusDays(1));
+        OneTimeSchedule schedule = new OneTimeSchedule(customer,
+                                                       waste,
+                                                       LocalDate.now().plusDays(1));
         collection = new Collection(schedule);
 
         getCustomerDAO().insert(customer);
@@ -41,12 +48,11 @@ class InvoiceTest extends AbstractDatabaseTest {
         invoice.setPaymentStatus(Invoice.PaymentStatus.PAID);
     }
 
-   
     @Test
     void testGetterSetter() {
-        invoice.setAmount(200.0);
+        invoice.setAmount(TEST_AMOUNT);
         invoice.setPaymentStatus(Invoice.PaymentStatus.UNPAID);
-        assertEquals(200.0, invoice.getAmount());
+        assertEquals(TEST_AMOUNT, invoice.getAmount());
         assertEquals(Invoice.PaymentStatus.UNPAID, invoice.getPaymentStatus());
         assertEquals(collection, invoice.getCollection());
     }
@@ -69,7 +75,8 @@ class InvoiceTest extends AbstractDatabaseTest {
         Invoice found = getInvoiceDAO().findById(invoice.getInvoiceId());
         assertNotNull(found);
         assertEquals(invoice.getAmount(), found.getAmount());
-        assertEquals(invoice.getCollection().getCollectionId(), found.getCollection().getCollectionId());
+        assertEquals(invoice.getCollection().getCollectionId(),
+            found.getCollection().getCollectionId());
 
         int foundId = found.getInvoiceId();
         getEntityManager().getTransaction().begin();
