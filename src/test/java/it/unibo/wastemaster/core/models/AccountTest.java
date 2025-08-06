@@ -1,14 +1,16 @@
 package it.unibo.wastemaster.core.models;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import it.unibo.wastemaster.core.AbstractDatabaseTest;
 import it.unibo.wastemaster.core.utils.ValidateUtils;
 import jakarta.validation.ConstraintViolation;
+import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import java.util.Set;
 
 class AccountTest extends AbstractDatabaseTest {
 
@@ -20,30 +22,18 @@ class AccountTest extends AbstractDatabaseTest {
     public void setUp() {
         super.setUp();
         Location address = new Location("Via Roma", "12", "Bologna", "40100");
-        employee = new Employee(
-                "Luca",
-                "Bianchi",
-                address,
-                "luca.bianchi@email.com",
-                "0511234567",
-                Employee.Role.OFFICE_WORKER,
-                Employee.Licence.B
-        );
+        employee = new Employee("Luca", "Bianchi", address, "luca.bianchi@email.com",
+                "0511234567", Employee.Role.OFFICE_WORKER, Employee.Licence.B);
         account = new Account("hashed_password_123", employee);
         getEntityManager().getTransaction().begin();
     }
 
     @Test
     void testAccountGettersAndSetters() {
-        Employee newEmployee = new Employee(
-                "Maria",
-                "Rossi",
+        Employee newEmployee = new Employee("Maria", "Rossi",
                 new Location("Via Verdi", "3", "Milano", "20100"),
-                "maria.rossi@email.com",
-                "027654321",
-                Employee.Role.ADMINISTRATOR,
-                Employee.Licence.C
-        );
+                "maria.rossi@email.com", "027654321", Employee.Role.ADMINISTRATOR,
+                Employee.Licence.C);
 
         Account a = new Account();
         a.setPasswordHash("new_hashed");
@@ -76,11 +66,13 @@ class AccountTest extends AbstractDatabaseTest {
         Set<ConstraintViolation<Account>> violations =
                 ValidateUtils.VALIDATOR.validate(invalid);
 
-        assertTrue(violations.stream()
-                        .anyMatch(v -> v.getPropertyPath().toString().equals("passwordHash")),
+        assertTrue(
+                violations.stream().anyMatch(
+                        v -> v.getPropertyPath().toString().equals("passwordHash")),
                 "Expected violation on passwordHash");
 
-        assertTrue(violations.stream()
+        assertTrue(
+                violations.stream()
                         .anyMatch(v -> v.getPropertyPath().toString().equals("employee")),
                 "Expected violation on employee");
     }

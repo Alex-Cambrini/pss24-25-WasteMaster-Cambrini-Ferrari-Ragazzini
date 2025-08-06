@@ -15,6 +15,13 @@ import java.util.List;
  */
 public class CollectionManager {
 
+    private static final int FIRST_HALF_START_MONTH = 1;
+    private static final int FIRST_HALF_END_MONTH = 6;
+    private static final int SECOND_HALF_START_MONTH = 7;
+    private static final int SECOND_HALF_END_MONTH = 12;
+    private static final int FIRST_DAY = 1;
+    private static final int LAST_DAY_FIRST_HALF = 30;
+    private static final int LAST_DAY_SECOND_HALF = 31;
     private final CollectionDAO collectionDAO;
     private final RecurringScheduleManager recurringScheduleManager;
 
@@ -25,7 +32,7 @@ public class CollectionManager {
      * @param recurringScheduleManager Manager for recurring schedule logic
      */
     public CollectionManager(final CollectionDAO collectionDAO,
-                             final RecurringScheduleManager recurringScheduleManager) {
+            final RecurringScheduleManager recurringScheduleManager) {
         this.collectionDAO = collectionDAO;
         this.recurringScheduleManager = recurringScheduleManager;
     }
@@ -123,5 +130,31 @@ public class CollectionManager {
     public Collection getActiveCollectionByRecurringSchedule(
             final RecurringSchedule schedule) {
         return collectionDAO.findActiveCollectionByRecurringSchedule(schedule);
+    }
+
+    /**
+     * Retrieves the collections for the first half of the specified year.
+     *
+     * @param year the year to filter collections by
+     * @return a list of collections occurring between January 1 and June 30 of the given
+     *         year
+     */
+    public List<Collection> getFirstHalfCollections(final int year) {
+        LocalDate start = LocalDate.of(year, FIRST_HALF_START_MONTH, FIRST_DAY);
+        LocalDate end = LocalDate.of(year, FIRST_HALF_END_MONTH, LAST_DAY_FIRST_HALF);
+        return collectionDAO.findByDateRange(start, end);
+    }
+
+    /**
+     * Retrieves the collections for the second half of the specified year.
+     *
+     * @param year the year to filter collections by
+     * @return a list of collections occurring between July 1 and December 31 of the given
+     *         year
+     */
+    public List<Collection> getSecondHalfCollections(final int year) {
+        LocalDate start = LocalDate.of(year, SECOND_HALF_START_MONTH, FIRST_DAY);
+        LocalDate end = LocalDate.of(year, SECOND_HALF_END_MONTH, LAST_DAY_SECOND_HALF);
+        return collectionDAO.findByDateRange(start, end);
     }
 }
