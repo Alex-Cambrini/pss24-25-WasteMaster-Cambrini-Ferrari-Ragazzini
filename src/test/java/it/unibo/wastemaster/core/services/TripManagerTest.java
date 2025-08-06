@@ -1,10 +1,19 @@
 package it.unibo.wastemaster.core.services;
 
-import static org.junit.jupiter.api.Assertions.*;
-
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 import it.unibo.wastemaster.core.AbstractDatabaseTest;
-import it.unibo.wastemaster.core.models.*;
+import it.unibo.wastemaster.core.models.Collection;
+import it.unibo.wastemaster.core.models.Customer;
+import it.unibo.wastemaster.core.models.Employee;
+import it.unibo.wastemaster.core.models.Location;
+import it.unibo.wastemaster.core.models.OneTimeSchedule;
+import it.unibo.wastemaster.core.models.RecurringSchedule;
+import it.unibo.wastemaster.core.models.Trip;
+import it.unibo.wastemaster.core.models.Vehicle;
+import it.unibo.wastemaster.core.models.Waste;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -13,6 +22,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 class TripManagerTest extends AbstractDatabaseTest {
+    private static final int VEHICLE_TEST_YEAR = 2020;
+    private static final int TRIP_EXPECTED_DURATION_HOURS = 5;
+    private static final int NEXT_COLLECTION_DAYS = 7;
 
     private Vehicle vehicle1;
     private Employee operator1, operator2;
@@ -25,37 +37,35 @@ class TripManagerTest extends AbstractDatabaseTest {
         super.setUp();
         getEntityManager().getTransaction().begin();
 
-        
-
-        vehicle1 = new Vehicle("AB123CD", "Iveco", "Daily", 2020,
-                Vehicle.RequiredLicence.C1,
-                Vehicle.VehicleStatus.IN_SERVICE, 3);
+        vehicle1 = new Vehicle("AB123CD", "Iveco", "Daily", VEHICLE_TEST_YEAR,
+            Vehicle.RequiredLicence.C1,
+            Vehicle.VehicleStatus.IN_SERVICE, 3);
 
         getVehicleDAO().insert(vehicle1);
 
         operator1 = new Employee("John", "Doe",
-                new Location("Via Roma", "10", "Bologna", "40100"),
-                "john.doe@example.com", "+391234567890",
-                Employee.Role.OPERATOR, Employee.Licence.C1);
+            new Location("Via Roma", "10", "Bologna", "40100"),
+            "john.doe@example.com", "+391234567890",
+            Employee.Role.OPERATOR, Employee.Licence.C1);
         operator2 = new Employee("Anna", "Rossi",
-                new Location("Via Milano", "22", "Milano", "20100"),
-                "anna.rossi@example.com", "+390987654321",
-                Employee.Role.OPERATOR, Employee.Licence.C1);
+            new Location("Via Milano", "22", "Milano", "20100"),
+            "anna.rossi@example.com", "+390987654321",
+            Employee.Role.OPERATOR, Employee.Licence.C1);
 
         getEmployeeDAO().insert(operator1);
         getEmployeeDAO().insert(operator2);
 
         departureTime = LocalDateTime.now().plusHours(1);
-        expectedReturnTime = departureTime.plusHours(5);
+        expectedReturnTime = departureTime.plusHours(TRIP_EXPECTED_DURATION_HOURS);
     }
 
     private List<Collection> createCollections() {
         Customer customer1 = new Customer("Mario", "Rossi",
-                new Location("Via Roma", "10", "Bologna", "40100"),
-                "mario.rossi@example.com", "1234567890");
+            new Location("Via Roma", "10", "Bologna", "40100"),
+            "mario.rossi@example.com", "1234567890");
         Customer customer2 = new Customer("Anna", "Bianchi",
-                new Location("Via Milano", "22", "Milano", "20100"),
-                "anna.bianchi@example.com", "0987654321");
+            new Location("Via Milano", "22", "Milano", "20100"),
+            "anna.bianchi@example.com", "0987654321");
 
         getCustomerDAO().insert(customer1);
         getCustomerDAO().insert(customer2);
@@ -66,9 +76,18 @@ class TripManagerTest extends AbstractDatabaseTest {
         getWasteDAO().insert(waste1);
         getWasteDAO().insert(waste2);
 
-        OneTimeSchedule oneTime1 = new OneTimeSchedule(customer1, waste1, LocalDate.now().plusDays(1));
-        RecurringSchedule recurring = new RecurringSchedule(customer2, waste2, LocalDate.now(), RecurringSchedule.Frequency.WEEKLY);
-        recurring.setNextCollectionDate(LocalDate.now().plusDays(7));
+        OneTimeSchedule oneTime1 = new OneTimeSchedule(
+        customer1,
+        waste1,
+        LocalDate.now().plusDays(1)
+        );
+        RecurringSchedule recurring = new RecurringSchedule(
+        customer2, 
+        waste2,
+        LocalDate.now(), 
+        RecurringSchedule.Frequency.WEEKLY
+        );
+        recurring.setNextCollectionDate(LocalDate.now().plusDays(NEXT_COLLECTION_DAYS));
 
         getOneTimeScheduleDAO().insert(oneTime1);
         getRecurringScheduleDAO().insert(recurring);
@@ -87,8 +106,8 @@ class TripManagerTest extends AbstractDatabaseTest {
         List<Collection> collections = createCollections();
 
         getTripManager().createTrip("40100", vehicle1,
-                List.of(operator1, operator2), departureTime,
-                expectedReturnTime, Trip.TripStatus.PENDING, collections);
+            List.of(operator1, operator2), departureTime,
+            expectedReturnTime, Trip.TripStatus.PENDING, collections);
 
         List<Trip> trips = getTripDAO().findAll();
         assertEquals(1, trips.size());
@@ -106,8 +125,8 @@ class TripManagerTest extends AbstractDatabaseTest {
         List<Collection> collections = createCollections();
 
         getTripManager().createTrip("40100", vehicle1,
-                List.of(operator1, operator2), departureTime,
-                expectedReturnTime, Trip.TripStatus.PENDING, collections);
+            List.of(operator1, operator2), departureTime,
+            expectedReturnTime, Trip.TripStatus.PENDING, collections);
 
         Trip trip = getTripDAO().findAll().get(0);
 
@@ -118,36 +137,38 @@ class TripManagerTest extends AbstractDatabaseTest {
     }
 
     @Test
-        void testUpdateTrip() {
+    void testUpdateTrip() {
         List<Collection> collections = createCollections();
 
         getTripManager().createTrip("40100", vehicle1,
-                List.of(operator1, operator2), departureTime,
-                expectedReturnTime, Trip.TripStatus.PENDING, collections);
+            List.of(operator1, operator2), departureTime,
+            expectedReturnTime, Trip.TripStatus.PENDING, collections);
 
         Trip trip = getTripDAO().findAll().get(0);
 
-        
-        getTripManager().updateTrip(trip.getTripId(), "20100", vehicle1,
-                new ArrayList<>(List.of(operator2)), 
-                departureTime.plusDays(1),
-                expectedReturnTime.plusDays(1), Trip.TripStatus.COMPLETED,
-                new ArrayList<>(collections)); 
+        getTripManager().updateTrip(
+            trip.getTripId(), "20100", vehicle1,
+            new ArrayList<>(List.of(operator2)),
+            departureTime.plusDays(1),
+            expectedReturnTime.plusDays(1),
+            Trip.TripStatus.COMPLETED,
+            new ArrayList<>(collections)
+        );
 
         Trip updated = getTripManager().getTripById(trip.getTripId());
         assertEquals("20100", updated.getPostalCodes());
         assertEquals(vehicle1.getPlate(), updated.getAssignedVehicle().getPlate());
         assertEquals(1, updated.getOperators().size());
         assertEquals(Trip.TripStatus.COMPLETED, updated.getStatus());
-        }
+    }
 
     @Test
     void testDeleteTrip() {
         List<Collection> collections = createCollections();
 
         getTripManager().createTrip("40100", vehicle1,
-                List.of(operator1, operator2), departureTime,
-                expectedReturnTime, Trip.TripStatus.PENDING, collections);
+            List.of(operator1, operator2), departureTime,
+            expectedReturnTime, Trip.TripStatus.PENDING, collections);
 
         Trip trip = getTripDAO().findAll().get(0);
         assertNotNull(trip);
