@@ -5,6 +5,7 @@ import it.unibo.wastemaster.core.dao.CollectionDAO;
 import it.unibo.wastemaster.core.dao.CustomerDAO;
 import it.unibo.wastemaster.core.dao.EmployeeDAO;
 import it.unibo.wastemaster.core.dao.GenericDAO;
+import it.unibo.wastemaster.core.dao.InvoiceDAO;
 import it.unibo.wastemaster.core.dao.OneTimeScheduleDAO;
 import it.unibo.wastemaster.core.dao.RecurringScheduleDAO;
 import it.unibo.wastemaster.core.dao.TripDAO;
@@ -16,6 +17,7 @@ import it.unibo.wastemaster.core.services.AccountManager;
 import it.unibo.wastemaster.core.services.CollectionManager;
 import it.unibo.wastemaster.core.services.CustomerManager;
 import it.unibo.wastemaster.core.services.EmployeeManager;
+import it.unibo.wastemaster.core.services.InvoiceManager;
 import it.unibo.wastemaster.core.services.OneTimeScheduleManager;
 import it.unibo.wastemaster.core.services.RecurringScheduleManager;
 import it.unibo.wastemaster.core.services.TripManager;
@@ -59,6 +61,7 @@ public abstract class AbstractDatabaseTest {
     private OneTimeScheduleDAO oneTimeScheduleDAO;
     private VehicleDAO vehicleDAO;
     private TripDAO tripDAO;
+    private InvoiceDAO invoiceDAO;
 
     // Service managers for business logic
     private AccountManager accountManager;
@@ -71,6 +74,7 @@ public abstract class AbstractDatabaseTest {
     private CollectionManager collectionManager;
     private VehicleManager vehicleManager;
     private TripManager tripManager;
+    private InvoiceManager invoiceManager;
 
     /**
      * Initializes the EntityManagerFactory before any test runs.
@@ -120,6 +124,7 @@ public abstract class AbstractDatabaseTest {
         collectionDAO = new CollectionDAO(em);
         vehicleDAO = new VehicleDAO(em);
         tripDAO = new TripDAO(em);
+        invoiceDAO = new InvoiceDAO(em);
 
         wasteManager = new WasteManager(wasteDAO);
         customerManager = new CustomerManager(customerDAO);
@@ -136,6 +141,7 @@ public abstract class AbstractDatabaseTest {
                 new OneTimeScheduleManager(oneTimeScheduleDAO, collectionManager);
         vehicleManager = new VehicleManager(vehicleDAO);
         tripManager = new TripManager(tripDAO);
+        invoiceManager = new InvoiceManager(invoiceDAO, collectionDAO);
     }
 
     /**
@@ -251,6 +257,15 @@ public abstract class AbstractDatabaseTest {
     }
 
     /**
+     * Returns the DAO for Invoice entities.
+     *
+     * @return the InvoiceDAO instance
+     */
+    protected InvoiceDAO getInvoiceDAO() {
+        return invoiceDAO;
+    }
+
+    /**
      * Returns the manager for Employee-related operations.
      *
      * @return the EmployeeManager instance
@@ -329,6 +344,15 @@ public abstract class AbstractDatabaseTest {
      */
     protected TripManager getTripManager() {
         return tripManager;
+    }
+
+    /**
+     * Returns the DaoManager instance.
+     *
+     * @return the DaoManager instance
+     */
+    protected InvoiceManager getInvoiceManager() {
+        return invoiceManager;
     }
 
     /**

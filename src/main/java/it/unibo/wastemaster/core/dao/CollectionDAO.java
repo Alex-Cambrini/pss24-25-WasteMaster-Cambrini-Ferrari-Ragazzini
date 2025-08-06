@@ -5,6 +5,7 @@ import it.unibo.wastemaster.core.models.RecurringSchedule;
 import it.unibo.wastemaster.core.models.Schedule;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.NoResultException;
+import java.time.LocalDate;
 import java.util.List;
 
 /**
@@ -69,5 +70,23 @@ public class CollectionDAO extends GenericDAO<Collection> {
         } catch (NoResultException e) {
             return null;
         }
+
+
+    }
+
+    /**
+     * Retrieves a list of Collection entities whose date field is between the specified
+     * start and end dates (inclusive).
+     *
+     * @param start the start date of the range (inclusive)
+     * @param end the end date of the range (inclusive)
+     * @return a list of Collection entities with dates between start and end
+     */
+    public List<Collection> findByDateRange(final LocalDate start, final LocalDate end) {
+        return getEntityManager().createQuery("""
+                SELECT c FROM Collection c
+                WHERE c.date BETWEEN :start AND :end
+                """, Collection.class).setParameter("start", start)
+                .setParameter("end", end).getResultList();
     }
 }
