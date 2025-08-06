@@ -40,9 +40,10 @@ public class EmployeeManager {
      * @param employee the employee to add
      * @param rawPassword the plain text password for the new account
      * @return the added employee
-     * @throws IllegalArgumentException if the email is already registered or inputs are invalid
+     * @throws IllegalArgumentException if the email is already registered or inputs
+     * are invalid
      */
-    public Employee addEmployee(Employee employee, String rawPassword) {
+    public Employee addEmployee(final Employee employee, final String rawPassword) {
         ValidateUtils.requireArgNotNull(employee, EMPLOYEE_NULL_MSG);
         ValidateUtils.requireArgNotNull(rawPassword, "Password cannot be null");
         ValidateUtils.validateEntity(employee);
