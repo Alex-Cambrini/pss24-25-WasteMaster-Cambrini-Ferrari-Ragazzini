@@ -19,8 +19,13 @@ public class AccountDAO extends GenericDAO<Account> {
         super(entityManager, Account.class);
     }
 
-    public Optional<Account> findAccountByEmployeeEmail
-            (String email) {
+    /**
+     * Finds an Account associated with the Employee who has the specified email.
+     *
+     * @param email the email of the Employee
+     * @return an Optional containing the Account if found, or empty if no result
+     */
+    public Optional<Account> findAccountByEmployeeEmail(final String email) {
         try {
             Account account = getEntityManager().createQuery(
                             "SELECT a FROM Account a JOIN a.employee e WHERE e.email = "
