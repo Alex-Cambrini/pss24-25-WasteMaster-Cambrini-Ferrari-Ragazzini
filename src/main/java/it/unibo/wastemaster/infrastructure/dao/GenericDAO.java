@@ -1,8 +1,9 @@
-package it.unibo.wastemaster.core.dao;
+package it.unibo.wastemaster.infrastructure.dao;
 
 import it.unibo.wastemaster.core.utils.TransactionHelper;
 import jakarta.persistence.EntityManager;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * GenericDAO class for managing entities.
@@ -82,10 +83,10 @@ public class GenericDAO<T> {
      * @param id the entity id (final)
      * @return the found entity or null
      */
-    public T findById(final int id) {
-        return entityManager.find(entityClass, id);
+    public Optional<T> findById(final int id) {
+        T entity = entityManager.find(entityClass, id);
+        return Optional.ofNullable(entity);
     }
-
     /**
      * Finds all entities of the given type.
      *
