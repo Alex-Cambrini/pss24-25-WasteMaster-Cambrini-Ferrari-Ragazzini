@@ -1,24 +1,19 @@
 package it.unibo.wastemaster.domain.service;
 
-import it.unibo.wastemaster.core.dao.CustomerDAO;
 import it.unibo.wastemaster.core.utils.ValidateUtils;
 import it.unibo.wastemaster.domain.model.Customer;
-import java.util.List;
+import it.unibo.wastemaster.domain.repository.CustomerRepository;
+import java.util.Optional;
 
 /**
  * Manages operations related to Customer entities.
  */
 public class CustomerManager {
 
-    private CustomerDAO customerDAO;
+    private final CustomerRepository customerRepository;
 
-    /**
-     * Constructs a CustomerManager with the specified DAO.
-     *
-     * @param customerDAO the DAO used for Customer persistence
-     */
-    public CustomerManager(final CustomerDAO customerDAO) {
-        this.customerDAO = customerDAO;
+    public CustomerManager(final CustomerRepository customerRepository) {
+        this.customerRepository = customerRepository;
     }
 
     /**
@@ -34,7 +29,7 @@ public class CustomerManager {
                     "Cannot add customer: the email address '%s' is already in use.",
                     customer.getEmail()));
         }
-        customerDAO.insert(customer);
+        customerRepository.save(customer);
         return customer;
     }
 
@@ -45,17 +40,7 @@ public class CustomerManager {
      * @return true if the email is registered, false otherwise
      */
     private boolean isEmailRegistered(final String email) {
-        return customerDAO.existsByEmail(email);
-    }
-
-    /**
-     * Retrieves a customer by its ID.
-     *
-     * @param customerId the ID of the customer
-     * @return the customer with the given ID, or null if not found
-     */
-    public Customer getCustomerById(final int customerId) {
-        return customerDAO.findById(customerId);
+        return customerRepository.existsByEmail(email);
     }
 
     /**
@@ -63,19 +48,20 @@ public class CustomerManager {
      *
      * @param toUpdateCustomer the customer with updated data
      * @throws IllegalArgumentException if the customer is invalid or the email is used by
-     * another customer
+     *         another customer
      */
     public void updateCustomer(final Customer toUpdateCustomer) {
         ValidateUtils.validateEntity(toUpdateCustomer);
         ValidateUtils.requireArgNotNull(toUpdateCustomer.getCustomerId(),
                 "Customer ID cannot be null");
-        Customer existing = customerDAO.findByEmail(toUpdateCustomer.getEmail());
-        if (existing != null
-                && !existing.getCustomerId().equals(toUpdateCustomer.getCustomerId())) {
+        Optional<Customer> existingOpt =
+                customerRepository.findByEmail(toUpdateCustomer.getEmail());
+        if (existingOpt.isPresent() && !existingOpt.get().getCustomerId()
+                .equals(toUpdateCustomer.getCustomerId())) {
             throw new IllegalArgumentException(
                     "Email is already used by another customer.");
         }
-        customerDAO.update(toUpdateCustomer);
+        customerRepository.update(toUpdateCustomer);
     }
 
     /**
@@ -95,14 +81,5 @@ public class CustomerManager {
         } catch (IllegalArgumentException e) {
             return false;
         }
-    }
-
-    /**
-     * Returns all customers.
-     *
-     * @return list of all customers
-     */
-    public List<Customer> getAllCustomers() {
-        return customerDAO.findAll();
     }
 }
