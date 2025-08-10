@@ -1,6 +1,7 @@
 package it.unibo.wastemaster.core.dao;
 
-import it.unibo.wastemaster.core.models.OneTimeSchedule;
+import it.unibo.wastemaster.domain.model.OneTimeSchedule;
+import it.unibo.wastemaster.infrastructure.dao.GenericDAO;
 import jakarta.persistence.EntityManager;
 
 /**

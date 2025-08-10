@@ -4,8 +4,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import it.unibo.wastemaster.core.AbstractDatabaseTest;
-import it.unibo.wastemaster.core.models.Waste;
-import it.unibo.wastemaster.core.models.WasteSchedule;
+import it.unibo.wastemaster.domain.model.Waste;
+import it.unibo.wastemaster.domain.model.WasteSchedule;
 import java.time.DayOfWeek;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

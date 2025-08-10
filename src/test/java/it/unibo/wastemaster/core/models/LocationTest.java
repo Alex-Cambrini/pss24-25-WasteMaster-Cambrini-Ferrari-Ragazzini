@@ -8,6 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import it.unibo.wastemaster.core.AbstractDatabaseTest;
 import it.unibo.wastemaster.core.utils.ValidateUtils;
+import it.unibo.wastemaster.domain.model.Location;
 import jakarta.validation.ConstraintViolation;
 import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;

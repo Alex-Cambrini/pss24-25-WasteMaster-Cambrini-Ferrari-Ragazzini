@@ -6,9 +6,9 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import it.unibo.wastemaster.core.AbstractDatabaseTest;
-import it.unibo.wastemaster.core.models.Vehicle;
-import it.unibo.wastemaster.core.models.Vehicle.RequiredLicence;
-import it.unibo.wastemaster.core.models.Vehicle.VehicleStatus;
+import it.unibo.wastemaster.domain.model.Vehicle;
+import it.unibo.wastemaster.domain.model.Vehicle.RequiredLicence;
+import it.unibo.wastemaster.domain.model.Vehicle.VehicleStatus;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

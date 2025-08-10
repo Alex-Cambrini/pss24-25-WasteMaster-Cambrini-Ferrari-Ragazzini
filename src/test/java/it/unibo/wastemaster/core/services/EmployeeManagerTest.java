@@ -9,11 +9,11 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import it.unibo.wastemaster.core.AbstractDatabaseTest;
-import it.unibo.wastemaster.core.models.Employee;
-import it.unibo.wastemaster.core.models.Employee.Licence;
-import it.unibo.wastemaster.core.models.Employee.Role;
-import it.unibo.wastemaster.core.models.Location;
-import it.unibo.wastemaster.core.models.Vehicle;
+import it.unibo.wastemaster.domain.model.Employee;
+import it.unibo.wastemaster.domain.model.Location;
+import it.unibo.wastemaster.domain.model.Vehicle;
+import it.unibo.wastemaster.domain.model.Employee.Licence;
+import it.unibo.wastemaster.domain.model.Employee.Role;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
