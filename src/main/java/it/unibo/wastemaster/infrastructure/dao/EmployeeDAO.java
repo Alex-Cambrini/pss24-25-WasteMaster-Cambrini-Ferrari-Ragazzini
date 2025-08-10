@@ -1,9 +1,8 @@
-package it.unibo.wastemaster.core.dao;
+package it.unibo.wastemaster.infrastructure.dao;
 
 import jakarta.persistence.EntityManager;
 import java.util.List;
 import it.unibo.wastemaster.domain.model.Employee;
-import it.unibo.wastemaster.infrastructure.dao.GenericDAO;
 
 /**
  * DAO for managing Employee entities.
