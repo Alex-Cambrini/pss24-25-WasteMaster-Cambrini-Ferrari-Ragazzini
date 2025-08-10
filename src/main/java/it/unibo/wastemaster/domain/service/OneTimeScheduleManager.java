@@ -1,6 +1,5 @@
 package it.unibo.wastemaster.domain.service;
 
-import it.unibo.wastemaster.core.dao.OneTimeScheduleDAO;
 import it.unibo.wastemaster.core.utils.ValidateUtils;
 import it.unibo.wastemaster.domain.model.Collection;
 import it.unibo.wastemaster.domain.model.Customer;
@@ -8,6 +7,7 @@ import it.unibo.wastemaster.domain.model.OneTimeSchedule;
 import it.unibo.wastemaster.domain.model.Waste;
 import it.unibo.wastemaster.domain.model.Collection.CollectionStatus;
 import it.unibo.wastemaster.domain.model.Schedule.ScheduleStatus;
+import it.unibo.wastemaster.domain.repository.OneTimeScheduleRepository;
 import java.time.LocalDate;
 
 /**
@@ -15,18 +15,18 @@ import java.time.LocalDate;
  */
 public class OneTimeScheduleManager {
 
-    private final OneTimeScheduleDAO oneTimeScheduleDAO;
+    private final OneTimeScheduleRepository oneTimeScheduleRepository;
     private final CollectionManager collectionManager;
 
     /**
      * Constructs a OneTimeScheduleManager with required dependencies.
      *
-     * @param oneTimeScheduleDAO the DAO for OneTimeSchedule persistence
+     * @param oneTimeScheduleRepository the DAO for OneTimeSchedule persistence
      * @param collectionManager the manager handling related collection logic
      */
-    public OneTimeScheduleManager(final OneTimeScheduleDAO oneTimeScheduleDAO,
+    public OneTimeScheduleManager(final OneTimeScheduleRepository oneTimeScheduleRepository,
                                   final CollectionManager collectionManager) {
-        this.oneTimeScheduleDAO = oneTimeScheduleDAO;
+        this.oneTimeScheduleRepository = oneTimeScheduleRepository;
         this.collectionManager = collectionManager;
     }
 
@@ -47,7 +47,7 @@ public class OneTimeScheduleManager {
                     + Collection.CANCEL_LIMIT_DAYS + " days from now.");
         }
         final OneTimeSchedule schedule = new OneTimeSchedule(customer, waste, pickupDate);
-        oneTimeScheduleDAO.insert(schedule);
+        oneTimeScheduleRepository.save(schedule);
         collectionManager.generateOneTimeCollection(schedule);
         return schedule;
     }
@@ -87,7 +87,7 @@ public class OneTimeScheduleManager {
 
         if (isDateValid(schedule.getPickupDate(), collection.getCancelLimitDays())) {
             schedule.setScheduleStatus(ScheduleStatus.CANCELLED);
-            oneTimeScheduleDAO.update(schedule);
+            oneTimeScheduleRepository.update(schedule);
             collection.setCollectionStatus(CollectionStatus.CANCELLED);
             collectionManager.updateCollection(collection);
             return true;
