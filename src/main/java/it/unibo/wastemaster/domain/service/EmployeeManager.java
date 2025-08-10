@@ -6,7 +6,6 @@ import it.unibo.wastemaster.core.utils.ValidateUtils;
 import it.unibo.wastemaster.domain.model.Employee;
 import it.unibo.wastemaster.domain.model.Vehicle;
 import it.unibo.wastemaster.domain.repository.EmployeeRepository;
-import it.unibo.wastemaster.infrastructure.dao.EmployeeDAO;
 import jakarta.persistence.EntityManager;
 
 /**
