@@ -1,8 +1,8 @@
-package it.unibo.wastemaster.core.services;
+package it.unibo.wastemaster.domain.service;
 
 import it.unibo.wastemaster.core.dao.VehicleDAO;
-import it.unibo.wastemaster.core.models.Vehicle;
 import it.unibo.wastemaster.core.utils.ValidateUtils;
+import it.unibo.wastemaster.domain.model.Vehicle;
 import java.time.LocalDate;
 
 /**

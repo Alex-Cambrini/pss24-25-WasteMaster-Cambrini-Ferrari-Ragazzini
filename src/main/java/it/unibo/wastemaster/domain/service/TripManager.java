@@ -1,10 +1,10 @@
-package it.unibo.wastemaster.core.services;
+package it.unibo.wastemaster.domain.service;
 
 import it.unibo.wastemaster.core.dao.TripDAO;
-import it.unibo.wastemaster.core.models.Collection;
-import it.unibo.wastemaster.core.models.Employee;
-import it.unibo.wastemaster.core.models.Trip;
-import it.unibo.wastemaster.core.models.Vehicle;
+import it.unibo.wastemaster.domain.model.Collection;
+import it.unibo.wastemaster.domain.model.Employee;
+import it.unibo.wastemaster.domain.model.Trip;
+import it.unibo.wastemaster.domain.model.Vehicle;
 import java.time.LocalDateTime;
 import java.util.List;
 

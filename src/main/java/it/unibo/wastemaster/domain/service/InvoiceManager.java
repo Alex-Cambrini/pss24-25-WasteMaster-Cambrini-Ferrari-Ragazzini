@@ -1,10 +1,10 @@
-package it.unibo.wastemaster.core.services;
+package it.unibo.wastemaster.domain.service;
 
 import it.unibo.wastemaster.core.dao.CollectionDAO;
 import it.unibo.wastemaster.core.dao.InvoiceDAO;
-import it.unibo.wastemaster.core.models.Collection;
-import it.unibo.wastemaster.core.models.Customer;
-import it.unibo.wastemaster.core.models.Invoice;
+import it.unibo.wastemaster.domain.model.Collection;
+import it.unibo.wastemaster.domain.model.Customer;
+import it.unibo.wastemaster.domain.model.Invoice;
 import java.time.LocalDate;
 import java.time.Month;
 import java.util.ArrayList;

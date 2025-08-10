@@ -1,4 +1,4 @@
-package it.unibo.wastemaster.core.models;
+package it.unibo.wastemaster.domain.model;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
