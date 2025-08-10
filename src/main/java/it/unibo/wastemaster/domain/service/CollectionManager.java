@@ -1,12 +1,12 @@
 package it.unibo.wastemaster.domain.service;
 
-import it.unibo.wastemaster.core.dao.CollectionDAO;
 import it.unibo.wastemaster.core.utils.ValidateUtils;
 import it.unibo.wastemaster.domain.model.Collection;
 import it.unibo.wastemaster.domain.model.OneTimeSchedule;
 import it.unibo.wastemaster.domain.model.RecurringSchedule;
 import it.unibo.wastemaster.domain.model.Schedule;
 import it.unibo.wastemaster.domain.model.Collection.CollectionStatus;
+import it.unibo.wastemaster.domain.repository.CollectionRepository;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -22,18 +22,18 @@ public class CollectionManager {
     private static final int FIRST_DAY = 1;
     private static final int LAST_DAY_FIRST_HALF = 30;
     private static final int LAST_DAY_SECOND_HALF = 31;
-    private final CollectionDAO collectionDAO;
+    private final CollectionRepository collectionRepository;
     private final RecurringScheduleManager recurringScheduleManager;
 
     /**
      * Constructs a CollectionManager with the necessary dependencies.
      *
-     * @param collectionDAO DAO used for Collection persistence
+     * @param collectionRepository DAO used for Collection persistence
      * @param recurringScheduleManager Manager for recurring schedule logic
      */
-    public CollectionManager(final CollectionDAO collectionDAO,
+    public CollectionManager(final CollectionRepository collectionRepository,
             final RecurringScheduleManager recurringScheduleManager) {
-        this.collectionDAO = collectionDAO;
+        this.collectionRepository = collectionRepository;
         this.recurringScheduleManager = recurringScheduleManager;
     }
 
@@ -44,7 +44,7 @@ public class CollectionManager {
      * @return a list of collections with the given status
      */
     public List<Collection> getCollectionsByStatus(final CollectionStatus status) {
-        return collectionDAO.findCollectionByStatus(status);
+        return collectionRepository.findByStatus(status);
     }
 
     /**
@@ -54,7 +54,7 @@ public class CollectionManager {
      * @return list of associated collections
      */
     public List<Collection> getAllCollectionBySchedule(final Schedule schedule) {
-        return collectionDAO.findAllCollectionsBySchedule(schedule);
+        return collectionRepository.findAllBySchedule(schedule);
     }
 
     /**
@@ -65,7 +65,7 @@ public class CollectionManager {
     public void generateCollection(final Schedule schedule) {
         if (schedule.getCollectionDate().isAfter(LocalDate.now())) {
             final Collection collection = new Collection(schedule);
-            collectionDAO.insert(collection);
+            collectionRepository.save(collection);
         }
     }
 
@@ -117,19 +117,7 @@ public class CollectionManager {
      * @param collection the collection to update
      */
     public void updateCollection(final Collection collection) {
-        collectionDAO.update(collection);
-    }
-
-    /**
-     * Retrieves the currently active collection associated with a given recurring
-     * schedule.
-     *
-     * @param schedule the recurring schedule
-     * @return the active collection, or null if none exists
-     */
-    public Collection getActiveCollectionByRecurringSchedule(
-            final RecurringSchedule schedule) {
-        return collectionDAO.findActiveCollectionByRecurringSchedule(schedule);
+        collectionRepository.update(collection);
     }
 
     /**
@@ -142,7 +130,7 @@ public class CollectionManager {
     public List<Collection> getFirstHalfCollections(final int year) {
         LocalDate start = LocalDate.of(year, FIRST_HALF_START_MONTH, FIRST_DAY);
         LocalDate end = LocalDate.of(year, FIRST_HALF_END_MONTH, LAST_DAY_FIRST_HALF);
-        return collectionDAO.findByDateRange(start, end);
+        return collectionRepository.findByDateRange(start, end);
     }
 
     /**
@@ -155,6 +143,6 @@ public class CollectionManager {
     public List<Collection> getSecondHalfCollections(final int year) {
         LocalDate start = LocalDate.of(year, SECOND_HALF_START_MONTH, FIRST_DAY);
         LocalDate end = LocalDate.of(year, SECOND_HALF_END_MONTH, LAST_DAY_SECOND_HALF);
-        return collectionDAO.findByDateRange(start, end);
+        return collectionRepository.findByDateRange(start, end);
     }
 }

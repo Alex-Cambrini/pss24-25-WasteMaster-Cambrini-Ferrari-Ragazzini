@@ -1,4 +1,4 @@
-package it.unibo.wastemaster.core.dao;
+package it.unibo.wastemaster.infrastructure.dao;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.NoResultException;
@@ -7,7 +7,6 @@ import java.util.List;
 import it.unibo.wastemaster.domain.model.Collection;
 import it.unibo.wastemaster.domain.model.RecurringSchedule;
 import it.unibo.wastemaster.domain.model.Schedule;
-import it.unibo.wastemaster.infrastructure.dao.GenericDAO;
 
 /**
  * DAO for {@link Collection} entity operations.
