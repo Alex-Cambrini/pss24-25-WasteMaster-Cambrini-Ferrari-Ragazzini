@@ -1,10 +1,12 @@
 package it.unibo.wastemaster.domain.service;
 
-import it.unibo.wastemaster.core.dao.EmployeeDAO;
+import java.util.Optional;
 import it.unibo.wastemaster.core.utils.TransactionHelper;
 import it.unibo.wastemaster.core.utils.ValidateUtils;
 import it.unibo.wastemaster.domain.model.Employee;
 import it.unibo.wastemaster.domain.model.Vehicle;
+import it.unibo.wastemaster.domain.repository.EmployeeRepository;
+import it.unibo.wastemaster.infrastructure.dao.EmployeeDAO;
 import jakarta.persistence.EntityManager;
 
 /**
@@ -14,34 +16,33 @@ import jakarta.persistence.EntityManager;
 public class EmployeeManager {
 
     private static final String EMPLOYEE_NULL_MSG = "Employee cannot be null";
-    private final EmployeeDAO employeeDAO;
+    private final EmployeeRepository employeeRepository;
     private final EntityManager entityManager;
     private final AccountManager accountManager;
 
     /**
      * Constructs an EmployeeManager with the given dependencies.
      *
-     * @param employeeDAO the DAO used for employee persistence
+     * @param employeeRepository the DAO used for employee persistence
      * @param entityManager the EntityManager used for transaction management
      * @param accountManager the manager responsible for account operations
      */
-    public EmployeeManager(final EmployeeDAO employeeDAO,
-                           final EntityManager entityManager,
-                           final AccountManager accountManager) {
-        this.employeeDAO = employeeDAO;
+    public EmployeeManager(final EmployeeRepository employeeRepository,
+            final EntityManager entityManager, final AccountManager accountManager) {
+        this.employeeRepository = employeeRepository;
         this.entityManager = entityManager;
         this.accountManager = accountManager;
     }
 
     /**
-     * Adds a new employee along with an associated account after validation and
-     * email uniqueness check.
+     * Adds a new employee along with an associated account after validation and email
+     * uniqueness check.
      *
      * @param employee the employee to add
      * @param rawPassword the plain text password for the new account
      * @return the added employee
-     * @throws IllegalArgumentException if the email is already registered or inputs
-     * are invalid
+     * @throws IllegalArgumentException if the email is already registered or inputs are
+     *         invalid
      */
     public Employee addEmployee(final Employee employee, final String rawPassword) {
         ValidateUtils.requireArgNotNull(employee, EMPLOYEE_NULL_MSG);
@@ -53,7 +54,7 @@ public class EmployeeManager {
         }
 
         TransactionHelper.executeTransaction(entityManager, () -> {
-            employeeDAO.insert(employee);
+            employeeRepository.save(employee);
             accountManager.createAccount(employee, rawPassword);
         });
         return employee;
@@ -66,17 +67,7 @@ public class EmployeeManager {
      * @return true if the email is registered, false otherwise
      */
     private boolean isEmailRegistered(final String email) {
-        return employeeDAO.existsByEmail(email);
-    }
-
-    /**
-     * Retrieves an employee by ID.
-     *
-     * @param employeeId the ID of the employee
-     * @return the employee if found, null otherwise
-     */
-    public Employee getEmployeeById(final int employeeId) {
-        return employeeDAO.findById(employeeId);
+        return employeeRepository.existsByEmail(email);
     }
 
     /**
@@ -84,21 +75,23 @@ public class EmployeeManager {
      *
      * @param toUpdateEmployee the employee to update
      * @throws IllegalArgumentException if the ID is null or email is used by another
-     * employee
+     *         employee
      */
     public void updateEmployee(final Employee toUpdateEmployee) {
         ValidateUtils.validateEntity(toUpdateEmployee);
         ValidateUtils.requireArgNotNull(toUpdateEmployee.getEmployeeId(),
                 "Employee ID cannot be null");
 
-        final Employee existing = employeeDAO.findByEmail(toUpdateEmployee.getEmail());
-        if (existing != null
-                && !existing.getEmployeeId().equals(toUpdateEmployee.getEmployeeId())) {
+        final Optional<Employee> existingOpt =
+                employeeRepository.findByEmail(toUpdateEmployee.getEmail());
+        if (existingOpt.isPresent() && !existingOpt.get().getEmployeeId()
+                .equals(toUpdateEmployee.getEmployeeId())) {
             throw new IllegalArgumentException(
                     "Email is already used by another employee.");
         }
-        employeeDAO.update(toUpdateEmployee);
+        employeeRepository.update(toUpdateEmployee);
     }
+
 
     /**
      * Performs a soft delete by marking the employee as deleted and updating it in the
