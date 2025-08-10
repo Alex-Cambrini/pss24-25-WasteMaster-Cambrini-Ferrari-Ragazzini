@@ -1,10 +1,9 @@
-package it.unibo.wastemaster.core.dao;
+package it.unibo.wastemaster.infrastructure.dao;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.NoResultException;
 import java.util.List;
 import it.unibo.wastemaster.domain.model.Vehicle;
-import it.unibo.wastemaster.infrastructure.dao.GenericDAO;
 
 /**
  * DAO for managing Vehicle entities.
