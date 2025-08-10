@@ -1,0 +1,57 @@
+package it.unibo.wastemaster.domain.repository.impl;
+
+import jakarta.persistence.EntityManager;
+import it.unibo.wastemaster.domain.model.Collection;
+import it.unibo.wastemaster.domain.model.Collection.CollectionStatus;
+import it.unibo.wastemaster.domain.model.Schedule;
+import it.unibo.wastemaster.domain.repository.CollectionRepository;
+import it.unibo.wastemaster.infrastructure.dao.CollectionDAO;
+import it.unibo.wastemaster.domain.model.RecurringSchedule;
+
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Optional;
+
+public class CollectionRepositoryImpl implements CollectionRepository {
+
+    private final CollectionDAO collectionDAO;
+
+    public CollectionRepositoryImpl(EntityManager entityManager) {
+        this.collectionDAO = new CollectionDAO(entityManager);
+    }
+
+    @Override
+    public List<Collection> findAllBySchedule(Schedule schedule) {
+        return collectionDAO.findAllCollectionsBySchedule(schedule);
+    }
+
+    @Override
+    public List<Collection> findByStatus(CollectionStatus status) {
+        return collectionDAO.findCollectionByStatus(status);
+    }
+
+    @Override
+    public Optional<Collection> findActiveByRecurringSchedule(RecurringSchedule schedule) {
+        return Optional.ofNullable(collectionDAO.findActiveCollectionByRecurringSchedule(schedule));
+    }
+
+    @Override
+    public List<Collection> findByDateRange(LocalDate start, LocalDate end) {
+        return collectionDAO.findByDateRange(start, end);
+    }
+
+    @Override
+    public void update(Collection collection) {
+        collectionDAO.update(collection);
+    }
+
+    @Override
+    public void save(Collection collection) {
+        collectionDAO.insert(collection);
+    }
+
+    @Override
+    public void delete(Collection collection) {
+        collectionDAO.delete(collection);
+    }
+}
