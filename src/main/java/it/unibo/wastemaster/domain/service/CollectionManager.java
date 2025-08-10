@@ -70,6 +70,18 @@ public class CollectionManager {
     }
 
     /**
+     * Retrieves the currently active collection associated with a given recurring
+     * schedule.
+     *
+     * @param schedule the recurring schedule
+     * @return the active collection, or null if none exists
+     */
+public Optional<Collection> getActiveCollectionByRecurringSchedule(final RecurringSchedule schedule) {
+    return collectionRepository.findActiveByRecurringSchedule(schedule);
+}
+
+
+    /**
      * Generates a collection specifically for a one-time schedule.
      *
      * @param schedule the one-time schedule
