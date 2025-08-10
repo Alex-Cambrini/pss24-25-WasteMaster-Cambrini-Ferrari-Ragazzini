@@ -1,30 +1,31 @@
-package it.unibo.wastemaster.core.services;
+package it.unibo.wastemaster.domain.service;
 
-import it.unibo.wastemaster.core.dao.AccountDAO;
-import it.unibo.wastemaster.core.models.Account;
-import it.unibo.wastemaster.core.models.Employee;
+import it.unibo.wastemaster.domain.exception.AccountCreationException;
+import it.unibo.wastemaster.domain.model.Account;
+import it.unibo.wastemaster.domain.model.Employee;
+import it.unibo.wastemaster.domain.repository.AccountRepository;
 import org.mindrot.jbcrypt.BCrypt;
 
 /**
- * Service class responsible for managing Account entities,
- * including account creation and password hashing.
+ * Service class responsible for managing Account entities, including account creation and
+ * password hashing.
  */
 public class AccountManager {
 
-    private final AccountDAO accountDAO;
+    private final AccountRepository accountRepository;
 
     /**
      * Constructs an AccountManager with the given AccountDAO.
      *
      * @param accountDAO the DAO used for account persistence operations
      */
-    public AccountManager(final AccountDAO accountDAO) {
-        this.accountDAO = accountDAO;
+    public AccountManager(final AccountRepository accountRepository) {
+        this.accountRepository = accountRepository;
     }
 
     /**
-     * Creates a new Account for the given Employee with the raw password.
-     * The password is hashed using BCrypt before storing.
+     * Creates a new Account for the given Employee with the raw password. The password is
+     * hashed using BCrypt before storing.
      *
      * @param employee the employee to associate with the new account
      * @param rawPassword the plain text password to hash and store
@@ -41,14 +42,14 @@ public class AccountManager {
                     "Password must be at least 8 characters long and include at least "
                             + "one letter and one number.");
         }
+        String passwordHash = hashPassword(rawPassword);
+        Account newAccount = new Account(passwordHash, employee);
 
         try {
-            String passwordHash = hashPassword(rawPassword);
-            Account newAccount = new Account(passwordHash, employee);
-            accountDAO.insert(newAccount);
+            accountRepository.save(newAccount);
             return newAccount;
         } catch (Exception e) {
-            throw new RuntimeException("Failed to create account: " + e.getMessage(), e);
+            throw new AccountCreationException("Failed to create account", e);
         }
     }
 

@@ -1,13 +1,13 @@
-package it.unibo.wastemaster.core.services;
+package it.unibo.wastemaster.domain.service;
 
 import it.unibo.wastemaster.core.dao.OneTimeScheduleDAO;
-import it.unibo.wastemaster.core.models.Collection;
-import it.unibo.wastemaster.core.models.Collection.CollectionStatus;
-import it.unibo.wastemaster.core.models.Customer;
-import it.unibo.wastemaster.core.models.OneTimeSchedule;
-import it.unibo.wastemaster.core.models.Schedule.ScheduleStatus;
-import it.unibo.wastemaster.core.models.Waste;
 import it.unibo.wastemaster.core.utils.ValidateUtils;
+import it.unibo.wastemaster.domain.model.Collection;
+import it.unibo.wastemaster.domain.model.Customer;
+import it.unibo.wastemaster.domain.model.OneTimeSchedule;
+import it.unibo.wastemaster.domain.model.Waste;
+import it.unibo.wastemaster.domain.model.Collection.CollectionStatus;
+import it.unibo.wastemaster.domain.model.Schedule.ScheduleStatus;
 import java.time.LocalDate;
 
 /**

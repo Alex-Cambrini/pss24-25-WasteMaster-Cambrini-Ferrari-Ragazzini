@@ -1,7 +1,7 @@
-package it.unibo.wastemaster.core.services;
+package it.unibo.wastemaster.domain.service;
 
 import it.unibo.wastemaster.core.dao.AccountDAO;
-import it.unibo.wastemaster.core.models.Account;
+import it.unibo.wastemaster.domain.model.Account;
 import java.util.Optional;
 import org.mindrot.jbcrypt.BCrypt;
 

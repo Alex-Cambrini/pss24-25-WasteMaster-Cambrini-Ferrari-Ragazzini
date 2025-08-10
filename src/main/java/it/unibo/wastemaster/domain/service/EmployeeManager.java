@@ -1,10 +1,10 @@
-package it.unibo.wastemaster.core.services;
+package it.unibo.wastemaster.domain.service;
 
 import it.unibo.wastemaster.core.dao.EmployeeDAO;
-import it.unibo.wastemaster.core.models.Employee;
-import it.unibo.wastemaster.core.models.Vehicle;
 import it.unibo.wastemaster.core.utils.TransactionHelper;
 import it.unibo.wastemaster.core.utils.ValidateUtils;
+import it.unibo.wastemaster.domain.model.Employee;
+import it.unibo.wastemaster.domain.model.Vehicle;
 import jakarta.persistence.EntityManager;
 
 /**
