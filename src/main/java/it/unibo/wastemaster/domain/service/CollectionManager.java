@@ -9,6 +9,7 @@ import it.unibo.wastemaster.domain.model.Collection.CollectionStatus;
 import it.unibo.wastemaster.domain.repository.CollectionRepository;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Manages the creation, retrieval, and cancellation of waste collections.
@@ -76,9 +77,10 @@ public class CollectionManager {
      * @param schedule the recurring schedule
      * @return the active collection, or null if none exists
      */
-public Optional<Collection> getActiveCollectionByRecurringSchedule(final RecurringSchedule schedule) {
-    return collectionRepository.findActiveByRecurringSchedule(schedule);
-}
+    public Optional<Collection> getActiveCollectionByRecurringSchedule(
+            final RecurringSchedule schedule) {
+        return collectionRepository.findActiveByRecurringSchedule(schedule);
+    }
 
 
     /**
