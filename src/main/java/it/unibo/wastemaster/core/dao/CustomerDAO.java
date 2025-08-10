@@ -1,8 +1,9 @@
 package it.unibo.wastemaster.core.dao;
 
-import it.unibo.wastemaster.core.models.Customer;
 import jakarta.persistence.EntityManager;
 import java.util.List;
+import it.unibo.wastemaster.domain.model.Customer;
+import it.unibo.wastemaster.infrastructure.dao.GenericDAO;
 
 /**
  * DAO for managing Customer entities.

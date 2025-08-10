@@ -1,17 +1,16 @@
 package it.unibo.wastemaster.core.services;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
-
-import it.unibo.wastemaster.core.AbstractDatabaseTest;
-import it.unibo.wastemaster.core.models.Collection;
-import it.unibo.wastemaster.core.models.Customer;
-import it.unibo.wastemaster.core.models.Employee;
-import it.unibo.wastemaster.core.models.Location;
-import it.unibo.wastemaster.core.models.OneTimeSchedule;
-import it.unibo.wastemaster.core.models.RecurringSchedule;
-import it.unibo.wastemaster.core.models.Trip;
+import static org.junit.jupiter.api.Assertions.assertNo
+import it.unibo.wastemaster.domain.models.Collection;
+import it.unibo.wastemaster.domain.models.Customer;
+import it.unibo.wastemaster.domain.models.Employee;
+import it.unibo.wastemaster.domain.models.Location;
+import it.unibo.wastemaster.domain.models.OneTimeSchedule;
+import it.unibo.wastemaster.domain.models.RecurringSchedule;
+import it.unibo.wastemaster.domain.models.Trip;
+import it.unibo.wastemaster.domain.models.Vehicle;
+import it.unibo.wastemaster.domain.models.Waste;emaster.core.models.Trip;
 import it.unibo.wastemaster.core.models.Vehicle;
 import it.unibo.wastemaster.core.models.Waste;
 import java.time.LocalDate;
