@@ -7,9 +7,10 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import it.unibo.wastemaster.core.AbstractDatabaseTest;
-import it.unibo.wastemaster.core.models.Customer;
-import it.unibo.wastemaster.core.models.Location;
+import it.unibo.wastemaster.domain.model.Customer;
+import it.unibo.wastemaster.domain.model.Location;
 import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -43,18 +44,20 @@ public class GenericDAOTest extends AbstractDatabaseTest {
         getLocationDAO().insert(location1);
         getCustomerDAO().insert(customer1);
 
-        Location foundLocation =
-                getLocationDAO().findById(location1.getId());
-        assertNotNull(foundLocation);
-        assertEquals(location1.getStreet(), foundLocation.getStreet());
-        assertEquals(location1.getCivicNumber(), foundLocation.getCivicNumber());
-        assertEquals(location1.getCity(), foundLocation.getCity());
-        assertEquals(location1.getPostalCode(), foundLocation.getPostalCode());
+        Optional<Location> foundLocation = getLocationDAO().findById(location1.getId());
+        assertTrue(foundLocation.isPresent());
+        Location location = foundLocation.get();
+        assertEquals(location1.getStreet(), location.getStreet());
+        assertEquals(location1.getCivicNumber(), location.getCivicNumber());
+        assertEquals(location1.getCity(), location.getCity());
+        assertEquals(location1.getPostalCode(), location.getPostalCode());
 
-        Customer foundCustomer = getCustomerDAO().findById(customer1.getCustomerId());
-        assertNotNull(foundCustomer);
-        assertEquals(customer1.getName(), foundCustomer.getName());
-        assertEquals(customer1.getSurname(), foundCustomer.getSurname());
+        Optional<Customer> foundCustomer =
+                getCustomerDAO().findById(customer1.getCustomerId());
+        assertTrue(foundCustomer.isPresent());
+        Customer customer = foundCustomer.get();
+        assertEquals(customer1.getName(), customer.getName());
+        assertEquals(customer1.getSurname(), customer.getSurname());
     }
 
     @Test
@@ -71,11 +74,17 @@ public class GenericDAOTest extends AbstractDatabaseTest {
         customer1.setSurname(updatedSurname);
         getCustomerDAO().update(customer1);
 
-        Location updatedLocation = getLocationDAO().findById(location1.getId());
+        Optional<Location> updatedLocationOpt =
+                getLocationDAO().findById(location1.getId());
+        assertTrue(updatedLocationOpt.isPresent());
+        Location updatedLocation = updatedLocationOpt.get();
         assertEquals("Via Torino", updatedLocation.getStreet());
         assertEquals("99", updatedLocation.getCivicNumber());
 
-        Customer updatedCustomer = getCustomerDAO().findById(customer1.getCustomerId());
+        Optional<Customer> updatedCustomerOpt =
+                getCustomerDAO().findById(customer1.getCustomerId());
+        assertTrue(updatedCustomerOpt.isPresent());
+        Customer updatedCustomer = updatedCustomerOpt.get();
         assertEquals("Giovanni", updatedCustomer.getName());
         assertEquals(updatedSurname, updatedCustomer.getSurname());
     }
@@ -103,13 +112,14 @@ public class GenericDAOTest extends AbstractDatabaseTest {
         getLocationDAO().insert(location1);
         getCustomerDAO().insert(customer1);
 
-        Location foundLocation = getLocationDAO().findById(location1.getId());
-        assertNotNull(foundLocation);
-        assertEquals(location1.getId(), foundLocation.getId());
+        Optional<Location> foundLocation = getLocationDAO().findById(location1.getId());
+        assertTrue(foundLocation.isPresent());
+        assertEquals(location1.getId(), foundLocation.get().getId());
 
-        Customer foundCustomer = getCustomerDAO().findById(customer1.getCustomerId());
-        assertNotNull(foundCustomer);
-        assertEquals(customer1.getCustomerId(), foundCustomer.getCustomerId());
+        Optional<Customer> foundCustomer =
+                getCustomerDAO().findById(customer1.getCustomerId());
+        assertTrue(foundCustomer.isPresent());
+        assertEquals(customer1.getCustomerId(), foundCustomer.get().getCustomerId());
     }
 
     @Test

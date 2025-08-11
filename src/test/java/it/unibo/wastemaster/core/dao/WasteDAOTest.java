@@ -20,7 +20,6 @@ class WasteDAOTest extends AbstractDatabaseTest {
     @BeforeEach
     public void setUp() {
         super.setUp();
-        getEntityManager().getTransaction().begin();
     }
 
     @Test

@@ -42,7 +42,6 @@ class CollectionDAOTest extends AbstractDatabaseTest {
     @BeforeEach
     public void setUp() {
         super.setUp();
-        getEntityManager().getTransaction().begin();
         date = LocalDate.now();
         waste = new Waste("PLASTIC", true, false);
         getWasteDAO().insert(waste);

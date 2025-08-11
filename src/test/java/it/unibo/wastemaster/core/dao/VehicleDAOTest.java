@@ -1,8 +1,7 @@
 package it.unibo.wastemaster.core.dao;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import it.unibo.wastemaster.core.AbstractDatabaseTest;
@@ -10,6 +9,7 @@ import it.unibo.wastemaster.domain.model.Vehicle;
 import it.unibo.wastemaster.domain.model.Vehicle.RequiredLicence;
 import it.unibo.wastemaster.domain.model.Vehicle.VehicleStatus;
 import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -26,7 +26,6 @@ class VehicleDAOTest extends AbstractDatabaseTest {
     @BeforeEach
     public void setUp() {
         super.setUp();
-        getEntityManager().getTransaction().begin();
 
         final int year2020 = 2020;
         final int year2021 = 2021;
@@ -52,23 +51,23 @@ class VehicleDAOTest extends AbstractDatabaseTest {
         final String plate1 = "AA111AA";
         final String plate2 = "BB222BB";
 
-        Vehicle found = getVehicleDAO().findByPlate(plate1);
-        assertNotNull(found);
-        assertEquals("Iveco", found.getBrand());
-        assertEquals(RequiredLicence.C1, found.getRequiredLicence());
+        Optional<Vehicle> found = getVehicleDAO().findByPlate(plate1);
+        assertTrue(found.isPresent());
+        assertEquals("Iveco", found.get().getBrand());
+        assertEquals(RequiredLicence.C1, found.get().getRequiredLicence());
 
-        Vehicle found2 = getVehicleDAO().findByPlate(plate2);
-        assertNotNull(found2);
-        assertEquals("Mercedes", found2.getBrand());
-        assertEquals(RequiredLicence.C, found2.getRequiredLicence());
+        Optional<Vehicle> found2 = getVehicleDAO().findByPlate(plate2);
+        assertTrue(found2.isPresent());
+        assertEquals("Mercedes", found2.get().getBrand());
+        assertEquals(RequiredLicence.C, found2.get().getRequiredLicence());
     }
 
     @Test
     void testFindByPlateNotFound() {
         final String unknownPlate = "ZZ999ZZ";
 
-        Vehicle found = getVehicleDAO().findByPlate(unknownPlate);
-        assertNull(found);
+        Optional<Vehicle> found = getVehicleDAO().findByPlate(unknownPlate);
+        assertFalse(found.isPresent());
     }
 
     @Test
