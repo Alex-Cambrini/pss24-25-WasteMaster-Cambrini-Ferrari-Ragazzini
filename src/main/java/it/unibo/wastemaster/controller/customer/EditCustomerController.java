@@ -1,9 +1,11 @@
 package it.unibo.wastemaster.controller.customer;
 
+import it.unibo.wastemaster.application.context.AppContext;
 import it.unibo.wastemaster.controller.utils.DialogUtils;
-import it.unibo.wastemaster.core.context.AppContext;
-import it.unibo.wastemaster.core.models.Customer;
-import it.unibo.wastemaster.core.models.Location;
+import it.unibo.wastemaster.domain.model.Customer;
+import it.unibo.wastemaster.domain.model.Location;
+import it.unibo.wastemaster.domain.service.CustomerManager;
+import java.util.Optional;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.TextField;
@@ -15,6 +17,8 @@ public final class EditCustomerController {
 
     private Customer customer;
     private CustomersController customerController;
+
+    private CustomerManager customerManager;
 
     @FXML
     private TextField nameField;
@@ -39,6 +43,10 @@ public final class EditCustomerController {
 
     @FXML
     private TextField postalCodeField;
+
+    public void setCustomerManager(CustomerManager customerManager) {
+        this.customerManager = customerManager;
+    }
 
     /**
      * Sets the customer to be edited and populates the form.
@@ -66,14 +74,16 @@ public final class EditCustomerController {
     @FXML
     private void handleUpdateCustomer(final ActionEvent event) {
         try {
-            Customer original = AppContext.getCustomerManager()
-                    .getCustomerById(customer.getCustomerId());
+            Optional<Customer> originalOpt =
+                    customerManager.getCustomerById(customer.getCustomerId());
 
-            if (original == null) {
+            if (originalOpt.isEmpty()) {
                 DialogUtils.showError("Error", "Customer not found.",
                         AppContext.getOwner());
                 return;
             }
+
+            Customer original = originalOpt.get();
 
             boolean changed = !original.getName().equals(nameField.getText())
                     || !original.getSurname().equals(surnameField.getText())
@@ -81,10 +91,10 @@ public final class EditCustomerController {
                     || !original.getEmail().equals(emailField.getText())
                     || !original.getLocation().getStreet().equals(streetField.getText())
                     || !original.getLocation().getCivicNumber()
-                            .equals(civicField.getText())
+                    .equals(civicField.getText())
                     || !original.getLocation().getCity().equals(cityField.getText())
                     || !original.getLocation().getPostalCode()
-                            .equals(postalCodeField.getText());
+                    .equals(postalCodeField.getText());
 
             if (!changed) {
                 DialogUtils.showError("No changes", "No fields were modified.",
@@ -99,7 +109,7 @@ public final class EditCustomerController {
             customer.setLocation(new Location(streetField.getText(), civicField.getText(),
                     cityField.getText(), postalCodeField.getText()));
 
-            AppContext.getCustomerManager().updateCustomer(customer);
+            customerManager.updateCustomer(customer);
 
             if (this.customerController != null) {
                 this.customerController.loadCustomers();

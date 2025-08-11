@@ -1,12 +1,13 @@
 package it.unibo.wastemaster.controller.employee;
 
+import it.unibo.wastemaster.application.context.AppContext;
 import it.unibo.wastemaster.controller.utils.DialogUtils;
-import it.unibo.wastemaster.core.context.AppContext;
-import it.unibo.wastemaster.core.models.Employee;
-import it.unibo.wastemaster.core.models.Employee.Licence;
-import it.unibo.wastemaster.core.models.Employee.Role;
-import it.unibo.wastemaster.core.models.Location;
-import it.unibo.wastemaster.core.utils.ValidateUtils;
+import it.unibo.wastemaster.domain.model.Employee;
+import it.unibo.wastemaster.domain.model.Employee.Licence;
+import it.unibo.wastemaster.domain.model.Employee.Role;
+import it.unibo.wastemaster.domain.model.Location;
+import it.unibo.wastemaster.domain.service.EmployeeManager;
+import it.unibo.wastemaster.infrastructure.utils.ValidateUtils;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
@@ -17,6 +18,8 @@ import javafx.scene.control.TextField;
  * Controller for the Add Employee modal view. Handles input validation and saving logic.
  */
 public final class AddEmployeeController {
+
+    private EmployeeManager employeeManager;
 
     @FXML
     private PasswordField passwordField;
@@ -53,6 +56,10 @@ public final class AddEmployeeController {
 
     @FXML
     private ComboBox<Licence> licenceComboBox;
+
+    public void setEmployeeManager(EmployeeManager employeeManager) {
+        this.employeeManager = employeeManager;
+    }
 
     /**
      * Initializes combo boxes with default values.
@@ -101,7 +108,7 @@ public final class AddEmployeeController {
 
             ValidateUtils.validateAll(employee, address);
 
-            AppContext.getEmployeeManager().addEmployee(employee, password);
+            employeeManager.addEmployee(employee, password);
             DialogUtils.showSuccess("Employee saved successfully.",
                     AppContext.getOwner());
             DialogUtils.closeModal(event);

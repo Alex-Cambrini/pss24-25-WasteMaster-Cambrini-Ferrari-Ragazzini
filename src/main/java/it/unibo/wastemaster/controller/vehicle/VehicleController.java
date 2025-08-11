@@ -1,9 +1,10 @@
 package it.unibo.wastemaster.controller.vehicle;
 
+import it.unibo.wastemaster.application.context.AppContext;
 import it.unibo.wastemaster.controller.main.MainLayoutController;
 import it.unibo.wastemaster.controller.utils.DialogUtils;
-import it.unibo.wastemaster.core.context.AppContext;
-import it.unibo.wastemaster.core.models.Vehicle;
+import it.unibo.wastemaster.domain.model.Vehicle;
+import it.unibo.wastemaster.domain.service.VehicleManager;
 import it.unibo.wastemaster.viewmodels.VehicleRow;
 import java.io.IOException;
 import java.time.LocalDate;
@@ -48,14 +49,14 @@ public final class VehicleController {
     private static final String NEXT_MAINTENANCE_DATE = "nextMaintenanceDate";
     private static final String REGISTRATION_YEAR = "registrationYear";
     private static final String CAPACITY = "capacity";
-
-    private Timeline refreshTimeline;
-    private ContextMenu filterMenu;
     private final ObservableList<VehicleRow> allVehicles = FXCollections
             .observableArrayList();
     private final ObservableList<String> activeFilters =
             FXCollections.observableArrayList(PLATE, BRAND, MODEL, YEAR, LICENCE_TYPE,
                     VEHICLE_STATUS, LAST_MAINTENANCE_DATE, NEXT_MAINTENANCE_DATE);
+    private Timeline refreshTimeline;
+    private ContextMenu filterMenu;
+    private VehicleManager vehicleManager;
 
     @FXML
     private TextField searchField;
@@ -99,6 +100,10 @@ public final class VehicleController {
     @FXML
     private TableColumn<VehicleRow, LocalDate> nextMaintenanceDateColumn;
 
+    public void setVehicleManager(VehicleManager vehicleManager) {
+        this.vehicleManager = vehicleManager;
+    }
+
     @FXML
     private void initialize() {
         plateColumn.setCellValueFactory(new PropertyValueFactory<>(PLATE));
@@ -141,7 +146,7 @@ public final class VehicleController {
 
                     @Override
                     protected void updateItem(final Vehicle.RequiredLicence item,
-                            final boolean empty) {
+                                              final boolean empty) {
                         super.updateItem(item, empty);
                         setText(empty || item == null ? "" : formatEnum(item));
                     }
@@ -154,7 +159,7 @@ public final class VehicleController {
 
                     @Override
                     protected void updateItem(final Vehicle.VehicleStatus item,
-                            final boolean empty) {
+                                              final boolean empty) {
                         super.updateItem(item, empty);
                         setText(empty || item == null ? "" : formatEnum(item));
                     }
@@ -200,7 +205,7 @@ public final class VehicleController {
     }
 
     private void loadVehicles() {
-        List<Vehicle> vehicles = AppContext.getVehicleDAO().findVehicleDetails();
+        List<Vehicle> vehicles = vehicleManager.findAllVehicle();
         allVehicles.clear();
 
         for (Vehicle vehicle : vehicles) {
@@ -222,7 +227,9 @@ public final class VehicleController {
 
             Optional<AddVehicleController> controllerOpt =
                     DialogUtils.showModalWithController("Add Vehicle",
-                            "/layouts/vehicle/AddVehicleView.fxml", mainStage, ctrl -> {
+                            "/layouts/vehicle/AddVehicleView.fxml", mainStage,
+                            ctrl -> {
+                                ctrl.setVehicleManager(vehicleManager);
                             });
 
             if (controllerOpt.isPresent()) {
@@ -244,20 +251,25 @@ public final class VehicleController {
             return;
         }
 
-        Vehicle vehicle =
-                AppContext.getVehicleManager().findVehicleByPlate(selected.getPlate());
-        if (vehicle == null) {
+        Optional<Vehicle> vehicleOpt =
+                vehicleManager.findVehicleByPlate(selected.getPlate());
+        if (vehicleOpt.isEmpty()) {
             DialogUtils.showError("Not Found", "Vehicle not found.",
                     AppContext.getOwner());
             return;
         }
 
+        Vehicle vehicle = vehicleOpt.get();
         try {
             Optional<EditVehicleController> controllerOpt =
                     DialogUtils.showModalWithController("Edit Vehicle",
                             "/layouts/vehicle/EditVehicleView.fxml",
                             AppContext.getOwner(),
-                            ctrl -> ctrl.setVehicleToEdit(vehicle));
+                            ctrl -> {
+                                ctrl.setVehicleToEdit(vehicle);
+                                ctrl.setVehicleManager(vehicleManager);
+
+                            });
 
             if (controllerOpt.isPresent()) {
                 loadVehicles();
@@ -288,17 +300,17 @@ public final class VehicleController {
             return;
         }
 
-        Vehicle vehicle = AppContext.getVehicleManager()
-                .findVehicleByPlate(selected.getPlate());
+        Optional<Vehicle> vehicleOpt =
+                vehicleManager.findVehicleByPlate(selected.getPlate());
 
-        if (vehicle == null) {
+        if (vehicleOpt.isEmpty()) {
             DialogUtils.showError("Not Found",
                     "The selected vehicle could not be found.",
                     AppContext.getOwner());
             return;
         }
-
-        boolean success = AppContext.getVehicleManager().deleteVehicle(vehicle);
+        Vehicle vehicle = vehicleOpt.get();
+        boolean success = vehicleManager.deleteVehicle(vehicle);
 
         if (success) {
             DialogUtils.showSuccess("Vehicle deleted successfully.",
@@ -324,22 +336,22 @@ public final class VehicleController {
             if ((activeFilters.contains(PLATE)
                     && row.getPlate().toLowerCase().contains(query))
                     || (activeFilters.contains(BRAND)
-                            && row.getBrand().toLowerCase().contains(query))
+                    && row.getBrand().toLowerCase().contains(query))
                     || (activeFilters.contains(MODEL)
-                            && row.getModel().toLowerCase().contains(query))
+                    && row.getModel().toLowerCase().contains(query))
                     || (activeFilters.contains(YEAR)
-                            && String.valueOf(row.getRegistrationYear()).contains(query))
+                    && String.valueOf(row.getRegistrationYear()).contains(query))
                     || (activeFilters.contains(LICENCE_TYPE)
-                            && row.getLicenceType().name().equalsIgnoreCase(query))
+                    && row.getLicenceType().name().equalsIgnoreCase(query))
                     || (activeFilters.contains(VEHICLE_STATUS)
-                            && formatEnum(row.getVehicleStatus()).toLowerCase()
-                                    .contains(query))
+                    && formatEnum(row.getVehicleStatus()).toLowerCase()
+                    .contains(query))
                     || (activeFilters.contains(LAST_MAINTENANCE_DATE)
-                            && row.getLastMaintenanceDate().toString().toLowerCase()
-                                    .contains(query))
+                    && row.getLastMaintenanceDate().toString().toLowerCase()
+                    .contains(query))
                     || (activeFilters.contains(NEXT_MAINTENANCE_DATE)
-                            && row.getNextMaintenanceDate().toString().toLowerCase()
-                                    .contains(query))) {
+                    && row.getNextMaintenanceDate().toString().toLowerCase()
+                    .contains(query))) {
                 filtered.add(row);
             }
         }
@@ -354,7 +366,6 @@ public final class VehicleController {
                 LAST_MAINTENANCE_DATE, NEXT_MAINTENANCE_DATE);
         loadVehicles();
     }
-
 
     @FXML
     private void showFilterMenu(final MouseEvent event) {

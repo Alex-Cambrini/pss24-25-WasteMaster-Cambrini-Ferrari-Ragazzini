@@ -2,10 +2,10 @@ package it.unibo.wastemaster.controller.employee;
 
 import it.unibo.wastemaster.controller.main.MainLayoutController;
 import it.unibo.wastemaster.controller.utils.DialogUtils;
-import it.unibo.wastemaster.core.context.AppContext;
-import it.unibo.wastemaster.core.models.Employee;
-import it.unibo.wastemaster.core.models.Employee.Licence;
-import it.unibo.wastemaster.core.models.Employee.Role;
+import it.unibo.wastemaster.domain.model.Employee;
+import it.unibo.wastemaster.domain.model.Employee.Licence;
+import it.unibo.wastemaster.domain.model.Employee.Role;
+import it.unibo.wastemaster.domain.service.EmployeeManager;
 import it.unibo.wastemaster.viewmodels.EmployeeRow;
 import java.util.List;
 import java.util.Optional;
@@ -27,7 +27,6 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
-
 /**
  * Controller for managing the employee view. Handles loading, filtering, adding, editing,
  * and deleting employees, as well as managing the table and search functionalities.
@@ -42,19 +41,15 @@ public final class EmployeeController {
     private static final String FILTER_LOCATION = "location";
     private static final int REFRESH_INTERVAL_SECONDS = 30;
     private static final String ERROR_NAVIGATION = "Navigation error";
-
-    private Timeline refreshTimeline;
-
-    private ContextMenu filterMenu;
-
     private final ObservableList<EmployeeRow> allEmployees =
             FXCollections.observableArrayList();
-
-    private Stage owner;
-
     private final ObservableList<String> activeFilters =
             FXCollections.observableArrayList(FILTER_NAME, FILTER_SURNAME, FILTER_EMAIL,
                     FILTER_ROLE, FILTER_LICENCE, FILTER_LOCATION);
+    private Timeline refreshTimeline;
+    private ContextMenu filterMenu;
+    private Stage owner;
+    private EmployeeManager employeeManager;
 
     @FXML
     private Button filterButton;
@@ -91,6 +86,10 @@ public final class EmployeeController {
 
     @FXML
     private TableColumn<EmployeeRow, String> locationColumn;
+
+    public void setEmployeeManager(EmployeeManager employeeManager) {
+        this.employeeManager = employeeManager;
+    }
 
     /**
      * Initializes the EmployeeController view, setting up table bindings, listeners, and
@@ -143,7 +142,6 @@ public final class EmployeeController {
         searchField.textProperty().addListener((obs, oldText, newText) -> handleSearch());
     }
 
-
     private void startAutoRefresh() {
         refreshTimeline =
                 new Timeline(new KeyFrame(Duration.seconds(REFRESH_INTERVAL_SECONDS),
@@ -168,7 +166,7 @@ public final class EmployeeController {
      * to the table.
      */
     public void loadEmployee() {
-        List<Employee> employees = AppContext.getEmployeeDAO().findEmployeeDetails();
+        List<Employee> employees = employeeManager.getAllActiveEmployee();
         allEmployees.clear();
 
         for (Employee employee : employees) {
@@ -197,17 +195,17 @@ public final class EmployeeController {
             if ((activeFilters.contains(FILTER_NAME)
                     && row.getName().toLowerCase().contains(query))
                     || (activeFilters.contains(FILTER_SURNAME)
-                            && row.getSurname().toLowerCase().contains(query))
+                    && row.getSurname().toLowerCase().contains(query))
                     || (activeFilters.contains(FILTER_EMAIL)
-                            && row.getEmail().toLowerCase().contains(query))
+                    && row.getEmail().toLowerCase().contains(query))
                     || (activeFilters.contains(FILTER_ROLE)
-                            && formatEnumOrNone(row.getRole()).toLowerCase()
-                                    .contains(query))
+                    && formatEnumOrNone(row.getRole()).toLowerCase()
+                    .contains(query))
                     || (activeFilters.contains(FILTER_LICENCE)
-                            && formatEnumOrNone(row.getLicence()).toLowerCase()
-                                    .contains(query))
+                    && formatEnumOrNone(row.getLicence()).toLowerCase()
+                    .contains(query))
                     || (activeFilters.contains(FILTER_LOCATION)
-                            && row.getFullLocation().toLowerCase().contains(query))) {
+                    && row.getFullLocation().toLowerCase().contains(query))) {
 
                 filtered.add(row);
             }
@@ -235,14 +233,16 @@ public final class EmployeeController {
             return;
         }
 
-        var employee = AppContext.getEmployeeDAO().findByEmail(selected.getEmail());
-        if (employee == null) {
+        Optional<Employee> employeeOpt =
+                employeeManager.findEmployeeByEmail(selected.getEmail());
+        if (employeeOpt.isEmpty()) {
             DialogUtils.showError("Not Found",
                     "The selected employee could not be found.", owner);
             return;
         }
 
-        boolean success = AppContext.getEmployeeManager().softDeleteEmployee(employee);
+        Employee employee = employeeOpt.get();
+        boolean success = employeeManager.softDeleteEmployee(employee);
         if (success) {
             DialogUtils.showSuccess("Employee deleted successfully.", owner);
             loadEmployee();
@@ -259,7 +259,7 @@ public final class EmployeeController {
                     DialogUtils.showModalWithController("Add Employee",
                             "/layouts/employee/AddEmployeeView.fxml", owner,
                             ctrl -> {
-                                // You can initialize the controller here if needed
+                                ctrl.setEmployeeManager(employeeManager);
                             });
 
             if (controllerOpt.isPresent()) {
@@ -283,18 +283,24 @@ public final class EmployeeController {
             return;
         }
 
-        var employee = AppContext.getEmployeeDAO().findByEmail(selected.getEmail());
-        if (employee == null) {
+        Optional<Employee> employeeOpt =
+                employeeManager.findEmployeeByEmail(selected.getEmail());
+        if (employeeOpt.isEmpty()) {
             DialogUtils.showError("Not Found",
                     "Employee not found.", owner);
             return;
         }
 
+        Employee employee = employeeOpt.get();
         try {
             Optional<EditEmployeeController> controllerOpt =
                     DialogUtils.showModalWithController("Edit Employee",
                             "/layouts/employee/EditEmployeeView.fxml", owner,
-                            ctrl -> ctrl.setEmployeeToEdit(employee));
+                            ctrl -> {
+                                ctrl.setEmployeeToEdit(employee);
+                                ctrl.setEmployeeManager(employeeManager);
+                            }
+                    );
 
             if (controllerOpt.isPresent()) {
                 loadEmployee();

@@ -1,8 +1,9 @@
 package it.unibo.wastemaster.controller.waste;
 
+import it.unibo.wastemaster.application.context.AppContext;
 import it.unibo.wastemaster.controller.utils.DialogUtils;
-import it.unibo.wastemaster.core.context.AppContext;
-import it.unibo.wastemaster.core.models.Waste;
+import it.unibo.wastemaster.domain.model.Waste;
+import it.unibo.wastemaster.domain.service.WasteManager;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.CheckBox;
@@ -22,6 +23,12 @@ public final class AddWasteController {
     @FXML
     private CheckBox dangerousCheckBox;
 
+    private WasteManager wasteManager;
+
+    public void setWasteManager(WasteManager wasteManager) {
+        this.wasteManager = wasteManager;
+    }
+
     /**
      * Saves the waste entry if valid.
      *
@@ -39,16 +46,16 @@ public final class AddWasteController {
             }
 
             Waste waste = new Waste(name, recyclable, dangerous);
-            AppContext.getWasteManager().addWaste(waste);
+            wasteManager.addWaste(waste);
 
             DialogUtils.showSuccess("Waste saved successfully.", AppContext.getOwner());
             DialogUtils.closeModal(event);
         } catch (IllegalArgumentException e) {
             DialogUtils.showError(
-                "Validation error", e.getMessage(), AppContext.getOwner());
+                    "Validation error", e.getMessage(), AppContext.getOwner());
         } catch (Exception e) {
             DialogUtils.showError(
-                "Unexpected error", e.getMessage(), AppContext.getOwner()
+                    "Unexpected error", e.getMessage(), AppContext.getOwner()
             );
         }
     }

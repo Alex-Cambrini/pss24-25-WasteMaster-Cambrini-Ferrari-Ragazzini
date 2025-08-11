@@ -1,6 +1,6 @@
 package it.unibo.wastemaster.controller.collection;
 
-import it.unibo.wastemaster.core.models.Collection;
+import it.unibo.wastemaster.domain.model.Collection;
 import it.unibo.wastemaster.viewmodels.CollectionRow;
 import java.util.List;
 import javafx.collections.FXCollections;

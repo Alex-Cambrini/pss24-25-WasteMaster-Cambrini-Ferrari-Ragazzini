@@ -1,10 +1,12 @@
 package it.unibo.wastemaster.controller.employee;
 
+import it.unibo.wastemaster.application.context.AppContext;
 import it.unibo.wastemaster.controller.utils.DialogUtils;
-import it.unibo.wastemaster.core.context.AppContext;
-import it.unibo.wastemaster.core.models.Employee;
-import it.unibo.wastemaster.core.models.Employee.Licence;
-import it.unibo.wastemaster.core.models.Employee.Role;
+import it.unibo.wastemaster.domain.model.Employee;
+import it.unibo.wastemaster.domain.model.Employee.Licence;
+import it.unibo.wastemaster.domain.model.Employee.Role;
+import it.unibo.wastemaster.domain.service.EmployeeManager;
+import java.util.Optional;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
@@ -45,6 +47,12 @@ public final class EditEmployeeController {
     @FXML
     private ComboBox<Licence> licenceComboBox;
 
+    private EmployeeManager employeeManager;
+
+    public void setEmployeeManager(EmployeeManager employeeManager) {
+        this.employeeManager = employeeManager;
+    }
+
     /**
      * Sets the employee to be edited and populates the form fields with the employee's
      * data.
@@ -79,22 +87,24 @@ public final class EditEmployeeController {
     @FXML
     private void handleSave(final ActionEvent event) {
         try {
-            Employee original =
-                    AppContext.getEmployeeDAO().findByEmail(employee.getEmail());
-            if (original == null) {
+            Optional<Employee> originalOpt =
+                    employeeManager.findEmployeeByEmail(employee.getEmail());
+            if (originalOpt.isPresent()) {
                 DialogUtils.showError("Error", "Employee not found.",
                         AppContext.getOwner());
                 return;
             }
 
+            Employee original = originalOpt.get();
+
             boolean changed = !original.getName().equals(nameField.getText())
                     || !original.getSurname().equals(surnameField.getText())
                     || !original.getLocation().getStreet().equals(streetField.getText())
                     || !original.getLocation().getCivicNumber()
-                            .equals(civicField.getText())
+                    .equals(civicField.getText())
                     || !original.getLocation().getCity().equals(cityField.getText())
                     || !original.getLocation().getPostalCode()
-                            .equals(postalCodeField.getText())
+                    .equals(postalCodeField.getText())
                     || original.getRole() != roleComboBox.getValue()
                     || original.getLicence() != licenceComboBox.getValue();
 
@@ -113,7 +123,7 @@ public final class EditEmployeeController {
             employee.setRole(roleComboBox.getValue());
             employee.setLicence(licenceComboBox.getValue());
 
-            AppContext.getEmployeeManager().updateEmployee(employee);
+            employeeManager.updateEmployee(employee);
 
             DialogUtils.showSuccess("Employee updated successfully.",
                     AppContext.getOwner());

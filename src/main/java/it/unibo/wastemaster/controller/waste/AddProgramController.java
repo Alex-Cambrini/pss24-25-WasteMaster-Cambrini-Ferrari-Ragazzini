@@ -1,8 +1,9 @@
 package it.unibo.wastemaster.controller.waste;
 
+import it.unibo.wastemaster.application.context.AppContext;
 import it.unibo.wastemaster.controller.utils.DialogUtils;
-import it.unibo.wastemaster.core.context.AppContext;
-import it.unibo.wastemaster.core.models.Waste;
+import it.unibo.wastemaster.domain.model.Waste;
+import it.unibo.wastemaster.domain.service.WasteScheduleManager;
 import java.time.DayOfWeek;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -17,6 +18,12 @@ public final class AddProgramController {
     private ComboBox<DayOfWeek> dayOfWeekComboBox;
 
     private Waste selectedWaste;
+
+    private WasteScheduleManager wasteScheduleManager;
+
+    public void setWasteScheduleManager(WasteScheduleManager wasteScheduleManager) {
+        this.wasteScheduleManager = wasteScheduleManager;
+    }
 
     /**
      * Initializes the controller. Populates the combo box with days of the week.
@@ -50,7 +57,7 @@ public final class AddProgramController {
                 throw new IllegalArgumentException("Invalid input.");
             }
 
-            AppContext.getWasteScheduleManager().setupCollectionRoutine(selectedWaste,
+            wasteScheduleManager.setupCollectionRoutine(selectedWaste,
                     selectedDay);
 
             DialogUtils.showSuccess("Program saved successfully.", AppContext.getOwner());

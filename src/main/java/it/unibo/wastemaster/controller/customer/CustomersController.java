@@ -1,8 +1,7 @@
 package it.unibo.wastemaster.controller.customer;
 
-import it.unibo.wastemaster.controller.main.MainLayoutController;
-import it.unibo.wastemaster.controller.utils.DialogUtils;
 import it.unibo.wastemaster.application.context.AppContext;
+import it.unibo.wastemaster.controller.utils.DialogUtils;
 import it.unibo.wastemaster.domain.model.Customer;
 import it.unibo.wastemaster.domain.service.CustomerManager;
 import it.unibo.wastemaster.viewmodels.CustomerRow;
@@ -30,30 +29,20 @@ import javafx.util.Duration;
  */
 public final class CustomersController {
 
-
-    private CustomerManager customerManager;
-
-    public void setCustomerManager(CustomerManager customerManager) {
-        this.customerManager = customerManager;
-    }
-
     private static final String FIELD_NAME = "name";
     private static final String FIELD_SURNAME = "surname";
     private static final String FIELD_EMAIL = "email";
     private static final String FILTER_LOCATION = "location";
     private static final String NAVIGATION_ERROR = "Navigation error";
     private static final int REFRESH_SECONDS = 30;
-
-    private Timeline refreshTimeline;
-    private ContextMenu filterMenu;
-
     private final ObservableList<CustomerRow> allCustomers =
             FXCollections.observableArrayList();
-
     private final ObservableList<String> activeFilters =
             FXCollections.observableArrayList(FIELD_NAME, FIELD_SURNAME,
                     FIELD_EMAIL, FILTER_LOCATION);
-
+    private CustomerManager customerManager;
+    private Timeline refreshTimeline;
+    private ContextMenu filterMenu;
 
     @FXML
     private Button filterButton;
@@ -85,6 +74,10 @@ public final class CustomersController {
     @FXML
     private TableColumn<CustomerRow, String> locationColumn;
 
+    public void setCustomerManager(CustomerManager customerManager) {
+        this.customerManager = customerManager;
+    }
+
     /**
      * Initializes the customer view with columns, search and auto-refresh logic.
      */
@@ -97,17 +90,18 @@ public final class CustomersController {
         locationColumn.setCellValueFactory(cellData -> new SimpleStringProperty(
                 cellData.getValue().getFullLocation()));
 
-        loadCustomers();
-        startAutoRefresh();
-
         searchField.textProperty().addListener((obs, oldText, newText) -> handleSearch());
-
         customerTable.getSelectionModel().selectedItemProperty()
                 .addListener((obs, oldVal, newVal) -> {
                     boolean rowSelected = newVal != null;
                     editCustomerButton.setDisable(!rowSelected);
                     deleteCustomerButton.setDisable(!rowSelected);
                 });
+    }
+
+    public void initData() {
+        loadCustomers();
+        startAutoRefresh();
     }
 
     private void startAutoRefresh() {
@@ -149,8 +143,8 @@ public final class CustomersController {
                     DialogUtils.showModalWithController("Add Customer",
                             "/layouts/customer/AddCustomerView.fxml",
                             AppContext.getOwner(), ctrl -> {
+                                ctrl.setCustomerManager(customerManager);
                             });
-
             if (controllerOpt.isPresent()) {
                 loadCustomers();
             }
@@ -180,7 +174,8 @@ public final class CustomersController {
             return;
         }
 
-        Optional<Customer> customerOpt = customerManager.findCustomerByEmail(selected.getEmail());
+        Optional<Customer> customerOpt =
+                customerManager.findCustomerByEmail(selected.getEmail());
         if (customerOpt.isEmpty()) {
             DialogUtils.showError("Not Found",
                     "The selected customer could not be found.", AppContext.getOwner());
@@ -207,8 +202,9 @@ public final class CustomersController {
             return;
         }
 
-        var customer = customerManager.findCustomerByEmail(selected.getEmail());
-        if (customer == null) {
+        Optional<Customer> customer =
+                customerManager.findCustomerByEmail(selected.getEmail());
+        if (customer.isEmpty()) {
             DialogUtils.showError("Not Found", "Customer not found.",
                     AppContext.getOwner());
             return;
@@ -221,6 +217,7 @@ public final class CustomersController {
                             AppContext.getOwner(), ctrl -> {
                                 ctrl.setCustomerToEdit(customer.get());
                                 ctrl.setCustomerController(this);
+                                ctrl.setCustomerManager(customerManager);
                             });
 
             controllerOpt.ifPresent(ctrl -> loadCustomers());
@@ -252,9 +249,9 @@ public final class CustomersController {
         return (activeFilters.contains(FIELD_NAME)
                 && row.getName().toLowerCase().contains(query))
                 || (activeFilters.contains(FIELD_SURNAME)
-                        && row.getSurname().toLowerCase().contains(query))
+                && row.getSurname().toLowerCase().contains(query))
                 || (activeFilters.contains(FIELD_EMAIL)
-                        && row.getEmail().toLowerCase().contains(query))
+                && row.getEmail().toLowerCase().contains(query))
                 || (activeFilters.contains(FILTER_LOCATION)
                 && row.getFullLocation().toLowerCase().contains(query));
     }
@@ -301,17 +298,17 @@ public final class CustomersController {
         filterMenu.show(filterButton, event.getScreenX(), event.getScreenY());
     }
 
-    /**
-     * Returns to the main customers view from a modal or sub-view.
-     */
-    public void returnToCustomerView() {
-        try {
-            MainLayoutController.getInstance().restorePreviousTitle();
-            MainLayoutController.getInstance()
-                    .loadCenter("/layouts/customer/CustomersView.fxml");
-        } catch (Exception e) {
-            DialogUtils.showError(NAVIGATION_ERROR, "Failed to load customer view.",
-                    AppContext.getOwner());
-        }
-    }
+//    /**
+//     * Returns to the main customers view from a modal or sub-view.
+//     */
+//    public void returnToCustomerView() {
+//        try {
+//            MainLayoutController.getInstance().restorePreviousTitle();
+//            MainLayoutController.getInstance()
+//                    .loadCenter("/layouts/customer/CustomersView.fxml");
+//        } catch (Exception e) {
+//            DialogUtils.showError(NAVIGATION_ERROR, "Failed to load customer view.",
+//                    AppContext.getOwner());
+//        }
+//    }
 }

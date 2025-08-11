@@ -49,13 +49,14 @@ public final class ScheduleController {
     private static final String TITLE_NO_SELECTION = "No Selection";
     private final ObservableList<String> activeFilters = FXCollections
             .observableArrayList(FILTER_WASTE_TYPE, FILTER_FREQUENCY, FILTER_CUSTOMER);
+    private final ObservableList<ScheduleRow> allSchedules =
+            FXCollections.observableArrayList();
+
     private CollectionManager collectionManager;
     private OneTimeScheduleManager oneTimeScheduleManager;
     private RecurringScheduleManager recurringScheduleManager;
     private ScheduleManager scheduleManager;
     private Timeline refreshTimeline;
-    private final ObservableList<ScheduleRow> allSchedules =
-            FXCollections.observableArrayList();
 
     @FXML
     private CheckBox oneTimeCheckBox;
@@ -335,6 +336,14 @@ public final class ScheduleController {
             Optional<AddScheduleController> controllerOpt =
                     DialogUtils.showModalWithController("Add Schedule",
                             "/layouts/schedule/AddScheduleView.fxml", mainStage, ctrl -> {
+                                ctrl.setCustomerManager(
+                                        AppContext.getServiceFactory()
+                                                .getCustomerManager());
+                                ctrl.setWasteManager(AppContext.getServiceFactory()
+                                        .getWasteManager());
+                                ctrl.setOneTimeScheduleManager(oneTimeScheduleManager);
+                                ctrl.setRecurringScheduleManager(
+                                        recurringScheduleManager);
                             });
             if (controllerOpt.isPresent()) {
                 loadSchedules();

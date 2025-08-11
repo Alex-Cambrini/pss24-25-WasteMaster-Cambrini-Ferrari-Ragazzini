@@ -4,10 +4,11 @@ import static it.unibo.wastemaster.controller.utils.DialogUtils.closeModal;
 import static it.unibo.wastemaster.controller.utils.DialogUtils.showError;
 import static it.unibo.wastemaster.controller.utils.DialogUtils.showSuccess;
 
-import it.unibo.wastemaster.core.context.AppContext;
-import it.unibo.wastemaster.core.models.Vehicle;
-import it.unibo.wastemaster.core.models.Vehicle.RequiredLicence;
-import it.unibo.wastemaster.core.models.Vehicle.VehicleStatus;
+import it.unibo.wastemaster.application.context.AppContext;
+import it.unibo.wastemaster.domain.model.Vehicle;
+import it.unibo.wastemaster.domain.model.Vehicle.RequiredLicence;
+import it.unibo.wastemaster.domain.model.Vehicle.VehicleStatus;
+import it.unibo.wastemaster.domain.service.VehicleManager;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
@@ -40,6 +41,12 @@ public final class AddVehicleController {
     @FXML
     private ComboBox<VehicleStatus> statusComboBox;
 
+    private VehicleManager vehicleManager;
+
+    public void setVehicleManager(VehicleManager vehicleManager) {
+        this.vehicleManager = vehicleManager;
+    }
+
     @FXML
     private void initialize() {
         licenceComboBox.getItems().setAll(RequiredLicence.values());
@@ -62,7 +69,7 @@ public final class AddVehicleController {
 
             Vehicle vehicle =
                     new Vehicle(plate, brand, model, year, licence, status, capacity);
-            AppContext.getVehicleManager().addVehicle(vehicle);
+            vehicleManager.addVehicle(vehicle);
             showSuccess("Vehicle saved successfully.", AppContext.getOwner());
             closeModal(event);
 

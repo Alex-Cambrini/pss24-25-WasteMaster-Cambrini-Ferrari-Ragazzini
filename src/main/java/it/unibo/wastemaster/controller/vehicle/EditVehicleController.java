@@ -4,10 +4,12 @@ import static it.unibo.wastemaster.controller.utils.DialogUtils.closeModal;
 import static it.unibo.wastemaster.controller.utils.DialogUtils.showError;
 import static it.unibo.wastemaster.controller.utils.DialogUtils.showSuccess;
 
-import it.unibo.wastemaster.core.context.AppContext;
-import it.unibo.wastemaster.core.models.Vehicle;
-import it.unibo.wastemaster.core.models.Vehicle.RequiredLicence;
-import it.unibo.wastemaster.core.models.Vehicle.VehicleStatus;
+import it.unibo.wastemaster.application.context.AppContext;
+import it.unibo.wastemaster.domain.model.Vehicle;
+import it.unibo.wastemaster.domain.model.Vehicle.RequiredLicence;
+import it.unibo.wastemaster.domain.model.Vehicle.VehicleStatus;
+import it.unibo.wastemaster.domain.service.VehicleManager;
+import java.util.Optional;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
@@ -42,6 +44,12 @@ public final class EditVehicleController {
     @FXML
     private ComboBox<VehicleStatus> statusComboBox;
 
+    private VehicleManager vehicleManager;
+
+    public void setVehicleManager(VehicleManager vehicleManager) {
+        this.vehicleManager = vehicleManager;
+    }
+
     /**
      * Sets the vehicle to be edited. Subclasses overriding this method must call
      * super.setVehicleToEdit().
@@ -67,23 +75,24 @@ public final class EditVehicleController {
     @FXML
     private void handleUpdateVehicle(final ActionEvent event) {
         try {
-            Vehicle original =
-                    AppContext.getVehicleManager().findVehicleByPlate(vehicle.getPlate());
-            if (original == null) {
+            Optional<Vehicle> vehicleOpt =
+                    vehicleManager.findVehicleByPlate(vehicle.getPlate());
+            if (vehicleOpt.isEmpty()) {
                 showError("Error", "Vehicle not found.", AppContext.getOwner());
                 return;
             }
 
+            Vehicle vehicle = vehicleOpt.get();
             boolean changed =
-                    !original.getPlate().equalsIgnoreCase(plateField.getText().trim())
-                            || !original.getBrand().equals(brandField.getText())
-                            || !original.getModel().equals(modelField.getText())
-                            || original.getRegistrationYear() != Integer
-                                    .parseInt(yearField.getText())
-                            || original.getRequiredLicence() != licenceComboBox.getValue()
-                            || original.getVehicleStatus() != statusComboBox.getValue()
-                            || original.getCapacity() != Integer
-                                    .parseInt(capacityField.getText());
+                    !vehicle.getPlate().equalsIgnoreCase(plateField.getText().trim())
+                            || !vehicle.getBrand().equals(brandField.getText())
+                            || !vehicle.getModel().equals(modelField.getText())
+                            || vehicle.getRegistrationYear() != Integer
+                            .parseInt(yearField.getText())
+                            || vehicle.getRequiredLicence() != licenceComboBox.getValue()
+                            || vehicle.getVehicleStatus() != statusComboBox.getValue()
+                            || vehicle.getCapacity() != Integer
+                            .parseInt(capacityField.getText());
 
             if (!changed) {
                 showError("No changes", "No fields were modified.",
@@ -99,7 +108,7 @@ public final class EditVehicleController {
             vehicle.setVehicleStatus(statusComboBox.getValue());
             vehicle.setCapacity(Integer.parseInt(capacityField.getText()));
 
-            AppContext.getVehicleManager().updateVehicle(vehicle);
+            vehicleManager.updateVehicle(vehicle);
             showSuccess("Vehicle updated successfully.", AppContext.getOwner());
             closeModal(event);
 

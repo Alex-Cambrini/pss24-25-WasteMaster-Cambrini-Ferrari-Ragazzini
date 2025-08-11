@@ -1,10 +1,14 @@
 package it.unibo.wastemaster.controller.schedule;
 
+import it.unibo.wastemaster.application.context.AppContext;
 import it.unibo.wastemaster.controller.utils.DialogUtils;
-import it.unibo.wastemaster.core.context.AppContext;
-import it.unibo.wastemaster.core.models.Customer;
-import it.unibo.wastemaster.core.models.RecurringSchedule.Frequency;
-import it.unibo.wastemaster.core.models.Waste;
+import it.unibo.wastemaster.domain.model.Customer;
+import it.unibo.wastemaster.domain.model.RecurringSchedule.Frequency;
+import it.unibo.wastemaster.domain.model.Waste;
+import it.unibo.wastemaster.domain.service.CustomerManager;
+import it.unibo.wastemaster.domain.service.OneTimeScheduleManager;
+import it.unibo.wastemaster.domain.service.RecurringScheduleManager;
+import it.unibo.wastemaster.domain.service.WasteManager;
 import java.time.LocalDate;
 import java.util.List;
 import javafx.collections.FXCollections;
@@ -26,6 +30,7 @@ import javafx.util.StringConverter;
  */
 public final class AddScheduleController {
 
+    private final ContextMenu suggestionsMenu = new ContextMenu();
     private boolean isRecurring;
 
     @FXML
@@ -57,9 +62,28 @@ public final class AddScheduleController {
 
     @FXML
     private DatePicker datePicker;
-
+    private CustomerManager customerManager;
+    private OneTimeScheduleManager oneTimeScheduleManager;
+    private RecurringScheduleManager recurringScheduleManager;
+    private WasteManager wasteManager;
     private List<Customer> allCustomers;
-    private final ContextMenu suggestionsMenu = new ContextMenu();
+
+    public void setCustomerManager(CustomerManager customerManager) {
+        this.customerManager = customerManager;
+    }
+
+    public void setOneTimeScheduleManager(OneTimeScheduleManager oneTimeScheduleManager) {
+        this.oneTimeScheduleManager = oneTimeScheduleManager;
+    }
+
+    public void setRecurringScheduleManager(
+            RecurringScheduleManager recurringScheduleManager) {
+        this.recurringScheduleManager = recurringScheduleManager;
+    }
+
+    public void setWasteManager(WasteManager WasteManager) {
+        this.wasteManager = wasteManager;
+    }
 
     /**
      * Initializes the controller components and listeners.
@@ -72,7 +96,7 @@ public final class AddScheduleController {
     }
 
     private void setupCustomerAutocomplete() {
-        allCustomers = AppContext.getCustomerManager().getAllCustomers();
+        allCustomers = customerManager.getAllCustomers();
 
         customerField.textProperty().addListener((obs, oldText, newText) -> {
             if (newText == null || newText.isBlank()) {
@@ -111,7 +135,7 @@ public final class AddScheduleController {
     }
 
     private void setupWasteComboBox() {
-        List<Waste> wasteList = AppContext.getWasteManager().getActiveWastes();
+        List<Waste> wasteList = wasteManager.getActiveWastes();
 
         if (wasteList.isEmpty()) {
             wasteComboBox.setDisable(true);
@@ -191,10 +215,10 @@ public final class AddScheduleController {
 
             if (isRecurring) {
                 final Frequency selectedFrequency = frequencyComboBox.getValue();
-                AppContext.getRecurringScheduleManager().createRecurringSchedule(
+                recurringScheduleManager.createRecurringSchedule(
                         selectedCustomer, selectedWaste, selectedDate, selectedFrequency);
             } else {
-                AppContext.getOneTimeScheduleManager().createOneTimeSchedule(
+                oneTimeScheduleManager.createOneTimeSchedule(
                         selectedCustomer, selectedWaste, selectedDate);
             }
 
