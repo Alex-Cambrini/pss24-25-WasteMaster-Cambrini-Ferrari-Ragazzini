@@ -1,9 +1,8 @@
 package it.unibo.wastemaster.controller.login;
 
-import it.unibo.wastemaster.core.context.AppContext;
-import it.unibo.wastemaster.core.dao.AccountDAO;
-import it.unibo.wastemaster.core.models.Account;
-import it.unibo.wastemaster.core.services.LoginService;
+import it.unibo.wastemaster.application.context.AppContext;
+import it.unibo.wastemaster.domain.model.Account;
+import it.unibo.wastemaster.domain.service.LoginManager;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.logging.Level;
@@ -48,8 +47,8 @@ public class LoginController {
 
     private boolean passwordVisible = false;
 
-    private final LoginService loginService =
-            new LoginService(new AccountDAO(AppContext.getEntityManager()));
+    private final LoginManager loginManager =
+            AppContext.getServiceFactory().getLoginManager();
 
     private final SVGPath eyeIcon = new SVGPath();
     private final SVGPath eyeOffIcon = new SVGPath();
@@ -161,7 +160,7 @@ public class LoginController {
             return;
         }
 
-        Optional<Account> authenticated = loginService.authenticate(email, password);
+        Optional<Account> authenticated = loginManager.authenticate(email, password);
         if (authenticated.isPresent()) {
             Account account = authenticated.get();
             AppContext.setCurrentAccount(account);
