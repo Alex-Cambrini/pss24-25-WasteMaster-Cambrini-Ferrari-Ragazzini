@@ -16,32 +16,30 @@ public class EmployeeManager {
 
     private static final String EMPLOYEE_NULL_MSG = "Employee cannot be null";
     private final EmployeeRepository employeeRepository;
-    private final EntityManager entityManager;
     private final AccountManager accountManager;
 
     /**
      * Constructs an EmployeeManager with the given dependencies.
      *
      * @param employeeRepository the DAO used for employee persistence
-     * @param entityManager the EntityManager used for transaction management
      * @param accountManager the manager responsible for account operations
      */
-    public EmployeeManager(final EmployeeRepository employeeRepository,
-            final EntityManager entityManager, final AccountManager accountManager) {
+    public EmployeeManager(final EmployeeRepository employeeRepository, final AccountManager accountManager) {
         this.employeeRepository = employeeRepository;
-        this.entityManager = entityManager;
         this.accountManager = accountManager;
     }
 
     /**
-     * Adds a new employee along with an associated account after validation and email
-     * uniqueness check.
+     * Adds a new employee after validating the input and ensuring email uniqueness.
+     * Also creates the associated account with the given plain text password.
      *
-     * @param employee the employee to add
-     * @param rawPassword the plain text password for the new account
-     * @return the added employee
-     * @throws IllegalArgumentException if the email is already registered or inputs are
-     *         invalid
+     * This method delegates persistence and account creation to the appropriate
+     * repositories/managers and does not manage transactions directly.
+     *
+     * @param employee    the employee entity to be added (must not be null)
+     * @param rawPassword the plain text password for the new account (must not be null)
+     * @return the persisted employee entity
+     * @throws IllegalArgumentException if the email is already registered or any input is invalid
      */
     public Employee addEmployee(final Employee employee, final String rawPassword) {
         ValidateUtils.requireArgNotNull(employee, EMPLOYEE_NULL_MSG);
@@ -52,10 +50,8 @@ public class EmployeeManager {
             throw new IllegalArgumentException("Email already registered");
         }
 
-        TransactionHelper.executeTransaction(entityManager, () -> {
-            employeeRepository.save(employee);
-            accountManager.createAccount(employee, rawPassword);
-        });
+        employeeRepository.save(employee);
+        accountManager.createAccount(employee, rawPassword);
         return employee;
     }
 
@@ -130,5 +126,15 @@ public class EmployeeManager {
             case B -> vehicle.getRequiredLicence() == Vehicle.RequiredLicence.B;
             default -> false;
         };
+    }
+
+    /**
+     * Retrieves an employee by ID.
+     *
+     * @param employeeId the ID of the employee
+     * @return an Optional containing the employee if found, or an empty Optional otherwise
+     */
+    public Optional<Employee> getEmployeeById(final int employeeId) {
+        return employeeRepository.findById(employeeId);
     }
 }
