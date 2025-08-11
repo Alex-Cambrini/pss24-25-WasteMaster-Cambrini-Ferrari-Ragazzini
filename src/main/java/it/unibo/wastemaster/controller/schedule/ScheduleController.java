@@ -1,16 +1,20 @@
 package it.unibo.wastemaster.controller.schedule;
 
+import it.unibo.wastemaster.application.context.AppContext;
 import it.unibo.wastemaster.controller.collection.CollectionController;
 import it.unibo.wastemaster.controller.main.MainLayoutController;
 import it.unibo.wastemaster.controller.utils.DialogUtils;
-import it.unibo.wastemaster.core.context.AppContext;
-import it.unibo.wastemaster.core.models.Collection;
-import it.unibo.wastemaster.core.models.OneTimeSchedule;
-import it.unibo.wastemaster.core.models.RecurringSchedule;
-import it.unibo.wastemaster.core.models.RecurringSchedule.Frequency;
-import it.unibo.wastemaster.core.models.Schedule;
-import it.unibo.wastemaster.core.models.Schedule.ScheduleCategory;
-import it.unibo.wastemaster.core.models.Schedule.ScheduleStatus;
+import it.unibo.wastemaster.domain.model.Collection;
+import it.unibo.wastemaster.domain.model.OneTimeSchedule;
+import it.unibo.wastemaster.domain.model.RecurringSchedule;
+import it.unibo.wastemaster.domain.model.RecurringSchedule.Frequency;
+import it.unibo.wastemaster.domain.model.Schedule;
+import it.unibo.wastemaster.domain.model.Schedule.ScheduleCategory;
+import it.unibo.wastemaster.domain.model.Schedule.ScheduleStatus;
+import it.unibo.wastemaster.domain.service.CollectionManager;
+import it.unibo.wastemaster.domain.service.OneTimeScheduleManager;
+import it.unibo.wastemaster.domain.service.RecurringScheduleManager;
+import it.unibo.wastemaster.domain.service.ScheduleManager;
 import it.unibo.wastemaster.viewmodels.ScheduleRow;
 import java.io.IOException;
 import java.time.LocalDate;
@@ -43,34 +47,43 @@ public final class ScheduleController {
     private static final String FILTER_FREQUENCY = "frequency";
     private static final String FILTER_CUSTOMER = "customer";
     private static final String TITLE_NO_SELECTION = "No Selection";
-
-
     private final ObservableList<String> activeFilters = FXCollections
             .observableArrayList(FILTER_WASTE_TYPE, FILTER_FREQUENCY, FILTER_CUSTOMER);
-
+    private CollectionManager collectionManager;
+    private OneTimeScheduleManager oneTimeScheduleManager;
+    private RecurringScheduleManager recurringScheduleManager;
+    private ScheduleManager scheduleManager;
     private Timeline refreshTimeline;
-    private ObservableList<ScheduleRow> allSchedules =
+    private final ObservableList<ScheduleRow> allSchedules =
             FXCollections.observableArrayList();
 
     @FXML
     private CheckBox oneTimeCheckBox;
+
     @FXML
     private CheckBox recurringCheckBox;
+
     @FXML
     private CheckBox showDeletedCheckBox;
+
     @FXML
     private CheckBox showActiveCheckBox;
+
     @FXML
     private CheckBox showPausedCheckBox;
+
     @FXML
     private CheckBox showCompletedCheckBox;
     // buttons
     @FXML
     private Button changeFrequencyButton;
+
     @FXML
     private Button toggleStatusButton;
+
     @FXML
     private Button viewAssociatedCollectionsButton;
+
     @FXML
     private Button deleteButton;
 
@@ -82,21 +95,44 @@ public final class ScheduleController {
 
     @FXML
     private TableColumn<ScheduleRow, String> wasteNameColumn;
+
     @FXML
     private TableColumn<ScheduleRow, ScheduleCategory> scheduleCategoryColumn;
+
     @FXML
     private TableColumn<ScheduleRow, Frequency> frequencyColumn;
+
     @FXML
     private TableColumn<ScheduleRow, LocalDate> executionDateColumn;
+
     @FXML
     private TableColumn<ScheduleRow, LocalDate> startDateColumn;
+
     @FXML
     private TableColumn<ScheduleRow, ScheduleStatus> statusColumn;
+
     @FXML
     private TableColumn<ScheduleRow, String> customerColumn;
 
     @FXML
     private TextField searchField;
+
+    public void setScheduleManager(ScheduleManager scheduleManager) {
+        this.scheduleManager = scheduleManager;
+    }
+
+    public void setRecurringScheduleManager(
+            RecurringScheduleManager recurringScheduleManager) {
+        this.recurringScheduleManager = recurringScheduleManager;
+    }
+
+    public void setOneTimeScheduleManager(OneTimeScheduleManager oneTimeScheduleManager) {
+        this.oneTimeScheduleManager = oneTimeScheduleManager;
+    }
+
+    public void setCollectionManager(CollectionManager collectionManager) {
+        this.collectionManager = collectionManager;
+    }
 
     /**
      * Initializes the controller after its root element has been completely processed.
@@ -141,7 +177,6 @@ public final class ScheduleController {
         scheduleTable.getSelectionModel().selectedItemProperty()
                 .addListener((obs, oldVal, newVal) -> updateButtons(newVal));
     }
-
 
     /**
      * Refreshes the schedule table by reloading schedules and applying the current search
@@ -202,19 +237,26 @@ public final class ScheduleController {
         if (selected == null) {
             return;
         }
-        RecurringSchedule recurring =
-                AppContext.getRecurringScheduleDAO().findById(selected.getId());
+        Optional<RecurringSchedule> recurringOpt =
+                recurringScheduleManager.findRecurringScheduleById(selected.getId());
+        if (recurringOpt.isEmpty()) {
+            DialogUtils.showError("Error",
+                    "Unable to find the selected recurring schedule.",
+                    AppContext.getOwner());
+            return;
+        }
+        RecurringSchedule recurring = recurringOpt.get();
         ScheduleStatus currentStatus = selected.getStatus();
 
         switch (currentStatus) {
             case ACTIVE:
-                AppContext.getRecurringScheduleManager()
-                        .updateStatusRecurringSchedule(recurring, ScheduleStatus.PAUSED);
+                recurringScheduleManager.updateStatusRecurringSchedule(recurring,
+                        ScheduleStatus.PAUSED);
                 toggleStatusButton.setText("Resume");
                 break;
             case PAUSED:
-                AppContext.getRecurringScheduleManager()
-                        .updateStatusRecurringSchedule(recurring, ScheduleStatus.ACTIVE);
+                recurringScheduleManager.updateStatusRecurringSchedule(recurring,
+                        ScheduleStatus.ACTIVE);
                 toggleStatusButton.setText("Pause");
                 break;
             default:
@@ -243,7 +285,7 @@ public final class ScheduleController {
 
     private void loadSchedules() {
         allSchedules.clear();
-        List<Schedule> all = AppContext.getScheduleDAO().findAll();
+        List<Schedule> all = scheduleManager.findAllSchedule();
 
         for (Schedule s : all) {
             if (shouldIncludeSchedule(s)) {
@@ -279,7 +321,7 @@ public final class ScheduleController {
                 || (status == ScheduleStatus.ACTIVE && showActiveCheckBox.isSelected())
                 || (status == ScheduleStatus.PAUSED && showPausedCheckBox.isSelected())
                 || (status == ScheduleStatus.COMPLETED
-                        && showCompletedCheckBox.isSelected());
+                && showCompletedCheckBox.isSelected());
 
         return matchesType && matchesStatus;
     }
@@ -318,13 +360,14 @@ public final class ScheduleController {
         }
 
         try {
-            RecurringSchedule schedule =
-                    AppContext.getRecurringScheduleDAO().findById(selected.getId());
-            if (schedule == null) {
+            Optional<RecurringSchedule> scheduleOpt =
+                    recurringScheduleManager.findRecurringScheduleById(selected.getId());
+            if (scheduleOpt.isEmpty()) {
                 DialogUtils.showError("Error", "Schedule not found.",
                         AppContext.getOwner());
                 return;
             }
+            RecurringSchedule schedule = scheduleOpt.get();
 
             Optional<ChangeFrequencyDialogController> controllerOpt =
                     DialogUtils
@@ -341,7 +384,7 @@ public final class ScheduleController {
             if (controllerOpt.isPresent()) {
                 Frequency newFreq = controllerOpt.get().getSelectedFrequency();
                 if (newFreq != null) {
-                    AppContext.getRecurringScheduleManager().updateFrequency(schedule,
+                    recurringScheduleManager.updateFrequency(schedule,
                             newFreq);
                     loadSchedules();
                 }
@@ -378,19 +421,21 @@ public final class ScheduleController {
 
         try {
             if (selected.getScheduleCategory() == ScheduleCategory.ONE_TIME) {
-                OneTimeSchedule schedule =
-                        AppContext.getOneTimeScheduleDAO().findById(selected.getId());
-                if (schedule != null) {
-                    success = AppContext.getOneTimeScheduleManager()
-                            .softDeleteOneTimeSchedule(schedule);
+                Optional<OneTimeSchedule> scheduleOpt =
+                        oneTimeScheduleManager.findOneTimeScheduleById(selected.getId());
+                if (scheduleOpt.isPresent()) {
+                    OneTimeSchedule schedule = scheduleOpt.get();
+                    success = oneTimeScheduleManager.softDeleteOneTimeSchedule(schedule);
                 }
             } else if (selected.getScheduleCategory() == ScheduleCategory.RECURRING) {
-                RecurringSchedule schedule =
-                        AppContext.getRecurringScheduleDAO().findById(selected.getId());
-                if (schedule != null) {
-                    success = AppContext.getRecurringScheduleManager()
-                            .updateStatusRecurringSchedule(schedule,
-                                    ScheduleStatus.CANCELLED);
+                Optional<RecurringSchedule> scheduleOpt =
+                        recurringScheduleManager.findRecurringScheduleById(
+                                selected.getId());
+
+                if (scheduleOpt.isPresent()) {
+                    RecurringSchedule schedule = scheduleOpt.get();
+                    success = recurringScheduleManager.updateStatusRecurringSchedule(
+                            schedule, ScheduleStatus.CANCELLED);
                 }
             } else {
                 DialogUtils.showError("Unknown Schedule Category",
@@ -430,10 +475,10 @@ public final class ScheduleController {
             if ((activeFilters.contains(FILTER_WASTE_TYPE)
                     && row.getWasteName().toLowerCase().contains(query))
                     || (activeFilters.contains(FILTER_FREQUENCY)
-                            && row.getFrequency() != null
-                            && row.getFrequency().name().toLowerCase().contains(query))
+                    && row.getFrequency() != null
+                    && row.getFrequency().name().toLowerCase().contains(query))
                     || (activeFilters.contains(FILTER_CUSTOMER)
-                            && row.getCustomer().toLowerCase().contains(query))) {
+                    && row.getCustomer().toLowerCase().contains(query))) {
                 filtered.add(row);
             }
         }
@@ -462,15 +507,23 @@ public final class ScheduleController {
             return;
         }
 
-        Schedule schedule;
+        Optional<? extends Schedule> scheduleOpt;
         if (selected.getScheduleCategory() == ScheduleCategory.ONE_TIME) {
-            schedule = AppContext.getOneTimeScheduleDAO().findById(selected.getId());
+            scheduleOpt =
+                    oneTimeScheduleManager.findOneTimeScheduleById(selected.getId());
         } else {
-            schedule = AppContext.getRecurringScheduleDAO().findById(selected.getId());
+            scheduleOpt =
+                    recurringScheduleManager.findRecurringScheduleById(selected.getId());
         }
 
+        if (scheduleOpt.isEmpty()) {
+            DialogUtils.showError("Error", "Schedule not found.", AppContext.getOwner());
+            return;
+        }
+
+        Schedule schedule = scheduleOpt.get();
         List<Collection> collections =
-                AppContext.getCollectionManager().getAllCollectionBySchedule(schedule);
+                collectionManager.getAllCollectionBySchedule(schedule);
 
         try {
             MainLayoutController.getInstance().setPageTitle("Associated Collections");
