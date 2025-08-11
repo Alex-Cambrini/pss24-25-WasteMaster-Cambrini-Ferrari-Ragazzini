@@ -12,8 +12,8 @@ public class RecurringScheduleRepositoryImpl implements RecurringScheduleReposit
 
     private final RecurringScheduleDAO recurringScheduleDAO;
 
-    public RecurringScheduleRepositoryImpl(EntityManager entityManager) {
-        this.recurringScheduleDAO = new RecurringScheduleDAO(entityManager);
+    public RecurringScheduleRepositoryImpl(RecurringScheduleDAO recurringScheduleDAO) {
+        this.recurringScheduleDAO = recurringScheduleDAO;
     }
 
     @Override
