@@ -1,7 +1,6 @@
-package it.unibo.wastemaster.core.dao;
+package it.unibo.wastemaster.infrastructure.dao;
 
 import it.unibo.wastemaster.domain.model.Trip;
-import it.unibo.wastemaster.infrastructure.dao.GenericDAO;
 import jakarta.persistence.EntityManager;
 
 /**
