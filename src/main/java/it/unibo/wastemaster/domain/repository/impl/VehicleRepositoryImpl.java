@@ -20,7 +20,7 @@ public class VehicleRepositoryImpl implements VehicleRepository {
 
     @Override
     public Optional<Vehicle> findByPlate(String plate) {
-        return Optional.ofNullable(vehicleDAO.findByPlate(plate));
+        return vehicleDAO.findByPlate(plate);
     }
 
     @Override
