@@ -1,9 +1,15 @@
 package it.unibo.wastemaster.controller.main;
 
-import it.unibo.wastemaster.controller.utils.DialogUtils;
 import it.unibo.wastemaster.application.context.AppContext;
+import it.unibo.wastemaster.controller.customer.CustomersController;
+import it.unibo.wastemaster.controller.employee.EmployeeController;
+import it.unibo.wastemaster.controller.schedule.ScheduleController;
+import it.unibo.wastemaster.controller.utils.DialogUtils;
+import it.unibo.wastemaster.controller.vehicle.VehicleController;
+import it.unibo.wastemaster.controller.waste.WasteController;
 import it.unibo.wastemaster.domain.model.Employee;
 import java.io.IOException;
+import java.net.URL;
 import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -133,20 +139,30 @@ public final class MainLayoutController {
      * @return the controller instance, or null if loading fails
      */
     public <T> T loadCenterWithController(final String fxmlPath) {
+        System.out.println("[DEBUG] Loading FXML from path: " + fxmlPath);
         try {
             invokeStopAutoRefresh();
-            final FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
+            final URL resource = getClass().getResource(fxmlPath);
+            System.out.println("[DEBUG] Resolved resource URL: " + resource);
+            if (resource == null) {
+                System.out.println("[ERROR] Resource not found: " + fxmlPath);
+                return null;
+            }
+            final FXMLLoader loader = new FXMLLoader(resource);
             final Pane view = loader.load();
             T controller = loader.getController();
+            System.out.println("[DEBUG] Controller loaded: " + (controller != null));
             currentController = controller;
 
             centerPane.getChildren().setAll(view);
             return controller;
         } catch (final IOException e) {
-            LOGGER.log(Level.SEVERE, ERROR_LOADING_FXML, e);
+            e.printStackTrace();
+            System.out.println("[ERROR] IOException loading FXML: " + e.getMessage());
             return null;
         }
     }
+
 
     private void invokeStopAutoRefresh() {
         if (currentController != null) {
@@ -163,10 +179,24 @@ public final class MainLayoutController {
 
     @FXML
     private void handleCustomers() {
+
         customersLink.setVisited(false);
         setPageTitle(CUSTOMER_MANAGEMENT);
-        loadCenter("/layouts/customer/CustomersView.fxml");
+
+        System.out.println("[DEBUG] Carico CustomersView.fxml...");
+        CustomersController controller =
+                loadCenterWithController("/layouts/customer/CustomersView.fxml");
+
+        System.out.println("[DEBUG] Controller caricato: " + (controller != null));
+
+        if (controller != null) {
+            var cm = AppContext.getServiceFactory().getCustomerManager();
+            System.out.println("[DEBUG] CustomerManager: " + cm);
+            controller.setCustomerManager(cm);
+            controller.initData();
+        }
     }
+
 
     @FXML
     private void handleDashboard() {
@@ -177,28 +207,56 @@ public final class MainLayoutController {
     private void handleWaste() {
         wasteLink.setVisited(false);
         setPageTitle(WASTE_MANAGEMENT);
-        loadCenter("/layouts/waste/WasteView.fxml");
+        WasteController controller = loadCenterWithController("/layouts/waste"
+                + "/WasteView.fxml");
+        if (controller != null) {
+            controller.setWasteManager(AppContext.getServiceFactory()
+                    .getWasteManager());
+            controller.setWasteScheduleManager(AppContext.getServiceFactory()
+                    .getWasteScheduleManager());
+        }
     }
 
     @FXML
     private void handleVehicle() {
         vehiclesLink.setVisited(false);
         setPageTitle(VEHICLE_MANAGEMENT);
-        loadCenter("/layouts/vehicle/VehicleView.fxml");
+        VehicleController controller =
+                loadCenterWithController("/layouts/vehicle/VehicleView.fxml");
+        if (controller != null) {
+            controller.setVehicleManager(AppContext.getServiceFactory()
+                    .getVehicleManager());
+        }
     }
 
     @FXML
     private void handleEmployee() {
         employeesLink.setVisited(false);
         setPageTitle(EMPLOYEE_MANAGEMENT);
-        loadCenter("/layouts/employee/EmployeeView.fxml");
+        EmployeeController controller =
+                loadCenterWithController("/layouts/employee/EmployeeView.fxml");
+        if (controller != null) {
+            controller.setEmployeeManager(
+                    AppContext.getServiceFactory().getEmployeeManager());
+        }
     }
 
     @FXML
     private void handleSchedule() {
         schedulesLink.setVisited(false);
         setPageTitle(SCHEDULE_MANAGEMENT);
-        loadCenter("/layouts/schedule/ScheduleView.fxml");
+        ScheduleController controller =
+                loadCenterWithController("/layouts/schedule/ScheduleView.fxml");
+        if (controller != null) {
+            controller.setScheduleManager(
+                    AppContext.getServiceFactory().getScheduleManager());
+            controller.setRecurringScheduleManager(AppContext.getServiceFactory()
+                    .getRecurringScheduleManager());
+            controller.setOneTimeScheduleManager(AppContext.getServiceFactory()
+                    .getOneTimeScheduleManager());
+            controller.setCollectionManager(AppContext.getServiceFactory()
+                    .getCollectionManager());
+        }
     }
 
     /**
