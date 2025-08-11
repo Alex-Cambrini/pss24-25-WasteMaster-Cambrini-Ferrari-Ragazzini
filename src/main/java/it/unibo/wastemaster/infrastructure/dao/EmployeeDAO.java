@@ -1,8 +1,9 @@
 package it.unibo.wastemaster.infrastructure.dao;
 
+import it.unibo.wastemaster.domain.model.Employee;
 import jakarta.persistence.EntityManager;
 import java.util.List;
-import it.unibo.wastemaster.domain.model.Employee;
+import java.util.Optional;
 
 /**
  * DAO for managing Employee entities.
@@ -35,14 +36,16 @@ public final class EmployeeDAO extends GenericDAO<Employee> {
     /**
      * Finds an employee by their email.
      *
-     * @param email the email of the employee
-     * @return the Employee if found, or null otherwise
+     * @param email The unique email address of the employee.
+     * @return An Optional containing the employee if found.
      */
-    public Employee findByEmail(final String email) {
+    public Optional<Employee> findByEmail(final String email) {
         return getEntityManager()
                 .createQuery("SELECT e FROM Employee e WHERE e.email = :email",
                         Employee.class)
-                .setParameter("email", email).getResultStream().findFirst().orElse(null);
+                .setParameter("email", email)
+                .getResultStream()
+                .findFirst();
     }
 
     /**
