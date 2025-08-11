@@ -7,19 +7,19 @@ import it.unibo.wastemaster.infrastructure.dao.OneTimeScheduleDAO;
 
 public class OneTimeScheduleRepositoryImpl implements OneTimeScheduleRepository {
 
-    private final OneTimeScheduleDAO dao;
+    private final OneTimeScheduleDAO oneTimeScheduleDAO;
 
     public OneTimeScheduleRepositoryImpl(EntityManager entityManager) {
-        this.dao = new OneTimeScheduleDAO(entityManager);
+        this.oneTimeScheduleDAO = new OneTimeScheduleDAO(entityManager);
     }
 
     @Override
     public void save(OneTimeSchedule schedule) {
-        dao.insert(schedule);
+        oneTimeScheduleDAO.insert(schedule);
     }
 
     @Override
     public void update(OneTimeSchedule schedule) {
-        dao.update(schedule);
+        oneTimeScheduleDAO.update(schedule);
     }
 }
