@@ -3,11 +3,12 @@ package it.unibo.wastemaster.controller.customer;
 import static it.unibo.wastemaster.controller.utils.DialogUtils.showError;
 import static it.unibo.wastemaster.controller.utils.DialogUtils.showSuccess;
 
+import it.unibo.wastemaster.application.context.AppContext;
 import it.unibo.wastemaster.controller.utils.DialogUtils;
-import it.unibo.wastemaster.core.context.AppContext;
-import it.unibo.wastemaster.core.models.Customer;
-import it.unibo.wastemaster.core.models.Location;
-import it.unibo.wastemaster.core.utils.ValidateUtils;
+import it.unibo.wastemaster.domain.model.Customer;
+import it.unibo.wastemaster.domain.model.Location;
+import it.unibo.wastemaster.domain.service.CustomerManager;
+import it.unibo.wastemaster.infrastructure.utils.ValidateUtils;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.TextField;
@@ -16,6 +17,8 @@ import javafx.scene.control.TextField;
  * Controller responsible for handling the logic of the "Add Customer" view.
  */
 public final class AddCustomerController {
+
+    private CustomerManager customerManager;
 
     @FXML
     private TextField emailField;
@@ -41,6 +44,10 @@ public final class AddCustomerController {
     @FXML
     private TextField postalCodeField;
 
+    public void setCustomerManager(CustomerManager customerManager) {
+        this.customerManager = customerManager;
+    }
+
     @FXML
     private void handleSaveCustomer(final ActionEvent event) {
         try {
@@ -58,11 +65,7 @@ public final class AddCustomerController {
 
             ValidateUtils.validateAll(customer, location);
 
-            if (AppContext.getCustomerDAO().existsByEmail(email)) {
-                throw new IllegalArgumentException("- Email is already in use");
-            }
-
-            AppContext.getCustomerManager().addCustomer(customer);
+            customerManager.addCustomer(customer);
             showSuccess("Customer saved successfully.", AppContext.getOwner());
             DialogUtils.closeModal(event);
 
