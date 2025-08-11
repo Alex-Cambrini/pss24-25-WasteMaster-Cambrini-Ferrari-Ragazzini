@@ -3,6 +3,7 @@ package it.unibo.wastemaster.domain.repository.impl;
 import it.unibo.wastemaster.domain.model.Vehicle;
 import it.unibo.wastemaster.domain.repository.VehicleRepository;
 import it.unibo.wastemaster.infrastructure.dao.VehicleDAO;
+import java.util.List;
 import java.util.Optional;
 
 public class VehicleRepositoryImpl implements VehicleRepository {
@@ -31,5 +32,10 @@ public class VehicleRepositoryImpl implements VehicleRepository {
     @Override
     public void delete(Vehicle vehicle) {
         vehicleDAO.delete(vehicle);
+    }
+
+    @Override
+    public List<Vehicle> findAll() {
+        return vehicleDAO.findAll();
     }
 }

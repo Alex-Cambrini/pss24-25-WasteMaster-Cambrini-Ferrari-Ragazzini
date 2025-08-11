@@ -1,14 +1,14 @@
 package it.unibo.wastemaster.domain.service;
 
-import it.unibo.wastemaster.infrastructure.utils.ValidateUtils;
 import it.unibo.wastemaster.domain.model.Collection;
 import it.unibo.wastemaster.domain.model.Customer;
 import it.unibo.wastemaster.domain.model.RecurringSchedule;
-import it.unibo.wastemaster.domain.model.Waste;
-import it.unibo.wastemaster.domain.model.WasteSchedule;
 import it.unibo.wastemaster.domain.model.RecurringSchedule.Frequency;
 import it.unibo.wastemaster.domain.model.Schedule.ScheduleStatus;
+import it.unibo.wastemaster.domain.model.Waste;
+import it.unibo.wastemaster.domain.model.WasteSchedule;
 import it.unibo.wastemaster.domain.repository.RecurringScheduleRepository;
+import it.unibo.wastemaster.infrastructure.utils.ValidateUtils;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.List;
@@ -59,7 +59,9 @@ public class RecurringScheduleManager {
      * @throws IllegalArgumentException if startDate is before today
      */
     public RecurringSchedule createRecurringSchedule(final Customer customer,
-            final Waste waste, final LocalDate startDate, final Frequency frequency) {
+                                                     final Waste waste,
+                                                     final LocalDate startDate,
+                                                     final Frequency frequency) {
         if (startDate.isBefore(LocalDate.now())) {
             throw new IllegalArgumentException(
                     "Start Date must be today or in the future");
@@ -111,7 +113,7 @@ public class RecurringScheduleManager {
     }
 
     private LocalDate alignToScheduledDay(final LocalDate date,
-            final DayOfWeek scheduledDay) {
+                                          final DayOfWeek scheduledDay) {
         LocalDate adjustedDate = date;
         while (adjustedDate.getDayOfWeek() != scheduledDay) {
             adjustedDate = adjustedDate.plusDays(1);
@@ -170,7 +172,7 @@ public class RecurringScheduleManager {
      * @throws IllegalStateException if associated collection is missing when required
      */
     public final boolean updateStatusRecurringSchedule(final RecurringSchedule schedule,
-            final ScheduleStatus newStatus) {
+                                                       final ScheduleStatus newStatus) {
         ValidateUtils.requireArgNotNull(schedule, SCHEDULE_NOT_NULL_MSG);
         ValidateUtils.requireArgNotNull(newStatus, "Status must not be null");
 
@@ -239,7 +241,7 @@ public class RecurringScheduleManager {
      * @throws IllegalArgumentException if schedule or newFrequency is null
      */
     public final boolean updateFrequency(final RecurringSchedule schedule,
-            final Frequency newFrequency) {
+                                         final Frequency newFrequency) {
         ValidateUtils.requireArgNotNull(schedule, SCHEDULE_NOT_NULL_MSG);
         ValidateUtils.requireArgNotNull(newFrequency, "Frequency must not be null");
 

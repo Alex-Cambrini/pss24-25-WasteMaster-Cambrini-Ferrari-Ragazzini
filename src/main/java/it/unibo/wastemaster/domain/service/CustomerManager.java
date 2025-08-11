@@ -1,8 +1,8 @@
 package it.unibo.wastemaster.domain.service;
 
-import it.unibo.wastemaster.infrastructure.utils.ValidateUtils;
 import it.unibo.wastemaster.domain.model.Customer;
 import it.unibo.wastemaster.domain.repository.CustomerRepository;
+import it.unibo.wastemaster.infrastructure.utils.ValidateUtils;
 import java.util.List;
 import java.util.Optional;
 
@@ -103,7 +103,9 @@ public class CustomerManager {
         return customerRepository.findAll();
     }
 
-    public List<Customer> getAllActiveCustomers(){ return customerRepository.findActive();}
+    public List<Customer> getAllActiveCustomers() {
+        return customerRepository.findActive();
+    }
 
     public Optional<Customer> findCustomerByEmail(String email) {
         return customerRepository.findByEmail(email);

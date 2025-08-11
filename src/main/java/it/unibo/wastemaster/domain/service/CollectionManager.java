@@ -1,12 +1,12 @@
 package it.unibo.wastemaster.domain.service;
 
-import it.unibo.wastemaster.infrastructure.utils.ValidateUtils;
 import it.unibo.wastemaster.domain.model.Collection;
+import it.unibo.wastemaster.domain.model.Collection.CollectionStatus;
 import it.unibo.wastemaster.domain.model.OneTimeSchedule;
 import it.unibo.wastemaster.domain.model.RecurringSchedule;
 import it.unibo.wastemaster.domain.model.Schedule;
-import it.unibo.wastemaster.domain.model.Collection.CollectionStatus;
 import it.unibo.wastemaster.domain.repository.CollectionRepository;
+import it.unibo.wastemaster.infrastructure.utils.ValidateUtils;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
@@ -33,7 +33,7 @@ public class CollectionManager {
      * @param recurringScheduleManager Manager for recurring schedule logic
      */
     public CollectionManager(final CollectionRepository collectionRepository,
-            final RecurringScheduleManager recurringScheduleManager) {
+                             final RecurringScheduleManager recurringScheduleManager) {
         this.collectionRepository = collectionRepository;
         this.recurringScheduleManager = recurringScheduleManager;
     }
@@ -81,7 +81,6 @@ public class CollectionManager {
             final RecurringSchedule schedule) {
         return collectionRepository.findActiveByRecurringSchedule(schedule);
     }
-
 
     /**
      * Generates a collection specifically for a one-time schedule.
@@ -139,7 +138,7 @@ public class CollectionManager {
      *
      * @param year the year to filter collections by
      * @return a list of collections occurring between January 1 and June 30 of the given
-     *         year
+     * year
      */
     public List<Collection> getFirstHalfCollections(final int year) {
         LocalDate start = LocalDate.of(year, FIRST_HALF_START_MONTH, FIRST_DAY);
@@ -152,7 +151,7 @@ public class CollectionManager {
      *
      * @param year the year to filter collections by
      * @return a list of collections occurring between July 1 and December 31 of the given
-     *         year
+     * year
      */
     public List<Collection> getSecondHalfCollections(final int year) {
         LocalDate start = LocalDate.of(year, SECOND_HALF_START_MONTH, FIRST_DAY);

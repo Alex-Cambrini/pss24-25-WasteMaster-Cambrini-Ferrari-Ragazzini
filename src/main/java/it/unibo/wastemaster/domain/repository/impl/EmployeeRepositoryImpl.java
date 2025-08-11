@@ -1,6 +1,5 @@
 package it.unibo.wastemaster.domain.repository.impl;
 
-import jakarta.persistence.EntityManager;
 import it.unibo.wastemaster.domain.model.Employee;
 import it.unibo.wastemaster.domain.repository.EmployeeRepository;
 import it.unibo.wastemaster.infrastructure.dao.EmployeeDAO;
@@ -22,7 +21,7 @@ public class EmployeeRepositoryImpl implements EmployeeRepository {
 
     @Override
     public Optional<Employee> findByEmail(String email) {
-        return Optional.ofNullable(employeeDAO.findByEmail(email));
+        return employeeDAO.findByEmail(email);
     }
 
     @Override

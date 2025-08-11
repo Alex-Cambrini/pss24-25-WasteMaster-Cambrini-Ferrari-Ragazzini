@@ -1,8 +1,8 @@
 package it.unibo.wastemaster.domain.repository.impl;
 
-import it.unibo.wastemaster.infrastructure.dao.InvoiceDAO;
 import it.unibo.wastemaster.domain.model.Invoice;
 import it.unibo.wastemaster.domain.repository.InvoiceRepository;
+import it.unibo.wastemaster.infrastructure.dao.InvoiceDAO;
 import java.time.LocalDate;
 import java.util.List;
 
