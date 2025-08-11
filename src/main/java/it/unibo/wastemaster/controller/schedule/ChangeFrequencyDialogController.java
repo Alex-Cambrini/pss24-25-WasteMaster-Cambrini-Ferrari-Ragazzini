@@ -1,7 +1,7 @@
 package it.unibo.wastemaster.controller.schedule;
 
-import it.unibo.wastemaster.core.models.RecurringSchedule;
-import it.unibo.wastemaster.core.models.RecurringSchedule.Frequency;
+import it.unibo.wastemaster.domain.model.RecurringSchedule;
+import it.unibo.wastemaster.domain.model.RecurringSchedule.Frequency;
 import java.util.List;
 import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
