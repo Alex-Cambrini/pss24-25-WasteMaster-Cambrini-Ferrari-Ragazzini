@@ -1,20 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <persistence xmlns="https://jakarta.ee/xml/ns/persistence" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="https://jakarta.ee/xml/ns/persistence https://jakarta.ee/xml/ns/persistence/persistence_3_0.xsd" version="3.0">
     <persistence-unit name="myJpaUnit">
-        <class>it.unibo.wastemaster.core.model.Collection</class>
-        <class>it.unibo.wastemaster.core.model.Customer</class>
-        <class>it.unibo.wastemaster.core.model.Account</class>
-        <class>it.unibo.wastemaster.core.model.Employee</class>
-        <class>it.unibo.wastemaster.core.model.Location</class>
-        <class>it.unibo.wastemaster.core.model.OneTimeSchedule</class>
-        <class>it.unibo.wastemaster.core.model.Person</class>
-        <class>it.unibo.wastemaster.core.model.RecurringSchedule</class>
-        <class>it.unibo.wastemaster.core.model.Schedule</class>
-        <class>it.unibo.wastemaster.core.model.Vehicle</class>
-        <class>it.unibo.wastemaster.core.model.Waste</class>
-        <class>it.unibo.wastemaster.core.model.WasteSchedule</class>
-        <class>it.unibo.wastemaster.core.model.Trip</class>
-        <class>it.unibo.wastemaster.core.model.Invoice</class>
+        <class>it.unibo.wastemaster.domain.model.Collection</class>
+        <class>it.unibo.wastemaster.domain.model.Customer</class>
+        <class>it.unibo.wastemaster.domain.model.Account</class>
+        <class>it.unibo.wastemaster.domain.model.Employee</class>
+        <class>it.unibo.wastemaster.domain.model.Location</class>
+        <class>it.unibo.wastemaster.domain.model.OneTimeSchedule</class>
+        <class>it.unibo.wastemaster.domain.model.Person</class>
+        <class>it.unibo.wastemaster.domain.model.RecurringSchedule</class>
+        <class>it.unibo.wastemaster.domain.model.Schedule</class>
+        <class>it.unibo.wastemaster.domain.model.Vehicle</class>
+        <class>it.unibo.wastemaster.domain.model.Waste</class>
+        <class>it.unibo.wastemaster.domain.model.WasteSchedule</class>
+        <class>it.unibo.wastemaster.domain.model.Trip</class>
+        <class>it.unibo.wastemaster.domain.model.Invoice</class>
         <properties>
             <property name="jakarta.persistence.jdbc.driver" value="com.mysql.cj.jdbc.Driver" />
             <property name="jakarta.persistence.jdbc.url" value="jdbc:mysql://localhost:3306/wastemaster_db" />
