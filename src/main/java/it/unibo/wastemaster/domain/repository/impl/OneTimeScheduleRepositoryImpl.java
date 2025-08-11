@@ -1,9 +1,9 @@
 package it.unibo.wastemaster.domain.repository.impl;
 
-import jakarta.persistence.EntityManager;
 import it.unibo.wastemaster.domain.model.OneTimeSchedule;
 import it.unibo.wastemaster.domain.repository.OneTimeScheduleRepository;
 import it.unibo.wastemaster.infrastructure.dao.OneTimeScheduleDAO;
+import java.util.Optional;
 
 public class OneTimeScheduleRepositoryImpl implements OneTimeScheduleRepository {
 
@@ -21,5 +21,10 @@ public class OneTimeScheduleRepositoryImpl implements OneTimeScheduleRepository 
     @Override
     public void update(OneTimeSchedule schedule) {
         oneTimeScheduleDAO.update(schedule);
+    }
+
+    @Override
+    public Optional<OneTimeSchedule> findById(Integer id) {
+        return oneTimeScheduleDAO.findById(id);
     }
 }
