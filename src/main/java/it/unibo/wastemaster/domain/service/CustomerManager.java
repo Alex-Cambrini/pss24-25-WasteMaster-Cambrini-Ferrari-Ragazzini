@@ -1,6 +1,6 @@
 package it.unibo.wastemaster.domain.service;
 
-import it.unibo.wastemaster.core.utils.ValidateUtils;
+import it.unibo.wastemaster.infrastructure.utils.ValidateUtils;
 import it.unibo.wastemaster.domain.model.Customer;
 import it.unibo.wastemaster.domain.repository.CustomerRepository;
 import java.util.List;

@@ -1,6 +1,6 @@
 package it.unibo.wastemaster.infrastructure.dao;
 
-import it.unibo.wastemaster.core.utils.TransactionHelper;
+import it.unibo.wastemaster.infrastructure.utils.TransactionHelper;
 import jakarta.persistence.EntityManager;
 import java.util.List;
 import java.util.Optional;
