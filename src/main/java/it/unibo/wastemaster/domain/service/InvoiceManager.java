@@ -1,10 +1,10 @@
 package it.unibo.wastemaster.domain.service;
 
-import it.unibo.wastemaster.domain.repository.CollectionRepository;
-import it.unibo.wastemaster.domain.repository.InvoiceRepository;
 import it.unibo.wastemaster.domain.model.Collection;
 import it.unibo.wastemaster.domain.model.Customer;
 import it.unibo.wastemaster.domain.model.Invoice;
+import it.unibo.wastemaster.domain.repository.CollectionRepository;
+import it.unibo.wastemaster.domain.repository.InvoiceRepository;
 import java.time.LocalDate;
 import java.time.Month;
 import java.util.ArrayList;
@@ -25,7 +25,8 @@ public final class InvoiceManager {
     private final CollectionRepository collectionRepository;
 
     /**
-     * Constructs an InvoiceManager with specified repositories for invoices and collections.
+     * Constructs an InvoiceManager with specified repositories for invoices and
+     * collections.
      *
      * @param invoiceRepository the repository managing invoice data
      * @param collectionRepository the repository managing collection data
@@ -44,8 +45,8 @@ public final class InvoiceManager {
      */
     public List<Invoice> generateInvoicesForFirstHalf(final int year) {
         return generateInvoicesForPeriod(
-            LocalDate.of(year, Month.JANUARY, 1),
-            LocalDate.of(year, Month.JUNE, JUNE_LAST_DAY)
+                LocalDate.of(year, Month.JANUARY, 1),
+                LocalDate.of(year, Month.JUNE, JUNE_LAST_DAY)
         );
     }
 
@@ -57,8 +58,8 @@ public final class InvoiceManager {
      */
     public List<Invoice> generateInvoicesForSecondHalf(final int year) {
         return generateInvoicesForPeriod(
-            LocalDate.of(year, Month.JULY, 1),
-            LocalDate.of(year, Month.DECEMBER, DECEMBER_LAST_DAY)
+                LocalDate.of(year, Month.JULY, 1),
+                LocalDate.of(year, Month.DECEMBER, DECEMBER_LAST_DAY)
         );
     }
 
@@ -66,25 +67,26 @@ public final class InvoiceManager {
      * Generates invoices for a specific date range.
      *
      * @param startDate the start date of the period (inclusive)
-     * @param endDate   the end date of the period (inclusive)
+     * @param endDate the end date of the period (inclusive)
      * @return a list of generated invoices
      */
     private List<Invoice> generateInvoicesForPeriod(final LocalDate startDate,
                                                     final LocalDate endDate) {
-        List<Collection> collections = collectionRepository.findByDateRange(startDate, endDate);
+        List<Collection> collections =
+                collectionRepository.findByDateRange(startDate, endDate);
 
         Map<Customer, List<Collection>> customerCollectionsMap = new HashMap<>();
         for (final Collection c : collections) {
             if (c.getCollectionStatus() == Collection.CollectionStatus.COMPLETED) {
                 customerCollectionsMap.computeIfAbsent(c.getCustomer(),
-                k -> new ArrayList<>()).add(c);
+                        k -> new ArrayList<>()).add(c);
             }
         }
 
         List<Invoice> invoices = new ArrayList<>();
 
         for (final Map.Entry<Customer,
-            List<Collection>> entry : customerCollectionsMap.entrySet()) {
+                List<Collection>> entry : customerCollectionsMap.entrySet()) {
             List<Collection> customerCollections = entry.getValue();
 
             for (final Collection collection : customerCollections) {

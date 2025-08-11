@@ -1,9 +1,9 @@
 package it.unibo.wastemaster.infrastructure.dao;
 
+import it.unibo.wastemaster.domain.model.Vehicle;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.NoResultException;
 import java.util.List;
-import it.unibo.wastemaster.domain.model.Vehicle;
 import java.util.Optional;
 
 /**
@@ -29,7 +29,8 @@ public final class VehicleDAO extends GenericDAO<Vehicle> {
     public Optional<Vehicle> findByPlate(final String plate) {
         try {
             Vehicle vehicle = getEntityManager()
-                    .createQuery("SELECT v FROM Vehicle v WHERE v.plate = :plate", Vehicle.class)
+                    .createQuery("SELECT v FROM Vehicle v WHERE v.plate = :plate",
+                            Vehicle.class)
                     .setParameter("plate", plate)
                     .getSingleResult();
             return Optional.of(vehicle);
@@ -37,7 +38,6 @@ public final class VehicleDAO extends GenericDAO<Vehicle> {
             return Optional.empty();
         }
     }
-
 
     /**
      * Retrieves all vehicles with the given status.

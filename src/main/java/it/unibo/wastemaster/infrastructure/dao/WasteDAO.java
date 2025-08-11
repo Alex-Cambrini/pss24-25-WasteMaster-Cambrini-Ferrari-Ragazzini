@@ -1,8 +1,8 @@
 package it.unibo.wastemaster.infrastructure.dao;
 
+import it.unibo.wastemaster.domain.model.Waste;
 import jakarta.persistence.EntityManager;
 import java.util.List;
-import it.unibo.wastemaster.domain.model.Waste;
 
 /**
  * DAO for managing Waste entities.

@@ -1,10 +1,10 @@
 package it.unibo.wastemaster.domain.repository.impl;
 
-import java.util.List;
-import java.util.Optional;
 import it.unibo.wastemaster.domain.model.Customer;
 import it.unibo.wastemaster.domain.repository.CustomerRepository;
 import it.unibo.wastemaster.infrastructure.dao.CustomerDAO;
+import java.util.List;
+import java.util.Optional;
 
 public class CustomerRepositoryImpl implements CustomerRepository {
 

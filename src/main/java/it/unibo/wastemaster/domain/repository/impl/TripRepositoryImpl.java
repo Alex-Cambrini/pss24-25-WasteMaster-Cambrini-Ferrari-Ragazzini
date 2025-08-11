@@ -1,9 +1,8 @@
 package it.unibo.wastemaster.domain.repository.impl;
 
-import it.unibo.wastemaster.infrastructure.dao.TripDAO;
 import it.unibo.wastemaster.domain.model.Trip;
 import it.unibo.wastemaster.domain.repository.TripRepository;
-
+import it.unibo.wastemaster.infrastructure.dao.TripDAO;
 import java.util.List;
 import java.util.Optional;
 

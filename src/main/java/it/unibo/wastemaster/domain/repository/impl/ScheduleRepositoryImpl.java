@@ -6,6 +6,7 @@ import it.unibo.wastemaster.infrastructure.dao.ScheduleDAO;
 import java.util.List;
 
 public class ScheduleRepositoryImpl implements ScheduleRepository {
+
     private final ScheduleDAO scheduleDAO;
 
     public ScheduleRepositoryImpl(ScheduleDAO scheduleDAO) {

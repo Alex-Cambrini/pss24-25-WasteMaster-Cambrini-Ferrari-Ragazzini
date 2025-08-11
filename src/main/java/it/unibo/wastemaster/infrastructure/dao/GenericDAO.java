@@ -87,6 +87,7 @@ public class GenericDAO<T> {
         T entity = entityManager.find(entityClass, id);
         return Optional.ofNullable(entity);
     }
+
     /**
      * Finds all entities of the given type.
      *

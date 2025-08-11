@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * Represents a trip assigned to a vehicle and 
+ * Represents a trip assigned to a vehicle and
  * a list of employees to perform waste collections.
  */
 @Entity
@@ -39,9 +39,9 @@ public final class Trip {
 
     @ManyToMany
     @JoinTable(
-        name = "trip_operators",
-        joinColumns = @JoinColumn(name = "trip_id"),
-        inverseJoinColumns = @JoinColumn(name = "employee_id")
+            name = "trip_operators",
+            joinColumns = @JoinColumn(name = "trip_id"),
+            inverseJoinColumns = @JoinColumn(name = "employee_id")
     )
     private List<Employee> operators;
 
@@ -71,13 +71,13 @@ public final class Trip {
     /**
      * Constructs a new Trip with the specified details.
      *
-     * @param postalCode         the postal code associated with the trip
-     * @param assignedVehicle    the vehicle assigned to the trip
-     * @param operators          the list of employees (operators) for the trip
-     * @param departureTime      the scheduled departure time
+     * @param postalCode the postal code associated with the trip
+     * @param assignedVehicle the vehicle assigned to the trip
+     * @param operators the list of employees (operators) for the trip
+     * @param departureTime the scheduled departure time
      * @param expectedReturnTime the expected return time
-     * @param status             the current status of the trip
-     * @param collections        the list of collections to be performed during the trip
+     * @param status the current status of the trip
+     * @param collections the list of collections to be performed during the trip
      */
     public Trip(final String postalCode, final Vehicle assignedVehicle,
                 final List<Employee> operators, final LocalDateTime departureTime,
@@ -235,27 +235,28 @@ public final class Trip {
     @Override
     public String toString() {
         final String operatorNames = this.operators != null
-            ? this.operators.stream()
-            .map(e -> e.getName() + " " + e.getSurname())
-            .collect(Collectors.joining(", "))
-            : "N/A";
+                ? this.operators.stream()
+                .map(e -> e.getName() + " " + e.getSurname())
+                .collect(Collectors.joining(", "))
+                : "N/A";
         final String collectionIds = this.collections != null
-            ? this.collections.stream()
-            .map(c -> String.valueOf(c.getCollectionId()))
-            .collect(Collectors.joining(", "))
-            : "N/A";
+                ? this.collections.stream()
+                .map(c -> String.valueOf(c.getCollectionId()))
+                .collect(Collectors.joining(", "))
+                : "N/A";
 
         return String.format(
-            "Trip {ID: %d, PostalCode: %s, Vehicle: %s, Operators: %s, Departure: %s, "
-                + "ExpectedReturn: %s, Status: %s, CollectionIDs: %s}",
-            tripId,
-            postalCode != null ? postalCode : "N/A",
-            assignedVehicle != null ? assignedVehicle.getPlate() : "N/A",
-            operatorNames,
-            departureTime != null ? departureTime.toString() : "N/A",
-            expectedReturnTime != null ? expectedReturnTime.toString() : "N/A",
-            status != null ? status.name() : "N/A",
-            collectionIds);
+                "Trip {ID: %d, PostalCode: %s, Vehicle: %s, Operators: %s, Departure: "
+                        + "%s, "
+                        + "ExpectedReturn: %s, Status: %s, CollectionIDs: %s}",
+                tripId,
+                postalCode != null ? postalCode : "N/A",
+                assignedVehicle != null ? assignedVehicle.getPlate() : "N/A",
+                operatorNames,
+                departureTime != null ? departureTime.toString() : "N/A",
+                expectedReturnTime != null ? expectedReturnTime.toString() : "N/A",
+                status != null ? status.name() : "N/A",
+                collectionIds);
     }
 
     /**
