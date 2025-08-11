@@ -275,4 +275,8 @@ public class RecurringScheduleManager {
         return true;
     }
 
+    public List<RecurringSchedule> findAllRecurringSchedule(){
+        return recurringScheduleRepository.findAll();
+    }
+
 }
