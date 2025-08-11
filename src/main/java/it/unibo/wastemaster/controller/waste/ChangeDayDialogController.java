@@ -1,6 +1,6 @@
 package it.unibo.wastemaster.controller.waste;
 
-import it.unibo.wastemaster.core.models.WasteSchedule;
+import it.unibo.wastemaster.domain.model.WasteSchedule;
 import java.time.DayOfWeek;
 import java.util.Arrays;
 import javafx.fxml.FXML;
