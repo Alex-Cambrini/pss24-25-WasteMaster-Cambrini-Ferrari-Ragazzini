@@ -16,8 +16,8 @@ public class CollectionRepositoryImpl implements CollectionRepository {
 
     private final CollectionDAO collectionDAO;
 
-    public CollectionRepositoryImpl(EntityManager entityManager) {
-        this.collectionDAO = new CollectionDAO(entityManager);
+    public CollectionRepositoryImpl(CollectionDAO collectionDAO) {
+        this.collectionDAO = collectionDAO;
     }
 
     @Override

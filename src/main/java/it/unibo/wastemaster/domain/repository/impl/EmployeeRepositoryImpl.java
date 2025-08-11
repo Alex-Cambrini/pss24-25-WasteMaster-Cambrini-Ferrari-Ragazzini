@@ -11,8 +11,8 @@ public class EmployeeRepositoryImpl implements EmployeeRepository {
 
     private final EmployeeDAO employeeDAO;
 
-    public EmployeeRepositoryImpl(EntityManager entityManager) {
-        this.employeeDAO = new EmployeeDAO(entityManager);
+    public EmployeeRepositoryImpl(EmployeeDAO employeeDAO) {
+        this.employeeDAO = employeeDAO;
     }
 
     @Override

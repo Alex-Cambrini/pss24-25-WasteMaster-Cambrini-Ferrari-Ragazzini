@@ -9,8 +9,8 @@ public class OneTimeScheduleRepositoryImpl implements OneTimeScheduleRepository 
 
     private final OneTimeScheduleDAO oneTimeScheduleDAO;
 
-    public OneTimeScheduleRepositoryImpl(EntityManager entityManager) {
-        this.oneTimeScheduleDAO = new OneTimeScheduleDAO(entityManager);
+    public OneTimeScheduleRepositoryImpl(OneTimeScheduleDAO oneTimeScheduleDAO) {
+        this.oneTimeScheduleDAO = oneTimeScheduleDAO;
     }
 
     @Override
