@@ -1,9 +1,7 @@
 package it.unibo.wastemaster.domain.service;
 
-import it.unibo.wastemaster.core.dao.CollectionDAO;
 import it.unibo.wastemaster.domain.repository.CollectionRepository;
 import it.unibo.wastemaster.domain.repository.InvoiceRepository;
-import it.unibo.wastemaster.infrastructure.dao.InvoiceDAO;
 import it.unibo.wastemaster.domain.model.Collection;
 import it.unibo.wastemaster.domain.model.Customer;
 import it.unibo.wastemaster.domain.model.Invoice;
@@ -27,10 +25,10 @@ public final class InvoiceManager {
     private final CollectionRepository collectionRepository;
 
     /**
-     * Constructs an InvoiceManager with a specified InvoiceDAO and CollectionDAO.
+     * Constructs an InvoiceManager with specified repositories for invoices and collections.
      *
-     * @param invoiceRepository the data access object for invoices
-     * @param collectionRepository the data access object for collections
+     * @param invoiceRepository the repository managing invoice data
+     * @param collectionRepository the repository managing collection data
      */
     public InvoiceManager(final InvoiceRepository invoiceRepository,
                           final CollectionRepository collectionRepository) {
