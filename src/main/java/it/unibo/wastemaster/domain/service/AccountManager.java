@@ -4,6 +4,7 @@ import it.unibo.wastemaster.domain.exception.AccountCreationException;
 import it.unibo.wastemaster.domain.model.Account;
 import it.unibo.wastemaster.domain.model.Employee;
 import it.unibo.wastemaster.domain.repository.AccountRepository;
+import java.util.Optional;
 import org.mindrot.jbcrypt.BCrypt;
 
 /**
@@ -15,9 +16,9 @@ public class AccountManager {
     private final AccountRepository accountRepository;
 
     /**
-     * Constructs an AccountManager with the given AccountDAO.
+     * Constructs an AccountManager with the given AccountRepository.
      *
-     * @param accountDAO the DAO used for account persistence operations
+     * @param accountRepository the repository used for account persistence operations
      */
     public AccountManager(final AccountRepository accountRepository) {
         this.accountRepository = accountRepository;
@@ -61,5 +62,9 @@ public class AccountManager {
      */
     private String hashPassword(final String rawPassword) {
         return BCrypt.hashpw(rawPassword, BCrypt.gensalt());
+    }
+
+    public Optional<Account> findAccountByEmployeeEmail(final String email) {
+        return accountRepository.findAccountByEmployeeEmail(email);
     }
 }

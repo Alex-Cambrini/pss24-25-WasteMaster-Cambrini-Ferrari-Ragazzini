@@ -1,9 +1,9 @@
 package it.unibo.wastemaster.infrastructure.dao;
 
+import it.unibo.wastemaster.domain.model.Account;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.NoResultException;
 import java.util.Optional;
-import it.unibo.wastemaster.domain.model.Account;
 
 /**
  * DAO for {@link Account} entity operations.

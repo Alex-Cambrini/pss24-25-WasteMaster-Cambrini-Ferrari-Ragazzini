@@ -1,9 +1,9 @@
 package it.unibo.wastemaster.domain.repository.impl;
 
-import java.util.Optional;
 import it.unibo.wastemaster.domain.model.Account;
 import it.unibo.wastemaster.domain.repository.AccountRepository;
 import it.unibo.wastemaster.infrastructure.dao.AccountDAO;
+import java.util.Optional;
 
 public class AccountRepositoryImpl implements AccountRepository {
 
@@ -30,11 +30,11 @@ public class AccountRepositoryImpl implements AccountRepository {
 
     @Override
     public Optional<Account> findAccountByEmployeeEmail(String email) {
-        return accountDAO.findAccountByEmployeeEmail(email);        
+        return accountDAO.findAccountByEmployeeEmail(email);
     }
 
     @Override
     public void update(Account account) {
-       accountDAO.update(account); 
+        accountDAO.update(account);
     }
 }
