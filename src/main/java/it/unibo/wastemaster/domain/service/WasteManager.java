@@ -1,8 +1,8 @@
 package it.unibo.wastemaster.domain.service;
 
-import it.unibo.wastemaster.core.dao.WasteDAO;
 import it.unibo.wastemaster.core.utils.ValidateUtils;
 import it.unibo.wastemaster.domain.model.Waste;
+import it.unibo.wastemaster.domain.repository.WasteRepository;
 import java.util.List;
 
 /**
@@ -11,15 +11,15 @@ import java.util.List;
  */
 public final class WasteManager {
 
-    private final WasteDAO wasteDAO;
+    private final WasteRepository wasteRepository;
 
     /**
      * Constructs a WasteManager with the specified DAO.
      *
-     * @param wasteDAO the DAO to use, must not be null
+     * @param wasteRepository the DAO to use, must not be null
      */
-    public WasteManager(final WasteDAO wasteDAO) {
-        this.wasteDAO = wasteDAO;
+    public WasteManager(final WasteRepository wasteRepository) {
+        this.wasteRepository = wasteRepository;
     }
 
     /**
@@ -28,7 +28,7 @@ public final class WasteManager {
      * @return a list of active Waste objects
      */
     public List<Waste> getActiveWastes() {
-        return wasteDAO.findActiveWastes();
+        return wasteRepository.findActive();
     }
 
     /**
@@ -47,7 +47,7 @@ public final class WasteManager {
                     "Waste with the same name already exists.");
         }
 
-        wasteDAO.insert(waste);
+        wasteRepository.save(waste);
         return waste;
     }
 
@@ -58,7 +58,7 @@ public final class WasteManager {
      * @return true if already registered, false otherwise
      */
     private boolean isWasteNameRegistered(final String name) {
-        return wasteDAO.existsByName(name);
+        return wasteRepository.existsByName(name);
     }
 
     /**
@@ -73,7 +73,7 @@ public final class WasteManager {
             ValidateUtils.requireArgNotNull(waste.getWasteId(),
                     "Waste ID cannot be null");
             waste.delete();
-            wasteDAO.update(waste);
+            wasteRepository.update(waste);
             return true;
         } catch (IllegalArgumentException e) {
             return false;
