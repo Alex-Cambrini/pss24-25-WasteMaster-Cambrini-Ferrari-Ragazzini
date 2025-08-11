@@ -2,8 +2,6 @@ package it.unibo.wastemaster.infrastructure.dao;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import it.unibo.wastemaster.infrastructure.AbstractDatabaseTest;
@@ -12,6 +10,7 @@ import it.unibo.wastemaster.domain.model.Location;
 import it.unibo.wastemaster.domain.model.Employee.Licence;
 import it.unibo.wastemaster.domain.model.Employee.Role;
 import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -65,16 +64,12 @@ class EmployeeDAOTest extends AbstractDatabaseTest {
                 Licence.NONE);
         getEmployeeDAO().insert(employee);
 
-        Employee foundEmployee = getEmployeeDAO().findByEmail(existingEmail);
-        assertNotNull(foundEmployee,
-                "Employee should be found for existing email");
-        assertEquals(existingEmail, foundEmployee.getEmail(),
-                "Email should match");
+        Optional<Employee> foundEmployeeOpt = getEmployeeDAO().findByEmail(existingEmail);
+        assertTrue(foundEmployeeOpt.isPresent(), "Employee should be found for existing email");
+        assertEquals(existingEmail, foundEmployeeOpt.get().getEmail(), "Email should match");
 
-        Employee notFoundEmployee =
-                getEmployeeDAO().findByEmail(nonExistingEmail);
-        assertNull(notFoundEmployee,
-                "Employee should not be found for non-existing email");
+        Optional<Employee> notFoundEmployeeOpt = getEmployeeDAO().findByEmail(nonExistingEmail);
+        assertTrue(notFoundEmployeeOpt.isEmpty(), "Employee should not be found for non-existing email");
     }
 
     /**
