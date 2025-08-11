@@ -1,9 +1,9 @@
 package it.unibo.wastemaster.domain.service;
 
-import it.unibo.wastemaster.infrastructure.utils.ValidateUtils;
 import it.unibo.wastemaster.domain.model.Waste;
 import it.unibo.wastemaster.domain.model.WasteSchedule;
 import it.unibo.wastemaster.domain.repository.WasteScheduleRepository;
+import it.unibo.wastemaster.infrastructure.utils.ValidateUtils;
 import java.time.DayOfWeek;
 
 /**
@@ -63,5 +63,9 @@ public final class WasteScheduleManager {
         ValidateUtils.requireStateNotNull(schedule,
                 "No WasteSchedule found for waste type: " + waste.getWasteName());
         return schedule;
+    }
+
+    public void deleteSchedule(WasteSchedule wasteSchedule) {
+        wasteScheduleRepository.delete(wasteSchedule);
     }
 }
