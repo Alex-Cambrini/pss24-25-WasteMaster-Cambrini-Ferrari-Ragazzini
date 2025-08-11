@@ -1,12 +1,12 @@
 package it.unibo.wastemaster.domain.repository.impl;
 
-import jakarta.persistence.EntityManager;
 import it.unibo.wastemaster.domain.repository.RecurringScheduleRepository;
 import it.unibo.wastemaster.infrastructure.dao.RecurringScheduleDAO;
 import it.unibo.wastemaster.domain.model.Customer;
 import it.unibo.wastemaster.domain.model.RecurringSchedule;
 
 import java.util.List;
+import java.util.Optional;
 
 public class RecurringScheduleRepositoryImpl implements RecurringScheduleRepository {
 
@@ -27,6 +27,11 @@ public class RecurringScheduleRepositoryImpl implements RecurringScheduleReposit
     }
 
     @Override
+    public Optional<RecurringSchedule> findById(Integer id) {
+        return recurringScheduleDAO.findById(id);
+    }
+
+    @Override
     public List<RecurringSchedule> findActiveSchedulesWithoutFutureCollections() {
         return recurringScheduleDAO.findActiveSchedulesWithoutFutureCollections();
     }
@@ -39,10 +44,5 @@ public class RecurringScheduleRepositoryImpl implements RecurringScheduleReposit
     @Override
     public List<RecurringSchedule> findSchedulesByCustomer(Customer customer) {
         return recurringScheduleDAO.findSchedulesByCustomer(customer);
-    }
-
-    @Override
-    public List<RecurringSchedule> findAll() {
-        return recurringScheduleDAO.findAll();
     }
 }
