@@ -1,6 +1,6 @@
 package it.unibo.wastemaster.main;
 
-import it.unibo.wastemaster.core.context.AppContext;
+import it.unibo.wastemaster.application.context.AppContext;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
