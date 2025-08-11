@@ -3,6 +3,7 @@ package it.unibo.wastemaster.domain.service;
 import it.unibo.wastemaster.core.utils.ValidateUtils;
 import it.unibo.wastemaster.domain.model.Customer;
 import it.unibo.wastemaster.domain.repository.CustomerRepository;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -91,5 +92,14 @@ public class CustomerManager {
      */
     public Optional<Customer> getCustomerById(final int customerId) {
         return customerRepository.findById(customerId);
+    }
+
+    /**
+     * Returns all customers.
+     *
+     * @return list of all customers
+     */
+    public List<Customer> getAllCustomers() {
+        return customerRepository.findAll();
     }
 }
