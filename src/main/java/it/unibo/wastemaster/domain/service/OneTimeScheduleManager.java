@@ -1,5 +1,6 @@
 package it.unibo.wastemaster.domain.service;
 
+import it.unibo.wastemaster.domain.model.RecurringSchedule;
 import it.unibo.wastemaster.infrastructure.utils.ValidateUtils;
 import it.unibo.wastemaster.domain.model.Collection;
 import it.unibo.wastemaster.domain.model.Customer;
@@ -9,6 +10,7 @@ import it.unibo.wastemaster.domain.model.Collection.CollectionStatus;
 import it.unibo.wastemaster.domain.model.Schedule.ScheduleStatus;
 import it.unibo.wastemaster.domain.repository.OneTimeScheduleRepository;
 import java.time.LocalDate;
+import java.util.Optional;
 
 /**
  * Manages operations related to one-time waste pickup schedules.
@@ -93,5 +95,9 @@ public class OneTimeScheduleManager {
             return true;
         }
         return false;
+    }
+
+    public Optional<OneTimeSchedule>  findOneTimeScheduleById(Integer id){
+        return oneTimeScheduleRepository.findById(id);
     }
 }
