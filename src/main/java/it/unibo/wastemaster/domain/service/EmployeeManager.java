@@ -1,12 +1,10 @@
 package it.unibo.wastemaster.domain.service;
 
 import java.util.Optional;
-import it.unibo.wastemaster.core.utils.TransactionHelper;
-import it.unibo.wastemaster.core.utils.ValidateUtils;
+import it.unibo.wastemaster.infrastructure.utils.ValidateUtils;
 import it.unibo.wastemaster.domain.model.Employee;
 import it.unibo.wastemaster.domain.model.Vehicle;
 import it.unibo.wastemaster.domain.repository.EmployeeRepository;
-import jakarta.persistence.EntityManager;
 
 /**
  * Manages operations related to employees such as creation, update, deletion and
