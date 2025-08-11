@@ -1,10 +1,8 @@
 package it.unibo.wastemaster.viewmodels;
 
-import it.unibo.wastemaster.core.models.OneTimeSchedule;
-import it.unibo.wastemaster.core.models.RecurringSchedule;
-import it.unibo.wastemaster.core.models.RecurringSchedule.Frequency;
-import it.unibo.wastemaster.core.models.Schedule.ScheduleCategory;
-import it.unibo.wastemaster.core.models.Schedule.ScheduleStatus;
+import it.unibo.wastemaster.domain.model.OneTimeSchedule;
+import it.unibo.wastemaster.domain.model.RecurringSchedule;
+import it.unibo.wastemaster.domain.model.Schedule;
 import java.time.LocalDate;
 
 /**
@@ -15,11 +13,11 @@ public final class ScheduleRow {
 
     private final int id;
     private final String wasteName;
-    private final ScheduleCategory scheduleCategory;
-    private final Frequency frequency;
+    private final Schedule.ScheduleCategory scheduleCategory;
+    private final RecurringSchedule.Frequency frequency;
     private final LocalDate executionDate;
     private final LocalDate startDate;
-    private final ScheduleStatus status;
+    private final Schedule.ScheduleStatus status;
     private final String customer;
 
     /**
@@ -30,7 +28,7 @@ public final class ScheduleRow {
     public ScheduleRow(final OneTimeSchedule schedule) {
         this.id = schedule.getScheduleId();
         this.wasteName = schedule.getWaste().getWasteName();
-        this.scheduleCategory = ScheduleCategory.ONE_TIME;
+        this.scheduleCategory = Schedule.ScheduleCategory.ONE_TIME;
         this.frequency = null;
         this.executionDate = schedule.getPickupDate();
         this.startDate = null;
@@ -47,7 +45,7 @@ public final class ScheduleRow {
     public ScheduleRow(final RecurringSchedule schedule) {
         this.id = schedule.getScheduleId();
         this.wasteName = schedule.getWaste().getWasteName();
-        this.scheduleCategory = ScheduleCategory.RECURRING;
+        this.scheduleCategory = Schedule.ScheduleCategory.RECURRING;
         this.frequency = schedule.getFrequency();
         this.executionDate = schedule.getNextCollectionDate();
         this.startDate = schedule.getStartDate();
@@ -79,7 +77,7 @@ public final class ScheduleRow {
      *
      * @return the schedule category
      */
-    public ScheduleCategory getScheduleCategory() {
+    public Schedule.ScheduleCategory getScheduleCategory() {
         return scheduleCategory;
     }
 
@@ -88,7 +86,7 @@ public final class ScheduleRow {
      *
      * @return the frequency, or null if one-time
      */
-    public Frequency getFrequency() {
+    public RecurringSchedule.Frequency getFrequency() {
         return frequency;
     }
 
@@ -115,7 +113,7 @@ public final class ScheduleRow {
      *
      * @return the schedule status
      */
-    public ScheduleStatus getStatus() {
+    public Schedule.ScheduleStatus getStatus() {
         return status;
     }
 

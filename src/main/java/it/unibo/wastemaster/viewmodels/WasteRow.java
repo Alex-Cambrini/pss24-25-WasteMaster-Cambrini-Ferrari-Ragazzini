@@ -1,7 +1,7 @@
 package it.unibo.wastemaster.viewmodels;
 
-import it.unibo.wastemaster.core.models.Waste;
-import it.unibo.wastemaster.core.models.WasteSchedule;
+import it.unibo.wastemaster.domain.model.Waste;
+import it.unibo.wastemaster.domain.model.WasteSchedule;
 import java.time.DayOfWeek;
 
 /**

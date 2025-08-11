@@ -1,9 +1,9 @@
 package it.unibo.wastemaster.viewmodels;
 
-import it.unibo.wastemaster.core.models.Employee;
-import it.unibo.wastemaster.core.models.Employee.Licence;
-import it.unibo.wastemaster.core.models.Employee.Role;
-import it.unibo.wastemaster.core.models.Location;
+import it.unibo.wastemaster.domain.model.Employee;
+import it.unibo.wastemaster.domain.model.Employee.Licence;
+import it.unibo.wastemaster.domain.model.Employee.Role;
+import it.unibo.wastemaster.domain.model.Location;
 
 /**
  * ViewModel class representing an employee row to be shown in UI tables.

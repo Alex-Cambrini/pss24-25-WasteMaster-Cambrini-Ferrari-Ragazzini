@@ -1,7 +1,7 @@
 package it.unibo.wastemaster.viewmodels;
 
-import it.unibo.wastemaster.core.models.Collection;
-import it.unibo.wastemaster.core.models.Collection.CollectionStatus;
+import it.unibo.wastemaster.domain.model.Collection;
+import it.unibo.wastemaster.domain.model.Collection.CollectionStatus;
 import java.time.LocalDate;
 
 /**

@@ -1,8 +1,8 @@
 package it.unibo.wastemaster.viewmodels;
 
-import it.unibo.wastemaster.core.models.Vehicle;
-import it.unibo.wastemaster.core.models.Vehicle.RequiredLicence;
-import it.unibo.wastemaster.core.models.Vehicle.VehicleStatus;
+import it.unibo.wastemaster.domain.model.Vehicle;
+import it.unibo.wastemaster.domain.model.Vehicle.RequiredLicence;
+import it.unibo.wastemaster.domain.model.Vehicle.VehicleStatus;
 import java.time.LocalDate;
 
 /**

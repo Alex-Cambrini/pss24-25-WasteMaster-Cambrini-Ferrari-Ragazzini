@@ -1,6 +1,6 @@
 package it.unibo.wastemaster.viewmodels;
 
-import it.unibo.wastemaster.core.models.Customer;
+import it.unibo.wastemaster.domain.model.Customer;
 
 /**
  * ViewModel class representing a customer row to be shown in UI tables. It wraps relevant
