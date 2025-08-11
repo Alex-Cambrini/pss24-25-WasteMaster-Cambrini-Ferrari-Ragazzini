@@ -275,8 +275,7 @@ public class RecurringScheduleManager {
         return true;
     }
 
-    public List<RecurringSchedule> findAllRecurringSchedule(){
-        return recurringScheduleRepository.findAll();
+    public Optional<RecurringSchedule> findRecurringScheduleById(Integer id) {
+        return recurringScheduleRepository.findById(id);
     }
-
 }
