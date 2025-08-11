@@ -19,6 +19,7 @@ public class ServiceFactory {
     private final VehicleManager vehicleManager;
     private final TripManager tripManager;
     private final InvoiceManager invoiceManager;
+    private final ScheduleManager scheduleManager;
 
     public ServiceFactory(EntityManager em) {
         var locationDao = new GenericDAO<>(em, Location.class);
@@ -33,6 +34,7 @@ public class ServiceFactory {
         var vehicleDao = new VehicleDAO(em);
         var tripDao = new TripDAO(em);
         var invoiceDao = new InvoiceDAO(em);
+        var scheduleDao = new ScheduleDAO(em);
 
         var accountRepository = new AccountRepositoryImpl(accountDao);
         var employeeRepository = new EmployeeRepositoryImpl(employeeDao);
@@ -45,6 +47,7 @@ public class ServiceFactory {
         var vehicleRepository = new VehicleRepositoryImpl(vehicleDao);
         var tripRepository = new TripRepositoryImpl(tripDao);
         var invoiceRepository = new InvoiceRepositoryImpl(invoiceDao);
+        var scheduleRepository = new ScheduleRepositoryImpl(scheduleDao);
 
         this.accountManager = new AccountManager(accountRepository);
         this.wasteManager = new WasteManager(wasteRepository);
@@ -58,6 +61,7 @@ public class ServiceFactory {
         this.tripManager = new TripManager(tripRepository);
         this.invoiceManager = new InvoiceManager(invoiceRepository, collectionRepository);
         this.employeeManager = new EmployeeManager(employeeRepository, accountManager);
+        this.scheduleManager = new ScheduleManager(scheduleRepository);
     }
 
     public AccountManager getAccountManager() { return accountManager; }
@@ -71,4 +75,5 @@ public class ServiceFactory {
     public VehicleManager getVehicleManager() { return vehicleManager; }
     public TripManager getTripManager() { return tripManager; }
     public InvoiceManager getInvoiceManager() { return invoiceManager; }
+    public ScheduleManager getScheduleManager() {return scheduleManager;}
 }
