@@ -2,13 +2,13 @@ package it.unibo.wastemaster.core.models;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import it.unibo.wastemaster.core.AbstractDatabaseTest;
 import it.unibo.wastemaster.core.utils.ValidateUtils;
 import it.unibo.wastemaster.domain.model.Waste;
 import jakarta.validation.ConstraintViolation;
+import java.util.Optional;
 import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -52,11 +52,14 @@ class WasteTest extends AbstractDatabaseTest {
     void testPersistence() {
         getWasteDAO().insert(waste);
         int id = waste.getWasteId();
-        Waste found = getWasteDAO().findById(id);
-        assertNotNull(found);
-        assertEquals(waste.getWasteName(), found.getWasteName());
-        assertEquals(waste.getIsRecyclable(), found.getIsRecyclable());
-        assertEquals(waste.getIsDangerous(), found.getIsDangerous());
+
+        Optional<Waste> found = getWasteDAO().findById(id);
+        assertTrue(found.isPresent());
+        Waste foundWaste = found.get();
+
+        assertEquals(waste.getWasteName(), foundWaste.getWasteName());
+        assertEquals(waste.getIsRecyclable(), foundWaste.getIsRecyclable());
+        assertEquals(waste.getIsDangerous(), foundWaste.getIsDangerous());
     }
 
     @Test
@@ -64,8 +67,12 @@ class WasteTest extends AbstractDatabaseTest {
         getWasteDAO().insert(waste);
         waste.delete();
         getWasteDAO().update(waste);
-        Waste found = getWasteDAO().findById(waste.getWasteId());
-        assertTrue(found.isDeleted());
+
+        Optional<Waste> found = getWasteDAO().findById(waste.getWasteId());
+        assertTrue(found.isPresent());
+        Waste foundWaste = found.get();
+
+        assertTrue(foundWaste.isDeleted());
     }
 
     @Test

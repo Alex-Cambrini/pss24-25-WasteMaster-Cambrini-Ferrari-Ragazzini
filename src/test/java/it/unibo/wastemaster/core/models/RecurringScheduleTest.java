@@ -15,6 +15,7 @@ import it.unibo.wastemaster.domain.model.Schedule;
 import it.unibo.wastemaster.domain.model.Waste;
 import jakarta.validation.ConstraintViolation;
 import java.time.LocalDate;
+import java.util.Optional;
 import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -99,15 +100,22 @@ class RecurringScheduleTest extends AbstractDatabaseTest {
         getCustomerDAO().insert(customer);
         getWasteDAO().insert(plastic);
         getRecurringScheduleDAO().insert(schedule);
+
         int scheduleId = schedule.getScheduleId();
-        RecurringSchedule found = getRecurringScheduleDAO().findById(scheduleId);
-        assertNotNull(found);
+
+        Optional<RecurringSchedule> foundOpt =
+                getRecurringScheduleDAO().findById(scheduleId);
+        assertTrue(foundOpt.isPresent());
+
+        RecurringSchedule found = foundOpt.get();
         assertEquals(schedule.getFrequency(), found.getFrequency());
         assertEquals(schedule.getStartDate(), found.getStartDate());
 
         getRecurringScheduleDAO().delete(found);
-        RecurringSchedule deleted = getRecurringScheduleDAO().findById(scheduleId);
-        assertNull(deleted);
+
+        Optional<RecurringSchedule> deletedOpt =
+                getRecurringScheduleDAO().findById(scheduleId);
+        assertTrue(deletedOpt.isEmpty());
     }
 
     @Test
