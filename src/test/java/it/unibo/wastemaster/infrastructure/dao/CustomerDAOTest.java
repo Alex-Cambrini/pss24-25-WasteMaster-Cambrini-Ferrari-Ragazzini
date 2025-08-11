@@ -94,7 +94,7 @@ class CustomerDAOTest extends AbstractDatabaseTest {
         deletedCustomer.delete();
         getCustomerDAO().update(deletedCustomer);
 
-        var result = getCustomerDAO().findCustomerDetails();
+        var result = getCustomerDAO().findActive();
 
         assertTrue(result.stream()
                         .anyMatch(c -> c.getEmail().equals("marco@example.com")),
