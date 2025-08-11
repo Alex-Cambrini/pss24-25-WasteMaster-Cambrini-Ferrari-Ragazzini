@@ -20,8 +20,10 @@ public class ServiceFactory {
     private final TripManager tripManager;
     private final InvoiceManager invoiceManager;
     private final ScheduleManager scheduleManager;
+    private final LoginManager loginManager;
 
     public ServiceFactory(EntityManager em) {
+
         var locationDao = new GenericDAO<>(em, Location.class);
         var accountDao = new AccountDAO(em);
         var employeeDao = new EmployeeDAO(em);
@@ -50,6 +52,7 @@ public class ServiceFactory {
         var scheduleRepository = new ScheduleRepositoryImpl(scheduleDao);
 
         this.accountManager = new AccountManager(accountRepository);
+        this.loginManager = new LoginManager(accountRepository);
         this.wasteManager = new WasteManager(wasteRepository);
         this.customerManager = new CustomerManager(customerRepository);
         this.wasteScheduleManager = new WasteScheduleManager(wasteScheduleRepository);
@@ -65,6 +68,7 @@ public class ServiceFactory {
     }
 
     public AccountManager getAccountManager() { return accountManager; }
+    public LoginManager getLoginManager() { return loginManager; }
     public EmployeeManager getEmployeeManager() { return employeeManager; }
     public WasteManager getWasteManager() { return wasteManager; }
     public CustomerManager getCustomerManager() { return customerManager; }
