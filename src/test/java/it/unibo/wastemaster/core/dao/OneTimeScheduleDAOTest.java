@@ -1,8 +1,6 @@
 package it.unibo.wastemaster.core.dao;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import it.unibo.wastemaster.core.AbstractDatabaseTest;
@@ -11,6 +9,7 @@ import it.unibo.wastemaster.domain.model.Location;
 import it.unibo.wastemaster.domain.model.OneTimeSchedule;
 import it.unibo.wastemaster.domain.model.Waste;
 import java.time.LocalDate;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -38,7 +37,6 @@ class OneTimeScheduleDAOTest extends AbstractDatabaseTest {
         customer2 = new Customer("Luca", "Verdi", location2, "luca.verdi@example.com",
                 "1234567890");
 
-        getEntityManager().getTransaction().begin();
         getWasteDAO().insert(waste);
         getCustomerDAO().insert(customer1);
         getCustomerDAO().insert(customer2);
@@ -55,9 +53,11 @@ class OneTimeScheduleDAOTest extends AbstractDatabaseTest {
     @Test
     void findTest() {
         getOneTimeScheduleDAO().insert(schedule);
-        OneTimeSchedule found =
+
+        Optional<OneTimeSchedule> foundOpt =
                 getOneTimeScheduleDAO().findById(schedule.getScheduleId());
-        assertNotNull(found);
+        assertTrue(foundOpt.isPresent());
+        OneTimeSchedule found = foundOpt.get();
         assertEquals(schedule.getScheduleId(), found.getScheduleId());
         assertEquals(schedule.getCustomer(), found.getCustomer());
         assertEquals(schedule.getWaste(), found.getWaste());
@@ -66,11 +66,15 @@ class OneTimeScheduleDAOTest extends AbstractDatabaseTest {
     @Test
     void deleteTest() {
         getOneTimeScheduleDAO().insert(schedule);
-        OneTimeSchedule toDelete =
+
+        Optional<OneTimeSchedule> toDeleteOpt =
                 getOneTimeScheduleDAO().findById(schedule.getScheduleId());
-        getOneTimeScheduleDAO().delete(toDelete);
-        OneTimeSchedule deleted =
+        assertTrue(toDeleteOpt.isPresent());
+
+        getOneTimeScheduleDAO().delete(toDeleteOpt.get());
+
+        Optional<OneTimeSchedule> deletedOpt =
                 getOneTimeScheduleDAO().findById(schedule.getScheduleId());
-        assertNull(deleted);
+        assertTrue(deletedOpt.isEmpty());
     }
 }

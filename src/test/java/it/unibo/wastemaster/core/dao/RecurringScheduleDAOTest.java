@@ -50,7 +50,6 @@ class RecurringScheduleDAOTest extends AbstractDatabaseTest {
         customer2 = new Customer("Luca", "Verdi", location2, "luca.verdi@example.com",
                 "1234567890");
 
-        getEntityManager().getTransaction().begin();
         getWasteDAO().insert(waste);
         getCustomerDAO().insert(customer1);
         getCustomerDAO().insert(customer2);
