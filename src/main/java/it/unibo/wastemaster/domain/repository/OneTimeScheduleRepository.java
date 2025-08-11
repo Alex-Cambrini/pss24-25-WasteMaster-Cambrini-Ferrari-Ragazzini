@@ -6,6 +6,8 @@ import java.util.Optional;
 public interface OneTimeScheduleRepository {
 
     void save(OneTimeSchedule schedule);
+
     void update(OneTimeSchedule schedule);
+
     Optional<OneTimeSchedule> findById(Integer id);
 }

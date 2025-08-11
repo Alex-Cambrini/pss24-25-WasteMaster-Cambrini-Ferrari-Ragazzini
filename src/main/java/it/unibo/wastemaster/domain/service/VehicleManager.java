@@ -1,9 +1,10 @@
 package it.unibo.wastemaster.domain.service;
 
-import it.unibo.wastemaster.infrastructure.utils.ValidateUtils;
 import it.unibo.wastemaster.domain.model.Vehicle;
 import it.unibo.wastemaster.domain.repository.VehicleRepository;
+import it.unibo.wastemaster.infrastructure.utils.ValidateUtils;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -66,7 +67,7 @@ public final class VehicleManager {
      *
      * @param vehicle the vehicle to update
      * @throws IllegalArgumentException if the new plate is already used by another
-     *         vehicle
+     * vehicle
      */
     public void updateVehicle(final Vehicle vehicle) {
         ValidateUtils.validateEntity(vehicle);
@@ -77,7 +78,8 @@ public final class VehicleManager {
         if (existing.isPresent()
                 && existing.get().getVehicleId() != vehicle.getVehicleId()) {
             throw new IllegalArgumentException(String.format(
-                    "Cannot update vehicle: the plate '%s' is already registered to another vehicle.",
+                    "Cannot update vehicle: the plate '%s' is already registered to "
+                            + "another vehicle.",
                     normalizedPlate));
         }
 
@@ -121,5 +123,9 @@ public final class VehicleManager {
         } catch (IllegalArgumentException e) {
             return false;
         }
+    }
+
+    public List<Vehicle> findAllVehicle() {
+        return vehicleRepository.findAll();
     }
 }

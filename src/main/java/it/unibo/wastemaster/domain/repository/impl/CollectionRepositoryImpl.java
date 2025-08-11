@@ -1,13 +1,11 @@
 package it.unibo.wastemaster.domain.repository.impl;
 
-import jakarta.persistence.EntityManager;
 import it.unibo.wastemaster.domain.model.Collection;
 import it.unibo.wastemaster.domain.model.Collection.CollectionStatus;
+import it.unibo.wastemaster.domain.model.RecurringSchedule;
 import it.unibo.wastemaster.domain.model.Schedule;
 import it.unibo.wastemaster.domain.repository.CollectionRepository;
 import it.unibo.wastemaster.infrastructure.dao.CollectionDAO;
-import it.unibo.wastemaster.domain.model.RecurringSchedule;
-
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
@@ -31,8 +29,10 @@ public class CollectionRepositoryImpl implements CollectionRepository {
     }
 
     @Override
-    public Optional<Collection> findActiveByRecurringSchedule(RecurringSchedule schedule) {
-        return Optional.ofNullable(collectionDAO.findActiveCollectionByRecurringSchedule(schedule));
+    public Optional<Collection> findActiveByRecurringSchedule(
+            RecurringSchedule schedule) {
+        return Optional.ofNullable(
+                collectionDAO.findActiveCollectionByRecurringSchedule(schedule));
     }
 
     @Override

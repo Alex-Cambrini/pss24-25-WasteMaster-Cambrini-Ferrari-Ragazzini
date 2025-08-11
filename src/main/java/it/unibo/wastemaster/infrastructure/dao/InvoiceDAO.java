@@ -22,7 +22,9 @@ public class InvoiceDAO extends GenericDAO<Invoice> {
 
     public List<Invoice> findByDateRange(LocalDate start, LocalDate end) {
         return getEntityManager().createQuery(
-                        "SELECT i FROM Invoice i WHERE i.issueDate BETWEEN :start AND :end", Invoice.class)
+                        "SELECT i FROM Invoice i WHERE i.issueDate BETWEEN :start AND "
+                                + ":end",
+                        Invoice.class)
                 .setParameter("start", start)
                 .setParameter("end", end)
                 .getResultList();

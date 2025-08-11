@@ -1,9 +1,8 @@
 package it.unibo.wastemaster.domain.repository.impl;
 
-import it.unibo.wastemaster.infrastructure.dao.WasteDAO;
 import it.unibo.wastemaster.domain.model.Waste;
 import it.unibo.wastemaster.domain.repository.WasteRepository;
-
+import it.unibo.wastemaster.infrastructure.dao.WasteDAO;
 import java.util.List;
 
 public class WasteRepositoryImpl implements WasteRepository {

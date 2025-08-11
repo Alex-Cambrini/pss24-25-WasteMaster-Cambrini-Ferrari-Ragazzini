@@ -1,10 +1,10 @@
 package it.unibo.wastemaster.infrastructure.dao;
 
+import it.unibo.wastemaster.domain.model.Waste;
+import it.unibo.wastemaster.domain.model.WasteSchedule;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
 import java.util.List;
-import it.unibo.wastemaster.domain.model.Waste;
-import it.unibo.wastemaster.domain.model.WasteSchedule;
 
 /**
  * DAO for managing WasteSchedule entities.
