@@ -1,8 +1,8 @@
 package it.unibo.wastemaster.controller.main;
 
 import it.unibo.wastemaster.controller.utils.DialogUtils;
-import it.unibo.wastemaster.core.context.AppContext;
-import it.unibo.wastemaster.core.models.Employee;
+import it.unibo.wastemaster.application.context.AppContext;
+import it.unibo.wastemaster.domain.model.Employee;
 import java.io.IOException;
 import java.util.Objects;
 import java.util.logging.Level;
