@@ -1,9 +1,44 @@
 package it.unibo.wastemaster.infrastructure.di;
 
 import it.unibo.wastemaster.domain.model.Location;
-import it.unibo.wastemaster.domain.repository.impl.*;
-import it.unibo.wastemaster.domain.service.*;
-import it.unibo.wastemaster.infrastructure.dao.*;
+import it.unibo.wastemaster.domain.repository.impl.AccountRepositoryImpl;
+import it.unibo.wastemaster.domain.repository.impl.CollectionRepositoryImpl;
+import it.unibo.wastemaster.domain.repository.impl.CustomerRepositoryImpl;
+import it.unibo.wastemaster.domain.repository.impl.EmployeeRepositoryImpl;
+import it.unibo.wastemaster.domain.repository.impl.InvoiceRepositoryImpl;
+import it.unibo.wastemaster.domain.repository.impl.OneTimeScheduleRepositoryImpl;
+import it.unibo.wastemaster.domain.repository.impl.RecurringScheduleRepositoryImpl;
+import it.unibo.wastemaster.domain.repository.impl.ScheduleRepositoryImpl;
+import it.unibo.wastemaster.domain.repository.impl.TripRepositoryImpl;
+import it.unibo.wastemaster.domain.repository.impl.VehicleRepositoryImpl;
+import it.unibo.wastemaster.domain.repository.impl.WasteRepositoryImpl;
+import it.unibo.wastemaster.domain.repository.impl.WasteScheduleRepositoryImpl;
+import it.unibo.wastemaster.domain.service.AccountManager;
+import it.unibo.wastemaster.domain.service.CollectionManager;
+import it.unibo.wastemaster.domain.service.CustomerManager;
+import it.unibo.wastemaster.domain.service.EmployeeManager;
+import it.unibo.wastemaster.domain.service.InvoiceManager;
+import it.unibo.wastemaster.domain.service.LoginManager;
+import it.unibo.wastemaster.domain.service.OneTimeScheduleManager;
+import it.unibo.wastemaster.domain.service.RecurringScheduleManager;
+import it.unibo.wastemaster.domain.service.ScheduleManager;
+import it.unibo.wastemaster.domain.service.TripManager;
+import it.unibo.wastemaster.domain.service.VehicleManager;
+import it.unibo.wastemaster.domain.service.WasteManager;
+import it.unibo.wastemaster.domain.service.WasteScheduleManager;
+import it.unibo.wastemaster.infrastructure.dao.AccountDAO;
+import it.unibo.wastemaster.infrastructure.dao.CollectionDAO;
+import it.unibo.wastemaster.infrastructure.dao.CustomerDAO;
+import it.unibo.wastemaster.infrastructure.dao.EmployeeDAO;
+import it.unibo.wastemaster.infrastructure.dao.GenericDAO;
+import it.unibo.wastemaster.infrastructure.dao.InvoiceDAO;
+import it.unibo.wastemaster.infrastructure.dao.OneTimeScheduleDAO;
+import it.unibo.wastemaster.infrastructure.dao.RecurringScheduleDAO;
+import it.unibo.wastemaster.infrastructure.dao.ScheduleDAO;
+import it.unibo.wastemaster.infrastructure.dao.TripDAO;
+import it.unibo.wastemaster.infrastructure.dao.VehicleDAO;
+import it.unibo.wastemaster.infrastructure.dao.WasteDAO;
+import it.unibo.wastemaster.infrastructure.dao.WasteScheduleDAO;
 import jakarta.persistence.EntityManager;
 
 public class ServiceFactory {
@@ -43,9 +78,11 @@ public class ServiceFactory {
         var wasteRepository = new WasteRepositoryImpl(wasteDao);
         var customerRepository = new CustomerRepositoryImpl(customerDao);
         var wasteScheduleRepository = new WasteScheduleRepositoryImpl(wasteScheduleDao);
-        var recurringScheduleRepository = new RecurringScheduleRepositoryImpl(recurringScheduleDao);
+        var recurringScheduleRepository =
+                new RecurringScheduleRepositoryImpl(recurringScheduleDao);
         var collectionRepository = new CollectionRepositoryImpl(collectionDao);
-        var oneTimeScheduleRepository = new OneTimeScheduleRepositoryImpl(oneTimeScheduleDao);
+        var oneTimeScheduleRepository =
+                new OneTimeScheduleRepositoryImpl(oneTimeScheduleDao);
         var vehicleRepository = new VehicleRepositoryImpl(vehicleDao);
         var tripRepository = new TripRepositoryImpl(tripDao);
         var invoiceRepository = new InvoiceRepositoryImpl(invoiceDao);
@@ -56,10 +93,14 @@ public class ServiceFactory {
         this.wasteManager = new WasteManager(wasteRepository);
         this.customerManager = new CustomerManager(customerRepository);
         this.wasteScheduleManager = new WasteScheduleManager(wasteScheduleRepository);
-        this.recurringScheduleManager = new RecurringScheduleManager(recurringScheduleRepository, wasteScheduleManager);
-        this.collectionManager = new CollectionManager(collectionRepository, recurringScheduleManager);
+        this.recurringScheduleManager =
+                new RecurringScheduleManager(recurringScheduleRepository,
+                        wasteScheduleManager);
+        this.collectionManager =
+                new CollectionManager(collectionRepository, recurringScheduleManager);
         this.recurringScheduleManager.setCollectionManager(collectionManager);
-        this.oneTimeScheduleManager = new OneTimeScheduleManager(oneTimeScheduleRepository, collectionManager);
+        this.oneTimeScheduleManager =
+                new OneTimeScheduleManager(oneTimeScheduleRepository, collectionManager);
         this.vehicleManager = new VehicleManager(vehicleRepository);
         this.tripManager = new TripManager(tripRepository);
         this.invoiceManager = new InvoiceManager(invoiceRepository, collectionRepository);
@@ -67,17 +108,55 @@ public class ServiceFactory {
         this.scheduleManager = new ScheduleManager(scheduleRepository);
     }
 
-    public AccountManager getAccountManager() { return accountManager; }
-    public LoginManager getLoginManager() { return loginManager; }
-    public EmployeeManager getEmployeeManager() { return employeeManager; }
-    public WasteManager getWasteManager() { return wasteManager; }
-    public CustomerManager getCustomerManager() { return customerManager; }
-    public WasteScheduleManager getWasteScheduleManager() { return wasteScheduleManager; }
-    public RecurringScheduleManager getRecurringScheduleManager() { return recurringScheduleManager; }
-    public CollectionManager getCollectionManager() { return collectionManager; }
-    public OneTimeScheduleManager getOneTimeScheduleManager() { return oneTimeScheduleManager; }
-    public VehicleManager getVehicleManager() { return vehicleManager; }
-    public TripManager getTripManager() { return tripManager; }
-    public InvoiceManager getInvoiceManager() { return invoiceManager; }
-    public ScheduleManager getScheduleManager() {return scheduleManager;}
+    public AccountManager getAccountManager() {
+        return accountManager;
+    }
+
+    public LoginManager getLoginManager() {
+        return loginManager;
+    }
+
+    public EmployeeManager getEmployeeManager() {
+        return employeeManager;
+    }
+
+    public WasteManager getWasteManager() {
+        return wasteManager;
+    }
+
+    public CustomerManager getCustomerManager() {
+        return customerManager;
+    }
+
+    public WasteScheduleManager getWasteScheduleManager() {
+        return wasteScheduleManager;
+    }
+
+    public RecurringScheduleManager getRecurringScheduleManager() {
+        return recurringScheduleManager;
+    }
+
+    public CollectionManager getCollectionManager() {
+        return collectionManager;
+    }
+
+    public OneTimeScheduleManager getOneTimeScheduleManager() {
+        return oneTimeScheduleManager;
+    }
+
+    public VehicleManager getVehicleManager() {
+        return vehicleManager;
+    }
+
+    public TripManager getTripManager() {
+        return tripManager;
+    }
+
+    public InvoiceManager getInvoiceManager() {
+        return invoiceManager;
+    }
+
+    public ScheduleManager getScheduleManager() {
+        return scheduleManager;
+    }
 }
