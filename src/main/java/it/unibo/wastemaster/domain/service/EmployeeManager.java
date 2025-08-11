@@ -1,10 +1,11 @@
 package it.unibo.wastemaster.domain.service;
 
-import java.util.Optional;
-import it.unibo.wastemaster.infrastructure.utils.ValidateUtils;
 import it.unibo.wastemaster.domain.model.Employee;
 import it.unibo.wastemaster.domain.model.Vehicle;
 import it.unibo.wastemaster.domain.repository.EmployeeRepository;
+import it.unibo.wastemaster.infrastructure.utils.ValidateUtils;
+import java.util.List;
+import java.util.Optional;
 
 /**
  * Manages operations related to employees such as creation, update, deletion and
@@ -22,7 +23,8 @@ public class EmployeeManager {
      * @param employeeRepository the DAO used for employee persistence
      * @param accountManager the manager responsible for account operations
      */
-    public EmployeeManager(final EmployeeRepository employeeRepository, final AccountManager accountManager) {
+    public EmployeeManager(final EmployeeRepository employeeRepository,
+                           final AccountManager accountManager) {
         this.employeeRepository = employeeRepository;
         this.accountManager = accountManager;
     }
@@ -30,14 +32,15 @@ public class EmployeeManager {
     /**
      * Adds a new employee after validating the input and ensuring email uniqueness.
      * Also creates the associated account with the given plain text password.
-     *
+     * <p>
      * This method delegates persistence and account creation to the appropriate
      * repositories/managers and does not manage transactions directly.
      *
-     * @param employee    the employee entity to be added (must not be null)
+     * @param employee the employee entity to be added (must not be null)
      * @param rawPassword the plain text password for the new account (must not be null)
      * @return the persisted employee entity
-     * @throws IllegalArgumentException if the email is already registered or any input is invalid
+     * @throws IllegalArgumentException if the email is already registered or any input
+     * is invalid
      */
     public Employee addEmployee(final Employee employee, final String rawPassword) {
         ValidateUtils.requireArgNotNull(employee, EMPLOYEE_NULL_MSG);
@@ -68,7 +71,7 @@ public class EmployeeManager {
      *
      * @param toUpdateEmployee the employee to update
      * @throws IllegalArgumentException if the ID is null or email is used by another
-     *         employee
+     * employee
      */
     public void updateEmployee(final Employee toUpdateEmployee) {
         ValidateUtils.validateEntity(toUpdateEmployee);
@@ -84,7 +87,6 @@ public class EmployeeManager {
         }
         employeeRepository.update(toUpdateEmployee);
     }
-
 
     /**
      * Performs a soft delete by marking the employee as deleted and updating it in the
@@ -130,9 +132,18 @@ public class EmployeeManager {
      * Retrieves an employee by ID.
      *
      * @param employeeId the ID of the employee
-     * @return an Optional containing the employee if found, or an empty Optional otherwise
+     * @return an Optional containing the employee if found, or an empty Optional
+     * otherwise
      */
     public Optional<Employee> getEmployeeById(final int employeeId) {
         return employeeRepository.findById(employeeId);
+    }
+
+    public Optional<Employee> findEmployeeByEmail(final String Email) {
+        return employeeRepository.findByEmail(Email);
+    }
+
+    public List<Employee> getAllActiveEmployee() {
+        return employeeRepository.findAllActive();
     }
 }
