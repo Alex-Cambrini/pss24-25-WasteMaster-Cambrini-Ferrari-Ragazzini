@@ -12,4 +12,5 @@ public interface RecurringScheduleRepository {
     List<RecurringSchedule> findActiveSchedulesWithoutFutureCollections();
     List<RecurringSchedule> findActiveSchedulesWithNextDateBeforeToday();
     List<RecurringSchedule> findSchedulesByCustomer(Customer customer);
+    List<RecurringSchedule> findAll();
 }

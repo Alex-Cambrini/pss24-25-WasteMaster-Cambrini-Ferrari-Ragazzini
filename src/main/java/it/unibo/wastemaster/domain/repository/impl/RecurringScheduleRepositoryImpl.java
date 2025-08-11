@@ -40,4 +40,9 @@ public class RecurringScheduleRepositoryImpl implements RecurringScheduleReposit
     public List<RecurringSchedule> findSchedulesByCustomer(Customer customer) {
         return recurringScheduleDAO.findSchedulesByCustomer(customer);
     }
+
+    @Override
+    public List<RecurringSchedule> findAll() {
+        return recurringScheduleDAO.findAll();
+    }
 }
