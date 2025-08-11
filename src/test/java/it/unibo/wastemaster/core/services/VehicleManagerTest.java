@@ -4,10 +4,12 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import it.unibo.wastemaster.core.AbstractDatabaseTest;
 import it.unibo.wastemaster.domain.model.Vehicle;
 import java.time.LocalDate;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -22,7 +24,6 @@ class VehicleManagerTest extends AbstractDatabaseTest {
     @BeforeEach
     public void setUp() {
         super.setUp();
-        getEntityManager().getTransaction().begin();
 
         v1 = new Vehicle("DD444DD", "Renault", "Master", VEHICLE_REGISTRATION_YEAR,
                 Vehicle.RequiredLicence.C1, Vehicle.VehicleStatus.IN_SERVICE, 3);
@@ -48,8 +49,10 @@ class VehicleManagerTest extends AbstractDatabaseTest {
 
         assertEquals("AA111AA", savedVehicle.getPlate());
 
-        Vehicle dbVehicle = getVehicleManager().findVehicleByPlate("aa111aa");
-        assertNotNull(dbVehicle);
+        Optional<Vehicle> dbVehicleOpt =
+                getVehicleManager().findVehicleByPlate("aa111aa");
+        assertTrue(dbVehicleOpt.isPresent());
+        Vehicle dbVehicle = dbVehicleOpt.get();
         assertEquals("AA111AA", dbVehicle.getPlate());
     }
 
@@ -63,8 +66,9 @@ class VehicleManagerTest extends AbstractDatabaseTest {
         vehicle.setPlate("cc333cc");
         getVehicleManager().updateVehicle(vehicle);
 
-        Vehicle reloaded = getVehicleManager().findVehicleByPlate("CC333CC");
-        assertNotNull(reloaded);
+        Optional<Vehicle> reloadedOpt = getVehicleManager().findVehicleByPlate("CC333CC");
+        assertTrue(reloadedOpt.isPresent());
+        Vehicle reloaded = reloadedOpt.get();
         assertEquals("CC333CC", reloaded.getPlate());
     }
 
@@ -91,8 +95,11 @@ class VehicleManagerTest extends AbstractDatabaseTest {
                 new Vehicle("  AA000BB ", "Brand", "Model", VEHICLE_REGISTRATION_YEAR,
                         Vehicle.RequiredLicence.C1, Vehicle.VehicleStatus.IN_SERVICE, 2);
         getVehicleManager().addVehicle(withSpaces);
-        Vehicle savedNoSpaces = getVehicleManager().findVehicleByPlate("aa000bb");
-        assertNotNull(savedNoSpaces);
+
+        Optional<Vehicle> savedNoSpacesOpt =
+                getVehicleManager().findVehicleByPlate("AA000BB");
+        assertTrue(savedNoSpacesOpt.isPresent());
+        Vehicle savedNoSpaces = savedNoSpacesOpt.get();
         assertEquals("AA000BB", savedNoSpaces.getPlate());
     }
 
@@ -101,8 +108,9 @@ class VehicleManagerTest extends AbstractDatabaseTest {
         v1.setModel("Updated");
         getVehicleManager().updateVehicle(v1);
 
-        Vehicle updated = getVehicleManager().findVehicleByPlate("DD444DD");
-        assertNotNull(updated);
+        Optional<Vehicle> updatedOpt = getVehicleManager().findVehicleByPlate("DD444DD");
+        assertTrue(updatedOpt.isPresent());
+        Vehicle updated = updatedOpt.get();
         assertEquals("Updated", updated.getModel());
 
         assertThrows(IllegalArgumentException.class,
@@ -123,9 +131,11 @@ class VehicleManagerTest extends AbstractDatabaseTest {
         assertEquals(Vehicle.VehicleStatus.IN_MAINTENANCE, v2.getVehicleStatus());
 
         getVehicleManager().markMaintenanceAsComplete(v2);
-        Vehicle updated = getVehicleManager().findVehicleByPlate("EE555EE");
 
-        assertNotNull(updated);
+        Optional<Vehicle> updatedOpt = getVehicleManager().findVehicleByPlate("EE555EE");
+        assertTrue(updatedOpt.isPresent());
+        Vehicle updated = updatedOpt.get();
+
         assertEquals(Vehicle.VehicleStatus.IN_SERVICE, updated.getVehicleStatus());
         assertEquals(LocalDate.now(), updated.getLastMaintenanceDate());
         assertEquals(LocalDate.now().plusYears(1), updated.getNextMaintenanceDate());
@@ -135,4 +145,5 @@ class VehicleManagerTest extends AbstractDatabaseTest {
         assertThrows(IllegalArgumentException.class,
                 () -> getVehicleManager().markMaintenanceAsComplete(v1));
     }
+
 }

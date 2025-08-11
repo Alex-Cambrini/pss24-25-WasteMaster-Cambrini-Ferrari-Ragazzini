@@ -3,7 +3,6 @@ package it.unibo.wastemaster.core.models;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -12,6 +11,7 @@ import it.unibo.wastemaster.core.utils.ValidateUtils;
 import it.unibo.wastemaster.domain.model.Vehicle;
 import jakarta.validation.ConstraintViolation;
 import java.time.LocalDate;
+import java.util.Optional;
 import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -110,19 +110,22 @@ class VehicleTest extends AbstractDatabaseTest {
     void testVehiclePersistence() {
         getVehicleDAO().insert(vehicle);
 
-        Vehicle found = getVehicleDAO().findByPlate(vehicle.getPlate());
-        int id = found.getVehicleId();
+        Optional<Vehicle> found = getVehicleDAO().findByPlate(vehicle.getPlate());
+        assertTrue(found.isPresent());
+        Vehicle vehicleFound = found.get();
+        int id = vehicleFound.getVehicleId();
 
-        assertNotNull(found);
-        assertEquals(vehicle.getBrand(), found.getBrand());
-        assertEquals(vehicle.getModel(), found.getModel());
-        assertEquals(vehicle.getRequiredLicence(), found.getRequiredLicence());
-        assertEquals(vehicle.getLastMaintenanceDate(), found.getLastMaintenanceDate());
-        assertEquals(vehicle.getNextMaintenanceDate(), found.getNextMaintenanceDate());
+        assertEquals(vehicle.getBrand(), vehicleFound.getBrand());
+        assertEquals(vehicle.getModel(), vehicleFound.getModel());
+        assertEquals(vehicle.getRequiredLicence(), vehicleFound.getRequiredLicence());
+        assertEquals(vehicle.getLastMaintenanceDate(),
+                vehicleFound.getLastMaintenanceDate());
+        assertEquals(vehicle.getNextMaintenanceDate(),
+                vehicleFound.getNextMaintenanceDate());
 
-        getVehicleDAO().delete(found);
-        Vehicle deleted = getVehicleDAO().findById(id);
-        assertNull(deleted);
+        getVehicleDAO().delete(vehicleFound);
+        Optional<Vehicle> deleted = getVehicleDAO().findById(id);
+        assertFalse(deleted.isPresent());
     }
 
     @Test

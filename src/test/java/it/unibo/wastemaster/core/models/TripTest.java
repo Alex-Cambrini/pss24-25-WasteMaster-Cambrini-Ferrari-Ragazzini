@@ -2,7 +2,6 @@ package it.unibo.wastemaster.core.models;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import it.unibo.wastemaster.core.AbstractDatabaseTest;
@@ -19,6 +18,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -41,7 +41,6 @@ class TripTest extends AbstractDatabaseTest {
     public void setUp() {
         super.setUp();
         final int fiveDaysAgo = 5;
-        getEntityManager().getTransaction().begin();
 
         final int vehicleYear = 2020;
         final int vehicleCapacity = 5;
@@ -158,14 +157,16 @@ class TripTest extends AbstractDatabaseTest {
 
         getTripDAO().insert(createdTrip);
 
-        Trip found = getTripDAO().findById(createdTrip.getTripId());
-        assertNotNull(found);
+        Optional<Trip> foundOpt = getTripDAO().findById(createdTrip.getTripId());
+        assertTrue(foundOpt.isPresent());
+
+        Trip found = foundOpt.get();
         assertEquals(createdTrip.getPostalCodes(), found.getPostalCodes());
 
         int foundId = found.getTripId();
         getTripDAO().delete(found);
 
-        Trip deleted = getTripDAO().findById(foundId);
-        assertNull(deleted);
+        Optional<Trip> deletedOpt = getTripDAO().findById(foundId);
+        assertTrue(deletedOpt.isEmpty());
     }
 }

@@ -20,7 +20,6 @@ class WasteManagerTest extends AbstractDatabaseTest {
     @BeforeEach
     public void setUp() {
         super.setUp();
-        getEntityManager().getTransaction().begin();
         waste = new Waste("Plastic", true, false);
     }
 
