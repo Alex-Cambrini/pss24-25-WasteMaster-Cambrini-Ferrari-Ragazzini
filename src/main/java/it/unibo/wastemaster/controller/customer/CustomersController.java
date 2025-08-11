@@ -2,8 +2,9 @@ package it.unibo.wastemaster.controller.customer;
 
 import it.unibo.wastemaster.controller.main.MainLayoutController;
 import it.unibo.wastemaster.controller.utils.DialogUtils;
-import it.unibo.wastemaster.core.context.AppContext;
-import it.unibo.wastemaster.core.models.Customer;
+import it.unibo.wastemaster.application.context.AppContext;
+import it.unibo.wastemaster.domain.model.Customer;
+import it.unibo.wastemaster.domain.service.CustomerManager;
 import it.unibo.wastemaster.viewmodels.CustomerRow;
 import java.util.List;
 import java.util.Optional;
@@ -29,6 +30,13 @@ import javafx.util.Duration;
  */
 public final class CustomersController {
 
+
+    private CustomerManager customerManager;
+
+    public void setCustomerManager(CustomerManager customerManager) {
+        this.customerManager = customerManager;
+    }
+
     private static final String FIELD_NAME = "name";
     private static final String FIELD_SURNAME = "surname";
     private static final String FIELD_EMAIL = "email";
@@ -45,6 +53,7 @@ public final class CustomersController {
     private final ObservableList<String> activeFilters =
             FXCollections.observableArrayList(FIELD_NAME, FIELD_SURNAME,
                     FIELD_EMAIL, FILTER_LOCATION);
+
 
     @FXML
     private Button filterButton;
@@ -121,7 +130,7 @@ public final class CustomersController {
      * Loads all customers from the database and updates the customer table.
      */
     public void loadCustomers() {
-        List<Customer> customers = AppContext.getCustomerDAO().findCustomerDetails();
+        List<Customer> customers = customerManager.getAllActiveCustomers();
         allCustomers.clear();
         for (Customer customer : customers) {
             allCustomers.add(new CustomerRow(customer));
@@ -171,14 +180,15 @@ public final class CustomersController {
             return;
         }
 
-        var customer = AppContext.getCustomerDAO().findByEmail(selected.getEmail());
-        if (customer == null) {
+        Optional<Customer> customerOpt = customerManager.findCustomerByEmail(selected.getEmail());
+        if (customerOpt.isEmpty()) {
             DialogUtils.showError("Not Found",
                     "The selected customer could not be found.", AppContext.getOwner());
             return;
         }
 
-        boolean success = AppContext.getCustomerManager().softDeleteCustomer(customer);
+        var customer = customerOpt.get();
+        boolean success = customerManager.softDeleteCustomer(customer);
         if (success) {
             loadCustomers();
         } else {
@@ -197,7 +207,7 @@ public final class CustomersController {
             return;
         }
 
-        var customer = AppContext.getCustomerDAO().findByEmail(selected.getEmail());
+        var customer = customerManager.findCustomerByEmail(selected.getEmail());
         if (customer == null) {
             DialogUtils.showError("Not Found", "Customer not found.",
                     AppContext.getOwner());
@@ -209,13 +219,11 @@ public final class CustomersController {
                     DialogUtils.showModalWithController("Edit Customer",
                             "/layouts/customer/EditCustomerView.fxml",
                             AppContext.getOwner(), ctrl -> {
-                                ctrl.setCustomerToEdit(customer);
+                                ctrl.setCustomerToEdit(customer.get());
                                 ctrl.setCustomerController(this);
                             });
 
-            if (controllerOpt.isPresent()) {
-                loadCustomers();
-            }
+            controllerOpt.ifPresent(ctrl -> loadCustomers());
         } catch (Exception e) {
             DialogUtils.showError(NAVIGATION_ERROR, "Could not load Edit Customer view.",
                     AppContext.getOwner());
