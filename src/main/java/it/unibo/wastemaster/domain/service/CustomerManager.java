@@ -48,7 +48,7 @@ public class CustomerManager {
      *
      * @param toUpdateCustomer the customer with updated data
      * @throws IllegalArgumentException if the customer is invalid or the email is used by
-     *         another customer
+     * another customer
      */
     public void updateCustomer(final Customer toUpdateCustomer) {
         ValidateUtils.validateEntity(toUpdateCustomer);
@@ -81,5 +81,15 @@ public class CustomerManager {
         } catch (IllegalArgumentException e) {
             return false;
         }
+    }
+
+    /**
+     * Retrieves a customer by their ID.
+     *
+     * @param customerId the ID of the customer
+     * @return an Optional containing the customer if found, or empty if not found
+     */
+    public Optional<Customer> getCustomerById(final int customerId) {
+        return customerRepository.findById(customerId);
     }
 }
