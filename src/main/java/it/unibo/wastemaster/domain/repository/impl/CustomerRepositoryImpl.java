@@ -24,10 +24,9 @@ public class CustomerRepositoryImpl implements CustomerRepository {
         return customerDAO.existsByEmail(email);
     }
 
-
     @Override
-    public List<Customer> findActiveCustomers() {
-        return customerDAO.findCustomerDetails();
+    public List<Customer> findActive() {
+        return customerDAO.findActive();
     }
 
     @Override

@@ -50,7 +50,7 @@ public final class CustomerDAO extends GenericDAO<Customer> {
      *
      * @return list of active customers
      */
-    public List<Customer> findCustomerDetails() {
+    public List<Customer> findActive() {
         return getEntityManager().createQuery("""
                     SELECT c FROM Customer c
                     WHERE c.isDeleted = false

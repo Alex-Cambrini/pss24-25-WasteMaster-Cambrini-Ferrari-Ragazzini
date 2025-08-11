@@ -102,4 +102,11 @@ public class CustomerManager {
     public List<Customer> getAllCustomers() {
         return customerRepository.findAll();
     }
+
+    public List<Customer> getAllActiveCustomers(){ return customerRepository.findActive();}
+
+    public Optional<Customer> findCustomerByEmail(String email) {
+        return customerRepository.findByEmail(email);
+    }
+
 }
