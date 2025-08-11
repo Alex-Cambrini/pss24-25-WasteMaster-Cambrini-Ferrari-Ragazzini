@@ -1,0 +1,99 @@
+package it.unibo.wastemaster.domain.service;
+
+import it.unibo.wastemaster.domain.model.Collection;
+import it.unibo.wastemaster.domain.model.Employee;
+import it.unibo.wastemaster.domain.model.Trip;
+import it.unibo.wastemaster.domain.model.Vehicle;
+import it.unibo.wastemaster.domain.repository.TripRepository;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
+
+/**
+ * Manages the creation, update, retrieval, and deletion of trips.
+ */
+public final class TripManager {
+
+    private final TripRepository tripRepository;
+
+    /**
+     * Constructs a TripManager with a specified TripDAO.
+     *
+     * @param tripRepository the data access object for trips
+     */
+    public TripManager(final TripRepository tripRepository) {
+        this.tripRepository = tripRepository;
+    }
+
+    /**
+     * Creates a new trip and persists it to the database.
+     *
+     * @param postalCode The postal code of the trip's destination.
+     * @param assignedVehicle The vehicle assigned to the trip.
+     * @param operators The list of employees assigned as operators.
+     * @param departureTime The scheduled departure time.
+     * @param expectedReturnTime The expected return time.
+     * @param status The initial status of the trip.
+     * @param collections The list of collections for the trip.
+     */
+    public void createTrip(final String postalCode, final Vehicle assignedVehicle,
+                           final List<Employee> operators,
+                           final LocalDateTime departureTime,
+                           final LocalDateTime expectedReturnTime,
+                           final Trip.TripStatus status,
+                           final List<Collection> collections) {
+        Trip trip = new Trip(postalCode, assignedVehicle, operators,
+                departureTime, expectedReturnTime, status, collections);
+        tripRepository.save(trip);
+    }
+
+    /**
+     * Aggiorna un viaggio esistente se trovato.
+     *
+     * @param tripId l'ID del viaggio da aggiornare
+     * @param postalCode il nuovo codice postale
+     * @param assignedVehicle il nuovo veicolo assegnato
+     * @param operators la nuova lista di operatori
+     * @param departureTime il nuovo orario di partenza
+     * @param expectedReturnTime il nuovo orario di ritorno previsto
+     * @param status il nuovo stato del viaggio
+     * @param collections la nuova lista di raccolte
+     */
+    public void updateTrip(final int tripId, final String postalCode,
+                           final Vehicle assignedVehicle,
+                           final List<Employee> operators,
+                           final LocalDateTime departureTime,
+                           final LocalDateTime expectedReturnTime,
+                           final Trip.TripStatus status,
+                           final List<Collection> collections) {
+        tripRepository.findById(tripId).ifPresent(trip -> {
+            trip.setPostalCodes(postalCode);
+            trip.setAssignedVehicle(assignedVehicle);
+            trip.setOperators(operators);
+            trip.setDepartureTime(departureTime);
+            trip.setExpectedReturnTime(expectedReturnTime);
+            trip.setStatus(status);
+            trip.setCollections(collections);
+            tripRepository.update(trip);
+        });
+    }
+
+    /**
+     * Finds a trip by its unique identifier.
+     *
+     * @param tripId The ID of the trip to find.
+     * @return An Optional containing the found Trip, or empty if not found.
+     */
+    public Optional<Trip> getTripById(final int tripId) {
+        return tripRepository.findById(tripId);
+    }
+
+    /**
+     * Deletes a trip from the database if it exists.
+     *
+     * @param tripId The ID of the trip to delete.
+     */
+    public void deleteTrip(final int tripId) {
+        tripRepository.findById(tripId).ifPresent(tripRepository::delete);
+    }
+}
