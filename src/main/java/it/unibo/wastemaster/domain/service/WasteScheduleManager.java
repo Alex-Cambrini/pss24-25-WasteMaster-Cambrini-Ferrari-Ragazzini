@@ -1,9 +1,9 @@
 package it.unibo.wastemaster.domain.service;
 
-import it.unibo.wastemaster.core.dao.WasteScheduleDAO;
 import it.unibo.wastemaster.core.utils.ValidateUtils;
 import it.unibo.wastemaster.domain.model.Waste;
 import it.unibo.wastemaster.domain.model.WasteSchedule;
+import it.unibo.wastemaster.domain.repository.WasteScheduleRepository;
 import java.time.DayOfWeek;
 
 /**
@@ -11,15 +11,15 @@ import java.time.DayOfWeek;
  */
 public final class WasteScheduleManager {
 
-    private final WasteScheduleDAO wasteScheduleDAO;
+    private final WasteScheduleRepository wasteScheduleRepository;
 
     /**
      * Constructs a WasteScheduleManager with the specified DAO.
      *
-     * @param wasteScheduleDAO DAO for waste scheduling
+     * @param wasteScheduleRepository DAO for waste scheduling
      */
-    public WasteScheduleManager(final WasteScheduleDAO wasteScheduleDAO) {
-        this.wasteScheduleDAO = wasteScheduleDAO;
+    public WasteScheduleManager(final WasteScheduleRepository wasteScheduleRepository) {
+        this.wasteScheduleRepository = wasteScheduleRepository;
     }
 
     /**
@@ -32,7 +32,7 @@ public final class WasteScheduleManager {
     public WasteSchedule setupCollectionRoutine(final Waste waste,
                                                 final DayOfWeek dayOfWeek) {
         WasteSchedule wasteSchedule = new WasteSchedule(waste, dayOfWeek);
-        wasteScheduleDAO.insert(wasteSchedule);
+        wasteScheduleRepository.save(wasteSchedule);
         return wasteSchedule;
     }
 
@@ -46,7 +46,7 @@ public final class WasteScheduleManager {
     public WasteSchedule changeCollectionDay(final WasteSchedule wasteSchedule,
                                              final DayOfWeek newDayOfWeek) {
         wasteSchedule.setDayOfWeek(newDayOfWeek);
-        wasteScheduleDAO.update(wasteSchedule);
+        wasteScheduleRepository.update(wasteSchedule);
         return wasteSchedule;
     }
 
@@ -59,7 +59,7 @@ public final class WasteScheduleManager {
      */
     public WasteSchedule getWasteScheduleByWaste(final Waste waste) {
         ValidateUtils.requireArgNotNull(waste, "WasteType cannot be null");
-        WasteSchedule schedule = wasteScheduleDAO.findSchedulebyWaste(waste);
+        WasteSchedule schedule = wasteScheduleRepository.findScheduleByWaste(waste);
         ValidateUtils.requireStateNotNull(schedule,
                 "No WasteSchedule found for waste type: " + waste.getWasteName());
         return schedule;
