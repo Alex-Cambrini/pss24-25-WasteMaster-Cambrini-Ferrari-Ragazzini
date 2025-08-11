@@ -1,7 +1,9 @@
 package it.unibo.wastemaster.domain.service;
 
 import it.unibo.wastemaster.core.dao.CollectionDAO;
-import it.unibo.wastemaster.core.dao.InvoiceDAO;
+import it.unibo.wastemaster.domain.repository.CollectionRepository;
+import it.unibo.wastemaster.domain.repository.InvoiceRepository;
+import it.unibo.wastemaster.infrastructure.dao.InvoiceDAO;
 import it.unibo.wastemaster.domain.model.Collection;
 import it.unibo.wastemaster.domain.model.Customer;
 import it.unibo.wastemaster.domain.model.Invoice;
@@ -21,19 +23,19 @@ public final class InvoiceManager {
     private static final int JUNE_LAST_DAY = 30;
     private static final int DECEMBER_LAST_DAY = 31;
 
-    private final InvoiceDAO invoiceDAO;
-    private final CollectionDAO collectionDAO;
+    private final InvoiceRepository invoiceRepository;
+    private final CollectionRepository collectionRepository;
 
     /**
      * Constructs an InvoiceManager with a specified InvoiceDAO and CollectionDAO.
      *
-     * @param invoiceDAO    the data access object for invoices
-     * @param collectionDAO the data access object for collections
+     * @param invoiceRepository the data access object for invoices
+     * @param collectionRepository the data access object for collections
      */
-    public InvoiceManager(final InvoiceDAO invoiceDAO,
-                          final CollectionDAO collectionDAO) {
-        this.invoiceDAO = invoiceDAO;
-        this.collectionDAO = collectionDAO;
+    public InvoiceManager(final InvoiceRepository invoiceRepository,
+                          final CollectionRepository collectionRepository) {
+        this.invoiceRepository = invoiceRepository;
+        this.collectionRepository = collectionRepository;
     }
 
     /**
@@ -71,7 +73,7 @@ public final class InvoiceManager {
      */
     private List<Invoice> generateInvoicesForPeriod(final LocalDate startDate,
                                                     final LocalDate endDate) {
-        List<Collection> collections = collectionDAO.findByDateRange(startDate, endDate);
+        List<Collection> collections = collectionRepository.findByDateRange(startDate, endDate);
 
         Map<Customer, List<Collection>> customerCollectionsMap = new HashMap<>();
         for (final Collection c : collections) {
@@ -90,7 +92,7 @@ public final class InvoiceManager {
             for (final Collection collection : customerCollections) {
                 Invoice invoice = new Invoice(collection);
                 invoice.setAmount(FIXED_FEE);
-                invoiceDAO.insert(invoice);
+                invoiceRepository.save(invoice);
                 invoices.add(invoice);
             }
         }
