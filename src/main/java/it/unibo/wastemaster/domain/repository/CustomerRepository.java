@@ -8,7 +8,7 @@ public interface CustomerRepository {
     Optional<Customer> findById(Integer id);
     Optional<Customer> findByEmail(String email);
     boolean existsByEmail(String email);
-    List<Customer> findActiveCustomers();
+    List<Customer> findActive();
     void save(Customer customer);
     void update(Customer customer);
     void delete(Customer customer);
