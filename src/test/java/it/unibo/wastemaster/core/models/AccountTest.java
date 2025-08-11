@@ -1,13 +1,15 @@
 package it.unibo.wastemaster.core.models;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import it.unibo.wastemaster.core.AbstractDatabaseTest;
 import it.unibo.wastemaster.core.utils.ValidateUtils;
+import it.unibo.wastemaster.domain.model.Account;
+import it.unibo.wastemaster.domain.model.Employee;
+import it.unibo.wastemaster.domain.model.Location;
 import jakarta.validation.ConstraintViolation;
+import java.util.Optional;
 import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -25,7 +27,6 @@ class AccountTest extends AbstractDatabaseTest {
         employee = new Employee("Luca", "Bianchi", address, "luca.bianchi@email.com",
                 "0511234567", Employee.Role.OFFICE_WORKER, Employee.Licence.B);
         account = new Account("hashed_password_123", employee);
-        getEntityManager().getTransaction().begin();
     }
 
     @Test
@@ -48,15 +49,18 @@ class AccountTest extends AbstractDatabaseTest {
         getEmployeeDAO().insert(employee);
         getAccountDAO().insert(account);
 
-        Account retrieved = getAccountDAO().findById(account.getId());
-        assertNotNull(retrieved);
+        Optional<Account> retrievedOpt = getAccountDAO().findById(account.getId());
+        assertTrue(retrievedOpt.isPresent());
+
+        Account retrieved = retrievedOpt.get();
         assertEquals("hashed_password_123", retrieved.getPasswordHash());
         assertEquals(employee.getEmployeeId(), retrieved.getEmployee().getEmployeeId());
 
         int id = retrieved.getId();
         getAccountDAO().delete(retrieved);
-        Account deleted = getAccountDAO().findById(id);
-        assertNull(deleted);
+
+        Optional<Account> deletedOpt = getAccountDAO().findById(id);
+        assertTrue(deletedOpt.isEmpty());
     }
 
     @Test

@@ -3,7 +3,6 @@ package it.unibo.wastemaster.core.models;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import it.unibo.wastemaster.core.AbstractDatabaseTest;
@@ -14,6 +13,7 @@ import it.unibo.wastemaster.domain.model.OneTimeSchedule;
 import it.unibo.wastemaster.domain.model.Waste;
 import jakarta.validation.ConstraintViolation;
 import java.time.LocalDate;
+import java.util.Optional;
 import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -78,15 +78,21 @@ class OneTimeScheduleTest extends AbstractDatabaseTest {
         getCustomerDAO().insert(customer);
         getWasteDAO().insert(organic);
         getOneTimeScheduleDAO().insert(schedule);
+
         int scheduleId = schedule.getScheduleId();
-        OneTimeSchedule found = getOneTimeScheduleDAO().findById(scheduleId);
-        assertNotNull(found);
+
+        Optional<OneTimeSchedule> foundOpt = getOneTimeScheduleDAO().findById(scheduleId);
+        assertTrue(foundOpt.isPresent());
+
+        OneTimeSchedule found = foundOpt.get();
         assertEquals(pickupDate, found.getPickupDate());
         assertEquals(customer.getEmail(), found.getCustomer().getEmail());
 
         getOneTimeScheduleDAO().delete(found);
-        OneTimeSchedule deleted = getOneTimeScheduleDAO().findById(scheduleId);
-        assertNull(deleted);
+
+        Optional<OneTimeSchedule> deletedOpt =
+                getOneTimeScheduleDAO().findById(scheduleId);
+        assertTrue(deletedOpt.isEmpty());
     }
 
     @Test

@@ -2,18 +2,18 @@ package it.unibo.wastemaster.core.models;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import it.unibo.wastemaster.core.AbstractDatabaseTest;
 import it.unibo.wastemaster.domain.model.Collection;
+import it.unibo.wastemaster.domain.model.Collection.CollectionStatus;
 import it.unibo.wastemaster.domain.model.Customer;
 import it.unibo.wastemaster.domain.model.Invoice;
 import it.unibo.wastemaster.domain.model.Location;
 import it.unibo.wastemaster.domain.model.OneTimeSchedule;
 import it.unibo.wastemaster.domain.model.Waste;
-import it.unibo.wastemaster.domain.model.Collection.CollectionStatus;
 import java.time.LocalDate;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -29,16 +29,16 @@ class InvoiceTest extends AbstractDatabaseTest {
     public void setUp() {
         super.setUp();
         Customer customer = new Customer(
-            "Mario", // nome
-            "Rossi", // cognome
-            new Location("Via Roma", "10", "Bologna", "40100"),
-            "mario.rossi@example.com",
-            "1234567890"
+                "Mario", // nome
+                "Rossi", // cognome
+                new Location("Via Roma", "10", "Bologna", "40100"),
+                "mario.rossi@example.com",
+                "1234567890"
         );
         Waste waste = new Waste("Organico", true, false);
         OneTimeSchedule schedule = new OneTimeSchedule(customer,
-                                                       waste,
-                                                       LocalDate.now().plusDays(1));
+                waste,
+                LocalDate.now().plusDays(1));
         collection = new Collection(schedule);
 
         getCustomerDAO().insert(customer);
@@ -74,22 +74,21 @@ class InvoiceTest extends AbstractDatabaseTest {
 
     @Test
     void testPersistence() {
-        getEntityManager().getTransaction().begin();
         getInvoiceDAO().insert(invoice);
-        getEntityManager().getTransaction().commit();
+        Optional<Invoice> foundOpt = getInvoiceDAO().findById(invoice.getInvoiceId());
+        assertTrue(foundOpt.isPresent());
 
-        Invoice found = getInvoiceDAO().findById(invoice.getInvoiceId());
-        assertNotNull(found);
+        Invoice found = foundOpt.get();
         assertEquals(invoice.getAmount(), found.getAmount());
         assertEquals(invoice.getCollection().getCollectionId(),
-            found.getCollection().getCollectionId());
+                found.getCollection().getCollectionId());
 
         int foundId = found.getInvoiceId();
-        getEntityManager().getTransaction().begin();
+
         getInvoiceDAO().delete(found);
         getEntityManager().getTransaction().commit();
 
-        Invoice deleted = getInvoiceDAO().findById(foundId);
-        assertNull(deleted);
+        Optional<Invoice> deletedOpt = getInvoiceDAO().findById(foundId);
+        assertTrue(deletedOpt.isEmpty());
     }
 }

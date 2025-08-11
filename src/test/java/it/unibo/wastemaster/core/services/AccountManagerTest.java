@@ -35,7 +35,6 @@ class AccountManagerTest extends AbstractDatabaseTest {
 
         getLocationDAO().insert(location);
         getEmployeeDAO().insert(employee);
-        getEntityManager().getTransaction().begin();
     }
 
     @Test

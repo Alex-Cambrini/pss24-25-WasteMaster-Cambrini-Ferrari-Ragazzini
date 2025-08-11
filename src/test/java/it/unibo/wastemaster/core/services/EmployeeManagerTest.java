@@ -4,16 +4,16 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import it.unibo.wastemaster.core.AbstractDatabaseTest;
 import it.unibo.wastemaster.domain.model.Employee;
-import it.unibo.wastemaster.domain.model.Location;
-import it.unibo.wastemaster.domain.model.Vehicle;
 import it.unibo.wastemaster.domain.model.Employee.Licence;
 import it.unibo.wastemaster.domain.model.Employee.Role;
+import it.unibo.wastemaster.domain.model.Location;
+import it.unibo.wastemaster.domain.model.Vehicle;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -28,7 +28,6 @@ class EmployeeManagerTest extends AbstractDatabaseTest {
     @BeforeEach
     public void setUp() {
         super.setUp();
-        getEntityManager().getTransaction().begin();
         email = "test@test.it";
         rawPassword = "Test1234";
         location = new Location("Via Roma", "10", "Bologna", "40100");
@@ -89,22 +88,27 @@ class EmployeeManagerTest extends AbstractDatabaseTest {
         Employee saved = getEmployeeManager().addEmployee(employee, rawPassword);
         int savedId = saved.getEmployeeId();
 
-        Employee found = getEmployeeManager().getEmployeeById(savedId);
-        assertNotNull(found);
-        assertEquals(saved.getName(), found.getName());
-        assertEquals(saved.getSurname(), found.getSurname());
-        assertEquals(saved.getEmail(), found.getEmail());
-        assertEquals(saved.getPhone(), found.getPhone());
-        assertEquals(saved.getLocation().getStreet(), found.getLocation().getStreet());
-        assertEquals(saved.getLocation().getCivicNumber(),
-                found.getLocation().getCivicNumber());
-        assertEquals(saved.getLocation().getCity(), found.getLocation().getCity());
-        assertEquals(saved.getLocation().getPostalCode(),
-                found.getLocation().getPostalCode());
-        assertEquals(saved.getRole(), found.getRole());
-        assertEquals(saved.getLicence(), found.getLicence());
+        Optional<Employee> found = getEmployeeManager().getEmployeeById(savedId);
+        assertTrue(found.isPresent());
+        Employee employeeFound = found.get();
 
-        assertNull(getEmployeeManager().getEmployeeById(-1));
+        assertEquals(saved.getName(), employeeFound.getName());
+        assertEquals(saved.getSurname(), employeeFound.getSurname());
+        assertEquals(saved.getEmail(), employeeFound.getEmail());
+        assertEquals(saved.getPhone(), employeeFound.getPhone());
+        assertEquals(saved.getLocation().getStreet(),
+                employeeFound.getLocation().getStreet());
+        assertEquals(saved.getLocation().getCivicNumber(),
+                employeeFound.getLocation().getCivicNumber());
+        assertEquals(saved.getLocation().getCity(),
+                employeeFound.getLocation().getCity());
+        assertEquals(saved.getLocation().getPostalCode(),
+                employeeFound.getLocation().getPostalCode());
+        assertEquals(saved.getRole(), employeeFound.getRole());
+        assertEquals(saved.getLicence(), employeeFound.getLicence());
+
+        Optional<Employee> notFound = getEmployeeManager().getEmployeeById(-1);
+        assertFalse(notFound.isPresent());
     }
 
     @Test
@@ -117,11 +121,15 @@ class EmployeeManagerTest extends AbstractDatabaseTest {
 
         saved.setPhone(newPhone);
         saved.setName(newName);
-        saved.setLicence(Licence.C1);
-        saved.setRole(Role.OPERATOR);
+        saved.setLicence(newLicence);
+        saved.setRole(newRole);
         getEmployeeManager().updateEmployee(saved);
 
-        Employee updated = getEmployeeManager().getEmployeeById(saved.getEmployeeId());
+        Optional<Employee> updatedOpt =
+                getEmployeeManager().getEmployeeById(saved.getEmployeeId());
+        assertTrue(updatedOpt.isPresent());
+        Employee updated = updatedOpt.get();
+
         assertEquals(newPhone, updated.getPhone());
         assertEquals(newName, updated.getName());
         assertEquals(newLicence, updated.getLicence());
@@ -139,8 +147,10 @@ class EmployeeManagerTest extends AbstractDatabaseTest {
         boolean result = getEmployeeManager().softDeleteEmployee(saved);
         assertTrue(result);
 
-        Employee deletedEmployee = getEmployeeManager().getEmployeeById(savedId);
-        assertNotNull(deletedEmployee);
+        Optional<Employee> deletedEmployeeOpt =
+                getEmployeeManager().getEmployeeById(savedId);
+        assertTrue(deletedEmployeeOpt.isPresent());
+        Employee deletedEmployee = deletedEmployeeOpt.get();
         assertTrue(deletedEmployee.isDeleted());
 
         assertEquals(savedId, deletedEmployee.getEmployeeId());
@@ -158,9 +168,9 @@ class EmployeeManagerTest extends AbstractDatabaseTest {
         final int invalidIdZero = 0;
         final int invalidIdTooLarge = 99999;
 
-        assertNull(getEmployeeManager().getEmployeeById(invalidIdNegative));
-        assertNull(getEmployeeManager().getEmployeeById(invalidIdZero));
-        assertNull(getEmployeeManager().getEmployeeById(invalidIdTooLarge));
+        assertTrue(getEmployeeManager().getEmployeeById(invalidIdNegative).isEmpty());
+        assertTrue(getEmployeeManager().getEmployeeById(invalidIdZero).isEmpty());
+        assertTrue(getEmployeeManager().getEmployeeById(invalidIdTooLarge).isEmpty());
     }
 
     @Test

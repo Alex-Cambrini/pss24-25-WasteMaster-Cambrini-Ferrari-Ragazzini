@@ -1,21 +1,22 @@
 package it.unibo.wastemaster.core.services;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import it.unibo.wastemaster.core.AbstractDatabaseTest;
 import it.unibo.wastemaster.domain.model.Collection;
+import it.unibo.wastemaster.domain.model.Collection.CollectionStatus;
 import it.unibo.wastemaster.domain.model.Customer;
 import it.unibo.wastemaster.domain.model.Location;
 import it.unibo.wastemaster.domain.model.OneTimeSchedule;
 import it.unibo.wastemaster.domain.model.RecurringSchedule;
 import it.unibo.wastemaster.domain.model.Schedule;
 import it.unibo.wastemaster.domain.model.Waste;
-import it.unibo.wastemaster.domain.model.Collection.CollectionStatus;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -39,7 +40,6 @@ class CollectionManagerTest extends AbstractDatabaseTest {
         futureDate = LocalDate.now().plusDays(3);
         plastic = new Waste("PLASTIC", true, false);
 
-        getEntityManager().getTransaction().begin();
         getWasteDAO().insert(plastic);
         getCustomerDAO().insert(customer);
 
@@ -119,7 +119,10 @@ class CollectionManagerTest extends AbstractDatabaseTest {
         collection.setCollectionStatus(CollectionStatus.COMPLETED);
         getCollectionManager().updateCollection(collection);
 
-        Collection updated = getCollectionDAO().findById(collection.getCollectionId());
+        Optional<Collection> updatedOpt =
+                getCollectionDAO().findById(collection.getCollectionId());
+        assertTrue(updatedOpt.isPresent());
+        Collection updated = updatedOpt.get();
         assertEquals(CollectionStatus.COMPLETED, updated.getCollectionStatus());
     }
 
@@ -151,31 +154,32 @@ class CollectionManagerTest extends AbstractDatabaseTest {
         getRecurringScheduleDAO().insert(schedule);
         getCollectionManager().generateCollection(schedule);
 
-        Collection active =
+        Optional<Collection> active =
                 getCollectionManager().getActiveCollectionByRecurringSchedule(schedule);
-        assertNotNull(active);
-        assertEquals(CollectionStatus.PENDING, active.getCollectionStatus());
-        assertEquals(schedule, active.getSchedule());
+        assertTrue(active.isPresent());
+        assertEquals(CollectionStatus.PENDING, active.get().getCollectionStatus());
+        assertEquals(schedule, active.get().getSchedule());
 
-        active.setCollectionStatus(CollectionStatus.CANCELLED);
-        getCollectionManager().updateCollection(active);
+        active.get().setCollectionStatus(CollectionStatus.CANCELLED);
+        getCollectionManager().updateCollection(active.get());
 
-        Collection none =
+        Optional<Collection> none =
                 getCollectionManager().getActiveCollectionByRecurringSchedule(schedule);
-        assertNull(none);
+        assertFalse(none.isPresent());
     }
 
     @Test
     void testSoftDeleteCollection() {
-
         assertEquals(CollectionStatus.PENDING, collection.getCollectionStatus());
         boolean deleted = getCollectionManager().softDeleteCollection(collection);
         assertTrue(deleted);
 
-        Collection updated = getCollectionDAO().findById(collection.getCollectionId());
-        assertEquals(CollectionStatus.CANCELLED, updated.getCollectionStatus());
+        Optional<Collection> updated =
+                getCollectionDAO().findById(collection.getCollectionId());
+        assertTrue(updated.isPresent());
+        assertEquals(CollectionStatus.CANCELLED, updated.get().getCollectionStatus());
 
-        boolean deletedAgain = getCollectionManager().softDeleteCollection(updated);
-        assertTrue(!deletedAgain);
+        boolean deletedAgain = getCollectionManager().softDeleteCollection(updated.get());
+        assertFalse(deletedAgain);
     }
 }

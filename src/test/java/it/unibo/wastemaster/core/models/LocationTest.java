@@ -2,14 +2,13 @@ package it.unibo.wastemaster.core.models;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import it.unibo.wastemaster.core.AbstractDatabaseTest;
 import it.unibo.wastemaster.core.utils.ValidateUtils;
 import it.unibo.wastemaster.domain.model.Location;
 import jakarta.validation.ConstraintViolation;
+import java.util.Optional;
 import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -79,15 +78,19 @@ class LocationTest extends AbstractDatabaseTest {
         getLocationDAO().insert(location);
 
         int locationId = location.getId();
-        Location found = getLocationDAO().findById(locationId);
-        assertNotNull(found);
+
+        Optional<Location> foundOpt = getLocationDAO().findById(locationId);
+        assertTrue(foundOpt.isPresent());
+
+        Location found = foundOpt.get();
         assertEquals(location.getStreet(), found.getStreet());
         assertEquals(location.getCivicNumber(), found.getCivicNumber());
         assertEquals(location.getCity(), found.getCity());
         assertEquals(location.getPostalCode(), found.getPostalCode());
 
         getLocationDAO().delete(found);
-        Location deleted = getLocationDAO().findById(locationId);
-        assertNull(deleted);
+
+        Optional<Location> deletedOpt = getLocationDAO().findById(locationId);
+        assertTrue(deletedOpt.isEmpty());
     }
 }

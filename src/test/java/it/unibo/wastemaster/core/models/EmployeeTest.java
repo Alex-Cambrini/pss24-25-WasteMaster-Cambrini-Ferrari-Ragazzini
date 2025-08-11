@@ -3,16 +3,16 @@ package it.unibo.wastemaster.core.models;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import it.unibo.wastemaster.core.AbstractDatabaseTest;
 import it.unibo.wastemaster.core.utils.ValidateUtils;
 import it.unibo.wastemaster.domain.model.Employee;
-import it.unibo.wastemaster.domain.model.Location;
 import it.unibo.wastemaster.domain.model.Employee.Licence;
 import it.unibo.wastemaster.domain.model.Employee.Role;
+import it.unibo.wastemaster.domain.model.Location;
 import jakarta.validation.ConstraintViolation;
+import java.util.Optional;
 import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -163,14 +163,18 @@ class EmployeeTest extends AbstractDatabaseTest {
     void testEmployeePersistence() {
         getEmployeeDAO().insert(employee);
         int employeeId = employee.getEmployeeId();
-        Employee found = getEmployeeDAO().findById(employeeId);
 
+        Optional<Employee> foundOpt = getEmployeeDAO().findById(employeeId);
+        assertTrue(foundOpt.isPresent());
+
+        Employee found = foundOpt.get();
         assertEquals(employee.getName(), found.getName());
         assertEquals(employee.getEmail(), found.getEmail());
 
         getEmployeeDAO().delete(employee);
-        Employee deleted = getEmployeeDAO().findById(employeeId);
-        assertNull(deleted);
+
+        Optional<Employee> deletedOpt = getEmployeeDAO().findById(employeeId);
+        assertTrue(deletedOpt.isEmpty());
     }
 
     @Test
