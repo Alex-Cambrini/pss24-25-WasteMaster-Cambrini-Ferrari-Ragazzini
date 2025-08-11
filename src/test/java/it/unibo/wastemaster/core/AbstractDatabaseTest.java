@@ -1,17 +1,28 @@
 package it.unibo.wastemaster.core;
 
-import it.unibo.wastemaster.core.dao.AccountDAO;
-import it.unibo.wastemaster.core.dao.CollectionDAO;
-import it.unibo.wastemaster.core.dao.CustomerDAO;
-import it.unibo.wastemaster.core.dao.EmployeeDAO;
-import it.unibo.wastemaster.core.dao.InvoiceDAO;
-import it.unibo.wastemaster.core.dao.OneTimeScheduleDAO;
-import it.unibo.wastemaster.core.dao.RecurringScheduleDAO;
-import it.unibo.wastemaster.core.dao.TripDAO;
-import it.unibo.wastemaster.core.dao.VehicleDAO;
-import it.unibo.wastemaster.core.dao.WasteDAO;
-import it.unibo.wastemaster.core.dao.WasteScheduleDAO;
 import it.unibo.wastemaster.domain.model.Location;
+import it.unibo.wastemaster.domain.repository.AccountRepository;
+import it.unibo.wastemaster.domain.repository.CollectionRepository;
+import it.unibo.wastemaster.domain.repository.CustomerRepository;
+import it.unibo.wastemaster.domain.repository.EmployeeRepository;
+import it.unibo.wastemaster.domain.repository.InvoiceRepository;
+import it.unibo.wastemaster.domain.repository.OneTimeScheduleRepository;
+import it.unibo.wastemaster.domain.repository.RecurringScheduleRepository;
+import it.unibo.wastemaster.domain.repository.TripRepository;
+import it.unibo.wastemaster.domain.repository.VehicleRepository;
+import it.unibo.wastemaster.domain.repository.WasteRepository;
+import it.unibo.wastemaster.domain.repository.WasteScheduleRepository;
+import it.unibo.wastemaster.domain.repository.impl.AccountRepositoryImpl;
+import it.unibo.wastemaster.domain.repository.impl.CollectionRepositoryImpl;
+import it.unibo.wastemaster.domain.repository.impl.CustomerRepositoryImpl;
+import it.unibo.wastemaster.domain.repository.impl.EmployeeRepositoryImpl;
+import it.unibo.wastemaster.domain.repository.impl.InvoiceRepositoryImpl;
+import it.unibo.wastemaster.domain.repository.impl.OneTimeScheduleRepositoryImpl;
+import it.unibo.wastemaster.domain.repository.impl.RecurringScheduleRepositoryImpl;
+import it.unibo.wastemaster.domain.repository.impl.TripRepositoryImpl;
+import it.unibo.wastemaster.domain.repository.impl.VehicleRepositoryImpl;
+import it.unibo.wastemaster.domain.repository.impl.WasteRepositoryImpl;
+import it.unibo.wastemaster.domain.repository.impl.WasteScheduleRepositoryImpl;
 import it.unibo.wastemaster.domain.service.AccountManager;
 import it.unibo.wastemaster.domain.service.CollectionManager;
 import it.unibo.wastemaster.domain.service.CustomerManager;
@@ -23,7 +34,18 @@ import it.unibo.wastemaster.domain.service.TripManager;
 import it.unibo.wastemaster.domain.service.VehicleManager;
 import it.unibo.wastemaster.domain.service.WasteManager;
 import it.unibo.wastemaster.domain.service.WasteScheduleManager;
+import it.unibo.wastemaster.infrastructure.dao.AccountDAO;
+import it.unibo.wastemaster.infrastructure.dao.CollectionDAO;
+import it.unibo.wastemaster.infrastructure.dao.CustomerDAO;
+import it.unibo.wastemaster.infrastructure.dao.EmployeeDAO;
 import it.unibo.wastemaster.infrastructure.dao.GenericDAO;
+import it.unibo.wastemaster.infrastructure.dao.InvoiceDAO;
+import it.unibo.wastemaster.infrastructure.dao.OneTimeScheduleDAO;
+import it.unibo.wastemaster.infrastructure.dao.RecurringScheduleDAO;
+import it.unibo.wastemaster.infrastructure.dao.TripDAO;
+import it.unibo.wastemaster.infrastructure.dao.VehicleDAO;
+import it.unibo.wastemaster.infrastructure.dao.WasteDAO;
+import it.unibo.wastemaster.infrastructure.dao.WasteScheduleDAO;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
@@ -62,6 +84,19 @@ public abstract class AbstractDatabaseTest {
     private VehicleDAO vehicleDAO;
     private TripDAO tripDAO;
     private InvoiceDAO invoiceDAO;
+
+    // Repository instances for data access abstraction
+    private AccountRepository accountRepository;
+    private EmployeeRepository employeeRepository;
+    private WasteRepository wasteRepository;
+    private CustomerRepository customerRepository;
+    private WasteScheduleRepository wasteScheduleRepository;
+    private RecurringScheduleRepository recurringScheduleRepository;
+    private CollectionRepository collectionRepository;
+    private OneTimeScheduleRepository oneTimeScheduleRepository;
+    private VehicleRepository vehicleRepository;
+    private TripRepository tripRepository;
+    private InvoiceRepository invoiceRepository;
 
     // Service managers for business logic
     private AccountManager accountManager;
@@ -107,41 +142,59 @@ public abstract class AbstractDatabaseTest {
     }
 
     /**
-     * Sets up the EntityManager, DAOs, and service managers before each test.
+     * Initializes the EntityManager and begins a transaction for the current test.
+     * Also sets up all DAOs, repositories, and service managers required for testing.
      */
     @BeforeEach
     public void setUp() {
         em = emf.createEntityManager();
+        em.getTransaction().begin();
 
-        wasteDAO = new WasteDAO(em);
+        // DAO init
         locationDAO = new GenericDAO<>(em, Location.class);
-        customerDAO = new CustomerDAO(em);
         accountDAO = new AccountDAO(em);
         employeeDAO = new EmployeeDAO(em);
+        wasteDAO = new WasteDAO(em);
+        customerDAO = new CustomerDAO(em);
         wasteScheduleDAO = new WasteScheduleDAO(em);
-        oneTimeScheduleDAO = new OneTimeScheduleDAO(em);
         recurringScheduleDAO = new RecurringScheduleDAO(em);
         collectionDAO = new CollectionDAO(em);
+        oneTimeScheduleDAO = new OneTimeScheduleDAO(em);
         vehicleDAO = new VehicleDAO(em);
         tripDAO = new TripDAO(em);
         invoiceDAO = new InvoiceDAO(em);
 
-        wasteManager = new WasteManager(wasteDAO);
-        customerManager = new CustomerManager(customerDAO);
-        accountManager = new AccountManager(accountDAO);
-        employeeManager = new EmployeeManager(employeeDAO, em, accountManager);
-        wasteScheduleManager = new WasteScheduleManager(wasteScheduleDAO);
+        // Repository init con implementazioni concrete
+        accountRepository = new AccountRepositoryImpl(accountDAO);
+        employeeRepository = new EmployeeRepositoryImpl(employeeDAO);
+        wasteRepository = new WasteRepositoryImpl(wasteDAO);
+        customerRepository = new CustomerRepositoryImpl(customerDAO);
+        wasteScheduleRepository = new WasteScheduleRepositoryImpl(wasteScheduleDAO);
+        recurringScheduleRepository =
+                new RecurringScheduleRepositoryImpl(recurringScheduleDAO);
+        collectionRepository = new CollectionRepositoryImpl(collectionDAO);
+        oneTimeScheduleRepository = new OneTimeScheduleRepositoryImpl(oneTimeScheduleDAO);
+        vehicleRepository = new VehicleRepositoryImpl(vehicleDAO);
+        tripRepository = new TripRepositoryImpl(tripDAO);
+        invoiceRepository = new InvoiceRepositoryImpl(invoiceDAO);
 
+        // Managers init (pass repositories)
+        accountManager = new AccountManager(accountRepository);
+        employeeManager = new EmployeeManager(employeeRepository, accountManager);
+        wasteManager = new WasteManager(wasteRepository);
+        customerManager = new CustomerManager(customerRepository);
+        wasteScheduleManager = new WasteScheduleManager(wasteScheduleRepository);
         recurringScheduleManager =
-                new RecurringScheduleManager(recurringScheduleDAO, wasteScheduleManager);
+                new RecurringScheduleManager(recurringScheduleRepository,
+                        wasteScheduleManager);
         collectionManager =
-                new CollectionManager(collectionDAO, recurringScheduleManager);
+                new CollectionManager(collectionRepository, recurringScheduleManager);
         recurringScheduleManager.setCollectionManager(collectionManager);
         oneTimeScheduleManager =
-                new OneTimeScheduleManager(oneTimeScheduleDAO, collectionManager);
-        vehicleManager = new VehicleManager(vehicleDAO);
-        tripManager = new TripManager(tripDAO);
-        invoiceManager = new InvoiceManager(invoiceDAO, collectionDAO);
+                new OneTimeScheduleManager(oneTimeScheduleRepository, collectionManager);
+        vehicleManager = new VehicleManager(vehicleRepository);
+        tripManager = new TripManager(tripRepository);
+        invoiceManager = new InvoiceManager(invoiceRepository, collectionRepository);
     }
 
     /**

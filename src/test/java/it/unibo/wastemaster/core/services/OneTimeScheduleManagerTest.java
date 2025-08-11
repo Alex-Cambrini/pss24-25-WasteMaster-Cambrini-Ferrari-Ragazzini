@@ -27,8 +27,6 @@ class OneTimeScheduleManagerTest extends AbstractDatabaseTest {
     @BeforeEach
     public void setUp() {
         super.setUp();
-        getEntityManager().getTransaction().begin();
-
         location = new Location("Via Milano", "22", "Modena", "41100");
         customer = new Customer("Luca", "Verdi", location, "luca.verdi@example.com",
                 "3334567890");

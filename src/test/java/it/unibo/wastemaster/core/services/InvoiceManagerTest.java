@@ -37,7 +37,6 @@ class InvoiceManagerTest extends AbstractDatabaseTest {
     @BeforeEach
     public void setUp() {
         super.setUp();
-        getEntityManager().getTransaction().begin();
 
         customer = new Customer("Mario", "Rossi",
                 new Location("Via Roma", "10", "Bologna", "40100"),

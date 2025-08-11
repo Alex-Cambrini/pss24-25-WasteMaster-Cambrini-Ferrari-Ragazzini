@@ -4,24 +4,24 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import it.unibo.wastemaster.core.AbstractDatabaseTest;
 import it.unibo.wastemaster.core.utils.ValidateUtils;
 import it.unibo.wastemaster.domain.model.Collection;
+import it.unibo.wastemaster.domain.model.Collection.CollectionStatus;
 import it.unibo.wastemaster.domain.model.Customer;
 import it.unibo.wastemaster.domain.model.Location;
 import it.unibo.wastemaster.domain.model.RecurringSchedule;
-import it.unibo.wastemaster.domain.model.Waste;
-import it.unibo.wastemaster.domain.model.WasteSchedule;
-import it.unibo.wastemaster.domain.model.Collection.CollectionStatus;
 import it.unibo.wastemaster.domain.model.RecurringSchedule.Frequency;
 import it.unibo.wastemaster.domain.model.Schedule.ScheduleStatus;
+import it.unibo.wastemaster.domain.model.Waste;
+import it.unibo.wastemaster.domain.model.WasteSchedule;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -131,8 +131,11 @@ class RecurringScheduleManagerTest extends AbstractDatabaseTest {
         // ACTIVE -> PAUSED: update status and soft delete associated collection
         RecurringSchedule s2 = getRecurringScheduleManager()
                 .createRecurringSchedule(customer, waste, validDate, Frequency.WEEKLY);
-        Collection associatedCollection =
+
+        Optional<Collection> activeCollectionOpt =
                 getCollectionManager().getActiveCollectionByRecurringSchedule(s2);
+        assertTrue(activeCollectionOpt.isPresent());
+        Collection associatedCollection = activeCollectionOpt.get();
         int associatedCollectionId = associatedCollection.getCollectionId();
 
         assertNotEquals(CollectionStatus.CANCELLED,
@@ -140,9 +143,15 @@ class RecurringScheduleManagerTest extends AbstractDatabaseTest {
         assertTrue(getRecurringScheduleManager().updateStatusRecurringSchedule(s2,
                 ScheduleStatus.PAUSED));
 
-        RecurringSchedule reloaded2 =
+        Optional<RecurringSchedule> reloaded2Opt =
                 getRecurringScheduleDAO().findById(s2.getScheduleId());
-        associatedCollection = getCollectionDAO().findById(associatedCollectionId);
+        assertTrue(reloaded2Opt.isPresent());
+        RecurringSchedule reloaded2 = reloaded2Opt.get();
+
+        Optional<Collection> associatedCollectionOpt =
+                getCollectionDAO().findById(associatedCollectionId);
+        assertTrue(associatedCollectionOpt.isPresent());
+        associatedCollection = associatedCollectionOpt.get();
 
         assertEquals(ScheduleStatus.PAUSED, reloaded2.getScheduleStatus());
         assertEquals(CollectionStatus.CANCELLED,
@@ -152,22 +161,34 @@ class RecurringScheduleManagerTest extends AbstractDatabaseTest {
         assertTrue(getRecurringScheduleManager().updateStatusRecurringSchedule(reloaded2,
                 ScheduleStatus.ACTIVE));
 
-        RecurringSchedule reloaded3 =
+        Optional<RecurringSchedule> reloaded3Opt =
                 getRecurringScheduleDAO().findById(s2.getScheduleId());
+        assertTrue(reloaded3Opt.isPresent());
+        RecurringSchedule reloaded3 = reloaded3Opt.get();
+
         assertEquals(ScheduleStatus.ACTIVE, reloaded3.getScheduleStatus());
-        associatedCollection =
+
+        activeCollectionOpt =
                 getCollectionManager().getActiveCollectionByRecurringSchedule(reloaded3);
+        assertTrue(activeCollectionOpt.isPresent());
+        associatedCollection = activeCollectionOpt.get();
+
         assertNotNull(associatedCollection);
         assertNotNull(reloaded3.getNextCollectionDate());
 
         // ACTIVE -> CANCELLED: update status and soft delete collection
         assertTrue(getRecurringScheduleManager().updateStatusRecurringSchedule(reloaded3,
                 ScheduleStatus.CANCELLED));
-        RecurringSchedule reloaded4 =
+
+        Optional<RecurringSchedule> reloaded4Opt =
                 getRecurringScheduleDAO().findById(s2.getScheduleId());
-        associatedCollection =
+        assertTrue(reloaded4Opt.isPresent());
+        RecurringSchedule reloaded4 = reloaded4Opt.get();
+
+        activeCollectionOpt =
                 getCollectionManager().getActiveCollectionByRecurringSchedule(reloaded4);
-        assertNull(associatedCollection);
+        assertTrue(activeCollectionOpt.isEmpty());
+
         assertEquals(ScheduleStatus.CANCELLED, reloaded4.getScheduleStatus());
 
         // Cannot reactivate CANCELLED schedule
@@ -205,16 +226,19 @@ class RecurringScheduleManagerTest extends AbstractDatabaseTest {
                 getRecurringScheduleManager().updateFrequency(s3, Frequency.MONTHLY);
         assertTrue(updated);
 
-        RecurringSchedule reloaded =
+        Optional<RecurringSchedule> reloadedOpt =
                 getRecurringScheduleDAO().findById(s3.getScheduleId());
+        assertTrue(reloadedOpt.isPresent());
+        RecurringSchedule reloaded = reloadedOpt.get();
         assertEquals(Frequency.MONTHLY, reloaded.getFrequency());
 
         LocalDate todayPlus2 = LocalDate.now().plusDays(2);
         assertFalse(reloaded.getNextCollectionDate().isBefore(todayPlus2));
 
-        Collection activeCollection =
+        Optional<Collection> activeCollectionOpt =
                 getCollectionManager().getActiveCollectionByRecurringSchedule(reloaded);
-        assertNotNull(activeCollection);
+        assertTrue(activeCollectionOpt.isPresent());
+        Collection activeCollection = activeCollectionOpt.get();
         assertNotEquals(CollectionStatus.CANCELLED,
                 activeCollection.getCollectionStatus());
     }
@@ -260,8 +284,11 @@ class RecurringScheduleManagerTest extends AbstractDatabaseTest {
 
         getRecurringScheduleManager().updateNextDates();
 
-        RecurringSchedule updated =
+        Optional<RecurringSchedule> updatedOpt =
                 getRecurringScheduleDAO().findById(schedule.getScheduleId());
+        assertTrue(updatedOpt.isPresent());
+        RecurringSchedule updated = updatedOpt.get();
+
         assertTrue(updated.getNextCollectionDate().isAfter(LocalDate.now()));
     }
 
@@ -277,8 +304,11 @@ class RecurringScheduleManagerTest extends AbstractDatabaseTest {
 
         getRecurringScheduleManager().updateNextDates();
 
-        RecurringSchedule updated =
+        Optional<RecurringSchedule> updatedOpt =
                 getRecurringScheduleDAO().findById(schedule.getScheduleId());
+        assertTrue(updatedOpt.isPresent());
+        RecurringSchedule updated = updatedOpt.get();
+
         assertEquals(futureDate, updated.getNextCollectionDate());
     }
 

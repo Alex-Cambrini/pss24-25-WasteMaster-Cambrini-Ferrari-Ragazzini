@@ -3,7 +3,6 @@ package it.unibo.wastemaster.core.models;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import it.unibo.wastemaster.core.AbstractDatabaseTest;
@@ -15,6 +14,7 @@ import it.unibo.wastemaster.domain.model.OneTimeSchedule;
 import it.unibo.wastemaster.domain.model.Waste;
 import jakarta.validation.ConstraintViolation;
 import java.time.LocalDate;
+import java.util.Optional;
 import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -80,20 +80,23 @@ class CollectionTest extends AbstractDatabaseTest {
 
     @Test
     void testPersistence() {
-        getEntityManager().getTransaction().begin();
         getCustomerDAO().insert(customer);
         getWasteDAO().insert(plastic);
         getOneTimeScheduleDAO().insert(schedule);
         getCollectionDAO().insert(collection);
-        Collection found = getCollectionDAO().findById(collection.getCollectionId());
-        assertNotNull(found);
+
+        Optional<Collection> foundOpt =
+                getCollectionDAO().findById(collection.getCollectionId());
+        assertTrue(foundOpt.isPresent());
+
+        Collection found = foundOpt.get();
         assertEquals(customer.getName(), found.getCustomer().getName());
 
         int foundId = found.getCollectionId();
         getCollectionDAO().delete(collection);
 
-        Collection deleted = getCollectionDAO().findById(foundId);
-        assertNull(deleted);
+        Optional<Collection> deletedOpt = getCollectionDAO().findById(foundId);
+        assertTrue(deletedOpt.isEmpty());
     }
 
     @Test

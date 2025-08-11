@@ -4,7 +4,6 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -13,6 +12,7 @@ import it.unibo.wastemaster.domain.model.Customer;
 import it.unibo.wastemaster.domain.model.Location;
 import jakarta.validation.ConstraintViolationException;
 import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -26,11 +26,9 @@ class CustomerManagerTest extends AbstractDatabaseTest {
     @BeforeEach
     public void setUp() {
         super.setUp();
-        getEntityManager().getTransaction().begin();
         email = "test@test.it";
         location = new Location("Via Roma", "10", "Bologna", "40100");
         customer = new Customer("Mario", "Rossi", location, email, "1234567890");
-
     }
 
     @Test
@@ -50,22 +48,25 @@ class CustomerManagerTest extends AbstractDatabaseTest {
         Customer saved = getCustomerManager().addCustomer(customer);
         int savedId = saved.getCustomerId();
 
-        Customer found = getCustomerManager().getCustomerById(savedId);
-        assertNotNull(found);
-        assertEquals(saved.getName(), found.getName());
-        assertEquals(saved.getSurname(), found.getSurname());
-        assertEquals(saved.getEmail(), found.getEmail());
-        assertEquals(saved.getPhone(), found.getPhone());
-        assertEquals(saved.getLocation().getStreet(), found.getLocation().getStreet());
-        assertEquals(saved.getLocation().getCivicNumber(),
-                found.getLocation().getCivicNumber());
-        assertEquals(saved.getLocation().getCity(), found.getLocation().getCity());
-        assertEquals(saved.getLocation().getPostalCode(),
-                found.getLocation().getPostalCode());
+        Optional<Customer> found = getCustomerManager().getCustomerById(savedId);
+        assertTrue(found.isPresent());
+        Customer foundCustomer = found.get();
 
-        // not found
-        Customer notFound = getCustomerManager().getCustomerById(-1);
-        assertNull(notFound);
+        assertEquals(saved.getName(), foundCustomer.getName());
+        assertEquals(saved.getSurname(), foundCustomer.getSurname());
+        assertEquals(saved.getEmail(), foundCustomer.getEmail());
+        assertEquals(saved.getPhone(), foundCustomer.getPhone());
+        assertEquals(saved.getLocation().getStreet(),
+                foundCustomer.getLocation().getStreet());
+        assertEquals(saved.getLocation().getCivicNumber(),
+                foundCustomer.getLocation().getCivicNumber());
+        assertEquals(saved.getLocation().getCity(),
+                foundCustomer.getLocation().getCity());
+        assertEquals(saved.getLocation().getPostalCode(),
+                foundCustomer.getLocation().getPostalCode());
+
+        Optional<Customer> notFound = getCustomerManager().getCustomerById(-1);
+        assertFalse(notFound.isPresent());
     }
 
     @Test
@@ -77,9 +78,13 @@ class CustomerManagerTest extends AbstractDatabaseTest {
         saved.setPhone(newPhone);
         saved.setName(newName);
         getCustomerManager().updateCustomer(saved);
-        Customer updated = getCustomerManager().getCustomerById(saved.getCustomerId());
-        assertEquals(newPhone, updated.getPhone());
-        assertEquals(newName, updated.getName());
+        Optional<Customer> updated =
+                getCustomerManager().getCustomerById(saved.getCustomerId());
+        assertTrue(updated.isPresent());
+        Customer updatedCustomer = updated.get();
+
+        assertEquals(newPhone, updatedCustomer.getPhone());
+        assertEquals(newName, updatedCustomer.getName());
     }
 
     @Test
@@ -87,17 +92,17 @@ class CustomerManagerTest extends AbstractDatabaseTest {
         Customer saved = getCustomerManager().addCustomer(customer);
         int savedId = saved.getCustomerId();
 
-        assertNotNull(saved);
         assertFalse(saved.isDeleted());
 
         boolean result = getCustomerManager().softDeleteCustomer(saved);
         assertTrue(result);
 
-        Customer deletedCustomer = getCustomerManager().getCustomerById(savedId);
-        assertNotNull(deletedCustomer);
-        assertTrue(deletedCustomer.isDeleted());
-
-        assertEquals(savedId, deletedCustomer.getCustomerId());
+        Optional<Customer> deletedCustomer =
+                getCustomerManager().getCustomerById(savedId);
+        assertTrue(deletedCustomer.isPresent());
+        Customer deleted = deletedCustomer.get();
+        assertTrue(deleted.isDeleted());
+        assertEquals(savedId, deleted.getCustomerId());
 
         assertFalse(getCustomerManager().softDeleteCustomer(null));
 
@@ -186,9 +191,9 @@ class CustomerManagerTest extends AbstractDatabaseTest {
         final int zeroId = 0;
         final int largeId = 99999;
 
-        assertNull(getCustomerManager().getCustomerById(negativeId));
-        assertNull(getCustomerManager().getCustomerById(zeroId));
-        assertNull(getCustomerManager().getCustomerById(largeId));
+        assertTrue(getCustomerManager().getCustomerById(negativeId).isEmpty());
+        assertTrue(getCustomerManager().getCustomerById(zeroId).isEmpty());
+        assertTrue(getCustomerManager().getCustomerById(largeId).isEmpty());
     }
 
     @Test
@@ -212,6 +217,10 @@ class CustomerManagerTest extends AbstractDatabaseTest {
 
     @Test
     void testGetAllCustomers() {
+        List<Customer> initialCustomers = getCustomerManager().getAllCustomers();
+        initialCustomers.forEach(
+                c -> getCustomerManager().softDeleteCustomer(c)); // se supportato
+
         assertTrue(getCustomerManager().getAllCustomers().isEmpty());
 
         getCustomerManager().addCustomer(customer);
@@ -221,7 +230,6 @@ class CustomerManagerTest extends AbstractDatabaseTest {
         getCustomerManager().addCustomer(secondCustomer);
 
         List<Customer> customers = getCustomerManager().getAllCustomers();
-        assertNotNull(customers);
         assertEquals(2, customers.size());
 
         List<String> emails = customers.stream().map(Customer::getEmail).toList();

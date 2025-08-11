@@ -2,12 +2,12 @@ package it.unibo.wastemaster.core.models;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import it.unibo.wastemaster.core.AbstractDatabaseTest;
 import it.unibo.wastemaster.domain.model.Customer;
 import it.unibo.wastemaster.domain.model.Location;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -29,12 +29,13 @@ class CustomerTest extends AbstractDatabaseTest {
     void testPersistenceAndGetter() {
         getCustomerDAO().insert(customer);
         int customerId = customer.getCustomerId();
-        Customer found = getCustomerDAO().findById(customerId);
-        assertNotNull(found);
+        Optional<Customer> foundOpt = getCustomerDAO().findById(customerId);
+        assertTrue(foundOpt.isPresent());
+        Customer found = foundOpt.get();
         assertEquals(customer.getName(), found.getName());
         getCustomerDAO().delete(customer);
-        Customer deleted = getCustomerDAO().findById(customerId);
-        assertNull(deleted);
+        Optional<Customer> deletedOpt = getCustomerDAO().findById(customerId);
+        assertTrue(deletedOpt.isEmpty());
     }
 
     @Test
