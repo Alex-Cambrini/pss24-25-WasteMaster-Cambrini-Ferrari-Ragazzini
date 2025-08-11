@@ -1,12 +1,12 @@
 package it.unibo.wastemaster.infrastructure.dao;
 
+import it.unibo.wastemaster.domain.model.Collection;
+import it.unibo.wastemaster.domain.model.RecurringSchedule;
+import it.unibo.wastemaster.domain.model.Schedule;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.NoResultException;
 import java.time.LocalDate;
 import java.util.List;
-import it.unibo.wastemaster.domain.model.Collection;
-import it.unibo.wastemaster.domain.model.RecurringSchedule;
-import it.unibo.wastemaster.domain.model.Schedule;
 
 /**
  * DAO for {@link Collection} entity operations.
@@ -71,7 +71,6 @@ public class CollectionDAO extends GenericDAO<Collection> {
             return null;
         }
 
-
     }
 
     /**
@@ -84,9 +83,9 @@ public class CollectionDAO extends GenericDAO<Collection> {
      */
     public List<Collection> findByDateRange(final LocalDate start, final LocalDate end) {
         return getEntityManager().createQuery("""
-                SELECT c FROM Collection c
-                WHERE c.date BETWEEN :start AND :end
-                """, Collection.class).setParameter("start", start)
+                        SELECT c FROM Collection c
+                        WHERE c.date BETWEEN :start AND :end
+                        """, Collection.class).setParameter("start", start)
                 .setParameter("end", end).getResultList();
     }
 }

@@ -6,7 +6,10 @@ import java.util.List;
 public interface WasteRepository {
 
     List<Waste> findActive();
+
     boolean existsByName(String name);
+
     Waste save(Waste waste);
+
     Waste update(Waste waste);
 }

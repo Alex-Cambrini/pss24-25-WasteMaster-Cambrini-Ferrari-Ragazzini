@@ -13,7 +13,6 @@ import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
 
-
 /**
  * Represents an invoice entity linked to a completed collection. This class is a JPA
  * entity mapped to the "invoices" table. Each invoice is associated with exactly one
@@ -54,7 +53,7 @@ public class Invoice {
 
     /**
      * Constructs an Invoice for a given collection.
-     * 
+     *
      * @param collection the collection to invoice; must not be null and must be COMPLETED
      * @throws IllegalArgumentException if collection is null or not completed
      */
@@ -154,7 +153,7 @@ public class Invoice {
      * Returns a string representation of the invoice, showing ID, collection ID,
      * customer, waste, amount, issue date, and payment status. Null values are shown as
      * "N/A".
-     *
+     * <p>
      * Subclasses overriding this method should call {@code super.toString()} to retain
      * details.
      *
@@ -180,13 +179,18 @@ public class Invoice {
      * Enum representing the payment status of an invoice.
      */
     public enum PaymentStatus {
-        /** Payment completed. */
+        /**
+         * Payment completed.
+         */
         PAID,
-        /** Payment not completed. */
+        /**
+         * Payment not completed.
+         */
         UNPAID,
-        /** Payment is pending. */
+        /**
+         * Payment is pending.
+         */
         PENDING
     }
-
 
 }

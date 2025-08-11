@@ -5,6 +5,7 @@ import it.unibo.wastemaster.domain.repository.ScheduleRepository;
 import java.util.List;
 
 public class ScheduleManager {
+
     private final ScheduleRepository scheduleRepository;
 
     public ScheduleManager(ScheduleRepository scheduleRepository) {

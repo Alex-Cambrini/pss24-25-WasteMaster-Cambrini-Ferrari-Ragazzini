@@ -1,14 +1,13 @@
 package it.unibo.wastemaster.domain.service;
 
-import it.unibo.wastemaster.domain.model.RecurringSchedule;
-import it.unibo.wastemaster.infrastructure.utils.ValidateUtils;
 import it.unibo.wastemaster.domain.model.Collection;
+import it.unibo.wastemaster.domain.model.Collection.CollectionStatus;
 import it.unibo.wastemaster.domain.model.Customer;
 import it.unibo.wastemaster.domain.model.OneTimeSchedule;
-import it.unibo.wastemaster.domain.model.Waste;
-import it.unibo.wastemaster.domain.model.Collection.CollectionStatus;
 import it.unibo.wastemaster.domain.model.Schedule.ScheduleStatus;
+import it.unibo.wastemaster.domain.model.Waste;
 import it.unibo.wastemaster.domain.repository.OneTimeScheduleRepository;
+import it.unibo.wastemaster.infrastructure.utils.ValidateUtils;
 import java.time.LocalDate;
 import java.util.Optional;
 
@@ -26,8 +25,9 @@ public class OneTimeScheduleManager {
      * @param oneTimeScheduleRepository the DAO for OneTimeSchedule persistence
      * @param collectionManager the manager handling related collection logic
      */
-    public OneTimeScheduleManager(final OneTimeScheduleRepository oneTimeScheduleRepository,
-                                  final CollectionManager collectionManager) {
+    public OneTimeScheduleManager(
+            final OneTimeScheduleRepository oneTimeScheduleRepository,
+            final CollectionManager collectionManager) {
         this.oneTimeScheduleRepository = oneTimeScheduleRepository;
         this.collectionManager = collectionManager;
     }
@@ -97,7 +97,7 @@ public class OneTimeScheduleManager {
         return false;
     }
 
-    public Optional<OneTimeSchedule>  findOneTimeScheduleById(Integer id){
+    public Optional<OneTimeSchedule> findOneTimeScheduleById(Integer id) {
         return oneTimeScheduleRepository.findById(id);
     }
 }

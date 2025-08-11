@@ -24,14 +24,15 @@ public final class LoginManager {
     /**
      * Authenticates a user by verifying the provided email and raw password.
      *
-     * @param email       the email address of the user
+     * @param email the email address of the user
      * @param rawPassword the plain-text password to verify
      * @return an Optional containing the Account if authentication succeeds,
-     *         or an empty Optional if authentication fails or account is not found
+     * or an empty Optional if authentication fails or account is not found
      */
     public Optional<Account> authenticate(final String email,
                                           final String rawPassword) {
-        Optional<Account> accountOpt = accountRepository.findAccountByEmployeeEmail(email);
+        Optional<Account> accountOpt =
+                accountRepository.findAccountByEmployeeEmail(email);
         if (accountOpt.isPresent()) {
             Account account = accountOpt.get();
             if (BCrypt.checkpw(rawPassword, account.getPasswordHash())) {

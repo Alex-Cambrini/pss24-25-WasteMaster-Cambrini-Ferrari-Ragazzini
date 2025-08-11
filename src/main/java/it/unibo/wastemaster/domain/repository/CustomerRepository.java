@@ -5,12 +5,20 @@ import java.util.List;
 import java.util.Optional;
 
 public interface CustomerRepository {
+
     Optional<Customer> findById(Integer id);
+
     Optional<Customer> findByEmail(String email);
+
     boolean existsByEmail(String email);
+
     List<Customer> findActive();
+
     void save(Customer customer);
+
     void update(Customer customer);
+
     void delete(Customer customer);
+
     List<Customer> findAll();
 }
