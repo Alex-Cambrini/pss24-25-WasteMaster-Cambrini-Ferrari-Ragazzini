@@ -4,6 +4,7 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.NoResultException;
 import java.util.List;
 import it.unibo.wastemaster.domain.model.Vehicle;
+import java.util.Optional;
 
 /**
  * DAO for managing Vehicle entities.
@@ -23,18 +24,20 @@ public final class VehicleDAO extends GenericDAO<Vehicle> {
      * Finds a vehicle by its plate.
      *
      * @param plate the vehicle plate
-     * @return the Vehicle if found, null otherwise
+     * @return an Optional containing the Vehicle if found, or an empty Optional otherwise
      */
-    public Vehicle findByPlate(final String plate) {
+    public Optional<Vehicle> findByPlate(final String plate) {
         try {
-            return getEntityManager()
-                    .createQuery("SELECT v FROM Vehicle v WHERE v.plate = :plate",
-                            Vehicle.class)
-                    .setParameter("plate", plate).getSingleResult();
+            Vehicle vehicle = getEntityManager()
+                    .createQuery("SELECT v FROM Vehicle v WHERE v.plate = :plate", Vehicle.class)
+                    .setParameter("plate", plate)
+                    .getSingleResult();
+            return Optional.of(vehicle);
         } catch (NoResultException e) {
-            return null;
+            return Optional.empty();
         }
     }
+
 
     /**
      * Retrieves all vehicles with the given status.
