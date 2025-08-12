@@ -215,6 +215,7 @@ public final class MainLayoutController {
             controller.setWasteScheduleManager(AppContext.getServiceFactory()
                     .getWasteScheduleManager());
         }
+        controller.initData();
     }
 
     @FXML

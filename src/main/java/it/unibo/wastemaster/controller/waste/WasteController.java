@@ -128,9 +128,6 @@ public final class WasteController {
                 }
         );
 
-        loadWastes();
-        startAutoRefresh();
-
         searchField.textProperty()
                 .addListener((obs, oldText, newText) -> handleSearch());
         showRecyclableCheckBox.selectedProperty()
@@ -163,6 +160,12 @@ public final class WasteController {
                     deleteProgramButton.setDisable(!hasProgram);
                 });
     }
+
+    public void initData() {
+        loadWastes();
+        startAutoRefresh();
+    }
+
 
     /**
      * Starts the automatic refresh of the waste list every fixed interval.
