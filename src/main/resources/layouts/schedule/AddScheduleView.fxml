@@ -67,11 +67,6 @@
                 <StackPane prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="2">
                     <children>
                         <ComboBox fx:id="wasteComboBox" prefWidth="160.0" StackPane.alignment="CENTER_LEFT"/>
-                        <Label fx:id="missingWasteLabel" text="" StackPane.alignment="BOTTOM_LEFT">
-                            <StackPane.margin>
-                                <Insets bottom="5.0"/>
-                            </StackPane.margin>
-                        </Label>
                     </children>
                 </StackPane>
                 <VBox alignment="CENTER_LEFT"

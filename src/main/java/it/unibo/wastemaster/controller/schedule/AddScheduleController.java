@@ -58,9 +58,6 @@ public final class AddScheduleController {
     private Label locationField;
 
     @FXML
-    private Label missingWasteLabel;
-
-    @FXML
     private DatePicker datePicker;
     private CustomerManager customerManager;
     private OneTimeScheduleManager oneTimeScheduleManager;
@@ -150,7 +147,7 @@ public final class AddScheduleController {
 
         if (wasteList.isEmpty()) {
             wasteComboBox.setDisable(true);
-            missingWasteLabel.setText("No Waste available");
+            wasteDetailsTitle.setText("No Waste available");
         } else {
             wasteComboBox.setItems(FXCollections.observableArrayList(wasteList));
             wasteDetailsInfo.setText("No Waste selected.");
