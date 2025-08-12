@@ -30,17 +30,20 @@ public class EmployeeManager {
     }
 
     /**
-     * Adds a new employee after validating the input and ensuring email uniqueness.
-     * Also creates the associated account with the given plain text password.
+     * Adds a new employee after validating inputs and ensuring email uniqueness.
      * <p>
-     * This method delegates persistence and account creation to the appropriate
-     * repositories/managers and does not manage transactions directly.
+     * Persists the employee entity and attempts to create the associated account
+     * with the provided raw password. If account creation fails, the employee
+     * persistence is rolled back by deleting the employee.
+     * <p>
+     * Note: This method does not manage transactions atomically; partial persistence
+     * may occur if account creation fails.
      *
-     * @param employee the employee entity to be added (must not be null)
+     * @param employee the employee entity to add (must not be null)
      * @param rawPassword the plain text password for the new account (must not be null)
      * @return the persisted employee entity
-     * @throws IllegalArgumentException if the email is already registered or any input
-     * is invalid
+     * @throws IllegalArgumentException if the email is already registered or input is invalid
+     * @throws RuntimeException if account creation fails, after deleting the persisted employee
      */
     public Employee addEmployee(final Employee employee, final String rawPassword) {
         ValidateUtils.requireArgNotNull(employee, EMPLOYEE_NULL_MSG);
@@ -52,9 +55,16 @@ public class EmployeeManager {
         }
 
         employeeRepository.save(employee);
-        accountManager.createAccount(employee, rawPassword);
+
+        try {
+            accountManager.createAccount(employee, rawPassword);
+        } catch (Exception e) {
+            employeeRepository.delete(employee);
+            throw new RuntimeException("Failed to create account, employee rolled back", e);
+        }
         return employee;
     }
+
 
     /**
      * Checks if an email is already registered.
