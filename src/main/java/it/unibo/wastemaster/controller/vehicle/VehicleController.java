@@ -105,19 +105,16 @@ public final class VehicleController {
     }
 
     @FXML
-    private void initialize() {
+    public void initialize() {
         plateColumn.setCellValueFactory(new PropertyValueFactory<>(PLATE));
         brandColumn.setCellValueFactory(new PropertyValueFactory<>(BRAND));
         modelColumn.setCellValueFactory(new PropertyValueFactory<>(MODEL));
         yearColumn.setCellValueFactory(new PropertyValueFactory<>(REGISTRATION_YEAR));
         capacityColumn.setCellValueFactory(new PropertyValueFactory<>(CAPACITY));
         licenceTypeColumn.setCellValueFactory(new PropertyValueFactory<>(LICENCE_TYPE));
-        vehicleStatusColumn
-                .setCellValueFactory(new PropertyValueFactory<>(VEHICLE_STATUS));
-        lastMaintenanceDateColumn
-                .setCellValueFactory(new PropertyValueFactory<>(LAST_MAINTENANCE_DATE));
-        nextMaintenanceDateColumn
-                .setCellValueFactory(new PropertyValueFactory<>(NEXT_MAINTENANCE_DATE));
+        vehicleStatusColumn.setCellValueFactory(new PropertyValueFactory<>(VEHICLE_STATUS));
+        lastMaintenanceDateColumn.setCellValueFactory(new PropertyValueFactory<>(LAST_MAINTENANCE_DATE));
+        nextMaintenanceDateColumn.setCellValueFactory(new PropertyValueFactory<>(NEXT_MAINTENANCE_DATE));
 
         setLicenceTypeCellFactory();
         setVehicleStatusCellFactory();
@@ -134,10 +131,17 @@ public final class VehicleController {
                     deleteVehicleButton.setDisable(!selected);
                 });
 
+        searchField.textProperty().addListener((obs, oldText, newText) -> handleSearch());
+    }
+
+    /**
+     * Initializes data and components that depend on external managers.
+     * To be called after setting the vehicleManager.
+     */
+    public void initData() {
+        System.out.println("[DEBUG] initData VehicleController called");
         loadVehicles();
         startAutoRefresh();
-
-        searchField.textProperty().addListener((obs, oldText, newText) -> handleSearch());
     }
 
     private void setLicenceTypeCellFactory() {

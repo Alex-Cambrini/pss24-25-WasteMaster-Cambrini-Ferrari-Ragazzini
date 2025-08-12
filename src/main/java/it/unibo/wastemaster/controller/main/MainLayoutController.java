@@ -227,6 +227,7 @@ public final class MainLayoutController {
         if (controller != null) {
             controller.setVehicleManager(AppContext.getServiceFactory()
                     .getVehicleManager());
+            controller.initData();
         }
     }
 
