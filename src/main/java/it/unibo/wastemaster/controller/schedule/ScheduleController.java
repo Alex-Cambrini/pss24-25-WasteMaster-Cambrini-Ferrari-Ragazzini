@@ -142,14 +142,13 @@ public final class ScheduleController {
     @FXML
     public void initialize() {
         wasteNameColumn.setCellValueFactory(new PropertyValueFactory<>("wasteName"));
-        scheduleCategoryColumn
-                .setCellValueFactory(new PropertyValueFactory<>("scheduleCategory"));
+        scheduleCategoryColumn.setCellValueFactory(new PropertyValueFactory<>("scheduleCategory"));
         frequencyColumn.setCellValueFactory(new PropertyValueFactory<>(FILTER_FREQUENCY));
-        executionDateColumn
-                .setCellValueFactory(new PropertyValueFactory<>("executionDate"));
+        executionDateColumn.setCellValueFactory(new PropertyValueFactory<>("executionDate"));
         startDateColumn.setCellValueFactory(new PropertyValueFactory<>("startDate"));
         statusColumn.setCellValueFactory(new PropertyValueFactory<>("status"));
         customerColumn.setCellValueFactory(new PropertyValueFactory<>(FILTER_CUSTOMER));
+
         oneTimeCheckBox.setSelected(true);
         recurringCheckBox.setSelected(true);
         showDeletedCheckBox.setSelected(false);
@@ -157,36 +156,36 @@ public final class ScheduleController {
         showPausedCheckBox.setSelected(false);
         showCompletedCheckBox.setSelected(false);
 
-        refresh();
-        startAutoRefresh();
-
         searchField.textProperty().addListener((obs, oldText, newText) -> handleSearch());
 
-        oneTimeCheckBox.selectedProperty()
-                .addListener((obs, oldVal, newVal) -> refresh());
-        recurringCheckBox.selectedProperty()
-                .addListener((obs, oldVal, newVal) -> refresh());
-        showDeletedCheckBox.selectedProperty()
-                .addListener((obs, oldVal, newVal) -> refresh());
-        showActiveCheckBox.selectedProperty()
-                .addListener((obs, oldVal, newVal) -> refresh());
-        showPausedCheckBox.selectedProperty()
-                .addListener((obs, oldVal, newVal) -> refresh());
-        showCompletedCheckBox.selectedProperty()
-                .addListener((obs, oldVal, newVal) -> refresh());
+        oneTimeCheckBox.selectedProperty().addListener((obs, oldVal, newVal) -> refresh());
+        recurringCheckBox.selectedProperty().addListener((obs, oldVal, newVal) -> refresh());
+        showDeletedCheckBox.selectedProperty().addListener((obs, oldVal, newVal) -> refresh());
+        showActiveCheckBox.selectedProperty().addListener((obs, oldVal, newVal) -> refresh());
+        showPausedCheckBox.selectedProperty().addListener((obs, oldVal, newVal) -> refresh());
+        showCompletedCheckBox.selectedProperty().addListener((obs, oldVal, newVal) -> refresh());
 
         scheduleTable.getSelectionModel().selectedItemProperty()
                 .addListener((obs, oldVal, newVal) -> updateButtons(newVal));
     }
 
     /**
-     * Refreshes the schedule table by reloading schedules and applying the current search
-     * filter.
+     * Refreshes the schedule table by reloading schedules and applying the current search filter.
      */
     public void refresh() {
         loadSchedules();
         handleSearch();
     }
+
+    /**
+     * Initializes data loading and starts automatic refresh.
+     * This should be called from the main controller after dependencies are set.
+     */
+    public void initData() {
+        refresh();
+        startAutoRefresh();
+    }
+
 
     private void updateButtons(final ScheduleRow selected) {
         if (selected != null) {
@@ -336,23 +335,24 @@ public final class ScheduleController {
             Optional<AddScheduleController> controllerOpt =
                     DialogUtils.showModalWithController("Add Schedule",
                             "/layouts/schedule/AddScheduleView.fxml", mainStage, ctrl -> {
-                                ctrl.setCustomerManager(
-                                        AppContext.getServiceFactory()
-                                                .getCustomerManager());
-                                ctrl.setWasteManager(AppContext.getServiceFactory()
-                                        .getWasteManager());
+                                ctrl.setCustomerManager(AppContext.getServiceFactory().getCustomerManager());
+                                ctrl.setWasteManager(AppContext.getServiceFactory().getWasteManager());
                                 ctrl.setOneTimeScheduleManager(oneTimeScheduleManager);
-                                ctrl.setRecurringScheduleManager(
-                                        recurringScheduleManager);
+                                ctrl.setRecurringScheduleManager(recurringScheduleManager);
+                                ctrl.initData();
                             });
+
             if (controllerOpt.isPresent()) {
+                AddScheduleController ctrl = controllerOpt.get();
                 loadSchedules();
             }
         } catch (IOException e) {
+            e.printStackTrace();
             DialogUtils.showError("Loading Error", "Could not load Add Schedule dialog.",
                     AppContext.getOwner());
         }
     }
+
 
     @FXML
     private void handleChangeFrequency() {

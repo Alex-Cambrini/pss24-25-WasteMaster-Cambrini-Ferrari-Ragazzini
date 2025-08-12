@@ -81,22 +81,32 @@ public final class AddScheduleController {
         this.recurringScheduleManager = recurringScheduleManager;
     }
 
-    public void setWasteManager(WasteManager WasteManager) {
+    public void setWasteManager(WasteManager wasteManager) {
         this.wasteManager = wasteManager;
     }
 
     /**
-     * Initializes the controller components and listeners.
+     * Sets up basic UI components and listeners that do not depend on external managers.
      */
     @FXML
     public void initialize() {
+        setupScheduleTypeToggle();
+    }
+
+    /**
+     * Initializes data and UI components that depend on injected managers.
+     * This method must be called after all required managers have been set.
+     */
+    public void initData() {
+        System.out.println("[DEBUG] initData addSchedule Controller called");
+        setupFrequencyComboBox();
         setupCustomerAutocomplete();
         setupWasteComboBox();
-        setupScheduleTypeToggle();
     }
 
     private void setupCustomerAutocomplete() {
         allCustomers = customerManager.getAllCustomers();
+        System.out.println("[DEBUG] Loaded customers: " + allCustomers.size());
 
         customerField.textProperty().addListener((obs, oldText, newText) -> {
             if (newText == null || newText.isBlank()) {
@@ -136,6 +146,7 @@ public final class AddScheduleController {
 
     private void setupWasteComboBox() {
         List<Waste> wasteList = wasteManager.getActiveWastes();
+        System.out.println("[DEBUG] Loaded wastes: " + wasteList.size());
 
         if (wasteList.isEmpty()) {
             wasteComboBox.setDisable(true);
@@ -181,6 +192,21 @@ public final class AddScheduleController {
                 dateLabel.setText(isRecurring ? "Start Date" : "Pickup Date");
             }
         });
+    }
+
+    private void setupFrequencyComboBox() {
+        frequencyComboBox.setItems(FXCollections.observableArrayList(Frequency.values()));
+        frequencyComboBox.setConverter(new StringConverter<Frequency>() {
+            @Override
+            public String toString(Frequency freq) {
+                return freq != null ? freq.name() : "";
+            }
+            @Override
+            public Frequency fromString(String string) {
+                return null;
+            }
+        });
+        frequencyComboBox.setDisable(true);
     }
 
     /**

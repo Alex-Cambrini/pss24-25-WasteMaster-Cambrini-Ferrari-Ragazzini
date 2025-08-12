@@ -258,6 +258,7 @@ public final class MainLayoutController {
             controller.setCollectionManager(AppContext.getServiceFactory()
                     .getCollectionManager());
         }
+        controller.initData();
     }
 
     /**
