@@ -240,6 +240,7 @@ public final class MainLayoutController {
         if (controller != null) {
             controller.setEmployeeManager(
                     AppContext.getServiceFactory().getEmployeeManager());
+            controller.initData();
         }
     }
 

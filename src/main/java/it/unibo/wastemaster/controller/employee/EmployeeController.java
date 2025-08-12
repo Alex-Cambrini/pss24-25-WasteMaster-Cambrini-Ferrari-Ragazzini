@@ -91,14 +91,9 @@ public final class EmployeeController {
         this.employeeManager = employeeManager;
     }
 
-    /**
-     * Initializes the EmployeeController view, setting up table bindings, listeners, and
-     * automatic refresh. This method is called automatically after the FXML is loaded.
-     */
     @FXML
     public void initialize() {
-        owner = (Stage) MainLayoutController.getInstance().getRootPane().getScene()
-                .getWindow();
+        owner = (Stage) MainLayoutController.getInstance().getRootPane().getScene().getWindow();
 
         nameColumn.setCellValueFactory(new PropertyValueFactory<>(FILTER_NAME));
         surnameColumn.setCellValueFactory(new PropertyValueFactory<>(FILTER_SURNAME));
@@ -136,11 +131,19 @@ public final class EmployeeController {
                     deleteEmployeeButton.setDisable(!selected);
                 });
 
-        loadEmployee();
-        startAutoRefresh();
-
         searchField.textProperty().addListener((obs, oldText, newText) -> handleSearch());
     }
+
+    /**
+     * Initializes data and components that depend on external managers or services.
+     * This method must be called after all required managers are injected.
+     */
+    public void initData() {
+        System.out.println("[DEBUG] initData EmployeeController called");
+        loadEmployee();
+        startAutoRefresh();
+    }
+
 
     private void startAutoRefresh() {
         refreshTimeline =
