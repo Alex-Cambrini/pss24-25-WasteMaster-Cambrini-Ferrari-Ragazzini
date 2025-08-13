@@ -183,4 +183,87 @@ class TripManagerTest extends AbstractDatabaseTest {
         Optional<Trip> deletedOpt = getTripDAO().findById(trip.getTripId());
         assertTrue(deletedOpt.isEmpty());
     }
+
+     @Test
+    void testHandleUnexpectedEventUpdatesOnlyNonNullFields() {
+        List<Collection> collections = createCollections();
+
+        getTripManager().createTrip("40100", vehicle1,
+                List.of(operator1, operator2), departureTime,
+                expectedReturnTime, Trip.TripStatus.PENDING, collections);
+
+        Trip trip = getTripDAO().findAll().get(0);
+
+        // Nuovi dati per l'imprevisto
+        Vehicle newVehicle = new Vehicle("ZZ999ZZ", "Fiat", "Ducato", 2022,
+                Vehicle.RequiredLicence.C1, Vehicle.VehicleStatus.IN_SERVICE, 3);
+        getVehicleDAO().insert(newVehicle);
+
+        Employee newOperator = new Employee("Luca", "Verdi",
+                new Location("Via Firenze", "5", "Firenze", "50100"),
+                "luca.verdi@example.com", "+390123456789",
+                Employee.Role.OPERATOR, Employee.Licence.C1);
+        getEmployeeDAO().insert(newOperator);
+
+        LocalDateTime newDeparture = departureTime.plusHours(2);
+        LocalDateTime newReturn = expectedReturnTime.plusHours(2);
+
+        List<Collection> newCollections = createCollections();
+
+        getTripManager().handleUnexpectedEvent(
+        trip.getTripId(),
+        newVehicle,
+        new ArrayList<>(List.of(newOperator)), 
+        newDeparture,
+        newReturn,
+        new ArrayList<>(newCollections),      
+        Trip.TripStatus.COMPLETED
+);
+
+        Trip updated = getTripManager().getTripById(trip.getTripId()).orElseThrow();
+
+        assertEquals(newVehicle.getPlate(), updated.getAssignedVehicle().getPlate());
+        assertEquals(1, updated.getOperators().size());
+        assertEquals(newOperator.getEmail(), updated.getOperators().get(0).getEmail());
+        assertEquals(newDeparture, updated.getDepartureTime());
+        assertEquals(newReturn, updated.getExpectedReturnTime());
+        assertEquals(Trip.TripStatus.COMPLETED, updated.getStatus());
+        assertEquals(newCollections.size(), updated.getCollections().size());
+    }
+
+    @Test
+    void testHandleUnexpectedEventWithNullFieldsDoesNotUpdate() {
+        List<Collection> collections = createCollections();
+
+       getTripManager().createTrip("40100", vehicle1,
+         new ArrayList<>(List.of(operator1, operator2)), departureTime,
+        expectedReturnTime, Trip.TripStatus.PENDING, new ArrayList<>(collections));
+
+        Trip trip = getTripDAO().findAll().get(0);
+
+        
+        Vehicle originalVehicle = trip.getAssignedVehicle();
+        List<Employee> originalOperators = trip.getOperators();
+        LocalDateTime originalDeparture = trip.getDepartureTime();
+        LocalDateTime originalReturn = trip.getExpectedReturnTime();
+        List<Collection> originalCollections = trip.getCollections();
+        Trip.TripStatus originalStatus = trip.getStatus();
+
+        
+        getTripManager().handleUnexpectedEvent(
+                trip.getTripId(),
+                null, null, null, null, null, null
+        );
+
+        Trip updated = getTripManager().getTripById(trip.getTripId()).orElseThrow();
+
+        assertEquals(originalVehicle.getPlate(), updated.getAssignedVehicle().getPlate());
+        assertEquals(originalOperators.size(), updated.getOperators().size());
+        assertEquals(originalDeparture, updated.getDepartureTime());
+        assertEquals(originalReturn, updated.getExpectedReturnTime());
+        assertEquals(originalStatus, updated.getStatus());
+        assertEquals(originalCollections.size(), updated.getCollections().size());
+    }
+
+
 }

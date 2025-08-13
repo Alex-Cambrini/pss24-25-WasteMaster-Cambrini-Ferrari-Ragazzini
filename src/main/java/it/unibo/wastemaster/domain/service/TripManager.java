@@ -96,4 +96,48 @@ public final class TripManager {
     public void deleteTrip(final int tripId) {
         tripRepository.findById(tripId).ifPresent(tripRepository::delete);
     }
+
+     /**
+     * Handles modifications to a trip in case of unexpected events.
+     * Only non-null parameters will be updated.
+     *
+     * @param tripId The ID of the trip to modify.
+     * @param newVehicle The new vehicle to assign (null if unchanged).
+     * @param newOperators The new list of operators (null if unchanged).
+     * @param newDepartureTime The new departure time (null if unchanged).
+     * @param newExpectedReturnTime The new expected return time (null if unchanged).
+     * @param newCollections The new list of collections (null if unchanged).
+     * @param newStatus The new status of the trip (null if unchanged).
+     */
+    public void handleUnexpectedEvent(
+            final int tripId,
+            final Vehicle newVehicle,
+            final List<Employee> newOperators,
+            final LocalDateTime newDepartureTime,
+            final LocalDateTime newExpectedReturnTime,
+            final List<Collection> newCollections,
+            final Trip.TripStatus newStatus
+    ) {
+        tripRepository.findById(tripId).ifPresent(trip -> {
+            if (newVehicle != null) {
+                trip.setAssignedVehicle(newVehicle);
+            }
+            if (newOperators != null) {
+                trip.setOperators(newOperators);
+            }
+            if (newDepartureTime != null) {
+                trip.setDepartureTime(newDepartureTime);
+            }
+            if (newExpectedReturnTime != null) {
+                trip.setExpectedReturnTime(newExpectedReturnTime);
+            }
+            if (newCollections != null) {
+                trip.setCollections(newCollections);
+            }
+            if (newStatus != null) {
+                trip.setStatus(newStatus);
+            }
+            tripRepository.update(trip);
+        });
+    }
 }
