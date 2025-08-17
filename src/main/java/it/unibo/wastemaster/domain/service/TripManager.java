@@ -136,6 +136,14 @@ public final class TripManager {
             }
             if (newStatus != null) {
                 trip.setStatus(newStatus);
+                // If the trip is cancelled, cancel all related collections
+                if (newStatus == Trip.TripStatus.CANCELED) {
+                    for (Collection collection : trip.getCollections()) {
+                        collection.setCollectionStatus(Collection.CollectionStatus.CANCELLED);
+                        
+                    }
+                    
+                }
             }
             tripRepository.update(trip);
         });

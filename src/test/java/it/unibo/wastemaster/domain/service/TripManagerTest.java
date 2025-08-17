@@ -194,7 +194,7 @@ class TripManagerTest extends AbstractDatabaseTest {
 
         Trip trip = getTripDAO().findAll().get(0);
 
-        // Nuovi dati per l'imprevisto
+        
         Vehicle newVehicle = new Vehicle("ZZ999ZZ", "Fiat", "Ducato", 2022,
                 Vehicle.RequiredLicence.C1, Vehicle.VehicleStatus.IN_SERVICE, 3);
         getVehicleDAO().insert(newVehicle);
@@ -264,6 +264,35 @@ class TripManagerTest extends AbstractDatabaseTest {
         assertEquals(originalStatus, updated.getStatus());
         assertEquals(originalCollections.size(), updated.getCollections().size());
     }
+
+   
+
+    @Test
+    void testHandleUnexpectedEventCancelsCollectionsWhenTripIsCanceled() {
+        List<Collection> collections = createCollections();
+
+        getTripManager().createTrip("40100", vehicle1,
+                new ArrayList<>(List.of(operator1, operator2)), departureTime,
+                expectedReturnTime, Trip.TripStatus.PENDING, new ArrayList<>(collections));
+
+        Trip trip = getTripDAO().findAll().get(0);
+
+        // cancel the trip
+        getTripManager().handleUnexpectedEvent(
+                trip.getTripId(),
+                null, null, null, null, null,
+                Trip.TripStatus.CANCELED
+        );
+
+        Trip updated = getTripManager().getTripById(trip.getTripId()).orElseThrow();
+
+        
+        for (Collection c : updated.getCollections()) {
+            assertEquals(Collection.CollectionStatus.CANCELLED, c.getCollectionStatus());
+        }
+        assertEquals(Trip.TripStatus.CANCELED, updated.getStatus());
+    }
+
 
 
 }
