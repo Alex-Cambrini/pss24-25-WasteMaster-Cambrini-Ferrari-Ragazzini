@@ -6,7 +6,7 @@
         <TableView fx:id="tripTable">
             <columns>
                 <TableColumn fx:id="idColumn" text="ID"/>
-                <TableColumn fx:id="capColumn" text="CAP"/>
+                <TableColumn fx:id="capColumn" text="Postal Codes"/>
                 <TableColumn fx:id="vehicleColumn" text="Vehicle"/>
                 <TableColumn fx:id="operatorsColumn" text="Operators"/>
                 <TableColumn fx:id="departureColumn" text="Departure"/>

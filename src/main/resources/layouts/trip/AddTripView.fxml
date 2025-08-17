@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<VBox spacing="15" alignment="CENTER" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.unibo.wastemaster.controller.trip.AddTripController">
+    <children>
+        <Label text="Add Trip" styleClass="header"/>
+        <GridPane hgap="10" vgap="10">
+            <children>
+                <Label text="Postal Code:" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+                <TextField fx:id="capField" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+                <Label text="Vehicle:" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+                <ComboBox fx:id="vehicleCombo" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+                <Label text="Operators:" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+                <ListView fx:id="operatorsList" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+                <Label text="Departure:" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
+                <DatePicker fx:id="departureDate" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
+                <Label text="Return:" GridPane.rowIndex="4" GridPane.columnIndex="0"/>
+                <DatePicker fx:id="returnDate" GridPane.rowIndex="4" GridPane.columnIndex="1"/>
+            </children>
+        </GridPane>
+        <HBox spacing="10" alignment="CENTER_RIGHT">
+            <Button text="Cancel" onAction="#onCancel"/>
+            <Button text="Save" onAction="#onSave"/>
+        </HBox>
+    </children>
+</VBox>
