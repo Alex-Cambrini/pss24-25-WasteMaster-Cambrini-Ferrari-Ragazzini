@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<BorderPane xmlns:fx="http://javafx.com/fxml" fx:controller="it.unibo.wastemaster.controller.invoice.InvoiceController">
+    <center>
+        <TableView fx:id="invoiceTable">
+            <columns>
+                <TableColumn fx:id="idColumn" text="ID"/>
+                <TableColumn fx:id="customerColumn" text="Customer"/>
+                <TableColumn fx:id="amountColumn" text="Amount"/>
+                <TableColumn fx:id="statusColumn" text="Status"/>
+            </columns>
+        </TableView>
+    </center>
+    <bottom>
+        <HBox spacing="10" alignment="CENTER">
+            <Button text="Delete" onAction="#onDelete"/>
+            <Button text="Print PDF" onAction="#onPrint"/>
+            <Button text="Refresh" onAction="#onRefresh"/>
+        </HBox>
+    </bottom>
+</BorderPane>

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<BorderPane xmlns:fx="http://javafx.com/fxml" fx:controller="it.unibo.wastemaster.controller.trip.TripController">
+    <center>
+        <TableView fx:id="tripTable">
+            <columns>
+                <TableColumn fx:id="idColumn" text="ID"/>
+                <TableColumn fx:id="capColumn" text="CAP"/>
+                <TableColumn fx:id="vehicleColumn" text="Vehicle"/>
+                <TableColumn fx:id="operatorsColumn" text="Operators"/>
+                <TableColumn fx:id="departureColumn" text="Departure"/>
+                <TableColumn fx:id="returnColumn" text="Return"/>
+                <TableColumn fx:id="statusColumn" text="Status"/>
+            </columns>
+        </TableView>
+    </center>
+    <bottom>
+        <HBox spacing="10" alignment="CENTER">
+            <Button text="Details" onAction="#onDetails"/>
+            <Button text="Cancel Trip" onAction="#onCancel"/>
+            <Button text="Refresh" onAction="#onRefresh"/>
+        </HBox>
+    </bottom>
+</BorderPane>

@@ -39,6 +39,8 @@ public final class MainLayoutController {
     private static final String VEHICLE_MANAGEMENT = "Vehicle Management";
     private static final String EMPLOYEE_MANAGEMENT = "Employee Management";
     private static final String SCHEDULE_MANAGEMENT = "Schedule Management";
+    private static final String TRIP_MANAGEMENT = "Trip Management";
+    private static final String INVOICE_MANAGEMENT = "Invoice Management";
 
     private static MainLayoutController instance;
     private Object currentController;
@@ -70,6 +72,12 @@ public final class MainLayoutController {
 
     @FXML
     private Hyperlink employeesLink;
+
+    @FXML
+    private Hyperlink tripsLink;
+
+    @FXML
+    private Hyperlink invoicesLink;
 
     /**
      * Returns the singleton instance of this controller.
@@ -263,6 +271,26 @@ public final class MainLayoutController {
         controller.initData();
     }
 
+    @FXML
+    private void handleTrip() {
+    tripsLink.setVisited(false);
+    setPageTitle(TRIP_MANAGEMENT);
+    var controller = loadCenterWithController("/layouts/trip/TripView.fxml");
+    if (controller != null) {
+        
+    }
+    }
+
+
+    @FXML
+    private void handleInvoice() {
+        invoicesLink.setVisited(false);
+        setPageTitle(INVOICE_MANAGEMENT);
+        var controller = loadCenterWithController("/layouts/invoice/InvoiceView.fxml");
+        if (controller != null) {
+           
+        }
+    }
     /**
      * Sets the page title label.
      *
