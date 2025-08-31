@@ -235,4 +235,46 @@ public final class TripController {
                 || (activeFilters.contains(FIELD_STATUS)
                 && row.getStatus().toLowerCase().contains(query));
     }
+
+      @FXML
+    private void handleResetSearch() {
+        searchField.clear();
+        activeFilters.clear();
+        activeFilters.addAll(FIELD_ID, FIELD_POSTAL_CODES, FIELD_VEHICLE, FIELD_OPERATORS, FIELD_STATUS);
+        loadTrips();
+    }
+
+    @FXML
+    private void showFilterMenu(final javafx.scene.input.MouseEvent event) {
+        if (filterMenu != null && filterMenu.isShowing()) {
+            filterMenu.hide();
+            return;
+        }
+
+        filterMenu = new ContextMenu();
+        String[] fields = {FIELD_ID, FIELD_POSTAL_CODES, FIELD_VEHICLE, FIELD_OPERATORS, FIELD_STATUS};
+        String[] labels = {"ID", "Postal Codes", "Vehicle", "Operators", "Status"};
+
+        for (int i = 0; i < fields.length; i++) {
+            String key = fields[i];
+            String label = labels[i];
+
+            CheckBox checkBox = new CheckBox(label);
+            checkBox.setSelected(activeFilters.contains(key));
+            checkBox.selectedProperty().addListener((obs, wasSelected, isSelected) -> {
+                if (isSelected.booleanValue()) {
+                    activeFilters.add(key);
+                } else {
+                    activeFilters.remove(key);
+                }
+                handleSearch();
+            });
+
+            CustomMenuItem item = new CustomMenuItem(checkBox);
+            item.setHideOnClick(false);
+            filterMenu.getItems().add(item);
+        }
+
+        filterMenu.show(filterButton, event.getScreenX(), event.getScreenY());
+    }
 }
