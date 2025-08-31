@@ -57,5 +57,49 @@ public class EditTripController {
         }
     }
 
-    
+    @FXML
+    private void onSave() {
+        String postalCodes = postalCodesField.getText().trim();
+        Vehicle vehicle = vehicleCombo.getValue();
+        List<Employee> operators = operatorsList.getSelectionModel().getSelectedItems();
+        LocalDate depDate = departureDate.getValue();
+        LocalDate retDate = returnDate.getValue();
+
+        if (postalCodes.isEmpty() || vehicle == null || operators.isEmpty() || depDate == null || retDate == null) {
+            showAlert("All fields are required.");
+            return;
+        }
+
+        LocalDateTime depDateTime = depDate.atStartOfDay();
+        LocalDateTime retDateTime = retDate.atStartOfDay();
+
+        tripManager.handleUnexpectedEvent(
+                tripToEdit.getTripId(),
+                vehicle,
+                operators,
+                depDateTime,
+                retDateTime,
+                null,
+                null  
+        );
+
+        close();
+        if (tripController != null) {
+            tripController.loadTrips();
+        }
+    }
+
+    @FXML
+    private void onCancel() {
+        close();
+    }
+
+    private void close() {
+        ((Stage) postalCodesField.getScene().getWindow()).close();
+    }
+
+    private void showAlert(String msg) {
+        Alert alert = new Alert(Alert.AlertType.ERROR, msg, ButtonType.OK);
+        alert.showAndWait();
+    }
 }
