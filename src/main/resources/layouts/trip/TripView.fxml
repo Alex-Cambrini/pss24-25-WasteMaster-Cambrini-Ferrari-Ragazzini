@@ -2,11 +2,17 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <BorderPane xmlns:fx="http://javafx.com/fxml" fx:controller="it.unibo.wastemaster.controller.trip.TripController">
+    <top>
+        <HBox spacing="10" alignment="CENTER_LEFT" styleClass="toolbar">
+            <Button text="Add Trip" onAction="#onAddTrip"/>
+            <Button text="Edit Trip" onAction="#onEditTrip"/>
+        </HBox>
+    </top>
     <center>
         <TableView fx:id="tripTable">
             <columns>
                 <TableColumn fx:id="idColumn" text="ID"/>
-                <TableColumn fx:id="capColumn" text="Postal Codes"/>
+                <TableColumn fx:id="capColumn" text="Postal Code"/>
                 <TableColumn fx:id="vehicleColumn" text="Vehicle"/>
                 <TableColumn fx:id="operatorsColumn" text="Operators"/>
                 <TableColumn fx:id="departureColumn" text="Departure"/>
