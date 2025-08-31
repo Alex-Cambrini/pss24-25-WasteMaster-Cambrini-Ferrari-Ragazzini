@@ -148,4 +148,12 @@ public final class TripManager {
             tripRepository.update(trip);
         });
     }
+    /**
+     * Retrieves all trips from the database.
+     *
+     * @return A list of all trips.
+     */
+    public List<Trip> findAllTrip() {
+    return tripRepository.findAll();
+    }
 }
