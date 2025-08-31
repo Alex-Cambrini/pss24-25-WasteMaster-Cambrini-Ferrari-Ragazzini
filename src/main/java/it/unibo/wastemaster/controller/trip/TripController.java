@@ -134,4 +134,75 @@ public final class TripController {
             e.printStackTrace();
         }
     }
+
+    @FXML
+    private void handleDeleteTrip() {
+        TripRow selected = tripTable.getSelectionModel().getSelectedItem();
+        if (selected == null) {
+            DialogUtils.showError("No Selection",
+                    "Please select a trip to cancel.", AppContext.getOwner());
+            return;
+        }
+
+        boolean confirmed = DialogUtils.showConfirmationDialog(
+                "Confirm Cancellation",
+                "Are you sure you want to cancel this trip?",
+                AppContext.getOwner()
+        );
+
+        if (!confirmed) {
+            return;
+        }
+
+        Optional<Trip> tripOpt = tripManager.getTripById(selected.getIdAsInt());
+        if (tripOpt.isEmpty()) {
+            DialogUtils.showError("Not Found",
+                    "The selected trip could not be found.", AppContext.getOwner());
+            return;
+        }
+
+        var trip = tripOpt.get();
+        boolean success = tripManager.deleteTrip(trip); // Implementa cancelTrip in TripManager
+        if (success) {
+            loadTrips();
+        } else {
+            DialogUtils.showError("Cancellation Failed",
+                    "Unable to cancel the selected trip.", AppContext.getOwner());
+        }
+    }
+
+    @FXML
+    private void handleEditTrip() {
+        TripRow selected = tripTable.getSelectionModel().getSelectedItem();
+        if (selected == null) {
+            DialogUtils.showError("No Selection",
+                    "Please select a trip to edit.",
+                    AppContext.getOwner());
+            return;
+        }
+
+        Optional<Trip> tripOpt = tripManager.getTripById(selected.getIdAsInt());
+        if (tripOpt.isEmpty()) {
+            DialogUtils.showError("Not Found", "Trip not found.",
+                    AppContext.getOwner());
+            return;
+        }
+
+        try {
+            Optional<EditTripController> controllerOpt =
+                    DialogUtils.showModalWithController("Edit Trip",
+                            "/layouts/trip/EditTripView.fxml",
+                            AppContext.getOwner(), ctrl -> {
+                                ctrl.setTripToEdit(tripOpt.get());
+                                ctrl.setTripController(this);
+                                ctrl.setTripManager(tripManager);
+                            });
+
+            controllerOpt.ifPresent(ctrl -> loadTrips());
+        } catch (Exception e) {
+            DialogUtils.showError(NAVIGATION_ERROR, "Could not load Edit Trip view.",
+                    AppContext.getOwner());
+        }
+    }
+
 }
