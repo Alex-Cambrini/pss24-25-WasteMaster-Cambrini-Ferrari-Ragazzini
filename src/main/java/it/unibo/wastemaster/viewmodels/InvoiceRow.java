@@ -1,7 +1,7 @@
 package it.unibo.wastemaster.viewmodels;
 
 import it.unibo.wastemaster.domain.model.Invoice;
-import it.unibo.wastemaster.domain.model.Customer;
+
 
 /**
  * ViewModel class that represents an invoice for the table view.
