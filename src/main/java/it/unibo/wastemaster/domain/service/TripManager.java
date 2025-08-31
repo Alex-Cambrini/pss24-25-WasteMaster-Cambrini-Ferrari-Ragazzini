@@ -5,6 +5,7 @@ import it.unibo.wastemaster.domain.model.Employee;
 import it.unibo.wastemaster.domain.model.Trip;
 import it.unibo.wastemaster.domain.model.Vehicle;
 import it.unibo.wastemaster.domain.repository.TripRepository;
+import it.unibo.wastemaster.infrastructure.utils.ValidateUtils;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -37,13 +38,11 @@ public final class TripManager {
      * @param collections The list of collections for the trip.
      */
     public void createTrip(final String postalCode, final Vehicle assignedVehicle,
-                           final List<Employee> operators,
-                           final LocalDateTime departureTime,
-                           final LocalDateTime expectedReturnTime,
-                           final Trip.TripStatus status,
-                           final List<Collection> collections) {
-        Trip trip = new Trip(postalCode, assignedVehicle, operators,
-                departureTime, expectedReturnTime, status, collections);
+            final List<Employee> operators, final LocalDateTime departureTime,
+            final LocalDateTime expectedReturnTime, final Trip.TripStatus status,
+            final List<Collection> collections) {
+        Trip trip = new Trip(postalCode, assignedVehicle, operators, departureTime,
+                expectedReturnTime, status, collections);
         tripRepository.save(trip);
     }
 
@@ -60,12 +59,9 @@ public final class TripManager {
      * @param collections la nuova lista di raccolte
      */
     public void updateTrip(final int tripId, final String postalCode,
-                           final Vehicle assignedVehicle,
-                           final List<Employee> operators,
-                           final LocalDateTime departureTime,
-                           final LocalDateTime expectedReturnTime,
-                           final Trip.TripStatus status,
-                           final List<Collection> collections) {
+            final Vehicle assignedVehicle, final List<Employee> operators,
+            final LocalDateTime departureTime, final LocalDateTime expectedReturnTime,
+            final Trip.TripStatus status, final List<Collection> collections) {
         tripRepository.findById(tripId).ifPresent(trip -> {
             trip.setPostalCodes(postalCode);
             trip.setAssignedVehicle(assignedVehicle);
@@ -89,17 +85,25 @@ public final class TripManager {
     }
 
     /**
-     * Deletes a trip from the database if it exists.
+     * Deletes the specified trip from the database.
      *
-     * @param tripId The ID of the trip to delete.
+     * @param trip The Trip object to delete; must not be null and must have a non-null tripId.
+     * @return true if the trip was successfully deleted, false if the trip or its ID was null.
      */
-    public void deleteTrip(final int tripId) {
-        tripRepository.findById(tripId).ifPresent(tripRepository::delete);
+    public boolean deleteTrip(final Trip trip) {
+        try {
+            ValidateUtils.requireArgNotNull(trip, "Trip cannot be null");
+            ValidateUtils.requireArgNotNull(trip.getTripId(), "Trip ID cannot be null");
+            tripRepository.delete(trip);
+            return true;
+        } catch (IllegalArgumentException e) {
+            return false;
+        }
     }
 
-     /**
-     * Handles modifications to a trip in case of unexpected events.
-     * Only non-null parameters will be updated.
+    /**
+     * Handles modifications to a trip in case of unexpected events. Only non-null
+     * parameters will be updated.
      *
      * @param tripId The ID of the trip to modify.
      * @param newVehicle The new vehicle to assign (null if unchanged).
@@ -109,15 +113,10 @@ public final class TripManager {
      * @param newCollections The new list of collections (null if unchanged).
      * @param newStatus The new status of the trip (null if unchanged).
      */
-    public void handleUnexpectedEvent(
-            final int tripId,
-            final Vehicle newVehicle,
-            final List<Employee> newOperators,
-            final LocalDateTime newDepartureTime,
+    public void handleUnexpectedEvent(final int tripId, final Vehicle newVehicle,
+            final List<Employee> newOperators, final LocalDateTime newDepartureTime,
             final LocalDateTime newExpectedReturnTime,
-            final List<Collection> newCollections,
-            final Trip.TripStatus newStatus
-    ) {
+            final List<Collection> newCollections, final Trip.TripStatus newStatus) {
         tripRepository.findById(tripId).ifPresent(trip -> {
             if (newVehicle != null) {
                 trip.setAssignedVehicle(newVehicle);
@@ -139,10 +138,11 @@ public final class TripManager {
                 // If the trip is cancelled, cancel all related collections
                 if (newStatus == Trip.TripStatus.CANCELED) {
                     for (Collection collection : trip.getCollections()) {
-                        collection.setCollectionStatus(Collection.CollectionStatus.CANCELLED);
-                        
+                        collection.setCollectionStatus(
+                                Collection.CollectionStatus.CANCELLED);
+
                     }
-                    
+
                 }
             }
             tripRepository.update(trip);
