@@ -100,4 +100,38 @@ public final class TripController {
         }
     }
 
+    /**
+     * Loads all trips from the database and updates the trip table.
+     */
+    public void loadTrips() {
+        List<Trip> trips = tripManager.getAllTrips();
+        allTrips.clear();
+        for (Trip trip : trips) {
+            allTrips.add(new TripRow(trip));
+        }
+        tripTable.setItems(FXCollections.observableArrayList(allTrips));
+        if (!searchField.getText().isBlank()) {
+            handleSearch();
+        }
+    }
+
+    @FXML
+    private void handleAddTrip() {
+        try {
+            Optional<AddTripController> controllerOpt =
+                    DialogUtils.showModalWithController("Add Trip",
+                            "/layouts/trip/AddTripView.fxml",
+                            AppContext.getOwner(), ctrl -> {
+                                ctrl.setTripManager(tripManager);
+                                ctrl.setTripController(this);
+                            });
+            if (controllerOpt.isPresent()) {
+                loadTrips();
+            }
+        } catch (Exception e) {
+            DialogUtils.showError(NAVIGATION_ERROR, "Could not load Add Trip view.",
+                    AppContext.getOwner());
+            e.printStackTrace();
+        }
+    }
 }
