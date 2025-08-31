@@ -140,6 +140,16 @@ public class Invoice {
         return amount;
     }
 
+     /**
+     * Returns the customer associated with this invoice (via the collection).
+     *
+     * @return the customer, or null if not available
+     */
+    public Customer getCustomer() {
+        return collection != null ? collection.getCustomer() : null;
+    }
+
+    
     /**
      * Sets the invoice amount.
      *
@@ -148,7 +158,7 @@ public class Invoice {
     public void setAmount(final double amount) {
         this.amount = amount;
     }
-
+    
     /**
      * Returns a string representation of the invoice, showing ID, collection ID,
      * customer, waste, amount, issue date, and payment status. Null values are shown as
