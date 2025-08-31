@@ -205,4 +205,34 @@ public final class TripController {
         }
     }
 
+     @FXML
+    private void handleSearch() {
+        String query = searchField.getText().toLowerCase().trim();
+
+        if (query.isEmpty()) {
+            tripTable.setItems(FXCollections.observableArrayList(allTrips));
+            return;
+        }
+
+        ObservableList<TripRow> filtered = FXCollections.observableArrayList();
+        for (TripRow row : allTrips) {
+            if (matchesQuery(row, query)) {
+                filtered.add(row);
+            }
+        }
+        tripTable.setItems(filtered);
+    }
+
+    private boolean matchesQuery(final TripRow row, final String query) {
+        return (activeFilters.contains(FIELD_ID)
+                && row.getId().toLowerCase().contains(query))
+                || (activeFilters.contains(FIELD_POSTAL_CODES)
+                && row.getPostalCodes().toLowerCase().contains(query))
+                || (activeFilters.contains(FIELD_VEHICLE)
+                && row.getVehicle().toLowerCase().contains(query))
+                || (activeFilters.contains(FIELD_OPERATORS)
+                && row.getOperators().toLowerCase().contains(query))
+                || (activeFilters.contains(FIELD_STATUS)
+                && row.getStatus().toLowerCase().contains(query));
+    }
 }
