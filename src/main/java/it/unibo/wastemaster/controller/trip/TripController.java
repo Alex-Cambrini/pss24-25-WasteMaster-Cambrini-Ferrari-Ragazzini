@@ -104,7 +104,7 @@ public final class TripController {
      * Loads all trips from the database and updates the trip table.
      */
     public void loadTrips() {
-        List<Trip> trips = tripManager.getAllTrips();
+        List<Trip> trips = tripManager.findAllTrip();
         allTrips.clear();
         for (Trip trip : trips) {
             allTrips.add(new TripRow(trip));
