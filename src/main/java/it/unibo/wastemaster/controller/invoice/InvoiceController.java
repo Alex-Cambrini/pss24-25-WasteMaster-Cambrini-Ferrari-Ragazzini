@@ -238,4 +238,32 @@ public final class InvoiceController {
         }
         filterMenu.show(invoiceTable, event.getScreenX(), event.getScreenY());
     }
+
+        @FXML
+    private void handleViewCollection() {
+        InvoiceRow selected = invoiceTable.getSelectionModel().getSelectedItem();
+        if (selected == null) {
+            DialogUtils.showError(TITLE_NO_SELECTION, "Please select an invoice.", AppContext.getOwner());
+            return;
+        }
+        Optional<Invoice> invoiceOpt = invoiceManager.findInvoiceById(selected.getIdAsLong());
+        if (invoiceOpt.isEmpty()) {
+            DialogUtils.showError("Not Found", "Invoice not found.", AppContext.getOwner());
+            return;
+        }
+        Collection collection = invoiceOpt.get().getCollection();
+        if (collection == null) {
+            DialogUtils.showError("No Collection", "No collection associated with this invoice.", AppContext.getOwner());
+            return;
+        }
+        try {
+            MainLayoutController.getInstance().setPageTitle("Associated Collection");
+            it.unibo.wastemaster.controller.collection.CollectionController controller =
+                    MainLayoutController.getInstance().loadCenterWithController("/layouts/collection/CollectionView.fxml");
+            controller.setCollections(List.of(collection));
+        } catch (Exception e) {
+            DialogUtils.showError("Navigation error", "Could not load Collection view.", AppContext.getOwner());
+            e.printStackTrace();
+        }
+    }
 }
