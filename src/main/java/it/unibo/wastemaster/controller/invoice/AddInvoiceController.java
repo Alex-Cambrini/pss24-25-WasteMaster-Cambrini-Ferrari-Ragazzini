@@ -46,4 +46,39 @@ public final class AddInvoiceController {
     public void setCollectionManager(CollectionManager collectionManager) {
         this.collectionManager = collectionManager;
     }
+     /**
+     * Sets up UI components and listeners.
+     */
+    @FXML
+    public void initialize() {
+        if (invoiceManager == null) {
+            invoiceManager = AppContext.getServiceFactory().getInvoiceManager();
+        }
+        if (collectionManager == null) {
+            collectionManager = AppContext.getServiceFactory().getCollectionManager();
+        }
+        setupCollectionCombo();
+        setupStatusCombo();
+    }
+
+    private void setupCollectionCombo() {
+        allCollections = collectionManager.getAllCollections();
+        collectionCombo.setItems(FXCollections.observableArrayList(allCollections));
+        collectionCombo.setConverter(new StringConverter<Collection>() {
+            @Override
+            public String toString(Collection collection) {
+                if (collection == null) return "";
+                return "ID: " + collection.getCollectionId();
+            }
+
+            @Override
+            public Collection fromString(String string) {
+                return null;
+            }
+        });
+    }
+
+    private void setupStatusCombo() {
+        statusCombo.setItems(FXCollections.observableArrayList(PaymentStatus.values()));
+    }
 }
