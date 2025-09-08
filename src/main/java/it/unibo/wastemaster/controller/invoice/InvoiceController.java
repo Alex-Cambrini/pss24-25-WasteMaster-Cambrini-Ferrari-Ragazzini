@@ -1,2 +1,74 @@
-package it.unibo.wastemaster.controller.invoice;
+import it.unibo.wastemaster.application.context.AppContext;
+import it.unibo.wastemaster.controller.main.MainLayoutController;
+import it.unibo.wastemaster.controller.utils.DialogUtils;
+import it.unibo.wastemaster.domain.model.Collection;
+import it.unibo.wastemaster.domain.model.Invoice;
+import it.unibo.wastemaster.domain.model.Invoice.PaymentStatus;
+import it.unibo.wastemaster.domain.service.CollectionManager;
+import it.unibo.wastemaster.domain.service.InvoiceManager;
+import it.unibo.wastemaster.viewmodels.InvoiceRow;
+import java.io.IOException;
+import java.util.List;
+import java.util.Optional;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.fxml.FXML;
+import javafx.scene.control.*;
+import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.stage.Stage;
+import javafx.util.Duration;
 
+public final class InvoiceController {
+
+    private static final int REFRESH_INTERVAL_SECONDS = 30;
+    private static final String FILTER_ID = "id";
+    private static final String FILTER_CUSTOMER = "customer";
+    private static final String FILTER_STATUS = "status";
+    private static final String TITLE_NO_SELECTION = "No Selection";
+
+    private final ObservableList<String> activeFilters = FXCollections.observableArrayList(
+            FILTER_ID, FILTER_CUSTOMER, FILTER_STATUS
+    );
+    private final ObservableList<InvoiceRow> allInvoices = FXCollections.observableArrayList();
+
+    private InvoiceManager invoiceManager;
+    private CollectionManager collectionManager;
+    private Timeline refreshTimeline;
+
+    @FXML private Button addInvoiceButton;
+    @FXML private Button editInvoiceButton;
+    @FXML private Button deleteInvoiceButton;
+    @FXML private Button viewCollectionButton;
+    @FXML private ContextMenu filterMenu;
+    @FXML private TableView<InvoiceRow> invoiceTable;
+    @FXML private TableColumn<InvoiceRow, String> idColumn;
+    @FXML private TableColumn<InvoiceRow, String> customerColumn;
+    @FXML private TableColumn<InvoiceRow, String> amountColumn;
+    @FXML private TableColumn<InvoiceRow, String> statusColumn;
+    @FXML private TextField searchField;
+
+    public void setInvoiceManager(InvoiceManager invoiceManager) {
+        this.invoiceManager = invoiceManager;
+    }
+
+    public void setCollectionManager(CollectionManager collectionManager) {
+        this.collectionManager = collectionManager;
+    }
+
+    @FXML
+    public void initialize() {
+        idColumn.setCellValueFactory(new PropertyValueFactory<>(FILTER_ID));
+        customerColumn.setCellValueFactory(new PropertyValueFactory<>(FILTER_CUSTOMER));
+        amountColumn.setCellValueFactory(new PropertyValueFactory<>("amount"));
+        statusColumn.setCellValueFactory(new PropertyValueFactory<>(FILTER_STATUS));
+
+        searchField.textProperty().addListener((obs, oldText, newText) -> handleSearch());
+
+        invoiceTable.getSelectionModel().selectedItemProperty()
+                .addListener((obs, oldVal, newVal) -> updateButtons(newVal));
+    }
+
+    // Methods below this line will be added in subsequent commits
+}
