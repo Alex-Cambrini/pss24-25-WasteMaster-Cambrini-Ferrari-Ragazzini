@@ -181,4 +181,61 @@ public final class InvoiceController {
             DialogUtils.showError("Deletion failed", "Invoice could not be deleted.", AppContext.getOwner());
         }
     }
+
+        @FXML
+    private void handleSearch() {
+        String query = searchField.getText().toLowerCase().trim();
+        if (query.isEmpty()) {
+            invoiceTable.setItems(FXCollections.observableArrayList(allInvoices));
+            return;
+        }
+        ObservableList<InvoiceRow> filtered = FXCollections.observableArrayList();
+        for (InvoiceRow row : allInvoices) {
+            if ((activeFilters.contains(FILTER_ID) && row.getId().toLowerCase().contains(query))
+                    || (activeFilters.contains(FILTER_CUSTOMER) && row.getCustomer().toLowerCase().contains(query))
+                    || (activeFilters.contains(FILTER_STATUS) && row.getStatus().toLowerCase().contains(query))) {
+                filtered.add(row);
+            }
+        }
+        invoiceTable.setItems(filtered);
+    }
+
+    @FXML
+    private void handleResetSearch() {
+        searchField.clear();
+        activeFilters.clear();
+        activeFilters.addAll(FILTER_ID, FILTER_CUSTOMER, FILTER_STATUS);
+        loadInvoices();
+    }
+
+    @FXML
+    private void showFilterMenu(final javafx.scene.input.MouseEvent event) {
+        if (filterMenu != null && filterMenu.isShowing()) {
+            filterMenu.hide();
+            return;
+        }
+        filterMenu = new ContextMenu();
+        String[] fields = {FILTER_ID, FILTER_CUSTOMER, FILTER_STATUS};
+        String[] labels = {"ID", "Customer", "Status"};
+        for (int i = 0; i < fields.length; i++) {
+            String key = fields[i];
+            String label = labels[i];
+            CheckBox checkBox = new CheckBox(label);
+            checkBox.setSelected(activeFilters.contains(key));
+            checkBox.selectedProperty().addListener((obs, wasSelected, isSelected) -> {
+                if (isSelected.booleanValue()) {
+                    if (!activeFilters.contains(key)) {
+                        activeFilters.add(key);
+                    }
+                } else {
+                    activeFilters.remove(key);
+                }
+                handleSearch();
+            });
+            CustomMenuItem item = new CustomMenuItem(checkBox);
+            item.setHideOnClick(false);
+            filterMenu.getItems().add(item);
+        }
+        filterMenu.show(invoiceTable, event.getScreenX(), event.getScreenY());
+    }
 }
