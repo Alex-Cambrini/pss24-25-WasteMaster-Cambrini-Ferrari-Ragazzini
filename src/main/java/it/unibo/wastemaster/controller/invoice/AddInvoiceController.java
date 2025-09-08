@@ -46,7 +46,8 @@ public final class AddInvoiceController {
     public void setCollectionManager(CollectionManager collectionManager) {
         this.collectionManager = collectionManager;
     }
-     /**
+
+    /**
      * Sets up UI components and listeners.
      */
     @FXML
@@ -80,5 +81,50 @@ public final class AddInvoiceController {
 
     private void setupStatusCombo() {
         statusCombo.setItems(FXCollections.observableArrayList(PaymentStatus.values()));
+    }
+
+    /**
+     * Handles the save action for the invoice.
+     */
+    @FXML
+    public void handleSaveInvoice(final ActionEvent event) {
+        try {
+            Collection selectedCollection = collectionCombo.getValue();
+            String amountText = amountField.getText().trim();
+            PaymentStatus status = statusCombo.getValue();
+
+            if (selectedCollection == null) {
+                throw new IllegalArgumentException("- Please select a collection");
+            }
+            if (amountText.isEmpty()) {
+                throw new IllegalArgumentException("- Please enter an amount");
+            }
+            if (status == null) {
+                throw new IllegalArgumentException("- Please select a status");
+            }
+
+            double amount;
+            try {
+                amount = Double.parseDouble(amountText);
+            } catch (NumberFormatException e) {
+                throw new IllegalArgumentException("- Amount must be a valid number");
+            }
+
+            invoiceManager.createInvoice(selectedCollection, amount, status);
+
+            DialogUtils.showSuccess("Invoice saved successfully.", AppContext.getOwner());
+            DialogUtils.closeModal(event);
+
+        } catch (final Exception e) {
+            DialogUtils.showError("Validation error", e.getMessage(), AppContext.getOwner());
+        }
+    }
+
+    /**
+     * Cancels and closes the invoice creation modal.
+     */
+    @FXML
+    private void handleAbortInvoiceCreation(final ActionEvent event) {
+        DialogUtils.closeModal(event);
     }
 }
