@@ -87,4 +87,44 @@ public final class EditInvoiceController {
         amountField.setText(String.valueOf(invoiceToEdit.getAmount()));
         statusCombo.setValue(invoiceToEdit.getPaymentStatus());
     }
+
+      @FXML
+    public void handleSaveInvoice(final ActionEvent event) {
+        try {
+            Collection selectedCollection = collectionCombo.getValue();
+            String amountText = amountField.getText().trim();
+            PaymentStatus status = statusCombo.getValue();
+
+            if (selectedCollection == null) {
+                throw new IllegalArgumentException("- Please select a collection");
+            }
+            if (amountText.isEmpty()) {
+                throw new IllegalArgumentException("- Please enter an amount");
+            }
+            if (status == null) {
+                throw new IllegalArgumentException("- Please select a status");
+            }
+
+            double amount;
+            try {
+                amount = Double.parseDouble(amountText);
+            } catch (NumberFormatException e) {
+                throw new IllegalArgumentException("- Amount must be a valid number");
+            }
+
+            invoiceManager.updateInvoice(invoiceToEdit.getInvoiceId(), selectedCollection, amount, status);
+
+            DialogUtils.showSuccess("Invoice updated successfully.", AppContext.getOwner());
+            DialogUtils.closeModal(event);
+
+        } catch (final Exception e) {
+            DialogUtils.showError("Validation error", e.getMessage(), AppContext.getOwner());
+        }
+    }
+
+    @FXML
+    private void handleAbortInvoiceEdit(final ActionEvent event) {
+        DialogUtils.closeModal(event);
+    }
 }
+
