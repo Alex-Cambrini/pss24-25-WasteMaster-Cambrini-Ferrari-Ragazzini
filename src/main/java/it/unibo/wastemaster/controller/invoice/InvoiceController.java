@@ -103,4 +103,82 @@ public final class InvoiceController {
         }
         invoiceTable.setItems(FXCollections.observableArrayList(allInvoices));
     }
+
+        private void updateButtons(final InvoiceRow selected) {
+    boolean rowSelected = selected != null;
+    editInvoiceButton.setDisable(!rowSelected);
+    deleteInvoiceButton.setDisable(!rowSelected);
+    viewCollectionButton.setDisable(!rowSelected);
+}
+
+    @FXML
+    private void handleAddInvoice() {
+        try {
+            Stage mainStage = (Stage) MainLayoutController.getInstance().getRootPane().getScene().getWindow();
+            Optional<AddInvoiceController> controllerOpt =
+                    DialogUtils.showModalWithController("Add Invoice",
+                            "/layouts/invoice/AddInvoiceView.fxml", mainStage, ctrl -> {
+                                ctrl.setInvoiceManager(invoiceManager);
+                                ctrl.setCollectionManager(collectionManager);
+                            });
+            if (controllerOpt.isPresent()) {
+                loadInvoices();
+            }
+        } catch (IOException e) {
+            DialogUtils.showError("Loading Error", "Could not load Add Invoice dialog.", AppContext.getOwner());
+        }
+    }
+
+    @FXML
+    private void handleEditInvoice() {
+        InvoiceRow selected = invoiceTable.getSelectionModel().getSelectedItem();
+        if (selected == null) {
+            DialogUtils.showError(TITLE_NO_SELECTION, "Please select an invoice to edit.", AppContext.getOwner());
+            return;
+        }
+        Optional<Invoice> invoiceOpt = invoiceManager.findInvoiceById(selected.getIdAsLong());
+        if (invoiceOpt.isEmpty()) {
+            DialogUtils.showError("Not Found", "Invoice not found.", AppContext.getOwner());
+            return;
+        }
+        try {
+            Stage mainStage = (Stage) MainLayoutController.getInstance().getRootPane().getScene().getWindow();
+            Optional<EditInvoiceController> controllerOpt =
+                    DialogUtils.showModalWithController("Edit Invoice",
+                            "/layouts/invoice/EditInvoiceView.fxml", mainStage, ctrl -> {
+                                ctrl.setInvoiceManager(invoiceManager);
+                                ctrl.setCollectionManager(collectionManager);
+                                ctrl.setInvoiceToEdit(invoiceOpt.get());
+                            });
+            if (controllerOpt.isPresent()) {
+                loadInvoices();
+            }
+        } catch (IOException e) {
+            DialogUtils.showError("Loading Error", "Could not load Edit Invoice dialog.", AppContext.getOwner());
+        }
+    }
+
+    @FXML
+    private void handleDeleteInvoice() {
+        InvoiceRow selected = invoiceTable.getSelectionModel().getSelectedItem();
+        if (selected == null) {
+            DialogUtils.showError(TITLE_NO_SELECTION, "Please select an invoice to delete.", AppContext.getOwner());
+            return;
+        }
+        boolean confirmed = DialogUtils.showConfirmationDialog(
+                "Confirm Deletion",
+                "Are you sure you want to delete this invoice?",
+                AppContext.getOwner()
+        );
+        if (!confirmed) {
+            return;
+        }
+        boolean success = invoiceManager.deleteInvoice(selected.getIdAsLong());
+        if (success) {
+            DialogUtils.showSuccess("Invoice deleted successfully.", AppContext.getOwner());
+            loadInvoices();
+        } else {
+            DialogUtils.showError("Deletion failed", "Invoice could not be deleted.", AppContext.getOwner());
+        }
+    }
 }
