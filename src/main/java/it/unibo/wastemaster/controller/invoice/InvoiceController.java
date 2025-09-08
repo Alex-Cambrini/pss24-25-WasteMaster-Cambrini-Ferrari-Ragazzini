@@ -70,5 +70,37 @@ public final class InvoiceController {
                 .addListener((obs, oldVal, newVal) -> updateButtons(newVal));
     }
 
-    // Methods below this line will be added in subsequent commits
+        public void initData() {
+        invoiceManager = AppContext.getServiceFactory().getInvoiceManager();
+        collectionManager = AppContext.getServiceFactory().getCollectionManager();
+        refresh();
+        startAutoRefresh();
+    }
+
+    public void refresh() {
+        loadInvoices();
+        handleSearch();
+    }
+
+    private void startAutoRefresh() {
+        refreshTimeline = new Timeline(new KeyFrame(Duration.seconds(REFRESH_INTERVAL_SECONDS),
+                e -> loadInvoices()));
+        refreshTimeline.setCycleCount(Timeline.INDEFINITE);
+        refreshTimeline.play();
+    }
+
+    public void stopAutoRefresh() {
+        if (refreshTimeline != null) {
+            refreshTimeline.stop();
+        }
+    }
+
+    private void loadInvoices() {
+        allInvoices.clear();
+        List<Invoice> invoices = invoiceManager.getAllInvoices();
+        for (Invoice invoice : invoices) {
+            allInvoices.add(new InvoiceRow(invoice));
+        }
+        invoiceTable.setItems(FXCollections.observableArrayList(allInvoices));
+    }
 }
