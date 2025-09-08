@@ -98,4 +98,61 @@ public final class InvoiceManager {
         }
         return invoices;
     }
+
+    /**
+     * Deletes an invoice by its ID.
+     *
+     * @param id the invoice ID
+     * @return true if the invoice was deleted, false otherwise
+     */
+    public boolean deleteInvoice(long id) {
+        Optional<Invoice> invoiceOpt = invoiceRepository.findById(id);
+        if (invoiceOpt.isPresent()) {
+            invoiceRepository.delete(invoiceOpt.get());
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Updates an existing invoice.
+     *
+     * @param invoiceId the invoice ID
+     * @param collection the new collection
+     * @param amount the new amount
+     * @param status the new payment status
+     */
+    public void updateInvoice(int invoiceId, Collection collection, double amount, PaymentStatus status) {
+        Optional<Invoice> invoiceOpt = invoiceRepository.findById((long) invoiceId);
+        if (invoiceOpt.isPresent()) {
+            Invoice invoice = invoiceOpt.get();
+            invoice.setCollection(collection);
+            invoice.setAmount(amount);
+            invoice.setPaymentStatus(status);
+            invoiceRepository.save(invoice);
+        }
+    }
+
+    /**
+     * Returns all collections.
+     *
+     * @return a list of all collections
+     */
+    public List<Collection> getAllCollections() {
+        return collectionRepository.findAll();
+    }
+
+    /**
+     * Creates a new invoice.
+     *
+     * @param collection the associated collection
+     * @param amount the invoice amount
+     * @param status the payment status
+     */
+    public void createInvoice(Collection collection, double amount, PaymentStatus status) {
+        Invoice invoice = new Invoice(collection);
+        invoice.setAmount(amount);
+        invoice.setPaymentStatus(status);
+        invoiceRepository.save(invoice);
+    }
 }
