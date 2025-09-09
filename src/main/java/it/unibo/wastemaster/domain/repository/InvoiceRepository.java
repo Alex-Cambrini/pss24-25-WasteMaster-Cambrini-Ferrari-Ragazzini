@@ -3,6 +3,7 @@ package it.unibo.wastemaster.domain.repository;
 import it.unibo.wastemaster.domain.model.Invoice;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 public interface InvoiceRepository {
 
@@ -13,4 +14,8 @@ public interface InvoiceRepository {
     void update(Invoice invoice);
 
     void delete(Invoice invoice);
+
+    Optional<Invoice> findById(int id);
+
+    List<Invoice> findAll();
 }
