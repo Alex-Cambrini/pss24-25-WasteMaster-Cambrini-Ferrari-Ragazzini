@@ -14,5 +14,5 @@ public interface TripRepository {
 
     void delete(Trip trip);
 
-    List<Trip> findAll(); // opzionale, se serve
+    List<Trip> findAll();
 }

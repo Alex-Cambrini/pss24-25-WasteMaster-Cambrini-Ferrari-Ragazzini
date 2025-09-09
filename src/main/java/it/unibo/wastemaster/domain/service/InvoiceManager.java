@@ -5,12 +5,14 @@ import it.unibo.wastemaster.domain.model.Customer;
 import it.unibo.wastemaster.domain.model.Invoice;
 import it.unibo.wastemaster.domain.repository.CollectionRepository;
 import it.unibo.wastemaster.domain.repository.InvoiceRepository;
+import it.unibo.wastemaster.domain.model.Invoice.PaymentStatus;
 import java.time.LocalDate;
 import java.time.Month;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * Manages the creation and generation of invoices for waste collections.
@@ -105,7 +107,7 @@ public final class InvoiceManager {
      * @param id the invoice ID
      * @return true if the invoice was deleted, false otherwise
      */
-    public boolean deleteInvoice(long id) {
+    public boolean deleteInvoice(int id) {
         Optional<Invoice> invoiceOpt = invoiceRepository.findById(id);
         if (invoiceOpt.isPresent()) {
             invoiceRepository.delete(invoiceOpt.get());
@@ -123,7 +125,7 @@ public final class InvoiceManager {
      * @param status the new payment status
      */
     public void updateInvoice(int invoiceId, Collection collection, double amount, PaymentStatus status) {
-        Optional<Invoice> invoiceOpt = invoiceRepository.findById((long) invoiceId);
+        Optional<Invoice> invoiceOpt = invoiceRepository.findById((int) invoiceId);
         if (invoiceOpt.isPresent()) {
             Invoice invoice = invoiceOpt.get();
             invoice.setCollection(collection);

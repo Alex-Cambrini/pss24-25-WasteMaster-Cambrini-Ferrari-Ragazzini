@@ -23,4 +23,6 @@ public interface CollectionRepository {
     void save(Collection collection);
 
     void delete(Collection collection);
+
+    List<Collection> findAll();
 }
