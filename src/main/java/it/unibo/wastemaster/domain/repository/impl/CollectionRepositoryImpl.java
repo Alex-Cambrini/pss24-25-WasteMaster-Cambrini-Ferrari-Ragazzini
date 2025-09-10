@@ -54,4 +54,9 @@ public class CollectionRepositoryImpl implements CollectionRepository {
     public void delete(Collection collection) {
         collectionDAO.delete(collection);
     }
+    
+    @Override
+    public List<Collection> findAll() {
+        return collectionDAO.findAll();
+    }
 }
