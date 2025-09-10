@@ -5,7 +5,7 @@ import it.unibo.wastemaster.domain.repository.InvoiceRepository;
 import it.unibo.wastemaster.infrastructure.dao.InvoiceDAO;
 import java.time.LocalDate;
 import java.util.List;
-
+import java.util.Optional;
 public class InvoiceRepositoryImpl implements InvoiceRepository {
 
     private final InvoiceDAO invoiceDAO;
@@ -32,6 +32,15 @@ public class InvoiceRepositoryImpl implements InvoiceRepository {
     @Override
     public void delete(Invoice invoice) {
         invoiceDAO.delete(invoice);
+    }
+    @Override
+    public Optional<Invoice> findById(int id) {
+        return (invoiceDAO.findById(id));
+    }
+
+    @Override
+    public List<Invoice> findAll() {
+        return invoiceDAO.findAll();
     }
 }
 
