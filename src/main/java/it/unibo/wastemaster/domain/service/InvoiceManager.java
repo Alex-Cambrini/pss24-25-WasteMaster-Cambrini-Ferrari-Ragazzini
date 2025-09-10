@@ -157,4 +157,8 @@ public final class InvoiceManager {
         invoice.setPaymentStatus(status);
         invoiceRepository.save(invoice);
     }
+
+    public Optional<Invoice> findInvoiceById(int id) {
+    return invoiceRepository.findById(id);
+    }
 }
