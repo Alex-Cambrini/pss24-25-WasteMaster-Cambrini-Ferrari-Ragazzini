@@ -30,7 +30,7 @@ public final class InvoiceRow {
         return id;
     }
 
-    public long getIdAsLong() {
+    public int getIdAsInt() {
         return invoice.getInvoiceId();
     }
 

@@ -162,7 +162,7 @@ public final class TripController {
         }
 
         var trip = tripOpt.get();
-        boolean success = tripManager.deleteTrip(trip);
+        boolean success = tripManager.deleteTrip(trip.getTripId());
         if (success) {
             loadTrips();
         } else {

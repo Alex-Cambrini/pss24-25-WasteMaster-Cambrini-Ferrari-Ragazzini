@@ -137,7 +137,7 @@ public final class InvoiceController {
             DialogUtils.showError(TITLE_NO_SELECTION, "Please select an invoice to edit.", AppContext.getOwner());
             return;
         }
-        Optional<Invoice> invoiceOpt = invoiceManager.findInvoiceById(selected.getIdAsLong());
+        Optional<Invoice> invoiceOpt = invoiceManager.findInvoiceById(selected.getIdAsInt());
         if (invoiceOpt.isEmpty()) {
             DialogUtils.showError("Not Found", "Invoice not found.", AppContext.getOwner());
             return;
@@ -174,7 +174,7 @@ public final class InvoiceController {
         if (!confirmed) {
             return;
         }
-        boolean success = invoiceManager.deleteInvoice(selected.getIdAsLong());
+        boolean success = invoiceManager.deleteInvoice(selected.getIdAsInt());
         if (success) {
             DialogUtils.showSuccess("Invoice deleted successfully.", AppContext.getOwner());
             loadInvoices();
@@ -247,7 +247,7 @@ public final class InvoiceController {
             DialogUtils.showError(TITLE_NO_SELECTION, "Please select an invoice.", AppContext.getOwner());
             return;
         }
-        Optional<Invoice> invoiceOpt = invoiceManager.findInvoiceById(selected.getIdAsLong());
+        Optional<Invoice> invoiceOpt = invoiceManager.findInvoiceById(selected.getIdAsInt());
         if (invoiceOpt.isEmpty()) {
             DialogUtils.showError("Not Found", "Invoice not found.", AppContext.getOwner());
             return;
