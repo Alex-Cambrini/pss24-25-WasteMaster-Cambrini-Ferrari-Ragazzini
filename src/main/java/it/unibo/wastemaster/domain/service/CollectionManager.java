@@ -158,4 +158,8 @@ public class CollectionManager {
         LocalDate end = LocalDate.of(year, SECOND_HALF_END_MONTH, LAST_DAY_SECOND_HALF);
         return collectionRepository.findByDateRange(start, end);
     }
+
+    public List<Collection> getAllCollections() {
+        return collectionRepository.findAll();
+    }
 }

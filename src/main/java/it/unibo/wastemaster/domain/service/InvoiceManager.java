@@ -131,7 +131,7 @@ public final class InvoiceManager {
             invoice.setCollection(collection);
             invoice.setAmount(amount);
             invoice.setPaymentStatus(status);
-            invoiceRepository.save(invoice);
+            invoiceRepository.update(invoice);
         }
     }
 
@@ -160,5 +160,9 @@ public final class InvoiceManager {
 
     public Optional<Invoice> findInvoiceById(int id) {
     return invoiceRepository.findById(id);
+    }
+
+    public List<Invoice> getAllInvoices() {
+        return invoiceRepository.findAll();
     }
 }
