@@ -5,7 +5,6 @@ import it.unibo.wastemaster.domain.model.Employee;
 import it.unibo.wastemaster.domain.model.Trip;
 import it.unibo.wastemaster.domain.model.Vehicle;
 import it.unibo.wastemaster.domain.repository.TripRepository;
-import it.unibo.wastemaster.infrastructure.utils.ValidateUtils;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -90,15 +89,13 @@ public final class TripManager {
      * @param trip The Trip object to delete; must not be null and must have a non-null tripId.
      * @return true if the trip was successfully deleted, false if the trip or its ID was null.
      */
-    public boolean deleteTrip(final Trip trip) {
-        try {
-            ValidateUtils.requireArgNotNull(trip, "Trip cannot be null");
-            ValidateUtils.requireArgNotNull(trip.getTripId(), "Trip ID cannot be null");
-            tripRepository.delete(trip);
-            return true;
-        } catch (IllegalArgumentException e) {
-            return false;
-        }
+    public boolean deleteTrip(final int tripId) {
+        return tripRepository.findById(tripId)
+            .map(trip -> {
+                tripRepository.delete(trip);
+                return true;
+            })
+            .orElse(false);
     }
 
     /**
