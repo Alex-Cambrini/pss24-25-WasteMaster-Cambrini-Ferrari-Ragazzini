@@ -10,7 +10,6 @@ import java.util.Optional;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
-import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -104,7 +103,7 @@ public final class TripController {
      * Loads all trips from the database and updates the trip table.
      */
     public void loadTrips() {
-        List<Trip> trips = tripManager.findAllTrip();
+        List<Trip> trips = tripManager.findAllTrips();
         allTrips.clear();
         for (Trip trip : trips) {
             allTrips.add(new TripRow(trip));
