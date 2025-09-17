@@ -1,31 +1,48 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
-<BorderPane xmlns:fx="http://javafx.com/fxml" fx:controller="it.unibo.wastemaster.controller.trip.TripController">
-    <top>
-        <HBox spacing="10" alignment="CENTER_LEFT" styleClass="toolbar">
-            <Button text="Add Trip" onAction="#onAddTrip"/>
-            <Button text="Edit Trip" onAction="#onEditTrip"/>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox alignment="TOP_CENTER" prefWidth="640.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.unibo.wastemaster.controller.trip.TripController">
+
+    <children>
+
+        <HBox alignment="TOP_CENTER" minHeight="40.0" prefHeight="60.0" prefWidth="600.0" spacing="10.0">
+            <children>
+                <Button fx:id="addTripButton" onAction="#handleAddTrip" styleClass="success" text="Create Trip" />
+                <Region prefHeight="20.0" prefWidth="0.0" HBox.hgrow="ALWAYS" />
+                <Button fx:id="filterButton" onMouseClicked="#showFilterMenu" styleClass="accent" text="Filter ▼" />
+                <TextField fx:id="searchField" promptText="Search..." />
+                <Button onAction="#handleResetSearch" styleClass="accent, button-outlined" text="Reset" />
+            </children>
         </HBox>
-    </top>
-    <center>
-        <TableView fx:id="tripTable">
+
+        <TableView fx:id="tripTable" prefHeight="300.0" prefWidth="600.0" styleClass="table-view" VBox.vgrow="ALWAYS">
             <columns>
-                <TableColumn fx:id="idColumn" text="ID"/>
-                <TableColumn fx:id="capColumn" text="Postal Code"/>
-                <TableColumn fx:id="vehicleColumn" text="Vehicle"/>
-                <TableColumn fx:id="operatorsColumn" text="Operators"/>
-                <TableColumn fx:id="departureColumn" text="Departure"/>
-                <TableColumn fx:id="returnColumn" text="Return"/>
-                <TableColumn fx:id="statusColumn" text="Status"/>
+                <TableColumn fx:id="postalCodeColumn" prefWidth="100.0" text="Postal Code" />
+                <TableColumn fx:id="vehicleColumn" prefWidth="100.0" text="Vehicle" />
+                <TableColumn fx:id="operatorsColumn" prefWidth="150.0" text="Operators" />
+                <TableColumn fx:id="departureColumn" prefWidth="100.0" text="Departure" />
+                <TableColumn fx:id="returnColumn" prefWidth="100.0" text="Return" />
+                <TableColumn fx:id="statusColumn" prefWidth="100.0" text="Status" />
             </columns>
         </TableView>
-    </center>
-    <bottom>
-        <HBox spacing="10" alignment="CENTER">
-            <Button text="Details" onAction="#onDetails"/>
-            <Button text="Cancel Trip" onAction="#onCancel"/>
-            <Button text="Refresh" onAction="#onRefresh"/>
+
+        <HBox alignment="TOP_RIGHT" minHeight="50.0" prefHeight="100.0" prefWidth="600.0" spacing="10.0">
+            <children>
+                <Button fx:id="editTripButton" disable="true" onAction="#handleEditTrip" styleClass="accent" text="Edit" />
+                <Button fx:id="deleteTripButton" disable="true" onAction="#handleDeleteTrip" styleClass="danger" text="Delete" />
+            </children>
+            <padding>
+                <Insets right="20.0" top="10.0" />
+            </padding>
         </HBox>
-    </bottom>
-</BorderPane>
+
+    </children>
+</VBox>
