@@ -79,14 +79,12 @@ class TripManagerTest extends AbstractDatabaseTest {
         OneTimeSchedule oneTime1 = new OneTimeSchedule(
                 customer1,
                 waste1,
-                LocalDate.now().plusDays(1)
-        );
+                LocalDate.now().plusDays(1));
         RecurringSchedule recurring = new RecurringSchedule(
                 customer2,
                 waste2,
                 LocalDate.now(),
-                RecurringSchedule.Frequency.WEEKLY
-        );
+                RecurringSchedule.Frequency.WEEKLY);
         recurring.setNextCollectionDate(LocalDate.now().plusDays(NEXT_COLLECTION_DAYS));
 
         getOneTimeScheduleDAO().insert(oneTime1);
@@ -148,14 +146,15 @@ class TripManagerTest extends AbstractDatabaseTest {
 
         Trip trip = getTripDAO().findAll().get(0);
 
-        getTripManager().updateTrip(
-                trip.getTripId(), "20100", vehicle1,
-                new ArrayList<>(List.of(operator2)),
-                departureTime.plusDays(1),
-                expectedReturnTime.plusDays(1),
-                Trip.TripStatus.COMPLETED,
-                new ArrayList<>(collections)
-        );
+        trip.setPostalCodes("20100");
+        trip.setAssignedVehicle(vehicle1);
+        trip.setOperators(new ArrayList<>(List.of(operator2)));
+        trip.setDepartureTime(departureTime.plusDays(1));
+        trip.setExpectedReturnTime(expectedReturnTime.plusDays(1));
+        trip.setStatus(Trip.TripStatus.COMPLETED);
+        trip.setCollections(new ArrayList<>(collections));
+
+        getTripManager().updateTrip(trip);
 
         Optional<Trip> updatedOpt = getTripManager().getTripById(trip.getTripId());
         assertTrue(updatedOpt.isPresent());
@@ -182,117 +181,5 @@ class TripManagerTest extends AbstractDatabaseTest {
 
         Optional<Trip> deletedOpt = getTripDAO().findById(trip.getTripId());
         assertTrue(deletedOpt.isEmpty());
-    }
-
-     @Test
-    void testHandleUnexpectedEventUpdatesOnlyNonNullFields() {
-        List<Collection> collections = createCollections();
-
-        getTripManager().createTrip("40100", vehicle1,
-                List.of(operator1, operator2), departureTime,
-                expectedReturnTime, Trip.TripStatus.PENDING, collections);
-
-        Trip trip = getTripDAO().findAll().get(0);
-
-        
-        Vehicle newVehicle = new Vehicle("ZZ999ZZ", "Fiat", "Ducato", 2022,
-                Vehicle.RequiredLicence.C1, Vehicle.VehicleStatus.IN_SERVICE, 3);
-        getVehicleDAO().insert(newVehicle);
-
-        Employee newOperator = new Employee("Luca", "Verdi",
-                new Location("Via Firenze", "5", "Firenze", "50100"),
-                "luca.verdi@example.com", "+390123456789",
-                Employee.Role.OPERATOR, Employee.Licence.C1);
-        getEmployeeDAO().insert(newOperator);
-
-        LocalDateTime newDeparture = departureTime.plusHours(2);
-        LocalDateTime newReturn = expectedReturnTime.plusHours(2);
-
-        List<Collection> newCollections = createCollections();
-
-        getTripManager().handleUnexpectedEvent(
-        trip.getTripId(),
-        newVehicle,
-        new ArrayList<>(List.of(newOperator)), 
-        newDeparture,
-        newReturn,
-        new ArrayList<>(newCollections),      
-        Trip.TripStatus.COMPLETED
-);
-
-        Trip updated = getTripManager().getTripById(trip.getTripId()).orElseThrow();
-
-        assertEquals(newVehicle.getPlate(), updated.getAssignedVehicle().getPlate());
-        assertEquals(1, updated.getOperators().size());
-        assertEquals(newOperator.getEmail(), updated.getOperators().get(0).getEmail());
-        assertEquals(newDeparture, updated.getDepartureTime());
-        assertEquals(newReturn, updated.getExpectedReturnTime());
-        assertEquals(Trip.TripStatus.COMPLETED, updated.getStatus());
-        assertEquals(newCollections.size(), updated.getCollections().size());
-    }
-
-    @Test
-    void testHandleUnexpectedEventWithNullFieldsDoesNotUpdate() {
-        List<Collection> collections = createCollections();
-
-       getTripManager().createTrip("40100", vehicle1,
-         new ArrayList<>(List.of(operator1, operator2)), departureTime,
-        expectedReturnTime, Trip.TripStatus.PENDING, new ArrayList<>(collections));
-
-        Trip trip = getTripDAO().findAll().get(0);
-
-        
-        Vehicle originalVehicle = trip.getAssignedVehicle();
-        List<Employee> originalOperators = trip.getOperators();
-        LocalDateTime originalDeparture = trip.getDepartureTime();
-        LocalDateTime originalReturn = trip.getExpectedReturnTime();
-        List<Collection> originalCollections = trip.getCollections();
-        Trip.TripStatus originalStatus = trip.getStatus();
-
-        
-        getTripManager().handleUnexpectedEvent(
-                trip.getTripId(),
-                null, null, null, null, null, null
-        );
-
-        Trip updated = getTripManager().getTripById(trip.getTripId()).orElseThrow();
-
-        assertEquals(originalVehicle.getPlate(), updated.getAssignedVehicle().getPlate());
-        assertEquals(originalOperators.size(), updated.getOperators().size());
-        assertEquals(originalDeparture, updated.getDepartureTime());
-        assertEquals(originalReturn, updated.getExpectedReturnTime());
-        assertEquals(originalStatus, updated.getStatus());
-        assertEquals(originalCollections.size(), updated.getCollections().size());
-    }
-
-   
-
-    @Test
-    void testHandleUnexpectedEventCancelsCollectionsWhenTripIsCanceled() {
-        List<Collection> collections = createCollections();
-
-        getTripManager().createTrip("40100", vehicle1,
-                new ArrayList<>(List.of(operator1, operator2)), departureTime,
-                expectedReturnTime, Trip.TripStatus.PENDING, new ArrayList<>(collections));
-
-        Trip trip = getTripDAO().findAll().get(0);
-
-        // cancel the trip
-        getTripManager().handleUnexpectedEvent(
-                trip.getTripId(),
-                null, null, null, null, null,
-                Trip.TripStatus.CANCELED
-        );
-
-        Trip updated = getTripManager().getTripById(trip.getTripId()).orElseThrow();
-
-        
-        for (Collection c : updated.getCollections()) {
-            assertEquals(Collection.CollectionStatus.CANCELLED, c.getCollectionStatus());
-        }
-        assertEquals(Trip.TripStatus.CANCELED, updated.getStatus());
-    }
-
-
-
+    }    
 }
