@@ -41,13 +41,11 @@ public final class TripController {
     private ContextMenu filterMenu;
 
     @FXML private Button filterButton;
-    @FXML private Button addTripButton;
     @FXML private Button editTripButton;
     @FXML private Button deleteTripButton;
     @FXML private TextField searchField;
     @FXML private TableView<TripRow> tripTable;
-    @FXML private TableColumn<TripRow, String> idColumn;
-    @FXML private TableColumn<TripRow, String> postalCodesColumn;
+    @FXML private TableColumn<TripRow, String> postalCodeColumn;
     @FXML private TableColumn<TripRow, String> vehicleColumn;
     @FXML private TableColumn<TripRow, String> operatorsColumn;
     @FXML private TableColumn<TripRow, String> departureColumn;
@@ -64,9 +62,7 @@ public final class TripController {
     @FXML
     public void initialize() {
         tripManager = AppContext.getServiceFactory().getTripManager();
-
-        idColumn.setCellValueFactory(new PropertyValueFactory<>(FIELD_ID));
-        postalCodesColumn.setCellValueFactory(new PropertyValueFactory<>(FIELD_POSTAL_CODES));
+        postalCodeColumn.setCellValueFactory(new PropertyValueFactory<>(FIELD_POSTAL_CODES));
         vehicleColumn.setCellValueFactory(new PropertyValueFactory<>(FIELD_VEHICLE));
         operatorsColumn.setCellValueFactory(new PropertyValueFactory<>(FIELD_OPERATORS));
         departureColumn.setCellValueFactory(new PropertyValueFactory<>(FIELD_DEPARTURE));
@@ -80,9 +76,11 @@ public final class TripController {
                     editTripButton.setDisable(!rowSelected);
                     deleteTripButton.setDisable(!rowSelected);
                 });
-
         // Carica i dati all'avvio
         loadTrips();
+    }
+
+    public void initData() {
         startAutoRefresh();
     }
 
