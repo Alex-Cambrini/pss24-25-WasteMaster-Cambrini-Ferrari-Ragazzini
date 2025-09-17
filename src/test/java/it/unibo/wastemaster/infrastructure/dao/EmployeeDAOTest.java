@@ -93,7 +93,7 @@ class EmployeeDAOTest extends AbstractDatabaseTest {
         e3.delete();
         getEmployeeDAO().update(e3);
 
-        List<Employee> result = getEmployeeDAO().findEmployeeDetails();
+        List<Employee> result = getEmployeeDAO().findActiveEmployees();
 
         assertTrue(result.stream()
                         .anyMatch(e -> e.getEmail().equals("marco@example.com")),
