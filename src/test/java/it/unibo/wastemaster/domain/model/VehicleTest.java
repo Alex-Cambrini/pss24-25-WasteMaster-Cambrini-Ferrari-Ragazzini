@@ -45,7 +45,7 @@ class VehicleTest extends AbstractDatabaseTest {
         vehicle.setRegistrationYear(updatedYear);
         vehicle.setRequiredLicence(Vehicle.RequiredLicence.C);
         vehicle.setVehicleStatus(Vehicle.VehicleStatus.IN_MAINTENANCE);
-        vehicle.setCapacity(updatedCapacity);
+        vehicle.setRequiredOperators(updatedCapacity);
         vehicle.setLastMaintenanceDate(lastMaintenance);
         vehicle.setNextMaintenanceDate(nextMaintenance);
 
@@ -56,7 +56,7 @@ class VehicleTest extends AbstractDatabaseTest {
         assertEquals(Vehicle.VehicleStatus.IN_MAINTENANCE, vehicle.getVehicleStatus());
         assertEquals(lastMaintenance, vehicle.getLastMaintenanceDate());
         assertEquals(nextMaintenance, vehicle.getNextMaintenanceDate());
-        assertEquals(updatedCapacity, vehicle.getCapacity());
+        assertEquals(updatedCapacity, vehicle.getRequiredOperators());
     }
 
     @Test

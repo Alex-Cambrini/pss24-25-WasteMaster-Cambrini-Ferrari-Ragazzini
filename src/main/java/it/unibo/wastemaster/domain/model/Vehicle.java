@@ -33,8 +33,7 @@ public final class Vehicle {
      */
     @Column(length = 10, nullable = false, unique = true)
     @NotBlank(message = "Plate must not be blank")
-    @Pattern(regexp = "^[a-zA-Z0-9\\-\\s]{5,10}$",
-            message = "Plate must contain 5 to 10 alphanumeric characters")
+    @Pattern(regexp = "^[a-zA-Z0-9\\-\\s]{5,10}$", message = "Plate must contain 5 to 10 alphanumeric characters")
     private String plate;
 
     /**
@@ -67,11 +66,11 @@ public final class Vehicle {
     private RequiredLicence requiredLicence;
 
     /**
-     * Load capacity of the vehicle.
+     * Number of operators required to operate the vehicle during waste collection.
      */
     @Column(nullable = false)
-    @NotNull(message = "Vehicle capacity is required")
-    private int capacity;
+    @NotNull(message = "Number of operators is required")
+    private int requiredOperators;
 
     /**
      * Operational status of the vehicle.
@@ -105,17 +104,17 @@ public final class Vehicle {
     /**
      * Constructs a vehicle with all required attributes.
      *
-     * @param plate license plate
-     * @param brand vehicle brand
-     * @param model vehicle model
-     * @param registrationYear year of registration
-     * @param requiredLicence licence needed to drive
-     * @param vehicleStatus current vehicle status
-     * @param capacity vehicle load capacity
+     * @param plate             license plate
+     * @param brand             vehicle brand
+     * @param model             vehicle model
+     * @param registrationYear  year of registration
+     * @param requiredLicence   licence needed to drive
+     * @param vehicleStatus     current vehicle status
+     * @param requiredOperators number of operators needed for the vehicle
      */
     public Vehicle(final String plate, final String brand, final String model,
-                   final int registrationYear, final RequiredLicence requiredLicence,
-                   final VehicleStatus vehicleStatus, final int capacity) {
+            final int registrationYear, final RequiredLicence requiredLicence,
+            final VehicleStatus vehicleStatus, final int requiredOperators) {
         if (plate == null) {
             throw new IllegalArgumentException("Plate must not be null");
         }
@@ -125,7 +124,7 @@ public final class Vehicle {
         this.registrationYear = registrationYear;
         this.requiredLicence = requiredLicence;
         this.vehicleStatus = vehicleStatus;
-        this.capacity = capacity;
+        this.requiredOperators = requiredOperators;
         this.lastMaintenanceDate = LocalDate.now();
         this.nextMaintenanceDate = lastMaintenanceDate.plusYears(1);
     }
@@ -230,17 +229,17 @@ public final class Vehicle {
     }
 
     /**
-     * @return vehicle load capacity
+     * @return number of operators required to operate the vehicle
      */
-    public int getCapacity() {
-        return capacity;
+    public int getRequiredOperators() {
+        return requiredOperators;
     }
 
     /**
-     * @param capacity the load capacity to set
+     * @param requiredOperators number of operators needed for the vehicle
      */
-    public void setCapacity(final int capacity) {
-        this.capacity = capacity;
+    public void setRequiredOperators(final int requiredOperators) {
+        this.requiredOperators = requiredOperators;
     }
 
     /**
@@ -284,11 +283,11 @@ public final class Vehicle {
     public String toString() {
         return String.format(
                 "Vehicle {Plate: %s, Brand: %s, Model: %s, Year: %d,%n"
-                        + "RequiredLicence: %s, Capacity: %d, Status: %s,%n"
+                        + "RequiredLicence: %s, RequiredOperators: %d, Status: %s,%n"
                         + "LastMaint: %s, NextMaint: %s}",
                 plate != null ? plate : "N/A", brand != null ? brand : "N/A",
                 model != null ? model : "N/A", registrationYear,
-                requiredLicence != null ? requiredLicence.name() : "N/A", capacity,
+                requiredLicence != null ? requiredLicence.name() : "N/A", requiredOperators,
                 vehicleStatus != null ? vehicleStatus.name() : "N/A",
                 lastMaintenanceDate != null ? lastMaintenanceDate.toString() : "N/A",
                 nextMaintenanceDate != null ? nextMaintenanceDate.toString() : "N/A");
