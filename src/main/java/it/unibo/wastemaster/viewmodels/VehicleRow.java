@@ -30,7 +30,7 @@ public final class VehicleRow {
         this.brand = vehicle.getBrand();
         this.model = vehicle.getModel();
         this.registrationYear = vehicle.getRegistrationYear();
-        this.capacity = vehicle.getCapacity();
+        this.capacity = vehicle.getRequiredOperators();
         this.licenceType = vehicle.getRequiredLicence();
         this.vehicleStatus = vehicle.getVehicleStatus();
         this.lastMaintenanceDate = vehicle.getLastMaintenanceDate();

@@ -63,7 +63,7 @@ public final class EditVehicleController {
         brandField.setText(vehicle.getBrand());
         modelField.setText(vehicle.getModel());
         yearField.setText(String.valueOf(vehicle.getRegistrationYear()));
-        capacityField.setText(String.valueOf(vehicle.getCapacity()));
+        capacityField.setText(String.valueOf(vehicle.getRequiredOperators()));
 
         licenceComboBox.getItems().setAll(RequiredLicence.values());
         licenceComboBox.getSelectionModel().select(vehicle.getRequiredLicence());
@@ -91,7 +91,7 @@ public final class EditVehicleController {
                             .parseInt(yearField.getText())
                             || vehicle.getRequiredLicence() != licenceComboBox.getValue()
                             || vehicle.getVehicleStatus() != statusComboBox.getValue()
-                            || vehicle.getCapacity() != Integer
+                            || vehicle.getRequiredOperators() != Integer
                             .parseInt(capacityField.getText());
 
             if (!changed) {
@@ -106,7 +106,7 @@ public final class EditVehicleController {
             vehicle.setRegistrationYear(Integer.parseInt(yearField.getText()));
             vehicle.setRequiredLicence(licenceComboBox.getValue());
             vehicle.setVehicleStatus(statusComboBox.getValue());
-            vehicle.setCapacity(Integer.parseInt(capacityField.getText()));
+            vehicle.setRequiredOperators(Integer.parseInt(capacityField.getText()));
 
             vehicleManager.updateVehicle(vehicle);
             showSuccess("Vehicle updated successfully.", AppContext.getOwner());
