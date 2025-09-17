@@ -25,7 +25,7 @@ public class Invoice {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int invoiceId;
+    private Integer invoiceId;
 
     @OneToOne(optional = false)
     @JoinColumn(name = "collection_id", nullable = false, unique = true)
@@ -73,7 +73,7 @@ public class Invoice {
      *
      * @return the invoice ID
      */
-    public int getInvoiceId() {
+    public Integer getInvoiceId() {
         return invoiceId;
     }
 

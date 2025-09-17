@@ -5,6 +5,7 @@ import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import jakarta.validation.ValidatorFactory;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -106,6 +107,13 @@ public final class ValidateUtils {
         }
         if (!errorMessages.isEmpty()) {
             throw new IllegalArgumentException(String.join("\n", errorMessages));
+        }
+    }
+
+    public static void requireListNotEmpty(final List<?> list, final String errorMessage) {
+        requireArgNotNull(list, errorMessage);
+        if (list.isEmpty()) {
+            throw new IllegalArgumentException(errorMessage);
         }
     }
 }
