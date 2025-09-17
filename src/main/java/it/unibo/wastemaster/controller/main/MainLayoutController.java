@@ -3,7 +3,9 @@ package it.unibo.wastemaster.controller.main;
 import it.unibo.wastemaster.application.context.AppContext;
 import it.unibo.wastemaster.controller.customer.CustomersController;
 import it.unibo.wastemaster.controller.employee.EmployeeController;
+import it.unibo.wastemaster.controller.invoice.InvoiceController;
 import it.unibo.wastemaster.controller.schedule.ScheduleController;
+import it.unibo.wastemaster.controller.trip.TripController;
 import it.unibo.wastemaster.controller.utils.DialogUtils;
 import it.unibo.wastemaster.controller.vehicle.VehicleController;
 import it.unibo.wastemaster.controller.waste.WasteController;
@@ -171,7 +173,6 @@ public final class MainLayoutController {
         }
     }
 
-
     private void invokeStopAutoRefresh() {
         if (currentController != null) {
             try {
@@ -204,7 +205,6 @@ public final class MainLayoutController {
             controller.initData();
         }
     }
-
 
     @FXML
     private void handleDashboard() {
@@ -273,24 +273,30 @@ public final class MainLayoutController {
 
     @FXML
     private void handleTrip() {
-    tripsLink.setVisited(false);
-    setPageTitle(TRIP_MANAGEMENT);
-    var controller = loadCenterWithController("/layouts/trip/TripView.fxml");
-    if (controller != null) {
-        
-    }
-    }
+        tripsLink.setVisited(false);
+        setPageTitle(TRIP_MANAGEMENT);
 
+        TripController controller =
+                loadCenterWithController("/layouts/trip/TripView.fxml");
+        if (controller != null) {
+            controller.setTripManager(
+                    AppContext.getServiceFactory().getTripManager());
+            controller.initData();
+        }
+    }
 
     @FXML
     private void handleInvoice() {
         invoicesLink.setVisited(false);
         setPageTitle(INVOICE_MANAGEMENT);
-        var controller = loadCenterWithController("/layouts/invoice/InvoiceView.fxml");
+        InvoiceController controller =
+                loadCenterWithController("/layouts/invoice/InvoiceView.fxml");
         if (controller != null) {
-           
+            controller.setInvoiceManager(AppContext.getServiceFactory().getInvoiceManager());
+            controller.initData();
         }
     }
+
     /**
      * Sets the page title label.
      *
