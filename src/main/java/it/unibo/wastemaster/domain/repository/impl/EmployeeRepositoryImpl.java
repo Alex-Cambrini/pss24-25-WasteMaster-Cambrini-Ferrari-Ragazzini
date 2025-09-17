@@ -26,7 +26,7 @@ public class EmployeeRepositoryImpl implements EmployeeRepository {
 
     @Override
     public List<Employee> findAllActive() {
-        return employeeDAO.findEmployeeDetails();
+        return employeeDAO.findActiveEmployees();
     }
 
     @Override

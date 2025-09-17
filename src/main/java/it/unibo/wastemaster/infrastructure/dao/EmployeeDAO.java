@@ -53,7 +53,7 @@ public final class EmployeeDAO extends GenericDAO<Employee> {
      *
      * @return list of active employees
      */
-    public List<Employee> findEmployeeDetails() {
+    public List<Employee> findActiveEmployees() {
         return getEntityManager().createQuery("""
                     SELECT e FROM Employee e
                     WHERE e.isDeleted = false
