@@ -48,7 +48,7 @@
                         <Hyperlink fx:id="vehiclesLink" onAction="#handleVehicle" text="Vehicle" />
                         <Hyperlink fx:id="employeesLink" onAction="#handleEmployee" text="Employee" />
                         <Hyperlink fx:id="tripsLink" onAction="#handleTrip" text="Trip" />
-                        <Hyperlink fx:id="invoiceLink" onAction="#handleInvoice" text="Invoice" />
+                        <Hyperlink fx:id="invoicesLink" onAction="#handleInvoice" text="Invoice" />
                     </children>
                 </VBox>
 
