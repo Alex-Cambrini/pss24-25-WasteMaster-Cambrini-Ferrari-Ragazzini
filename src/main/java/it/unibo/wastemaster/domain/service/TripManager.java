@@ -44,6 +44,12 @@ public final class TripManager {
             final LocalDateTime expectedReturnTime, final Trip.TripStatus status,
             final List<Collection> collections) {
 
+           
+        if (assignedVehicle == null || assignedVehicle.getVehicleStatus() != Vehicle.VehicleStatus.IN_SERVICE) {
+            throw new IllegalArgumentException("The assigned vehicle is not available or is not IN_SERVICE.");
+        }
+
+         
         
         List<Trip> overlappingTripsVehicle = tripRepository.findTripsByVehicleAndPeriod(
                 assignedVehicle, departureTime, expectedReturnTime);
@@ -83,10 +89,36 @@ public final class TripManager {
      * @throws IllegalArgumentException if {@code toUpdateTrip} is null or its ID is
      *                                  null
      */
-    public void updateTrip(final Trip toUpdateTrip) {
+     public void updateTrip(final Trip toUpdateTrip) {
         ValidateUtils.validateEntity(toUpdateTrip);
-        ValidateUtils.requireArgNotNull(toUpdateTrip.getTripId(),
-                "Trip ID cannot be null");
+        ValidateUtils.requireArgNotNull(toUpdateTrip.getTripId(), "Trip ID cannot be null");
+
+        
+        List<Trip> overlappingTripsVehicle = tripRepository.findTripsByVehicleAndPeriod(
+                toUpdateTrip.getAssignedVehicle(),
+                toUpdateTrip.getDepartureTime(),
+                toUpdateTrip.getExpectedReturnTime()
+        ).stream()
+         .filter(t -> t.getTripId() != toUpdateTrip.getTripId())
+         .toList();
+        if (!overlappingTripsVehicle.isEmpty()) {
+            throw new IllegalArgumentException("The vehicle is already booked for other trips during the same period.");
+        }
+
+        
+        for (Employee operator : toUpdateTrip.getOperators()) {
+            List<Trip> overlappingTripsOperator = tripRepository.findTripsByOperatorAndPeriod(
+                    operator,
+                    toUpdateTrip.getDepartureTime(),
+                    toUpdateTrip.getExpectedReturnTime()
+            ).stream()
+             .filter(t -> t.getTripId() != toUpdateTrip.getTripId())
+             .toList();
+            if (!overlappingTripsOperator.isEmpty()) {
+                throw new IllegalArgumentException("The operator " + operator.getName() + " is already booked for other trips during the same period.");
+            }
+        }
+
         tripRepository.update(toUpdateTrip);
     }
 
@@ -125,7 +157,25 @@ public final class TripManager {
 
         ValidateUtils.requireArgNotNull(newVehicle, "new vehicle cannot be null");
 
+        
+        if (newVehicle.getVehicleStatus() != Vehicle.VehicleStatus.IN_SERVICE) {
+            throw new IllegalArgumentException("The new vehicle is not available or is not IN_SERVICE.");
+        }
+
         Trip trip = tripOpt.get();
+
+        
+        List<Trip> overlappingTripsVehicle = tripRepository.findTripsByVehicleAndPeriod(
+                newVehicle,
+                trip.getDepartureTime(),
+                trip.getExpectedReturnTime()
+        ).stream()
+         .filter(t -> t.getTripId() != tripId)
+         .toList();
+        if (!overlappingTripsVehicle.isEmpty()) {
+            throw new IllegalArgumentException("The vehicle is already booked for other trips during the same period.");
+        }
+
         trip.setAssignedVehicle(newVehicle);
         tripRepository.update(trip);
     }
@@ -140,22 +190,24 @@ public final class TripManager {
         ValidateUtils.requireListNotEmpty(newOperators, "The operators list cannot be null or empty");
 
         Trip trip = tripOpt.get();
+
+        for (Employee operator : newOperators) {
+           
+            
+            
+            List<Trip> overlappingTripsOperator = tripRepository.findTripsByOperatorAndPeriod(
+                    operator,
+                    trip.getDepartureTime(),
+                    trip.getExpectedReturnTime()
+            ).stream()
+             .filter(t -> t.getTripId() != tripId)
+             .toList();
+            if (!overlappingTripsOperator.isEmpty()) {
+                throw new IllegalArgumentException("Operator " + operator.getName() + " is already booked for other trips during the same period.");
+            }
+        }
+
         trip.setOperators(newOperators);
-        tripRepository.update(trip);
-    }
-
-    public void cancelTrip(int tripId) {
-        Optional<Trip> tripOpt = getTripById(tripId);
-        if (tripOpt.isEmpty()) {
-            throw new IllegalArgumentException("Trip not found");
-        }
-
-        Trip trip = tripOpt.get();
-        trip.setStatus(Trip.TripStatus.CANCELED);
-
-        for (Collection collection : trip.getCollections()) {
-            collection.setCollectionStatus(CollectionStatus.FAILED);
-        }
         tripRepository.update(trip);
     }
 
