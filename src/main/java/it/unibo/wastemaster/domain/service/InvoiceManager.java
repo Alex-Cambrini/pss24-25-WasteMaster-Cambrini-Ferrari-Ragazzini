@@ -6,6 +6,12 @@ import it.unibo.wastemaster.domain.model.Invoice;
 import it.unibo.wastemaster.domain.repository.CollectionRepository;
 import it.unibo.wastemaster.domain.repository.InvoiceRepository;
 import it.unibo.wastemaster.domain.model.Invoice.PaymentStatus;
+import com.itextpdf.kernel.pdf.PdfWriter;
+import com.itextpdf.kernel.pdf.PdfDocument;
+import com.itextpdf.layout.Document;
+import com.itextpdf.layout.element.Paragraph;
+import java.io.ByteArrayOutputStream;
+import java.io.ByteArrayOutputStream;
 import java.time.LocalDate;
 import java.time.Month;
 import java.util.ArrayList;
@@ -164,5 +170,35 @@ public final class InvoiceManager {
 
     public List<Invoice> getAllInvoices() {
         return invoiceRepository.findAll();
+    }
+
+
+
+    /**
+     * Generates a PDF for the given invoice.
+     *
+     * @param invoice the invoice to export
+     * @return a byte array containing the PDF data
+     */
+
+
+     //bisogna mettere questo nel gradlew implementation 'com.itextpdf:itextpdf:5.5.13.3'
+    public byte[] exportInvoiceToPdf(Invoice invoice) {
+        try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
+            PdfWriter writer = new PdfWriter(baos);
+            PdfDocument pdfDoc = new PdfDocument(writer);
+            Document document = new Document(pdfDoc);
+
+            document.add(new Paragraph("Invoice ID: " + invoice.getId()));
+            document.add(new Paragraph("Customer: " + invoice.getCollection().getCustomer().getName()));
+            document.add(new Paragraph("Amount: €" + invoice.getAmount()));
+            document.add(new Paragraph("Status: " + invoice.getPaymentStatus()));
+            document.add(new Paragraph("Date: " + invoice.getCollection().getDate()));
+
+            document.close();
+            return baos.toByteArray();
+        } catch (Exception e) {
+            throw new RuntimeException("Error generating PDF invoice", e);
+        }
     }
 }
