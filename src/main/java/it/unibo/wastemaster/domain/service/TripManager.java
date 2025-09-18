@@ -145,6 +145,19 @@ public final class TripManager {
         return tripRepository.findAll();
     }
 
+
+    /**
+     * Retrieves all collections for a given postal code (CAP).
+     *
+     * @param postalCode the postal code to filter collections
+     * @return a list of collections associated with the given postal code
+     */
+    public List<Collection> getCollectionsByPostalCode(final String postalCode) {
+        ValidateUtils.requireArgNotNull(postalCode, "Postal code cannot be null");
+        return tripRepository.findCollectionsByPostalCode(postalCode);
+    }
+
+
     public enum IssueType {
         VEHICLE_PROBLEM,
         OPERATOR_PROBLEM,
