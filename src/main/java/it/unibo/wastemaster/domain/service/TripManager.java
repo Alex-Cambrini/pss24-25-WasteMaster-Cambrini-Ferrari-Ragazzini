@@ -43,6 +43,29 @@ public final class TripManager {
             final List<Employee> operators, final LocalDateTime departureTime,
             final LocalDateTime expectedReturnTime, final Trip.TripStatus status,
             final List<Collection> collections) {
+
+        
+        List<Trip> overlappingTripsVehicle = tripRepository.findTripsByVehicleAndPeriod(
+                assignedVehicle, departureTime, expectedReturnTime);
+        if (!overlappingTripsVehicle.isEmpty()) {
+            throw new IllegalArgumentException("The vehicle is already booked for other trips during the same period.");
+        }
+
+        
+        for (Employee operator : operators) {
+            List<Trip> overlappingTripsOperator = tripRepository.findTripsByOperatorAndPeriod(
+                    operator, departureTime, expectedReturnTime);
+            if (!overlappingTripsOperator.isEmpty()) {
+                throw new IllegalArgumentException("The operator " + operator.getName() + " t is already booked for other trips during the same period.");
+            }
+        }
+
+        
+        List<Collection> collectionsForCap = getCollectionsByPostalCode(postalCode);
+        if (collectionsForCap.isEmpty()) {
+            throw new IllegalArgumentException("There are no collections for the specified postal code.");
+        }
+
         Trip trip = new Trip(postalCode, assignedVehicle, operators, departureTime,
                 expectedReturnTime, status, collections);
         tripRepository.save(trip);
