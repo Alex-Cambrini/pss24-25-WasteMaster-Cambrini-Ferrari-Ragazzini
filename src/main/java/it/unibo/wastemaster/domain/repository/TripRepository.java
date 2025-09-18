@@ -1,7 +1,11 @@
 package it.unibo.wastemaster.domain.repository;
 
 import it.unibo.wastemaster.domain.model.Collection;
+import it.unibo.wastemaster.domain.model.Employee;
 import it.unibo.wastemaster.domain.model.Trip;
+import it.unibo.wastemaster.domain.model.Vehicle;
+
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -25,5 +29,16 @@ public interface TripRepository {
      * @return a list of collections associated with the given postal code
      */
     List<Collection> findCollectionsByPostalCode(String postalCode);
+
+    /**
+     * Finds trips for a vehicle that overlap with a given period.
+     */
+    List<Trip> findTripsByVehicleAndPeriod(Vehicle vehicle, LocalDateTime start, LocalDateTime end);
+
+    /**
+     * Finds trips for an operator that overlap with a given period.
+     */
+    List<Trip> findTripsByOperatorAndPeriod(Employee operator, LocalDateTime start, LocalDateTime end);
+
 
 }

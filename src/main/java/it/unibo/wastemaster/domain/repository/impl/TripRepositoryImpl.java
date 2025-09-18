@@ -1,9 +1,13 @@
 package it.unibo.wastemaster.domain.repository.impl;
 
 import it.unibo.wastemaster.domain.model.Collection;
+import it.unibo.wastemaster.domain.model.Employee;
 import it.unibo.wastemaster.domain.model.Trip;
+import it.unibo.wastemaster.domain.model.Vehicle;
 import it.unibo.wastemaster.domain.repository.TripRepository;
 import it.unibo.wastemaster.infrastructure.dao.TripDAO;
+
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -43,5 +47,15 @@ public class TripRepositoryImpl implements TripRepository {
     @Override
     public List<Collection> findCollectionsByPostalCode(String postalCode) {
         return tripDAO.findCollectionsByPostalCode(postalCode);
+    }
+
+    @Override
+    public List<Trip> findTripsByVehicleAndPeriod(Vehicle vehicle, LocalDateTime start, LocalDateTime end) {
+        return tripDAO.findTripsByVehicleAndPeriod(vehicle, start, end);
+    }
+
+    @Override
+    public List<Trip> findTripsByOperatorAndPeriod(Employee operator, LocalDateTime start, LocalDateTime end) {
+        return tripDAO.findTripsByOperatorAndPeriod(operator, start, end);
     }
 }
