@@ -1,5 +1,6 @@
 package it.unibo.wastemaster.domain.repository.impl;
 
+import it.unibo.wastemaster.domain.model.Collection;
 import it.unibo.wastemaster.domain.model.Trip;
 import it.unibo.wastemaster.domain.repository.TripRepository;
 import it.unibo.wastemaster.infrastructure.dao.TripDAO;
@@ -37,5 +38,10 @@ public class TripRepositoryImpl implements TripRepository {
     @Override
     public List<Trip> findAll() {
         return tripDAO.findAll();
+    }
+
+    @Override
+    public List<Collection> findCollectionsByPostalCode(String postalCode) {
+        return tripDAO.findCollectionsByPostalCode(postalCode);
     }
 }
