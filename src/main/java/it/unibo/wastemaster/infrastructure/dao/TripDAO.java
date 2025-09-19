@@ -1,12 +1,10 @@
 package it.unibo.wastemaster.infrastructure.dao;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
-
-
-
-import it.unibo.wastemaster.domain.model.Collection;
+import it.unibo.wastemaster.domain.model.Collection.CollectionStatus;
 import it.unibo.wastemaster.domain.model.Employee;
 import it.unibo.wastemaster.domain.model.Trip;
 import it.unibo.wastemaster.domain.model.Vehicle;
@@ -27,33 +25,19 @@ public class TripDAO extends GenericDAO<Trip> {
         super(entityManager, Trip.class);
     }
 
-     /**
-     * Finds all collections by postal code (CAP).
-     *
-     * @param postalCode the postal code to filter collections
-     * @return a list of collections associated with the given postal code
-     */
-    
-       
-    public List<Collection> findCollectionsByPostalCode(String postalCode) {
-        String jpql = "SELECT c FROM Trip t JOIN t.collections c WHERE t.postalCode = :postalCode";
-        return getEntityManager().createQuery(jpql, Collection.class)
-                .setParameter("postalCode", postalCode)
-                .getResultList();
-    }
-
     public List<Vehicle> findAvailableVehicles(LocalDateTime start, LocalDateTime end) {
         String jpql = """
-            SELECT v FROM Vehicle v
-            WHERE v.vehicleStatus = :inService
-            AND v.nextMaintenanceDate > :tripEnd
-            AND NOT EXISTS (
-                SELECT 1 FROM Trip t
-                WHERE t.assignedVehicle = v
-                    AND t.departureTime < :tripEnd
-                    AND t.expectedReturnTime > :tripStart
-            )
-            """;
+                SELECT v FROM Vehicle v
+                WHERE v.vehicleStatus = :inService
+                AND v.nextMaintenanceDate > :tripEnd
+                AND NOT EXISTS (
+                    SELECT 1 FROM Trip t
+                    WHERE t.assignedVehicle = v
+                        AND t.tripStatus = it.unibo.wastemaster.domain.model.TripStatus.ACTIVE
+                        AND t.departureTime < :tripEnd
+                        AND t.expectedReturnTime > :tripStart
+                )
+                """;
 
         return getEntityManager().createQuery(jpql, Vehicle.class)
                 .setParameter("inService", Vehicle.VehicleStatus.IN_SERVICE)
@@ -64,18 +48,35 @@ public class TripDAO extends GenericDAO<Trip> {
 
     public List<Employee> findAvailableOperators(LocalDateTime start, LocalDateTime end) {
         String jpql = """
-            SELECT e FROM Employee e
-            WHERE NOT EXISTS (
-                SELECT 1 FROM Trip t JOIN t.operators o
-                WHERE o = e
-                AND t.departureTime < :tripEnd
-                AND t.expectedReturnTime > :tripStart
-            )
-        """;
+                    SELECT e FROM Employee e
+                    WHERE NOT EXISTS (
+                        SELECT 1 FROM Trip t JOIN t.operators o
+                        WHERE o = e
+                        AND t.tripStatus = it.unibo.wastemaster.domain.model.TripStatus.ACTIVE
+                        AND t.departureTime < :tripEnd
+                        AND t.expectedReturnTime > :tripStart
+                    )
+                """;
 
         return getEntityManager().createQuery(jpql, Employee.class)
                 .setParameter("tripStart", start)
                 .setParameter("tripEnd", end)
                 .getResultList();
     }
+
+    public List<String> findAvailablePostalCodes(LocalDate date) {
+        String jpql = """
+                    SELECT DISTINCT c.customer.location.postalCode
+                    FROM Collection c
+                    WHERE c.date = :date
+                      AND c.trip IS NULL
+                      AND c.collectionStatus = :toBeScheduled
+                """;
+
+        return getEntityManager().createQuery(jpql, String.class)
+                .setParameter("date", date)
+                .setParameter("toBeScheduled", CollectionStatus.TO_BE_SCHEDULED)
+                .getResultList();
+    }
+
 }
