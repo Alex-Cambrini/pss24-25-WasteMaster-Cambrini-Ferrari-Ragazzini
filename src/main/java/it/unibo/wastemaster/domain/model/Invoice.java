@@ -1,24 +1,10 @@
 package it.unibo.wastemaster.domain.model;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
+import java.util.List;
 
-/**
- * Represents an invoice entity linked to a completed collection. This class is a JPA
- * entity mapped to the "invoices" table. Each invoice is associated with exactly one
- * completed collection. It stores invoice details including ID, related collection, issue
- * date, payment status, and amount.
- */
 @Entity
 @Table(name = "invoices")
 public class Invoice {
@@ -27,10 +13,14 @@ public class Invoice {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer invoiceId;
 
-    @OneToOne(optional = false)
-    @JoinColumn(name = "collection_id", nullable = false, unique = true)
-    @NotNull(message = "The collection cannot be null")
-    private Collection collection;
+    @OneToMany
+    @JoinColumn(name = "invoice_id")
+    private List<Collection> collections;
+
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "customer_id", nullable = false)
+    @NotNull(message = "The customer cannot be null")
+    private Customer customer;
 
     @Column(nullable = false)
     @NotNull(message = "The issue date cannot be null")
@@ -44,159 +34,110 @@ public class Invoice {
     @Column(nullable = false)
     private double amount;
 
-    /**
-     * Default constructor required by Hibernate.
-     */
+    @Column(nullable = false)
+    private double totalRecurring;
+
+    @Column(nullable = false)
+    private double totalOnetime;
+
+    @Column(nullable = false)
+    private int recurringCount;
+
+    @Column(nullable = false)
+    private int onetimeCount;
+
     public Invoice() {
-        // empty constructor required by Hibernate
+        // required by Hibernate
     }
 
-    /**
-     * Constructs an Invoice for a given collection.
-     *
-     * @param collection the collection to invoice; must not be null and must be COMPLETED
-     * @throws IllegalArgumentException if collection is null or not completed
-     */
-    public Invoice(final Collection collection) {
-        if (collection == null || collection
-                .getCollectionStatus() != Collection.CollectionStatus.COMPLETED) {
-            throw new IllegalArgumentException(
-                    "Cannot create invoice for null or non-completed collection.");
-        }
-        this.collection = collection;
-        this.issueDate = LocalDate.now();
+    public Invoice(Customer customer, List<Collection> collections, 
+                double totalRecurring, double totalOnetime, 
+                int recurringCount, int onetimeCount, LocalDate issueDate) {
+        this.customer = customer;
+        this.collections = collections;
+        this.totalRecurring = totalRecurring;
+        this.totalOnetime = totalOnetime;
+        this.recurringCount = recurringCount;
+        this.onetimeCount = onetimeCount;
+        this.issueDate = issueDate;
         this.paymentStatus = PaymentStatus.UNPAID;
+        this.amount = totalRecurring + totalOnetime;
     }
 
-    /**
-     * Returns the invoice ID.
-     *
-     * @return the invoice ID
-     */
     public Integer getInvoiceId() {
         return invoiceId;
     }
 
-    /**
-     * Returns the associated collection.
-     *
-     * @return the collection
-     */
-    public Collection getCollection() {
-        return collection;
+    public List<Collection> getCollections() {
+        return collections;
     }
 
-    /**
-     * Sets the associated collection.
-     *
-     * @param collection the collection to set
-     */
-    public void setCollection(final Collection collection) {
-        this.collection = collection;
+    public Customer getCustomer() {
+        return customer;
     }
 
-    /**
-     * Returns the issue date of the invoice.
-     *
-     * @return the issue date
-     */
+    public void setCustomer(final Customer customer) {
+        this.customer = customer;
+    }
+
     public LocalDate getIssueDate() {
         return issueDate;
     }
 
-    /**
-     * Sets the issue date of the invoice.
-     *
-     * @param issueDate the issue date to set
-     */
     public void setIssueDate(final LocalDate issueDate) {
         this.issueDate = issueDate;
     }
 
-    /**
-     * Returns the payment status.
-     *
-     * @return the payment status
-     */
     public PaymentStatus getPaymentStatus() {
         return paymentStatus;
     }
 
-    /**
-     * Sets the payment status.
-     *
-     * @param paymentStatus the payment status to set
-     */
     public void setPaymentStatus(final PaymentStatus paymentStatus) {
         this.paymentStatus = paymentStatus;
     }
 
-    /**
-     * Returns the invoice amount.
-     *
-     * @return the amount
-     */
     public double getAmount() {
         return amount;
     }
 
-     /**
-     * Returns the customer associated with this invoice (via the collection).
-     *
-     * @return the customer, or null if not available
-     */
-    public Customer getCustomer() {
-        return collection != null ? collection.getCustomer() : null;
-    }
-
-    
-    /**
-     * Sets the invoice amount.
-     *
-     * @param amount the amount to set
-     */
     public void setAmount(final double amount) {
         this.amount = amount;
     }
-    
-    /**
-     * Returns a string representation of the invoice, showing ID, collection ID,
-     * customer, waste, amount, issue date, and payment status. Null values are shown as
-     * "N/A".
-     * <p>
-     * Subclasses overriding this method should call {@code super.toString()} to retain
-     * details.
-     *
-     * @return formatted string summarizing the invoice
-     */
-    @Override
-    public String toString() {
-        return String.format(
-                "Invoice {ID: %d, CollectionID: %s, Customer: %s, Waste: %s, Amount: %"
-                        + ".2f, IssueDate: %s, Status: %s}",
-                invoiceId, collection != null ? collection.getCollectionId() : "N/A",
-                collection != null && collection.getCustomer() != null
-                        ? collection.getCustomer().getName()
-                        : "N/A",
-                collection != null && collection.getWaste() != null
-                        ? collection.getWaste().getWasteName()
-                        : "N/A",
-                amount, issueDate != null ? issueDate.toString() : "N/A",
-                paymentStatus != null ? paymentStatus.name() : "N/A");
+
+    public double getTotalRecurring() {
+        return totalRecurring;
     }
 
-    /**
-     * Enum representing the payment status of an invoice.
-     */
+    public void setTotalRecurring(final double totalRecurring) {
+        this.totalRecurring = totalRecurring;
+    }
+
+    public double getTotalOnetime() {
+        return totalOnetime;
+    }
+
+    public void setTotalOnetime(final double totalOnetime) {
+        this.totalOnetime = totalOnetime;
+    }
+
+    public int getRecurringCount() {
+        return recurringCount;
+    }
+
+    public void setRecurringCount(final int recurringCount) {
+        this.recurringCount = recurringCount;
+    }
+
+    public int getOnetimeCount() {
+        return onetimeCount;
+    }
+
+    public void setOnetimeCount(final int onetimeCount) {
+        this.onetimeCount = onetimeCount;
+    }
+
     public enum PaymentStatus {
-        /**
-         * Payment completed.
-         */
         PAID,
-        /**
-         * Payment not completed.
-         */
         UNPAID
     }
-
 }
