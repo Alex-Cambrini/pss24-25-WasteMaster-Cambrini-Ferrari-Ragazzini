@@ -60,9 +60,9 @@ class CollectionManagerTest extends AbstractDatabaseTest {
         @Test
         void testGetCollectionsByStatus() {
                 List<Collection> pending = getCollectionManager()
-                                .getCollectionsByStatus(CollectionStatus.TO_BE_SCHEDULED);
+                                .getCollectionsByStatus(CollectionStatus.ACTIVE);
                 assertEquals(1, pending.size());
-                assertEquals(CollectionStatus.TO_BE_SCHEDULED, pending.get(0).getCollectionStatus());
+                assertEquals(CollectionStatus.ACTIVE, pending.get(0).getCollectionStatus());
         }
 
         @Test
@@ -112,7 +112,7 @@ class CollectionManagerTest extends AbstractDatabaseTest {
 
         @Test
         void testUpdateCollection() {
-                assertEquals(CollectionStatus.TO_BE_SCHEDULED, collection.getCollectionStatus());
+                assertEquals(CollectionStatus.ACTIVE, collection.getCollectionStatus());
 
                 collection.setCollectionStatus(CollectionStatus.COMPLETED);
                 getCollectionManager().updateCollection(collection);
@@ -130,7 +130,7 @@ class CollectionManagerTest extends AbstractDatabaseTest {
 
                 Collection active = getCollectionManager().getAllCollectionBySchedule(schedule).get(0);
                 assertNotNull(active);
-                assertEquals(CollectionStatus.TO_BE_SCHEDULED, active.getCollectionStatus());
+                assertEquals(CollectionStatus.ACTIVE, active.getCollectionStatus());
                 assertEquals(schedule, active.getSchedule());
 
                 active.setCollectionStatus(CollectionStatus.CANCELLED);
@@ -151,7 +151,7 @@ class CollectionManagerTest extends AbstractDatabaseTest {
 
                 Optional<Collection> active = getCollectionManager().getActiveCollectionByRecurringSchedule(schedule);
                 assertTrue(active.isPresent());
-                assertEquals(CollectionStatus.TO_BE_SCHEDULED, active.get().getCollectionStatus());
+                assertEquals(CollectionStatus.ACTIVE, active.get().getCollectionStatus());
                 assertEquals(schedule, active.get().getSchedule());
 
                 active.get().setCollectionStatus(CollectionStatus.CANCELLED);
@@ -163,7 +163,7 @@ class CollectionManagerTest extends AbstractDatabaseTest {
 
         @Test
         void testSoftDeleteCollection() {
-                assertEquals(CollectionStatus.TO_BE_SCHEDULED, collection.getCollectionStatus());
+                assertEquals(CollectionStatus.ACTIVE, collection.getCollectionStatus());
                 boolean deleted = getCollectionManager().softDeleteCollection(collection);
                 assertTrue(deleted);
 

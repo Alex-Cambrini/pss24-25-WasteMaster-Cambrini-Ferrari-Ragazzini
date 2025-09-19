@@ -47,7 +47,7 @@ class CollectionDAOTest extends AbstractDatabaseTest {
                 getWasteDAO().insert(waste);
                 getWasteScheduleManager().setupCollectionRoutine(waste, DayOfWeek.MONDAY);
 
-                toBeScheduled = Collection.CollectionStatus.TO_BE_SCHEDULED;
+                toBeScheduled = Collection.CollectionStatus.ACTIVE;
                 completed = Collection.CollectionStatus.COMPLETED;
                 cancelled = Collection.CollectionStatus.CANCELLED;
 
@@ -119,7 +119,7 @@ class CollectionDAOTest extends AbstractDatabaseTest {
                                 .findFirst().orElse(null);
 
                 assertNotNull(active);
-                assertEquals(Collection.CollectionStatus.TO_BE_SCHEDULED, active.getCollectionStatus());
+                assertEquals(Collection.CollectionStatus.ACTIVE, active.getCollectionStatus());
 
                 active.setCollectionStatus(cancelled);
 
@@ -170,13 +170,13 @@ class CollectionDAOTest extends AbstractDatabaseTest {
 
                 Collection collection = new Collection(recurringSchedule);
                 collection.setCollectionDate(newDate);
-                collection.setCollectionStatus(CollectionStatus.TO_BE_SCHEDULED);
+                collection.setCollectionStatus(CollectionStatus.ACTIVE);
                 getCollectionDAO().insert(collection);
 
                 Collection result = getCollectionDAO().findActiveCollectionByRecurringSchedule(
                                 recurringSchedule);
                 assertNotNull(result);
-                assertEquals(Collection.CollectionStatus.TO_BE_SCHEDULED, result.getCollectionStatus());
+                assertEquals(Collection.CollectionStatus.ACTIVE, result.getCollectionStatus());
 
                 result.setCollectionStatus(Collection.CollectionStatus.CANCELLED);
                 getCollectionDAO().update(result);
