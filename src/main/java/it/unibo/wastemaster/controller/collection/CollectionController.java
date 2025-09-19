@@ -27,7 +27,7 @@ public final class CollectionController {
     private Label cancelledLabel;
 
     @FXML
-    private Label toBeScheduledLabel;
+    private Label activeLabel;
 
     @FXML
     private TableView<CollectionRow> collectionTable;
@@ -54,7 +54,7 @@ public final class CollectionController {
     private CheckBox showCancelledCheckBox;
 
     @FXML
-    private CheckBox showToBeScheduledCheckBox;
+    private CheckBox showActiveCheckBox;
 
     private final ObservableList<CollectionRow> allSchedules =
             FXCollections.observableArrayList();
@@ -94,13 +94,13 @@ public final class CollectionController {
 
         showCompletedCheckBox.setSelected(true);
         showCancelledCheckBox.setSelected(true);
-        showToBeScheduledCheckBox.setSelected(true);
+        showActiveCheckBox.setSelected(true);
 
         showCompletedCheckBox.selectedProperty()
                 .addListener((obs, oldVal, newVal) -> refresh());
         showCancelledCheckBox.selectedProperty()
                 .addListener((obs, oldVal, newVal) -> refresh());
-        showToBeScheduledCheckBox.selectedProperty()
+        showActiveCheckBox.selectedProperty()
                 .addListener((obs, oldVal, newVal) -> refresh());
     }
 
@@ -119,13 +119,13 @@ public final class CollectionController {
         int total = allSchedules.size();
         int completed = 0;
         int cancelled = 0;
-        int toBeScheduled = 0;
+        int active = 0;
 
         for (CollectionRow c : allSchedules) {
             switch (c.getStatus()) {
                 case COMPLETED -> completed++;
                 case CANCELLED -> cancelled++;
-                case TO_BE_SCHEDULED -> toBeScheduled++;
+                case ACTIVE -> active++;
                 default -> {
                     // Do nothing for unknown statuses
                 }
@@ -135,7 +135,7 @@ public final class CollectionController {
         totalLabel.setText("Total: " + total);
         completedLabel.setText("Completed: " + completed);
         cancelledLabel.setText("Cancelled: " + cancelled);
-        toBeScheduledLabel.setText("To Be Scheduled: " + toBeScheduled);
+        activeLabel.setText("Active: " + active);
     }
 
     private void applyFilters() {
@@ -152,7 +152,7 @@ public final class CollectionController {
         return switch (row.getStatus()) {
             case COMPLETED -> showCompletedCheckBox.isSelected();
             case CANCELLED -> showCancelledCheckBox.isSelected();
-            case TO_BE_SCHEDULED -> showToBeScheduledCheckBox.isSelected();
+            case ACTIVE -> showActiveCheckBox.isSelected();
             default -> false;
         };
     }

@@ -25,7 +25,7 @@
                 <Label fx:id="totalLabel" text="Total: 0" styleClass="title-4, text-bold" />
                 <Label fx:id="completedLabel" text="Completed: 0" styleClass="title-4, text-bold, text, success" />
                 <Label fx:id="cancelledLabel" text="Cancelled: 0" styleClass="title-4, text-bold, danger" />
-                <Label fx:id="toBeScheduledLabel" text="to Be ScheduledLabel: 0" styleClass="title-4, text-bold, text, accent" />
+                <Label fx:id="activeLabel" text="Active: 0" styleClass="title-4, text-bold, text, accent" />
             </children>
         </HBox>
         <HBox alignment="CENTER_RIGHT" prefHeight="30.0" prefWidth="30.0" spacing="10.0">
@@ -40,9 +40,9 @@
                         <Tooltip text="Show Cancelled" />
                     </tooltip>
                 </CheckBox>
-                <CheckBox fx:id="showToBeScheduledCheckBox" mnemonicParsing="false" text="Show To Be Scheduled">
+                <CheckBox fx:id="showActiveCheckBox" mnemonicParsing="false" text="Show Active">
                     <tooltip>
-                        <Tooltip text="Show To Be Scheduled" />
+                        <Tooltip text="Show Active" />
                     </tooltip>
                 </CheckBox>
             </children>
