@@ -41,6 +41,11 @@ public class CollectionRepositoryImpl implements CollectionRepository {
     }
 
     @Override
+    public List<Collection> findCollectionsByPostalCodeAndDate(String postalCode,  LocalDate date) {
+        return collectionDAO.findCollectionsByPostalCodeAndDate(postalCode, date);
+    }
+
+    @Override
     public void update(Collection collection) {
         collectionDAO.update(collection);
     }

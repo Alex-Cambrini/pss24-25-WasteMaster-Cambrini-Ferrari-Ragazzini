@@ -18,6 +18,8 @@ public interface CollectionRepository {
 
     List<Collection> findByDateRange(LocalDate start, LocalDate end);
 
+    List<Collection> findCollectionsByPostalCodeAndDate(String postalCode, LocalDate date);
+
     void update(Collection collection);
 
     void save(Collection collection);
