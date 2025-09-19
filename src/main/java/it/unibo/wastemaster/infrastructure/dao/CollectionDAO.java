@@ -88,4 +88,20 @@ public class CollectionDAO extends GenericDAO<Collection> {
                         """, Collection.class).setParameter("start", start)
                 .setParameter("end", end).getResultList();
     }
+
+    public List<Collection> findCollectionsByPostalCodeAndDate(String postalCode, LocalDate date) {
+        String jpql = """
+            SELECT c
+            FROM Collection c
+            WHERE c.customer.location.postalCode = :postalCode
+            AND c.date = :date
+        """;
+
+        return getEntityManager().createQuery(jpql, Collection.class)
+                .setParameter("postalCode", postalCode)
+                .setParameter("date", date)
+                .getResultList();
+    }
+
+
 }
