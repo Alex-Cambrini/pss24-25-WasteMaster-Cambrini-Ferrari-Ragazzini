@@ -2,6 +2,7 @@ package it.unibo.wastemaster.domain.service;
 
 import it.unibo.wastemaster.domain.model.Collection;
 import it.unibo.wastemaster.domain.model.Collection.CollectionStatus;
+import it.unibo.wastemaster.domain.model.Customer;
 import it.unibo.wastemaster.domain.model.OneTimeSchedule;
 import it.unibo.wastemaster.domain.model.RecurringSchedule;
 import it.unibo.wastemaster.domain.model.Schedule;
@@ -21,11 +22,11 @@ public class CollectionManager {
     /**
      * Constructs a CollectionManager with the necessary dependencies.
      *
-     * @param collectionRepository DAO used for Collection persistence
+     * @param collectionRepository     DAO used for Collection persistence
      * @param recurringScheduleManager Manager for recurring schedule logic
      */
     public CollectionManager(final CollectionRepository collectionRepository,
-                             final RecurringScheduleManager recurringScheduleManager) {
+            final RecurringScheduleManager recurringScheduleManager) {
         this.collectionRepository = collectionRepository;
         this.recurringScheduleManager = recurringScheduleManager;
     }
@@ -51,7 +52,8 @@ public class CollectionManager {
     }
 
     /**
-     * Generates a collection for a schedule if the collection date is in the future.
+     * Generates a collection for a schedule if the collection date is in the
+     * future.
      *
      * @param schedule the schedule to generate a collection for
      */
@@ -84,12 +86,13 @@ public class CollectionManager {
     }
 
     /**
-     * Generates upcoming collections for all recurring schedules without an assigned
+     * Generates upcoming collections for all recurring schedules without an
+     * assigned
      * collection.
      */
     public void generateRecurringCollections() {
-        final List<RecurringSchedule> upcomingSchedules =
-                recurringScheduleManager.getRecurringSchedulesWithoutCollections();
+        final List<RecurringSchedule> upcomingSchedules = recurringScheduleManager
+                .getRecurringSchedulesWithoutCollections();
         for (final RecurringSchedule schedule : upcomingSchedules) {
             generateCollection(schedule);
         }
@@ -125,6 +128,18 @@ public class CollectionManager {
         collectionRepository.update(collection);
     }
 
+    /**
+     * Retrieves all completed collections for a given customer that have not yet
+     * been billed.
+     *
+     * @param customer the customer whose collections to retrieve
+     * @return list of completed but not billed collections for the customer
+     * @throws IllegalArgumentException if the customer is null
+     */
+    public List<Collection> getCompletedNotBilledCollections(final Customer customer) {
+        ValidateUtils.requireArgNotNull(customer, "Customer cannot be null");
+        return collectionRepository.findCompletedNotBilledByCustomer(customer);
+    }
 
     public List<Collection> getCollectionsByPostalCode(final String postalCode, final LocalDate date) {
         ValidateUtils.requireArgNotNull(postalCode, "Postal code cannot be null");
