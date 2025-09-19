@@ -38,6 +38,7 @@ public final class InvoiceController {
     private CollectionManager collectionManager;
     private Timeline refreshTimeline;
 
+    @FXML private Button markAsPaidButton;
     @FXML private Button addInvoiceButton;
     @FXML private Button editInvoiceButton;
     @FXML private Button deleteInvoiceButton;
@@ -110,6 +111,9 @@ public final class InvoiceController {
     editInvoiceButton.setDisable(!rowSelected);
     deleteInvoiceButton.setDisable(!rowSelected);
     viewCollectionButton.setDisable(!rowSelected);
+     markAsPaidButton.setDisable(!rowSelected || 
+    (selected != null && selected.getStatus().equalsIgnoreCase("PAID")));
+
 }
 
     @FXML
@@ -265,6 +269,23 @@ public final class InvoiceController {
         } catch (Exception e) {
             DialogUtils.showError("Navigation error", "Could not load Collection view.", AppContext.getOwner());
             e.printStackTrace();
+        }
+    }
+
+
+    @FXML
+    private void handleMarkAsPaid() {
+        InvoiceRow selected = invoiceTable.getSelectionModel().getSelectedItem();
+        if (selected == null) {
+            DialogUtils.showError(TITLE_NO_SELECTION, "Please select an invoice to mark as paid.", AppContext.getOwner());
+            return;
+        }
+        boolean success = invoiceManager.markInvoiceAsPaid(selected.getIdAsInt());
+        if (success) {
+            DialogUtils.showSuccess("Invoice marked as paid.", AppContext.getOwner());
+            loadInvoices();
+        } else {
+            DialogUtils.showError("Error", "Could not mark invoice as paid.", AppContext.getOwner());
         }
     }
 }
