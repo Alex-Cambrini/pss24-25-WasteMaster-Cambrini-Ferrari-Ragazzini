@@ -29,36 +29,39 @@ public class TripDAO extends GenericDAO<Trip> {
         String jpql = """
                 SELECT v FROM Vehicle v
                 WHERE v.vehicleStatus = :inService
-                AND v.nextMaintenanceDate > :tripEnd
-                AND NOT EXISTS (
-                    SELECT 1 FROM Trip t
-                    WHERE t.assignedVehicle = v
-                        AND t.tripStatus = it.unibo.wastemaster.domain.model.TripStatus.ACTIVE
+                  AND (v.nextMaintenanceDate IS NULL OR v.nextMaintenanceDate > :tripEndDate)
+                  AND NOT EXISTS (
+                      SELECT 1 FROM Trip t
+                      WHERE t.assignedVehicle = v
+                        AND t.status = :active
                         AND t.departureTime < :tripEnd
                         AND t.expectedReturnTime > :tripStart
-                )
+                  )
                 """;
 
         return getEntityManager().createQuery(jpql, Vehicle.class)
                 .setParameter("inService", Vehicle.VehicleStatus.IN_SERVICE)
+                .setParameter("active", Trip.TripStatus.ACTIVE)
                 .setParameter("tripStart", start)
                 .setParameter("tripEnd", end)
+                .setParameter("tripEndDate", end.toLocalDate())
                 .getResultList();
     }
 
     public List<Employee> findAvailableOperators(LocalDateTime start, LocalDateTime end) {
         String jpql = """
-                    SELECT e FROM Employee e
-                    WHERE NOT EXISTS (
-                        SELECT 1 FROM Trip t JOIN t.operators o
-                        WHERE o = e
-                        AND t.tripStatus = it.unibo.wastemaster.domain.model.TripStatus.ACTIVE
-                        AND t.departureTime < :tripEnd
-                        AND t.expectedReturnTime > :tripStart
-                    )
+                SELECT e FROM Employee e
+                WHERE NOT EXISTS (
+                    SELECT 1 FROM Trip t JOIN t.operators o
+                    WHERE o = e
+                      AND t.status = :active
+                      AND t.departureTime < :tripEnd
+                      AND t.expectedReturnTime > :tripStart
+                )
                 """;
 
         return getEntityManager().createQuery(jpql, Employee.class)
+                .setParameter("active", Trip.TripStatus.ACTIVE)
                 .setParameter("tripStart", start)
                 .setParameter("tripEnd", end)
                 .getResultList();
@@ -66,11 +69,14 @@ public class TripDAO extends GenericDAO<Trip> {
 
     public List<String> findAvailablePostalCodes(LocalDate date) {
         String jpql = """
-                    SELECT DISTINCT c.customer.location.postalCode
-                    FROM Collection c
-                    WHERE c.date = :date
-                      AND c.trip IS NULL
-                      AND c.collectionStatus = :toBeScheduled
+                SELECT DISTINCT loc.postalCode
+                FROM Collection c
+                JOIN c.schedule s
+                JOIN s.customer cust
+                JOIN cust.location loc
+                WHERE c.date = :date
+                  AND c.trip IS NULL
+                  AND c.collectionStatus = :toBeScheduled
                 """;
 
         return getEntityManager().createQuery(jpql, String.class)
@@ -78,5 +84,4 @@ public class TripDAO extends GenericDAO<Trip> {
                 .setParameter("toBeScheduled", CollectionStatus.TO_BE_SCHEDULED)
                 .getResultList();
     }
-
 }
