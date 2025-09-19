@@ -76,19 +76,17 @@ public final class Trip {
      * @param operators the list of employees (operators) for the trip
      * @param departureTime the scheduled departure time
      * @param expectedReturnTime the expected return time
-     * @param status the current status of the trip
      * @param collections the list of collections to be performed during the trip
      */
     public Trip(final String postalCode, final Vehicle assignedVehicle,
                 final List<Employee> operators, final LocalDateTime departureTime,
-                final LocalDateTime expectedReturnTime, final TripStatus status,
+                final LocalDateTime expectedReturnTime,
                 final List<Collection> collections) {
         this.postalCode = postalCode;
         this.assignedVehicle = assignedVehicle;
         this.operators = operators;
         this.departureTime = departureTime;
         this.expectedReturnTime = expectedReturnTime;
-        this.status = status;
         this.collections = collections;
     }
 
@@ -263,6 +261,6 @@ public final class Trip {
      * Enum for the status of a trip.
      */
     public enum TripStatus {
-        PENDING, IN_PROGRESS, COMPLETED, CANCELED
+        ACTIVE, COMPLETED, CANCELED
     }
 }
