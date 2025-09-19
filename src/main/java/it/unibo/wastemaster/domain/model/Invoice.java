@@ -196,11 +196,7 @@ public class Invoice {
         /**
          * Payment not completed.
          */
-        UNPAID,
-        /**
-         * Payment is pending.
-         */
-        PENDING
+        UNPAID
     }
 
 }
