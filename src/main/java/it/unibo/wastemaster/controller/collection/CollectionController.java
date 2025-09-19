@@ -27,13 +27,7 @@ public final class CollectionController {
     private Label cancelledLabel;
 
     @FXML
-    private Label failedLabel;
-
-    @FXML
-    private Label inProgressLabel;
-
-    @FXML
-    private Label pendingLabel;
+    private Label toBeScheduledLabel;
 
     @FXML
     private TableView<CollectionRow> collectionTable;
@@ -60,13 +54,7 @@ public final class CollectionController {
     private CheckBox showCancelledCheckBox;
 
     @FXML
-    private CheckBox showFailedCheckBox;
-
-    @FXML
-    private CheckBox showInProgressCheckBox;
-
-    @FXML
-    private CheckBox showPendingCheckBox;
+    private CheckBox showToBeScheduledCheckBox;
 
     private final ObservableList<CollectionRow> allSchedules =
             FXCollections.observableArrayList();
@@ -106,19 +94,13 @@ public final class CollectionController {
 
         showCompletedCheckBox.setSelected(true);
         showCancelledCheckBox.setSelected(true);
-        showFailedCheckBox.setSelected(true);
-        showInProgressCheckBox.setSelected(true);
-        showPendingCheckBox.setSelected(true);
+        showToBeScheduledCheckBox.setSelected(true);
 
         showCompletedCheckBox.selectedProperty()
                 .addListener((obs, oldVal, newVal) -> refresh());
         showCancelledCheckBox.selectedProperty()
                 .addListener((obs, oldVal, newVal) -> refresh());
-        showFailedCheckBox.selectedProperty()
-                .addListener((obs, oldVal, newVal) -> refresh());
-        showInProgressCheckBox.selectedProperty()
-                .addListener((obs, oldVal, newVal) -> refresh());
-        showPendingCheckBox.selectedProperty()
+        showToBeScheduledCheckBox.selectedProperty()
                 .addListener((obs, oldVal, newVal) -> refresh());
     }
 
@@ -137,17 +119,13 @@ public final class CollectionController {
         int total = allSchedules.size();
         int completed = 0;
         int cancelled = 0;
-        int failed = 0;
-        int inProgress = 0;
-        int pending = 0;
+        int toBeScheduled = 0;
 
         for (CollectionRow c : allSchedules) {
             switch (c.getStatus()) {
                 case COMPLETED -> completed++;
                 case CANCELLED -> cancelled++;
-                case FAILED -> failed++;
-                case IN_PROGRESS -> inProgress++;
-                case PENDING -> pending++;
+                case TO_BE_SCHEDULED -> toBeScheduled++;
                 default -> {
                     // Do nothing for unknown statuses
                 }
@@ -157,9 +135,7 @@ public final class CollectionController {
         totalLabel.setText("Total: " + total);
         completedLabel.setText("Completed: " + completed);
         cancelledLabel.setText("Cancelled: " + cancelled);
-        failedLabel.setText("Failed: " + failed);
-        inProgressLabel.setText("In progress: " + inProgress);
-        pendingLabel.setText("Pending: " + pending);
+        toBeScheduledLabel.setText("To Be Scheduled: " + toBeScheduled);
     }
 
     private void applyFilters() {
@@ -176,9 +152,7 @@ public final class CollectionController {
         return switch (row.getStatus()) {
             case COMPLETED -> showCompletedCheckBox.isSelected();
             case CANCELLED -> showCancelledCheckBox.isSelected();
-            case FAILED -> showFailedCheckBox.isSelected();
-            case IN_PROGRESS -> showInProgressCheckBox.isSelected();
-            case PENDING -> showPendingCheckBox.isSelected();
+            case TO_BE_SCHEDULED -> showToBeScheduledCheckBox.isSelected();
             default -> false;
         };
     }
