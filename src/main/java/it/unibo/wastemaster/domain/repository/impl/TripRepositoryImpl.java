@@ -50,12 +50,12 @@ public class TripRepositoryImpl implements TripRepository {
     }
 
     @Override
-    public List<Trip> findTripsByVehicleAndPeriod(Vehicle vehicle, LocalDateTime start, LocalDateTime end) {
-        return tripDAO.findTripsByVehicleAndPeriod(vehicle, start, end);
+    public List<Vehicle> findAvailableVehicles(LocalDateTime start, LocalDateTime end) {
+        return tripDAO.findAvailableVehicles(start, end);
     }
 
     @Override
-    public List<Trip> findTripsByOperatorAndPeriod(Employee operator, LocalDateTime start, LocalDateTime end) {
-        return tripDAO.findTripsByOperatorAndPeriod(operator, start, end);
+    public List<Employee> findAvailableOperators(LocalDateTime start, LocalDateTime end) {
+        return tripDAO.findAvailableOperators(start, end);
     }
 }

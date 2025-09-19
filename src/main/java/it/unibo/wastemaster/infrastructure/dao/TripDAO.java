@@ -42,23 +42,40 @@ public class TripDAO extends GenericDAO<Trip> {
                 .getResultList();
     }
 
-    public List<Trip> findTripsByVehicleAndPeriod(Vehicle vehicle, LocalDateTime start, LocalDateTime end) {
-        String jpql = "SELECT t FROM Trip t WHERE t.assignedVehicle = :vehicle "
-                    + "AND t.departureTime < :end AND t.expectedReturnTime > :start";
-        return getEntityManager().createQuery(jpql, Trip.class)
-                .setParameter("vehicle", vehicle)
-                .setParameter("start", start)
-                .setParameter("end", end)
+    public List<Vehicle> findAvailableVehicles(LocalDateTime start, LocalDateTime end) {
+        String jpql = """
+            SELECT v FROM Vehicle v
+            WHERE v.vehicleStatus = :inService
+            AND v.nextMaintenanceDate > :tripEnd
+            AND NOT EXISTS (
+                SELECT 1 FROM Trip t
+                WHERE t.assignedVehicle = v
+                    AND t.departureTime < :tripEnd
+                    AND t.expectedReturnTime > :tripStart
+            )
+            """;
+
+        return getEntityManager().createQuery(jpql, Vehicle.class)
+                .setParameter("inService", Vehicle.VehicleStatus.IN_SERVICE)
+                .setParameter("tripStart", start)
+                .setParameter("tripEnd", end)
                 .getResultList();
     }
 
-    public List<Trip> findTripsByOperatorAndPeriod(Employee operator, LocalDateTime start, LocalDateTime end) {
-        String jpql = "SELECT t FROM Trip t JOIN t.operators o WHERE o = :operator "
-                    + "AND t.departureTime < :end AND t.expectedReturnTime > :start";
-        return getEntityManager().createQuery(jpql, Trip.class)
-                .setParameter("operator", operator)
-                .setParameter("start", start)
-                .setParameter("end", end)
+    public List<Employee> findAvailableOperators(LocalDateTime start, LocalDateTime end) {
+        String jpql = """
+            SELECT e FROM Employee e
+            WHERE NOT EXISTS (
+                SELECT 1 FROM Trip t JOIN t.operators o
+                WHERE o = e
+                AND t.departureTime < :tripEnd
+                AND t.expectedReturnTime > :tripStart
+            )
+        """;
+
+        return getEntityManager().createQuery(jpql, Employee.class)
+                .setParameter("tripStart", start)
+                .setParameter("tripEnd", end)
                 .getResultList();
     }
 }

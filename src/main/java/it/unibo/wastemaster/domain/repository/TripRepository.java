@@ -21,24 +21,9 @@ public interface TripRepository {
 
     List<Trip> findAll();
 
-    
-    /**
-     * Finds all collections by postal code (CAP).
-     *
-     * @param postalCode the postal code to filter collections
-     * @return a list of collections associated with the given postal code
-     */
     List<Collection> findCollectionsByPostalCode(String postalCode);
 
-    /**
-     * Finds trips for a vehicle that overlap with a given period.
-     */
-    List<Trip> findTripsByVehicleAndPeriod(Vehicle vehicle, LocalDateTime start, LocalDateTime end);
+    List<Vehicle> findAvailableVehicles(LocalDateTime start, LocalDateTime end);
 
-    /**
-     * Finds trips for an operator that overlap with a given period.
-     */
-    List<Trip> findTripsByOperatorAndPeriod(Employee operator, LocalDateTime start, LocalDateTime end);
-
-
+    List<Employee> findAvailableOperators(LocalDateTime start, LocalDateTime end);
 }
