@@ -159,6 +159,12 @@ public class CollectionManager {
         return collectionRepository.findByDateRange(start, end);
     }
 
+
+    public List<Collection> getCollectionsByPostalCode(final String postalCode, final LocalDate date) {
+        ValidateUtils.requireArgNotNull(postalCode, "Postal code cannot be null");
+        return collectionRepository.findCollectionsByPostalCodeAndDate(postalCode, date);
+    }
+
     public List<Collection> getAllCollections() {
         return collectionRepository.findAll();
     }
