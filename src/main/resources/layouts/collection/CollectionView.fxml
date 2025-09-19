@@ -24,10 +24,8 @@
             <children>
                 <Label fx:id="totalLabel" text="Total: 0" styleClass="title-4, text-bold" />
                 <Label fx:id="completedLabel" text="Completed: 0" styleClass="title-4, text-bold, text, success" />
-                <Label fx:id="cancelledLabel" text="Cancelled: 0" styleClass="title-4, text-bold, text-muted" />
-                <Label fx:id="failedLabel" text="Failed: 0" styleClass="title-4, text-bold, text, danger" />
-                <Label fx:id="inProgressLabel" text="In progress: 0" styleClass="title-4, text-bold, text, accent" />
-                <Label fx:id="pendingLabel" text="Pending: 0" styleClass="title-4, text-bold, text-subtle" />
+                <Label fx:id="cancelledLabel" text="Cancelled: 0" styleClass="title-4, text-bold, danger" />
+                <Label fx:id="toBeScheduledLabel" text="to Be ScheduledLabel: 0" styleClass="title-4, text-bold, text, accent" />
             </children>
         </HBox>
         <HBox alignment="CENTER_RIGHT" prefHeight="30.0" prefWidth="30.0" spacing="10.0">
@@ -42,19 +40,9 @@
                         <Tooltip text="Show Cancelled" />
                     </tooltip>
                 </CheckBox>
-                <CheckBox fx:id="showFailedCheckBox" mnemonicParsing="false" text="Show Failed">
+                <CheckBox fx:id="showToBeScheduledCheckBox" mnemonicParsing="false" text="Show To Be Scheduled">
                     <tooltip>
-                        <Tooltip text="Show Failed" />
-                    </tooltip>
-                </CheckBox>
-                <CheckBox fx:id="showInProgressCheckBox" mnemonicParsing="false" text="Show In Progress">
-                    <tooltip>
-                        <Tooltip text="Show In Progress" />
-                    </tooltip>
-                </CheckBox>
-                <CheckBox fx:id="showPendingCheckBox" text="Show Pending">
-                    <tooltip>
-                        <Tooltip text="Show Pending" />
+                        <Tooltip text="Show To Be Scheduled" />
                     </tooltip>
                 </CheckBox>
             </children>
