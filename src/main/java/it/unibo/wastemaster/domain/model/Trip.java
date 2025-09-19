@@ -69,6 +69,7 @@ public final class Trip {
 
     /**
      * Constructs a new Trip with the specified details.
+     * The trip status is set to ACTIVE by default.
      *
      * @param postalCode the postal code associated with the trip
      * @param assignedVehicle the vehicle assigned to the trip
@@ -87,6 +88,7 @@ public final class Trip {
         this.departureTime = departureTime;
         this.expectedReturnTime = expectedReturnTime;
         this.collections = collections;
+        this.status = TripStatus.ACTIVE;
     }
 
     /**
