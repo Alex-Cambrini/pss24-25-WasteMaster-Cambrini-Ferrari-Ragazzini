@@ -17,8 +17,10 @@ import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
 
 /**
- * Represents a waste collection linked to a customer and a schedule. Contains information
- * about the waste type, scheduled date, collection status, and other relevant details for
+ * Represents a waste collection linked to a customer and a schedule. Contains
+ * information
+ * about the waste type, scheduled date, collection status, and other relevant
+ * details for
  * managing the collection.
  */
 @Entity
@@ -83,6 +85,9 @@ public class Collection {
     @JoinColumn(name = "schedule_id", nullable = false)
     @NotNull(message = "Schedule cannot be null")
     private Schedule schedule;
+
+    /** True if the collection has been billed, false otherwise. */
+    private Boolean isBilled = false;
 
     /**
      * Trip associated with the collection (optional).
@@ -193,6 +198,24 @@ public class Collection {
     }
 
     /**
+     * Returns whether the collection has been billed.
+     *
+     * @return true if billed, false otherwise
+     */
+    public Boolean getIsBilled() {
+        return isBilled;
+    }
+
+    /**
+     * Sets whether the collection has been billed.
+     *
+     * @param isBilled true if billed, false otherwise
+     */
+    public void setIsBilled(final Boolean isBilled) {
+        this.isBilled = isBilled;
+    }
+
+    /**
      * @return the schedule linked to the collection
      */
     public Schedule getSchedule() {
@@ -202,7 +225,8 @@ public class Collection {
     /**
      * Returns a string representation of the collection.
      * <p>
-     * Subclasses overriding this method should call super.toString() and append their
+     * Subclasses overriding this method should call super.toString() and append
+     * their
      * additional information to maintain consistency.
      *
      * @return string representation of the collection
@@ -210,8 +234,8 @@ public class Collection {
     @Override
     public String toString() {
         return String.format("""
-                        Collection {ID: %d, Customer: %s, Date: %s, Waste: %s, Status: %s,
-                        Cancel Limit Days: %d, Schedule ID: %s, Schedule Category: %s}""",
+                Collection {ID: %d, Customer: %s, Date: %s, Waste: %s, Status: %s,
+                Cancel Limit Days: %d, Schedule ID: %s, Schedule Category: %s}""",
                 collectionId, customer != null ? customer.getName() : "N/A", date,
                 waste != null ? waste.getWasteName() : "N/A", collectionStatus,
                 cancelLimitDays, schedule != null ? schedule.getScheduleId() : "N/A",
@@ -223,8 +247,8 @@ public class Collection {
      */
     public enum CollectionStatus {
         ACTIVE, // raccolta attiva
-        COMPLETED,  // raccolta terminata
-        CANCELLED   // raccolta annullata
+        COMPLETED, // raccolta terminata
+        CANCELLED // raccolta annullata
     }
 
 }

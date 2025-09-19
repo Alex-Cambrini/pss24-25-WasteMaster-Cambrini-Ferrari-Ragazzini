@@ -2,6 +2,7 @@ package it.unibo.wastemaster.domain.repository.impl;
 
 import it.unibo.wastemaster.domain.model.Collection;
 import it.unibo.wastemaster.domain.model.Collection.CollectionStatus;
+import it.unibo.wastemaster.domain.model.Customer;
 import it.unibo.wastemaster.domain.model.RecurringSchedule;
 import it.unibo.wastemaster.domain.model.Schedule;
 import it.unibo.wastemaster.domain.repository.CollectionRepository;
@@ -43,6 +44,11 @@ public class CollectionRepositoryImpl implements CollectionRepository {
     @Override
     public List<Collection> findCollectionsByPostalCodeAndDate(String postalCode,  LocalDate date) {
         return collectionDAO.findCollectionsByPostalCodeAndDate(postalCode, date);
+    }
+
+    @Override
+    public List<Collection> findCompletedNotBilledByCustomer(final Customer customer) {
+        return collectionDAO.findCompletedNotBilledByCustomer(customer);
     }
 
     @Override

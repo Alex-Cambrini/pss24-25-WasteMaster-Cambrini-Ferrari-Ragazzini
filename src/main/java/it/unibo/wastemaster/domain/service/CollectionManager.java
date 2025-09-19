@@ -2,6 +2,7 @@ package it.unibo.wastemaster.domain.service;
 
 import it.unibo.wastemaster.domain.model.Collection;
 import it.unibo.wastemaster.domain.model.Collection.CollectionStatus;
+import it.unibo.wastemaster.domain.model.Customer;
 import it.unibo.wastemaster.domain.model.OneTimeSchedule;
 import it.unibo.wastemaster.domain.model.RecurringSchedule;
 import it.unibo.wastemaster.domain.model.Schedule;
@@ -15,25 +16,17 @@ import java.util.Optional;
  * Manages the creation, retrieval, and cancellation of waste collections.
  */
 public class CollectionManager {
-
-    private static final int FIRST_HALF_START_MONTH = 1;
-    private static final int FIRST_HALF_END_MONTH = 6;
-    private static final int SECOND_HALF_START_MONTH = 7;
-    private static final int SECOND_HALF_END_MONTH = 12;
-    private static final int FIRST_DAY = 1;
-    private static final int LAST_DAY_FIRST_HALF = 30;
-    private static final int LAST_DAY_SECOND_HALF = 31;
     private final CollectionRepository collectionRepository;
     private final RecurringScheduleManager recurringScheduleManager;
 
     /**
      * Constructs a CollectionManager with the necessary dependencies.
      *
-     * @param collectionRepository DAO used for Collection persistence
+     * @param collectionRepository     DAO used for Collection persistence
      * @param recurringScheduleManager Manager for recurring schedule logic
      */
     public CollectionManager(final CollectionRepository collectionRepository,
-                             final RecurringScheduleManager recurringScheduleManager) {
+            final RecurringScheduleManager recurringScheduleManager) {
         this.collectionRepository = collectionRepository;
         this.recurringScheduleManager = recurringScheduleManager;
     }
@@ -59,7 +52,8 @@ public class CollectionManager {
     }
 
     /**
-     * Generates a collection for a schedule if the collection date is in the future.
+     * Generates a collection for a schedule if the collection date is in the
+     * future.
      *
      * @param schedule the schedule to generate a collection for
      */
@@ -92,12 +86,13 @@ public class CollectionManager {
     }
 
     /**
-     * Generates upcoming collections for all recurring schedules without an assigned
+     * Generates upcoming collections for all recurring schedules without an
+     * assigned
      * collection.
      */
     public void generateRecurringCollections() {
-        final List<RecurringSchedule> upcomingSchedules =
-                recurringScheduleManager.getRecurringSchedulesWithoutCollections();
+        final List<RecurringSchedule> upcomingSchedules = recurringScheduleManager
+                .getRecurringSchedulesWithoutCollections();
         for (final RecurringSchedule schedule : upcomingSchedules) {
             generateCollection(schedule);
         }
@@ -134,31 +129,17 @@ public class CollectionManager {
     }
 
     /**
-     * Retrieves the collections for the first half of the specified year.
+     * Retrieves all completed collections for a given customer that have not yet
+     * been billed.
      *
-     * @param year the year to filter collections by
-     * @return a list of collections occurring between January 1 and June 30 of the given
-     * year
+     * @param customer the customer whose collections to retrieve
+     * @return list of completed but not billed collections for the customer
+     * @throws IllegalArgumentException if the customer is null
      */
-    public List<Collection> getFirstHalfCollections(final int year) {
-        LocalDate start = LocalDate.of(year, FIRST_HALF_START_MONTH, FIRST_DAY);
-        LocalDate end = LocalDate.of(year, FIRST_HALF_END_MONTH, LAST_DAY_FIRST_HALF);
-        return collectionRepository.findByDateRange(start, end);
+    public List<Collection> getCompletedNotBilledCollections(final Customer customer) {
+        ValidateUtils.requireArgNotNull(customer, "Customer cannot be null");
+        return collectionRepository.findCompletedNotBilledByCustomer(customer);
     }
-
-    /**
-     * Retrieves the collections for the second half of the specified year.
-     *
-     * @param year the year to filter collections by
-     * @return a list of collections occurring between July 1 and December 31 of the given
-     * year
-     */
-    public List<Collection> getSecondHalfCollections(final int year) {
-        LocalDate start = LocalDate.of(year, SECOND_HALF_START_MONTH, FIRST_DAY);
-        LocalDate end = LocalDate.of(year, SECOND_HALF_END_MONTH, LAST_DAY_SECOND_HALF);
-        return collectionRepository.findByDateRange(start, end);
-    }
-
 
     public List<Collection> getCollectionsByPostalCode(final String postalCode, final LocalDate date) {
         ValidateUtils.requireArgNotNull(postalCode, "Postal code cannot be null");
