@@ -36,7 +36,8 @@ public class CollectionDAO extends GenericDAO<Collection> {
     }
 
     /**
-     * Retrieves all collections with the specified {@link Collection.CollectionStatus}.
+     * Retrieves all collections with the specified
+     * {@link Collection.CollectionStatus}.
      *
      * @param status the collection status to filter by
      * @return list of collections matching the status
@@ -49,7 +50,8 @@ public class CollectionDAO extends GenericDAO<Collection> {
     }
 
     /**
-     * Finds an active {@link Collection} linked to the given {@link RecurringSchedule}.
+     * Finds an active {@link Collection} linked to the given
+     * {@link RecurringSchedule}.
      * An active collection is one whose status is not CANCELLED.
      *
      * @param schedule the recurring schedule to search collections for
@@ -74,18 +76,39 @@ public class CollectionDAO extends GenericDAO<Collection> {
     }
 
     /**
-     * Retrieves a list of Collection entities whose date field is between the specified
+     * Retrieves a list of Collection entities whose date field is between the
+     * specified
      * start and end dates (inclusive).
      *
      * @param start the start date of the range (inclusive)
-     * @param end the end date of the range (inclusive)
+     * @param end   the end date of the range (inclusive)
      * @return a list of Collection entities with dates between start and end
      */
     public List<Collection> findByDateRange(final LocalDate start, final LocalDate end) {
         return getEntityManager().createQuery("""
-                        SELECT c FROM Collection c
-                        WHERE c.date BETWEEN :start AND :end
-                        """, Collection.class).setParameter("start", start)
+                SELECT c FROM Collection c
+                WHERE c.date BETWEEN :start AND :end
+                """, Collection.class).setParameter("start", start)
                 .setParameter("end", end).getResultList();
     }
+
+    public List<Collection> findCollectionsByPostalCodeAndDate(final String postalCode, final LocalDate date) {
+        final String jpql = """
+                SELECT c
+                FROM Collection c
+                JOIN c.schedule s
+                JOIN s.customer cust
+                JOIN cust.location loc
+                WHERE loc.postalCode = :postal
+                  AND c.date = :date
+                  AND c.collectionStatus = :status
+                """;
+
+        return getEntityManager().createQuery(jpql, Collection.class)
+                .setParameter("postal", postalCode)
+                .setParameter("date", date)
+                .setParameter("status", Collection.CollectionStatus.TO_BE_SCHEDULED)
+                .getResultList();
+    }
+
 }

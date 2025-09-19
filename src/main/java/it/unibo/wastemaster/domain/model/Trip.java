@@ -16,7 +16,6 @@ import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * Represents a trip assigned to a vehicle and
@@ -70,26 +69,26 @@ public final class Trip {
 
     /**
      * Constructs a new Trip with the specified details.
+     * The trip status is set to ACTIVE by default.
      *
      * @param postalCode the postal code associated with the trip
      * @param assignedVehicle the vehicle assigned to the trip
      * @param operators the list of employees (operators) for the trip
      * @param departureTime the scheduled departure time
      * @param expectedReturnTime the expected return time
-     * @param status the current status of the trip
      * @param collections the list of collections to be performed during the trip
      */
     public Trip(final String postalCode, final Vehicle assignedVehicle,
                 final List<Employee> operators, final LocalDateTime departureTime,
-                final LocalDateTime expectedReturnTime, final TripStatus status,
+                final LocalDateTime expectedReturnTime,
                 final List<Collection> collections) {
         this.postalCode = postalCode;
         this.assignedVehicle = assignedVehicle;
         this.operators = operators;
         this.departureTime = departureTime;
         this.expectedReturnTime = expectedReturnTime;
-        this.status = status;
         this.collections = collections;
+        this.status = TripStatus.ACTIVE;
     }
 
     /**
@@ -228,41 +227,9 @@ public final class Trip {
     }
 
     /**
-     * Returns a string representation of the Trip.
-     *
-     * @return a formatted string
-     */
-    @Override
-    public String toString() {
-        final String operatorNames = this.operators != null
-                ? this.operators.stream()
-                .map(e -> e.getName() + " " + e.getSurname())
-                .collect(Collectors.joining(", "))
-                : "N/A";
-        final String collectionIds = this.collections != null
-                ? this.collections.stream()
-                .map(c -> String.valueOf(c.getCollectionId()))
-                .collect(Collectors.joining(", "))
-                : "N/A";
-
-        return String.format(
-                "Trip {ID: %d, PostalCode: %s, Vehicle: %s, Operators: %s, Departure: "
-                        + "%s, "
-                        + "ExpectedReturn: %s, Status: %s, CollectionIDs: %s}",
-                tripId,
-                postalCode != null ? postalCode : "N/A",
-                assignedVehicle != null ? assignedVehicle.getPlate() : "N/A",
-                operatorNames,
-                departureTime != null ? departureTime.toString() : "N/A",
-                expectedReturnTime != null ? expectedReturnTime.toString() : "N/A",
-                status != null ? status.name() : "N/A",
-                collectionIds);
-    }
-
-    /**
      * Enum for the status of a trip.
      */
     public enum TripStatus {
-        PENDING, IN_PROGRESS, COMPLETED, CANCELED
+        ACTIVE, COMPLETED, CANCELED
     }
 }

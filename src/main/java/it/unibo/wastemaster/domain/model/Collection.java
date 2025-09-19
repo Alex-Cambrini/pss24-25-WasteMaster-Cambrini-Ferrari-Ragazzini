@@ -110,7 +110,7 @@ public class Collection {
             this.waste = schedule.getWaste();
             this.customer = schedule.getCustomer();
         }
-        this.collectionStatus = CollectionStatus.PENDING;
+        this.collectionStatus = CollectionStatus.TO_BE_SCHEDULED;
         this.cancelLimitDays = CANCEL_LIMIT_DAYS;
     }
 
@@ -222,30 +222,9 @@ public class Collection {
      * Possible statuses of the collection.
      */
     public enum CollectionStatus {
-        /**
-         * Pending status.
-         */
-        PENDING,
-
-        /**
-         * In progress status.
-         */
-        IN_PROGRESS,
-
-        /**
-         * Completed status.
-         */
-        COMPLETED,
-
-        /**
-         * Cancelled status.
-         */
-        CANCELLED,
-
-        /**
-         * Failed status.
-         */
-        FAILED
+        TO_BE_SCHEDULED, // da schedulare
+        COMPLETED,  // raccolta terminata
+        CANCELLED   // raccolta annullata
     }
 
 }

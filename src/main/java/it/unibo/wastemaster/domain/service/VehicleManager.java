@@ -1,5 +1,6 @@
 package it.unibo.wastemaster.domain.service;
 
+import it.unibo.wastemaster.domain.model.Employee.Licence;
 import it.unibo.wastemaster.domain.model.Vehicle;
 import it.unibo.wastemaster.domain.repository.VehicleRepository;
 import it.unibo.wastemaster.infrastructure.utils.ValidateUtils;
@@ -124,6 +125,17 @@ public final class VehicleManager {
             return false;
         }
     }
+
+
+    public List<Licence> getAllowedLicences(final Vehicle vehicle) {
+        ValidateUtils.requireArgNotNull(vehicle, "Vehicle cannot be null");
+        return switch (vehicle.getRequiredLicence()) {
+            case B -> List.of(Licence.B, Licence.C1, Licence.C);
+            case C1 -> List.of(Licence.C1, Licence.C);
+            case C -> List.of(Licence.C);
+        };
+    }
+
 
     public List<Vehicle> findAllVehicle() {
         return vehicleRepository.findAll();
