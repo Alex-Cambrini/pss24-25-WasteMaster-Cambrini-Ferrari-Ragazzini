@@ -1,167 +1,63 @@
 package it.unibo.wastemaster.domain.service;
 
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Optional;
+
 import it.unibo.wastemaster.domain.model.Collection;
 import it.unibo.wastemaster.domain.model.Customer;
 import it.unibo.wastemaster.domain.model.Invoice;
-import it.unibo.wastemaster.domain.repository.CollectionRepository;
+import it.unibo.wastemaster.domain.model.OneTimeSchedule;
+import it.unibo.wastemaster.domain.model.RecurringSchedule;
 import it.unibo.wastemaster.domain.repository.InvoiceRepository;
-import it.unibo.wastemaster.domain.model.Invoice.PaymentStatus;
-import com.itextpdf.kernel.pdf.PdfWriter;
-import com.itextpdf.kernel.pdf.PdfDocument;
-import com.itextpdf.layout.Document;
-import com.itextpdf.layout.element.Paragraph;
-import java.io.ByteArrayOutputStream;
-import java.io.ByteArrayOutputStream;
-import java.time.LocalDate;
-import java.time.Month;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 
-/**
- * Manages the creation and generation of invoices for waste collections.
- */
-public final class InvoiceManager {
+public class InvoiceManager {
 
-    private static final double FIXED_FEE = 30.0;
-    private static final int JUNE_LAST_DAY = 30;
-    private static final int DECEMBER_LAST_DAY = 31;
-
+    private static final double RECURRING_FEE = 0.25;
+    private static final double ONE_TIME_FEE = 0.40;
     private final InvoiceRepository invoiceRepository;
-    private final CollectionRepository collectionRepository;
 
-    /**
-     * Constructs an InvoiceManager with specified repositories for invoices and
-     * collections.
-     *
-     * @param invoiceRepository the repository managing invoice data
-     * @param collectionRepository the repository managing collection data
-     */
-    public InvoiceManager(final InvoiceRepository invoiceRepository,
-                          final CollectionRepository collectionRepository) {
+    public InvoiceManager(InvoiceRepository invoiceRepository){
         this.invoiceRepository = invoiceRepository;
-        this.collectionRepository = collectionRepository;
     }
 
-    /**
-     * Generates invoices for the first half of a given year (January 1st - June 30th).
-     *
-     * @param year the year for which to generate invoices
-     * @return a list of generated invoices
-     */
-    public List<Invoice> generateInvoicesForFirstHalf(final int year) {
-        return generateInvoicesForPeriod(
-                LocalDate.of(year, Month.JANUARY, 1),
-                LocalDate.of(year, Month.JUNE, JUNE_LAST_DAY)
-        );
-    }
+    public Invoice createInvoice(Customer customer, List<Collection> collectionsToBill) {
+        if (collectionsToBill == null || collectionsToBill.isEmpty()) {
+            throw new IllegalArgumentException("No collections to bill for this customer.");
+        }
 
-    /**
-     * Generates invoices for the second half of a given year (July 1st - December 31st).
-     *
-     * @param year the year for which to generate invoices
-     * @return a list of generated invoices
-     */
-    public List<Invoice> generateInvoicesForSecondHalf(final int year) {
-        return generateInvoicesForPeriod(
-                LocalDate.of(year, Month.JULY, 1),
-                LocalDate.of(year, Month.DECEMBER, DECEMBER_LAST_DAY)
-        );
-    }
+        double totalRecurring = 0.0;
+        double totalOnetime = 0.0;
+        int recurringCount = 0;
+        int onetimeCount = 0;
 
-    /**
-     * Generates invoices for a specific date range.
-     *
-     * @param startDate the start date of the period (inclusive)
-     * @param endDate the end date of the period (inclusive)
-     * @return a list of generated invoices
-     */
-    private List<Invoice> generateInvoicesForPeriod(final LocalDate startDate,
-                                                    final LocalDate endDate) {
-        List<Collection> collections =
-                collectionRepository.findByDateRange(startDate, endDate);
-
-        Map<Customer, List<Collection>> customerCollectionsMap = new HashMap<>();
-        for (final Collection c : collections) {
-            if (c.getCollectionStatus() == Collection.CollectionStatus.COMPLETED) {
-                customerCollectionsMap.computeIfAbsent(c.getCustomer(),
-                        k -> new ArrayList<>()).add(c);
+        for (Collection collection : collectionsToBill) {
+            if (collection.getSchedule() instanceof RecurringSchedule) {
+                totalRecurring += RECURRING_FEE;
+                recurringCount++;
+            } else if (collection.getSchedule() instanceof OneTimeSchedule) {
+                totalOnetime += ONE_TIME_FEE;
+                onetimeCount++;
+            } else {
+                throw new IllegalStateException(
+                        "Unknown schedule type for collection ID " + collection.getCollectionId());
             }
+
+            collection.setIsBilled(true);
         }
 
-        List<Invoice> invoices = new ArrayList<>();
+        Invoice invoice = new Invoice(
+                customer,
+                collectionsToBill,
+                totalRecurring,
+                totalOnetime,
+                recurringCount,
+                onetimeCount,
+                LocalDate.now());
 
-        for (final Map.Entry<Customer,
-                List<Collection>> entry : customerCollectionsMap.entrySet()) {
-            List<Collection> customerCollections = entry.getValue();
+        invoiceRepository.save(invoice); 
 
-            for (final Collection collection : customerCollections) {
-                Invoice invoice = new Invoice(collection);
-                invoice.setAmount(FIXED_FEE);
-                invoiceRepository.save(invoice);
-                invoices.add(invoice);
-            }
-        }
-        return invoices;
-    }
-
-    /**
-     * Deletes an invoice by its ID.
-     *
-     * @param id the invoice ID
-     * @return true if the invoice was deleted, false otherwise
-     */
-    public boolean deleteInvoice(int id) {
-        Optional<Invoice> invoiceOpt = invoiceRepository.findById(id);
-        if (invoiceOpt.isPresent()) {
-            invoiceRepository.delete(invoiceOpt.get());
-            return true;
-        }
-        return false;
-    }
-
-    /**
-     * Updates an existing invoice.
-     *
-     * @param invoiceId the invoice ID
-     * @param collection the new collection
-     * @param amount the new amount
-     * @param status the new payment status
-     */
-    public void updateInvoice(int invoiceId, Collection collection, double amount, PaymentStatus status) {
-        Optional<Invoice> invoiceOpt = invoiceRepository.findById((int) invoiceId);
-        if (invoiceOpt.isPresent()) {
-            Invoice invoice = invoiceOpt.get();
-            invoice.setCollection(collection);
-            invoice.setAmount(amount);
-            invoice.setPaymentStatus(status);
-            invoiceRepository.update(invoice);
-        }
-    }
-
-    /**
-     * Returns all collections.
-     *
-     * @return a list of all collections
-     */
-    public List<Collection> getAllCollections() {
-        return collectionRepository.findAll();
-    }
-
-    /**
-     * Creates a new invoice.
-     *
-     * @param collection the associated collection
-     * @param amount the invoice amount
-     * @param status the payment status
-     */
-    public void createInvoice(Collection collection, double amount, PaymentStatus status) {
-        Invoice invoice = new Invoice(collection);
-        invoice.setAmount(amount);
-        invoice.setPaymentStatus(status);
-        invoiceRepository.save(invoice);
+        return invoice;
     }
 
     public Optional<Invoice> findInvoiceById(int id) {
@@ -170,35 +66,5 @@ public final class InvoiceManager {
 
     public List<Invoice> getAllInvoices() {
         return invoiceRepository.findAll();
-    }
-
-
-
-    /**
-     * Generates a PDF for the given invoice.
-     *
-     * @param invoice the invoice to export
-     * @return a byte array containing the PDF data
-     */
-
-
-     //bisogna mettere questo nel gradlew implementation 'com.itextpdf:itextpdf:5.5.13.3'
-    public byte[] exportInvoiceToPdf(Invoice invoice) {
-        try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
-            PdfWriter writer = new PdfWriter(baos);
-            PdfDocument pdfDoc = new PdfDocument(writer);
-            Document document = new Document(pdfDoc);
-
-            document.add(new Paragraph("Invoice ID: " + invoice.getId()));
-            document.add(new Paragraph("Customer: " + invoice.getCollection().getCustomer().getName()));
-            document.add(new Paragraph("Amount: €" + invoice.getAmount()));
-            document.add(new Paragraph("Status: " + invoice.getPaymentStatus()));
-            document.add(new Paragraph("Date: " + invoice.getCollection().getDate()));
-
-            document.close();
-            return baos.toByteArray();
-        } catch (Exception e) {
-            throw new RuntimeException("Error generating PDF invoice", e);
-        }
     }
 }
