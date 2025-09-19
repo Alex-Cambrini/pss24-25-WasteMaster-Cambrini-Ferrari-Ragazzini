@@ -95,13 +95,11 @@ public class CollectionDAO extends GenericDAO<Collection> {
             FROM Collection c
             WHERE c.customer.location.postalCode = :postalCode
             AND c.date = :date
+            AND c.collectionStatus = it.unibo.wastemaster.domain.model.CollectionStatus.PENDING
         """;
-
         return getEntityManager().createQuery(jpql, Collection.class)
                 .setParameter("postalCode", postalCode)
                 .setParameter("date", date)
                 .getResultList();
     }
-
-
 }
