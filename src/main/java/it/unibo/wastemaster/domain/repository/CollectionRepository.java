@@ -2,6 +2,7 @@ package it.unibo.wastemaster.domain.repository;
 
 import it.unibo.wastemaster.domain.model.Collection;
 import it.unibo.wastemaster.domain.model.Collection.CollectionStatus;
+import it.unibo.wastemaster.domain.model.Customer;
 import it.unibo.wastemaster.domain.model.RecurringSchedule;
 import it.unibo.wastemaster.domain.model.Schedule;
 import java.time.LocalDate;
@@ -19,6 +20,8 @@ public interface CollectionRepository {
     List<Collection> findByDateRange(LocalDate start, LocalDate end);
 
     List<Collection> findCollectionsByPostalCodeAndDate(String postalCode, LocalDate date);
+
+    List<Collection> findCompletedNotBilledByCustomer(final Customer customer);
 
     void update(Collection collection);
 
