@@ -107,7 +107,7 @@ public class CollectionDAO extends GenericDAO<Collection> {
         return getEntityManager().createQuery(jpql, Collection.class)
                 .setParameter("postal", postalCode)
                 .setParameter("date", date)
-                .setParameter("status", Collection.CollectionStatus.TO_BE_SCHEDULED)
+                .setParameter("status", Collection.CollectionStatus.ACTIVE)
                 .getResultList();
     }
 

@@ -81,7 +81,7 @@ public class TripDAO extends GenericDAO<Trip> {
 
         return getEntityManager().createQuery(jpql, String.class)
                 .setParameter("date", date)
-                .setParameter("toBeScheduled", CollectionStatus.TO_BE_SCHEDULED)
+                .setParameter("toBeScheduled", CollectionStatus.ACTIVE)
                 .getResultList();
     }
 }

@@ -110,7 +110,7 @@ public class Collection {
             this.waste = schedule.getWaste();
             this.customer = schedule.getCustomer();
         }
-        this.collectionStatus = CollectionStatus.TO_BE_SCHEDULED;
+        this.collectionStatus = CollectionStatus.ACTIVE;
         this.cancelLimitDays = CANCEL_LIMIT_DAYS;
     }
 
@@ -222,7 +222,7 @@ public class Collection {
      * Possible statuses of the collection.
      */
     public enum CollectionStatus {
-        TO_BE_SCHEDULED, // da schedulare
+        ACTIVE, // raccolta attiva
         COMPLETED,  // raccolta terminata
         CANCELLED   // raccolta annullata
     }
