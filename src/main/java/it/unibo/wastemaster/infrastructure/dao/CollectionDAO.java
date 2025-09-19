@@ -1,6 +1,7 @@
 package it.unibo.wastemaster.infrastructure.dao;
 
 import it.unibo.wastemaster.domain.model.Collection;
+import it.unibo.wastemaster.domain.model.Customer;
 import it.unibo.wastemaster.domain.model.RecurringSchedule;
 import it.unibo.wastemaster.domain.model.Schedule;
 import jakarta.persistence.EntityManager;
@@ -108,6 +109,28 @@ public class CollectionDAO extends GenericDAO<Collection> {
                 .setParameter("postal", postalCode)
                 .setParameter("date", date)
                 .setParameter("status", Collection.CollectionStatus.ACTIVE)
+                .getResultList();
+    }
+
+    /**
+     * Retrieves all completed collections that have not been billed for the given
+     * customer.
+     *
+     * @param customer the customer to filter collections by
+     * @return list of completed and not yet billed collections for the customer
+     */
+    public List<Collection> findCompletedNotBilledByCustomer(final Customer customer) {
+        final String jpql = """
+                SELECT c
+                FROM Collection c
+                WHERE c.customer = :customer
+                  AND c.collectionStatus = :completedStatus
+                  AND c.isBilled = false
+                """;
+
+        return getEntityManager().createQuery(jpql, Collection.class)
+                .setParameter("customer", customer)
+                .setParameter("completedStatus", Collection.CollectionStatus.COMPLETED)
                 .getResultList();
     }
 
