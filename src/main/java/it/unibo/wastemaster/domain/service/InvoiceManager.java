@@ -67,4 +67,22 @@ public class InvoiceManager {
     public List<Invoice> getAllInvoices() {
         return invoiceRepository.findAll();
     }
+
+
+     /**
+     * Marks the invoice with the given ID as PAID.
+     *
+     * @param invoiceId the ID of the invoice to mark as paid
+     * @return true if the invoice was found and updated, false otherwise
+     */
+    public boolean markInvoiceAsPaid(int invoiceId) {
+        Optional<Invoice> invoiceOpt = invoiceRepository.findById(invoiceId);
+        if (invoiceOpt.isPresent()) {
+            Invoice invoice = invoiceOpt.get();
+            invoice.setPaymentStatus(Invoice.PaymentStatus.PAID);
+            invoiceRepository.update(invoice);
+            return true;
+        }
+        return false;
+    }
 }
