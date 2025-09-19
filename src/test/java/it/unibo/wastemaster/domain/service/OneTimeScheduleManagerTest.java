@@ -55,7 +55,7 @@ class OneTimeScheduleManagerTest extends AbstractDatabaseTest {
         Collection associatedCollection =
                 getCollectionManager().getAllCollectionBySchedule(newSchedule).get(0);
         assertNotNull(associatedCollection);
-        assertEquals(Collection.CollectionStatus.PENDING,
+        assertEquals(Collection.CollectionStatus.TO_BE_SCHEDULED,
                 associatedCollection.getCollectionStatus());
     }
 
