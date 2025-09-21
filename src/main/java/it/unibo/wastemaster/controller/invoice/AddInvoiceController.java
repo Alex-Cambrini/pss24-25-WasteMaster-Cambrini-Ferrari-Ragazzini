@@ -37,6 +37,7 @@ public final class AddInvoiceController {
     private InvoiceManager invoiceManager;
     private CollectionManager collectionManager;
     private List<Collection> allCollections;
+    private boolean invoiceCreated = false;
 
     public void setInvoiceManager(InvoiceManager invoiceManager) {
         this.invoiceManager = invoiceManager;
@@ -45,6 +46,11 @@ public final class AddInvoiceController {
     public void setCollectionManager(CollectionManager collectionManager) {
         this.collectionManager = collectionManager;
     }
+
+    public boolean isInvoiceCreated() {
+    return invoiceCreated;
+    }
+    
 
     /**
      * Sets up UI components and listeners.
@@ -89,27 +95,23 @@ public final class AddInvoiceController {
     public void handleSaveInvoice(final ActionEvent event) {
         try {
             Collection selectedCollection = collectionCombo.getValue();
-            String amountText = amountField.getText().trim();
+            
             PaymentStatus status = statusCombo.getValue();
 
             if (selectedCollection == null) {
                 throw new IllegalArgumentException("- Please select a collection");
             }
-            if (amountText.isEmpty()) {
-                throw new IllegalArgumentException("- Please enter an amount");
-            }
             if (status == null) {
                 throw new IllegalArgumentException("- Please select a status");
             }
 
-            double amount;
-            try {
-                amount = Double.parseDouble(amountText);
-            } catch (NumberFormatException e) {
-                throw new IllegalArgumentException("- Amount must be a valid number");
-            }
+            
+            var customer = selectedCollection.getCustomer();
 
-            invoiceManager.createInvoice(selectedCollection, amount, status);
+            
+            invoiceManager.createInvoice(customer, List.of(selectedCollection));
+
+            invoiceCreated = true;
 
             DialogUtils.showSuccess("Invoice saved successfully.", AppContext.getOwner());
             DialogUtils.closeModal(event);

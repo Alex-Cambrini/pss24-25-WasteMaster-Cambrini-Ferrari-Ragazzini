@@ -16,6 +16,7 @@
                 <Button fx:id="addInvoiceButton" mnemonicParsing="false" onAction="#handleAddInvoice" styleClass="success" text="Add Invoice" />
                 <Region prefHeight="20" prefWidth="0.0" HBox.hgrow="ALWAYS" />
                 <Button fx:id="filterButton" onMouseClicked="#showFilterMenu" styleClass="accent" text="Filter ▼" />
+                <ComboBox fx:id="statusFilterCombo" promptText="Filter by Status"/>
                 <TextField fx:id="searchField" promptText="Search..." />
                 <Button mnemonicParsing="false" onAction="#handleResetSearch" styleClass="accent, button-outlined" text="Reset" />
             </children>
@@ -29,6 +30,7 @@
                 <TableColumn fx:id="customerColumn" prefWidth="160" text="Customer" />
                 <TableColumn fx:id="amountColumn" prefWidth="120" text="Amount" />
                 <TableColumn fx:id="statusColumn" prefWidth="120" text="Status" />
+                <TableColumn fx:id="dateColumn" text="Date" />
             </columns>
         </TableView>
         <HBox alignment="TOP_RIGHT" minHeight="50.0" prefHeight="100.0" prefWidth="600.0" spacing="10.0">

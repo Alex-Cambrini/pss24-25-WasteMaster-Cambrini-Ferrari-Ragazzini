@@ -49,7 +49,10 @@ public final class InvoiceController {
     @FXML private TableColumn<InvoiceRow, String> customerColumn;
     @FXML private TableColumn<InvoiceRow, String> amountColumn;
     @FXML private TableColumn<InvoiceRow, String> statusColumn;
+    @FXML private TableColumn<InvoiceRow, String> dateColumn;
     @FXML private TextField searchField;
+    @FXML private ComboBox<String> statusFilterCombo;
+
 
     public void setInvoiceManager(InvoiceManager invoiceManager) {
         this.invoiceManager = invoiceManager;
@@ -59,17 +62,21 @@ public final class InvoiceController {
         this.collectionManager = collectionManager;
     }
 
+    
+
     @FXML
     public void initialize() {
         idColumn.setCellValueFactory(new PropertyValueFactory<>(FILTER_ID));
         customerColumn.setCellValueFactory(new PropertyValueFactory<>(FILTER_CUSTOMER));
         amountColumn.setCellValueFactory(new PropertyValueFactory<>("amount"));
         statusColumn.setCellValueFactory(new PropertyValueFactory<>(FILTER_STATUS));
-
+        dateColumn.setCellValueFactory(new PropertyValueFactory<>("date"));
         searchField.textProperty().addListener((obs, oldText, newText) -> handleSearch());
 
         invoiceTable.getSelectionModel().selectedItemProperty()
                 .addListener((obs, oldVal, newVal) -> updateButtons(newVal));
+        statusFilterCombo.setItems(FXCollections.observableArrayList("ALL", "PAID", "UNPAID"));
+        statusFilterCombo.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> handleSearch());
     }
 
         public void initData() {
@@ -114,7 +121,7 @@ public final class InvoiceController {
      markAsPaidButton.setDisable(!rowSelected || 
     (selected != null && selected.getStatus().equalsIgnoreCase("PAID")));
 
-}
+    }
 
     @FXML
     private void handleAddInvoice() {
@@ -126,7 +133,8 @@ public final class InvoiceController {
                                 ctrl.setInvoiceManager(invoiceManager);
                                 ctrl.setCollectionManager(collectionManager);
                             });
-            if (controllerOpt.isPresent()) {
+            // Controllo: aggiorna solo se la fattura è stata creata
+            if (controllerOpt.isPresent() && controllerOpt.get().isInvoiceCreated()) {
                 loadInvoices();
             }
         } catch (IOException e) {
@@ -189,20 +197,31 @@ public final class InvoiceController {
 
         @FXML
     private void handleSearch() {
-        String query = searchField.getText().toLowerCase().trim();
-        if (query.isEmpty()) {
-            invoiceTable.setItems(FXCollections.observableArrayList(allInvoices));
-            return;
-        }
-        ObservableList<InvoiceRow> filtered = FXCollections.observableArrayList();
-        for (InvoiceRow row : allInvoices) {
-            if ((activeFilters.contains(FILTER_ID) && row.getId().toLowerCase().contains(query))
-                    || (activeFilters.contains(FILTER_CUSTOMER) && row.getCustomer().toLowerCase().contains(query))
-                    || (activeFilters.contains(FILTER_STATUS) && row.getStatus().toLowerCase().contains(query))) {
-                filtered.add(row);
-            }
+    String query = searchField.getText().toLowerCase().trim();
+    String statusFilter = statusFilterCombo.getValue();
+
+    if (query.isEmpty()) {
+        ObservableList<InvoiceRow> filtered = FXCollections.observableArrayList(allInvoices);
+        
+        if (!"ALL".equals(statusFilter)) {
+            filtered.removeIf(row -> !row.getStatus().equalsIgnoreCase(statusFilter));
         }
         invoiceTable.setItems(filtered);
+        return;
+    }
+    ObservableList<InvoiceRow> filtered = FXCollections.observableArrayList();
+    for (InvoiceRow row : allInvoices) {
+        if ((activeFilters.contains(FILTER_ID) && row.getId().toLowerCase().contains(query))
+                || (activeFilters.contains(FILTER_CUSTOMER) && row.getCustomer().toLowerCase().contains(query))
+                || (activeFilters.contains(FILTER_STATUS) && row.getStatus().toLowerCase().contains(query))) {
+            filtered.add(row);
+        }
+    }
+    
+    if (!"ALL".equals(statusFilter)) {
+        filtered.removeIf(row -> !row.getStatus().equalsIgnoreCase(statusFilter));
+    }
+    invoiceTable.setItems(filtered);
     }
 
     @FXML
@@ -256,16 +275,16 @@ public final class InvoiceController {
             DialogUtils.showError("Not Found", "Invoice not found.", AppContext.getOwner());
             return;
         }
-        Collection collection = invoiceOpt.get().getCollection();
-        if (collection == null) {
-            DialogUtils.showError("No Collection", "No collection associated with this invoice.", AppContext.getOwner());
+        List<Collection> collections = invoiceOpt.get().getCollections();
+        if (collections == null || collections.isEmpty()) {
+            DialogUtils.showError("No Collection", "No collections associated with this invoice.", AppContext.getOwner());
             return;
         }
         try {
-            MainLayoutController.getInstance().setPageTitle("Associated Collection");
+            MainLayoutController.getInstance().setPageTitle("Associated Collections");
             it.unibo.wastemaster.controller.collection.CollectionController controller =
                     MainLayoutController.getInstance().loadCenterWithController("/layouts/collection/CollectionView.fxml");
-            controller.setCollections(List.of(collection));
+            controller.setCollections(collections);
         } catch (Exception e) {
             DialogUtils.showError("Navigation error", "Could not load Collection view.", AppContext.getOwner());
             e.printStackTrace();
