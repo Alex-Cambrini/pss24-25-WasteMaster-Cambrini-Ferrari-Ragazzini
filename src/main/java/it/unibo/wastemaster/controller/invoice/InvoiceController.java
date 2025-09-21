@@ -1,12 +1,15 @@
 package it.unibo.wastemaster.controller.invoice;
 import it.unibo.wastemaster.application.context.AppContext;
+import it.unibo.wastemaster.controller.customer.CustomerDetailController;
 import it.unibo.wastemaster.controller.main.MainLayoutController;
 import it.unibo.wastemaster.controller.utils.DialogUtils;
 import it.unibo.wastemaster.domain.model.Collection;
+import it.unibo.wastemaster.domain.model.Customer;
 import it.unibo.wastemaster.domain.model.Invoice;
 import it.unibo.wastemaster.domain.model.Invoice.PaymentStatus;
 import it.unibo.wastemaster.domain.service.CollectionManager;
 import it.unibo.wastemaster.domain.service.InvoiceManager;
+import it.unibo.wastemaster.viewmodels.CustomerRow;
 import it.unibo.wastemaster.viewmodels.InvoiceRow;
 import java.io.IOException;
 import java.util.List;
@@ -45,6 +48,7 @@ public final class InvoiceController {
     @FXML private Button viewCollectionButton;
     @FXML private ContextMenu filterMenu;
     @FXML private TableView<InvoiceRow> invoiceTable;
+    @FXML private TableView<CustomerRow> customerTable;
     @FXML private TableColumn<InvoiceRow, String> idColumn;
     @FXML private TableColumn<InvoiceRow, String> customerColumn;
     @FXML private TableColumn<InvoiceRow, String> amountColumn;
@@ -113,7 +117,7 @@ public final class InvoiceController {
         invoiceTable.setItems(FXCollections.observableArrayList(allInvoices));
     }
 
-        private void updateButtons(final InvoiceRow selected) {
+    private void updateButtons(final InvoiceRow selected) {
     boolean rowSelected = selected != null;
     editInvoiceButton.setDisable(!rowSelected);
     deleteInvoiceButton.setDisable(!rowSelected);
@@ -133,7 +137,7 @@ public final class InvoiceController {
                                 ctrl.setInvoiceManager(invoiceManager);
                                 ctrl.setCollectionManager(collectionManager);
                             });
-            // Controllo: aggiorna solo se la fattura è stata creata
+            
             if (controllerOpt.isPresent() && controllerOpt.get().isInvoiceCreated()) {
                 loadInvoices();
             }
@@ -171,29 +175,7 @@ public final class InvoiceController {
         }
     }
 
-    @FXML
-    private void handleDeleteInvoice() {
-        InvoiceRow selected = invoiceTable.getSelectionModel().getSelectedItem();
-        if (selected == null) {
-            DialogUtils.showError(TITLE_NO_SELECTION, "Please select an invoice to delete.", AppContext.getOwner());
-            return;
-        }
-        boolean confirmed = DialogUtils.showConfirmationDialog(
-                "Confirm Deletion",
-                "Are you sure you want to delete this invoice?",
-                AppContext.getOwner()
-        );
-        if (!confirmed) {
-            return;
-        }
-        boolean success = invoiceManager.deleteInvoice(selected.getIdAsInt());
-        if (success) {
-            DialogUtils.showSuccess("Invoice deleted successfully.", AppContext.getOwner());
-            loadInvoices();
-        } else {
-            DialogUtils.showError("Deletion failed", "Invoice could not be deleted.", AppContext.getOwner());
-        }
-    }
+    
 
         @FXML
     private void handleSearch() {
@@ -263,7 +245,7 @@ public final class InvoiceController {
         filterMenu.show(invoiceTable, event.getScreenX(), event.getScreenY());
     }
 
-        @FXML
+    @FXML
     private void handleViewCollection() {
         InvoiceRow selected = invoiceTable.getSelectionModel().getSelectedItem();
         if (selected == null) {
@@ -306,5 +288,19 @@ public final class InvoiceController {
         } else {
             DialogUtils.showError("Error", "Could not mark invoice as paid.", AppContext.getOwner());
         }
+    }
+
+    @FXML
+    private void handleViewCustomerDetail() {
+        InvoiceRow selected = invoiceTable.getSelectionModel().getSelectedItem();
+        if (selected == null) {
+            DialogUtils.showError(TITLE_NO_SELECTION, "Please select an invoice.", AppContext.getOwner());
+            return;
+        }
+        Customer customer = selected.getCustomerObject(); 
+        CustomerDetailController controller = MainLayoutController.getInstance()
+            .loadCenterWithController("/layouts/customer/CustomerDetailView.fxml");
+        controller.setManagers(collectionManager, invoiceManager);
+        controller.setCustomer(customer);
     }
 }
