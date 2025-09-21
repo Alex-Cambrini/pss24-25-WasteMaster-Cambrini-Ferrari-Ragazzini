@@ -1,5 +1,6 @@
 package it.unibo.wastemaster.viewmodels;
 
+import it.unibo.wastemaster.domain.model.Customer;
 import it.unibo.wastemaster.domain.model.Invoice;
 
 
@@ -45,4 +46,8 @@ public final class InvoiceRow {
     public String getStatus() {
         return status;
     }
+
+    public Customer getCustomerObject() {
+    return invoice.getCustomer();
+}
 }
