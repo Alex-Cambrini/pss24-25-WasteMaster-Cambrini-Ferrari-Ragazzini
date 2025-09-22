@@ -8,6 +8,7 @@ import it.unibo.wastemaster.infrastructure.AbstractDatabaseTest;
 import it.unibo.wastemaster.domain.model.Collection.CollectionStatus;
 import java.time.LocalDate;
 import java.util.Optional;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -42,7 +43,7 @@ class InvoiceTest extends AbstractDatabaseTest {
         collection.setCollectionStatus(CollectionStatus.COMPLETED);
         getCollectionDAO().update(collection);
 
-        invoice = new Invoice(collection);
+        invoice = new Invoice(customer, List.of(collection), 0, 0, 0, 0, null);
         invoice.setAmount(100.0);
         invoice.setIssueDate(LocalDate.now());
         invoice.setPaymentStatus(Invoice.PaymentStatus.PAID);
@@ -54,7 +55,7 @@ class InvoiceTest extends AbstractDatabaseTest {
         invoice.setPaymentStatus(Invoice.PaymentStatus.UNPAID);
         assertEquals(TEST_AMOUNT, invoice.getAmount());
         assertEquals(Invoice.PaymentStatus.UNPAID, invoice.getPaymentStatus());
-        assertEquals(collection, invoice.getCollection());
+        assertTrue(invoice.getCollections().contains(collection));
     }
 
     @Test
@@ -74,8 +75,8 @@ class InvoiceTest extends AbstractDatabaseTest {
 
         Invoice found = foundOpt.get();
         assertEquals(invoice.getAmount(), found.getAmount());
-        assertEquals(invoice.getCollection().getCollectionId(),
-                found.getCollection().getCollectionId());
+        assertTrue(found.getCollections().stream()
+        .anyMatch(c -> c.getCollectionId() == collection.getCollectionId()));
 
         int foundId = found.getInvoiceId();
 
