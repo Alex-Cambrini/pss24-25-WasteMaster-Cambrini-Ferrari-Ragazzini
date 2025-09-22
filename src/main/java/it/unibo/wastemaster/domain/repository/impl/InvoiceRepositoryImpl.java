@@ -1,5 +1,6 @@
 package it.unibo.wastemaster.domain.repository.impl;
 
+import it.unibo.wastemaster.domain.model.Customer;
 import it.unibo.wastemaster.domain.model.Invoice;
 import it.unibo.wastemaster.domain.repository.InvoiceRepository;
 import it.unibo.wastemaster.infrastructure.dao.InvoiceDAO;
@@ -41,6 +42,11 @@ public class InvoiceRepositoryImpl implements InvoiceRepository {
     @Override
     public List<Invoice> findAll() {
         return invoiceDAO.findAll();
+    }
+
+    @Override
+    public List<Invoice> findByCustomer(Customer customer) {
+        return invoiceDAO.findByCustomer(customer);
     }
 }
 
