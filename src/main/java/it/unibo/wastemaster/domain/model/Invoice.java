@@ -140,4 +140,15 @@ public class Invoice {
         PAID,
         UNPAID
     }
+
+    @Override
+    public String toString() {
+        return "Invoice{id=" + invoiceId +
+                ", customer=" + (customer != null ? customer.getName() : "null") +
+                ", amount=" + String.format("%.2f", amount) +
+                ", status=" + (paymentStatus != null ? paymentStatus.name() : "null") +
+                ", date=" + (issueDate != null ? issueDate.toString() : "null") +
+                ", collections=" + (collections != null ? collections.size() : 0) +
+                "}";
+    }
 }

@@ -2,7 +2,6 @@ package it.unibo.wastemaster.domain.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-
 import it.unibo.wastemaster.infrastructure.AbstractDatabaseTest;
 import it.unibo.wastemaster.domain.model.Collection;
 import it.unibo.wastemaster.domain.model.Customer;
@@ -13,6 +12,7 @@ import it.unibo.wastemaster.domain.model.OneTimeSchedule;
 import it.unibo.wastemaster.domain.model.Waste;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.ArrayList;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -50,15 +50,15 @@ class InvoiceManagerTest extends AbstractDatabaseTest {
 
     @Test
     void testGetTotalBilledAmountForCustomer() {
-        Collection c1 = insertCompletedCollection(LocalDate.now().minusDays(2));
-        Collection c2 = insertCompletedCollection(LocalDate.now().minusDays(1));
+        Collection c1 = insertCompletedCollection(LocalDate.now());
+        Collection c2 = insertCompletedCollection(LocalDate.now().plusDays(1));
 
-        Invoice invoice1 = getInvoiceManager().createInvoice(customer, List.of(c1));
+        Invoice invoice1 = getInvoiceManager().createInvoice(customer, new ArrayList<>(List.of(c1)));
         invoice1.setAmount(50.0);
         invoice1.setPaymentStatus(PaymentStatus.UNPAID);
         getInvoiceDAO().update(invoice1);
 
-        Invoice invoice2 = getInvoiceManager().createInvoice(customer, List.of(c2));
+        Invoice invoice2 = getInvoiceManager().createInvoice(customer, new ArrayList<>(List.of(c2)));
         invoice2.setAmount(100.0);
         invoice2.setPaymentStatus(PaymentStatus.PAID);
         getInvoiceDAO().update(invoice2);
@@ -69,15 +69,15 @@ class InvoiceManagerTest extends AbstractDatabaseTest {
 
     @Test
     void testGetTotalPaidAmountForCustomer() {
-        Collection c1 = insertCompletedCollection(LocalDate.now().minusDays(2));
-        Collection c2 = insertCompletedCollection(LocalDate.now().minusDays(1));
+        Collection c1 = insertCompletedCollection(LocalDate.now());
+        Collection c2 = insertCompletedCollection(LocalDate.now().plusDays(1));
 
-        Invoice invoice1 = getInvoiceManager().createInvoice(customer, List.of(c1));
+        Invoice invoice1 = getInvoiceManager().createInvoice(customer, new ArrayList<>(List.of(c1)));
         invoice1.setAmount(50.0);
         invoice1.setPaymentStatus(PaymentStatus.UNPAID);
         getInvoiceDAO().update(invoice1);
 
-        Invoice invoice2 = getInvoiceManager().createInvoice(customer, List.of(c2));
+        Invoice invoice2 = getInvoiceManager().createInvoice(customer, new ArrayList<>(List.of(c2)));
         invoice2.setAmount(100.0);
         invoice2.setPaymentStatus(PaymentStatus.PAID);
         getInvoiceDAO().update(invoice2);
