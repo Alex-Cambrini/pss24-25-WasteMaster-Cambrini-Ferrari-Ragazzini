@@ -30,4 +30,8 @@ public interface CollectionRepository {
     void delete(Collection collection);
 
     List<Collection> findAll();
+
+    List<Collection> findByCustomer(Customer customer);
+    
+    List<Collection> findBilledByCustomer(Customer customer);
 }
