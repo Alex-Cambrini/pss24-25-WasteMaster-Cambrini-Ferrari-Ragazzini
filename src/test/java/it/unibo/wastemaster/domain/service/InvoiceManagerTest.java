@@ -1,8 +1,7 @@
 package it.unibo.wastemaster.domain.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+
 
 import it.unibo.wastemaster.infrastructure.AbstractDatabaseTest;
 import it.unibo.wastemaster.domain.model.Collection;
