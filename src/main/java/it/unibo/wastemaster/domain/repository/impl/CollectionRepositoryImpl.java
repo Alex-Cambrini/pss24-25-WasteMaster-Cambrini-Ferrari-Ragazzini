@@ -70,4 +70,14 @@ public class CollectionRepositoryImpl implements CollectionRepository {
     public List<Collection> findAll() {
         return collectionDAO.findAll();
     }
+
+    @Override
+    public List<Collection> findByCustomer(Customer customer) {
+        return collectionDAO.findByCustomer(customer);
+    }
+
+    @Override
+    public List<Collection> findBilledByCustomer(Customer customer) {
+        return collectionDAO.findBilledByCustomer(customer);
+    }
 }
