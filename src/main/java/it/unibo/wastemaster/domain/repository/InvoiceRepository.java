@@ -18,4 +18,6 @@ public interface InvoiceRepository {
     Optional<Invoice> findById(int id);
 
     List<Invoice> findAll();
+
+    List<Invoice> findByCustomer(it.unibo.wastemaster.domain.model.Customer customer);
 }

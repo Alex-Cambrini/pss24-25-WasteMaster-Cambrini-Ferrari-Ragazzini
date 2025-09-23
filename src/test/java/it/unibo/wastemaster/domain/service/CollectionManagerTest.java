@@ -206,4 +206,49 @@ class CollectionManagerTest extends AbstractDatabaseTest {
                 assertEquals(targetDate, result40121.get(0).getCollectionDate());
         }
 
+
+
+    @Test
+    void testCountCollectionsByCustomer() {
+        long count = getCollectionManager().countCollectionsByCustomer(customer);
+        assertEquals(1, count);
+
+        OneTimeSchedule anotherSchedule = new OneTimeSchedule(customer, plastic, futureDate.plusDays(1));
+        getOneTimeScheduleDAO().insert(anotherSchedule);
+        Collection anotherCollection = new Collection(anotherSchedule);
+        getCollectionDAO().insert(anotherCollection);
+
+        count = getCollectionManager().countCollectionsByCustomer(customer);
+        assertEquals(2, count);
+    }
+
+    @Test
+    void testCountBilledCollectionsByCustomer() {
+        
+        long billedCount = getCollectionManager().countBilledCollectionsByCustomer(customer);
+        assertEquals(0, billedCount);
+
+        
+        collection.setIsBilled(true);
+        getCollectionDAO().update(collection);
+
+        billedCount = getCollectionManager().countBilledCollectionsByCustomer(customer);
+        assertEquals(1, billedCount);
+
+        
+        OneTimeSchedule anotherSchedule = new OneTimeSchedule(customer, plastic, futureDate.plusDays(2));
+        getOneTimeScheduleDAO().insert(anotherSchedule);
+        Collection anotherCollection = new Collection(anotherSchedule);
+        getCollectionDAO().insert(anotherCollection);
+
+        billedCount = getCollectionManager().countBilledCollectionsByCustomer(customer);
+        assertEquals(1, billedCount);
+
+        
+        anotherCollection.setIsBilled(true);
+        getCollectionDAO().update(anotherCollection);
+
+        billedCount = getCollectionManager().countBilledCollectionsByCustomer(customer);
+        assertEquals(2, billedCount);
+    }
 }

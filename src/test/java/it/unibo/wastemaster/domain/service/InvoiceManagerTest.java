@@ -1,34 +1,22 @@
 package it.unibo.wastemaster.domain.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import it.unibo.wastemaster.infrastructure.AbstractDatabaseTest;
 import it.unibo.wastemaster.domain.model.Collection;
 import it.unibo.wastemaster.domain.model.Customer;
 import it.unibo.wastemaster.domain.model.Invoice;
+import it.unibo.wastemaster.domain.model.Invoice.PaymentStatus;
 import it.unibo.wastemaster.domain.model.Location;
 import it.unibo.wastemaster.domain.model.OneTimeSchedule;
 import it.unibo.wastemaster.domain.model.Waste;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.ArrayList;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-
 class InvoiceManagerTest extends AbstractDatabaseTest {
-
-    private static final int FUTURE_TEST_YEAR = LocalDate.now().getYear() + 1;
-    private static final double TEST_AMOUNT = 30.0;
-    private static final double DELTA = 0.001;
-    private static final int MARCH = 3;
-    private static final int SEPTEMBER = 9;
-    private static final int OCTOBER = 10;
-    private static final int MARCH_DAY = 15;
-    private static final int SEPTEMBER_DAY = 10;
-    private static final int OCTOBER_DAY = 5;
-    private static final int FUTURE_DAY = 20;
 
     private Customer customer;
     private Waste waste;
@@ -47,15 +35,13 @@ class InvoiceManagerTest extends AbstractDatabaseTest {
         getWasteDAO().insert(waste);
     }
 
-    private Collection insertCompletedCollection(
-    final LocalDate collectionScheduledDate) {
-        OneTimeSchedule schedule = new OneTimeSchedule(customer, waste,
-                LocalDate.now().plusDays(1));
+    private Collection insertCompletedCollection(final LocalDate collectionScheduledDate) {
+        OneTimeSchedule schedule = new OneTimeSchedule(customer, waste, collectionScheduledDate);
         getOneTimeScheduleDAO().insert(schedule);
 
         Collection collection = new Collection(schedule);
         collection.setCollectionStatus(Collection.CollectionStatus.COMPLETED);
-        collection.setCollectionDate(collectionScheduledDate); 
+        collection.setCollectionDate(collectionScheduledDate);
 
         getCollectionDAO().insert(collection);
 
@@ -63,42 +49,40 @@ class InvoiceManagerTest extends AbstractDatabaseTest {
     }
 
     @Test
-    void testGenerateInvoicesForFirstHalf() {
-        int year = FUTURE_TEST_YEAR;
+    void testGetTotalBilledAmountForCustomer() {
+        Collection c1 = insertCompletedCollection(LocalDate.now());
+        Collection c2 = insertCompletedCollection(LocalDate.now().plusDays(1));
 
-        insertCompletedCollection(LocalDate.of(year, MARCH, MARCH_DAY));
-        insertCompletedCollection(LocalDate.of(year, SEPTEMBER, SEPTEMBER_DAY));
+        Invoice invoice1 = getInvoiceManager().createInvoice(customer, new ArrayList<>(List.of(c1)));
+        invoice1.setAmount(50.0);
+        invoice1.setPaymentStatus(PaymentStatus.UNPAID);
+        getInvoiceDAO().update(invoice1);
 
-        List<Invoice> invoices = getInvoiceManager().generateInvoicesForFirstHalf(year);
+        Invoice invoice2 = getInvoiceManager().createInvoice(customer, new ArrayList<>(List.of(c2)));
+        invoice2.setAmount(100.0);
+        invoice2.setPaymentStatus(PaymentStatus.PAID);
+        getInvoiceDAO().update(invoice2);
 
-        assertEquals(1, invoices.size(), 
-            "Exactly 1 invoice should be generated for the first half.");
-        assertNotNull(invoices.get(0));
-        assertEquals(TEST_AMOUNT, invoices.get(0).getAmount(), DELTA);
-        assertEquals(Invoice.PaymentStatus.UNPAID, invoices.get(0).getPaymentStatus());
+        double total = getInvoiceManager().getTotalBilledAmountForCustomer(customer);
+        assertEquals(150.0, total, 0.001);
     }
 
     @Test
-    void testGenerateInvoicesForSecondHalf() {
-        int year = FUTURE_TEST_YEAR;
+    void testGetTotalPaidAmountForCustomer() {
+        Collection c1 = insertCompletedCollection(LocalDate.now());
+        Collection c2 = insertCompletedCollection(LocalDate.now().plusDays(1));
 
-        insertCompletedCollection(LocalDate.of(year, OCTOBER, OCTOBER_DAY));
-        insertCompletedCollection(LocalDate.of(year, MARCH, FUTURE_DAY));
+        Invoice invoice1 = getInvoiceManager().createInvoice(customer, new ArrayList<>(List.of(c1)));
+        invoice1.setAmount(50.0);
+        invoice1.setPaymentStatus(PaymentStatus.UNPAID);
+        getInvoiceDAO().update(invoice1);
 
-        List<Invoice> invoices = getInvoiceManager().generateInvoicesForSecondHalf(year);
-        assertEquals(1, invoices.size(), 
-            "Exactly 1 invoice should be generated for the second half.");
-        assertNotNull(invoices.get(0));
-        assertEquals(TEST_AMOUNT, invoices.get(0).getAmount(), DELTA);
-        assertEquals(Invoice.PaymentStatus.UNPAID, invoices.get(0).getPaymentStatus());
-    }
+        Invoice invoice2 = getInvoiceManager().createInvoice(customer, new ArrayList<>(List.of(c2)));
+        invoice2.setAmount(100.0);
+        invoice2.setPaymentStatus(PaymentStatus.PAID);
+        getInvoiceDAO().update(invoice2);
 
-    @Test
-    void testNoInvoicesForEmptyPeriod() {
-        int yearForEmptyPeriod = FUTURE_TEST_YEAR + 1;
-        List<Invoice> invoices = getInvoiceManager().
-                                 generateInvoicesForFirstHalf(yearForEmptyPeriod);
-        assertTrue(invoices.isEmpty(), 
-            "There should be no invoices for a period with no collections.");
+        double totalPaid = getInvoiceManager().getTotalPaidAmountForCustomer(customer);
+        assertEquals(100.0, totalPaid, 0.001);
     }
 }

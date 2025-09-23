@@ -1,5 +1,6 @@
 package it.unibo.wastemaster.infrastructure.dao;
 
+import it.unibo.wastemaster.domain.model.Customer;
 import it.unibo.wastemaster.domain.model.Invoice;
 import jakarta.persistence.EntityManager;
 import java.time.LocalDate;
@@ -30,4 +31,11 @@ public class InvoiceDAO extends GenericDAO<Invoice> {
                 .getResultList();
     }
 
+
+    public List<Invoice> findByCustomer(Customer customer) {
+    return getEntityManager().createQuery(
+        "SELECT i FROM Invoice i WHERE i.customer = :customer", Invoice.class)
+        .setParameter("customer", customer)
+        .getResultList();
+}
 }

@@ -85,4 +85,23 @@ public class InvoiceManager {
         }
         return false;
     }
+
+
+    public double getTotalBilledAmountForCustomer(Customer customer) {
+    double total = 0.0;
+    for (Invoice invoice : invoiceRepository.findByCustomer(customer)) {
+        total += invoice.getAmount();
+    }
+    return total;
+    }
+
+    public double getTotalPaidAmountForCustomer(Customer customer) {
+        double total = 0.0;
+        for (Invoice invoice : invoiceRepository.findByCustomer(customer)) {
+            if (invoice.getPaymentStatus() == Invoice.PaymentStatus.PAID) {
+                total += invoice.getAmount();
+            }
+        }
+        return total;
+    }
 }
