@@ -72,6 +72,10 @@ public class Invoice {
         return collections;
     }
 
+    public void setCollections(final List<Collection> collections) {
+        this.collections = collections;
+    }
+
     public Customer getCustomer() {
         return customer;
     }
