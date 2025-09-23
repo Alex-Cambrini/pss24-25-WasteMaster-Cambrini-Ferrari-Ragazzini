@@ -98,6 +98,10 @@ public final class TripManager {
         return tripRepository.findAvailablePostalCodes(date);
     }
 
+    public void updateTrip(Trip trip) {
+    tripRepository.update(trip); 
+    }
+
     public enum IssueType {
         VEHICLE_PROBLEM,
         OPERATOR_PROBLEM,
