@@ -147,7 +147,7 @@ public final class InvoiceController {
 
     
 
-        @FXML
+    @FXML
     private void handleSearch() {
     String query = searchField.getText().toLowerCase().trim();
     String statusFilter = statusFilterCombo.getValue();
