@@ -59,6 +59,7 @@ public final class EditInvoiceController {
         }
         setupCollectionCombo();
         setupStatusCombo();
+        populateFields();
     }
 
     private void setupCollectionCombo() {
@@ -83,12 +84,14 @@ public final class EditInvoiceController {
 
     private void populateFields() {
         if (invoiceToEdit == null) return;
-        collectionCombo.setValue(invoiceToEdit.getCollection());
+        if (invoiceToEdit.getCollections() != null && !invoiceToEdit.getCollections().isEmpty()) {
+        collectionCombo.setValue(invoiceToEdit.getCollections().get(0));
+        }
         amountField.setText(String.valueOf(invoiceToEdit.getAmount()));
         statusCombo.setValue(invoiceToEdit.getPaymentStatus());
     }
 
-      @FXML
+    @FXML
     public void handleSaveInvoice(final ActionEvent event) {
         try {
             Collection selectedCollection = collectionCombo.getValue();
@@ -112,7 +115,7 @@ public final class EditInvoiceController {
                 throw new IllegalArgumentException("- Amount must be a valid number");
             }
 
-            invoiceManager.updateInvoice(invoiceToEdit.getInvoiceId(), selectedCollection, amount, status);
+            invoiceManager.updateInvoice(invoiceToEdit.getInvoiceId(), new java.util.ArrayList<>(List.of(selectedCollection)), amount, status);
 
             DialogUtils.showSuccess("Invoice updated successfully.", AppContext.getOwner());
             DialogUtils.closeModal(event);
