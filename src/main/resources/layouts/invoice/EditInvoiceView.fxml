@@ -24,7 +24,7 @@
         </GridPane>
         <HBox spacing="10" alignment="CENTER_RIGHT">
             <Button text="Cancel" onAction="#handleAbortInvoiceEdit"/>
-            <Button text="Save" onAction="#handleSaveInvoice"/>
+            <Button text="Save" onAction="#onSave"/>
         </HBox>
         <VBox.margin>
             <Insets top="10.0" bottom="10.0"/>
