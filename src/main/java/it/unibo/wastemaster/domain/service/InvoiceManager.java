@@ -104,4 +104,17 @@ public class InvoiceManager {
         }
         return total;
     }
+
+        public void updateInvoice(int invoiceId, List<Collection> collections, double amount, Invoice.PaymentStatus status) {
+        Optional<Invoice> invoiceOpt = invoiceRepository.findById(invoiceId);
+        if (invoiceOpt.isPresent()) {
+            Invoice invoice = invoiceOpt.get();
+            invoice.setCollections(collections);
+            invoice.setAmount(amount);
+            invoice.setPaymentStatus(status);
+            invoiceRepository.update(invoice);
+        } else {
+            throw new IllegalArgumentException("Invoice not found");
+        }
+    }
 }
