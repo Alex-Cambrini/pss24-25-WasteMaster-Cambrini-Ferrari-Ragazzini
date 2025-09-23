@@ -81,7 +81,7 @@ public class EditTripController {
         tripToEdit.setExpectedReturnTime(retDateTime);
 
         // Salva le modifiche
-        tripManager.getTripRepository().update(tripToEdit);
+        tripManager.updateTrip(tripToEdit);
         close();
         if (tripController != null) {
             tripController.loadTrips();

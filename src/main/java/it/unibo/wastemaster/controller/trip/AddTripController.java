@@ -1,7 +1,7 @@
 package it.unibo.wastemaster.controller.trip;
 
 import it.unibo.wastemaster.domain.model.Employee;
-import it.unibo.wastemaster.domain.model.Trip;
+
 import it.unibo.wastemaster.domain.model.Vehicle;
 import it.unibo.wastemaster.domain.service.TripManager;
 import javafx.fxml.FXML;
