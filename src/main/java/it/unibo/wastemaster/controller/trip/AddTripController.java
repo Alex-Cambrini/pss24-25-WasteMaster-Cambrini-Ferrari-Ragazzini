@@ -10,6 +10,7 @@ import javafx.stage.Stage;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 public class AddTripController {
@@ -32,6 +33,13 @@ public class AddTripController {
     public void setTripController(TripController tripController) {
         this.tripController = tripController;
     }
+
+    @FXML
+    public void initialize() {
+        
+        operatorsList.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+    }
+
     @FXML
         private void onSave() {
             String postalCodes = postalCodesField.getText().trim();
@@ -48,15 +56,14 @@ public class AddTripController {
             LocalDateTime depDateTime = depDate.atStartOfDay();
             LocalDateTime retDateTime = retDate.atStartOfDay();
 
-            tripManager.createTrip(
-                    postalCodes,
-                    vehicle,
-                    operators,
-                    depDateTime,
-                    retDateTime,
-                    Trip.TripStatus.PENDING,
-                    List.of() 
-            );
+           tripManager.createTrip(
+            postalCodes,
+            vehicle,
+            operators,
+            depDateTime,
+            retDateTime,
+            new ArrayList<>()
+        );
 
             close();
             if (tripController != null) {

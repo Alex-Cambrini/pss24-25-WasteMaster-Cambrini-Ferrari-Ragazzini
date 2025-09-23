@@ -73,16 +73,15 @@ public class EditTripController {
         LocalDateTime depDateTime = depDate.atStartOfDay();
         LocalDateTime retDateTime = retDate.atStartOfDay();
 
-        tripManager.handleUnexpectedEvent(
-                tripToEdit.getTripId(),
-                vehicle,
-                operators,
-                depDateTime,
-                retDateTime,
-                null,
-                null  
-        );
+        // Aggiorna direttamente i campi del trip
+        tripToEdit.setPostalCodes(postalCodes);
+        tripToEdit.setAssignedVehicle(vehicle);
+        tripToEdit.setOperators(operators);
+        tripToEdit.setDepartureTime(depDateTime);
+        tripToEdit.setExpectedReturnTime(retDateTime);
 
+        // Salva le modifiche
+        tripManager.getTripRepository().update(tripToEdit);
         close();
         if (tripController != null) {
             tripController.loadTrips();
