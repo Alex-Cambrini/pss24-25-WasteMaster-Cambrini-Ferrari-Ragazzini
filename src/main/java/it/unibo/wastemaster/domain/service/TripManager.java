@@ -31,6 +31,12 @@ public final class TripManager {
 
         Trip trip = new Trip(postalCode, assignedVehicle, operators, departureTime,
                 expectedReturnTime, collections);
+
+        for (Collection collection : collections) {
+            collection.setTrip(trip);
+            trip.getCollections().add(collection);
+        }
+
         tripRepository.save(trip);
     }
 
