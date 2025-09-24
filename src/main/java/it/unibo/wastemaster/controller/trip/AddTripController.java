@@ -4,6 +4,7 @@ import it.unibo.wastemaster.domain.model.Employee;
 
 import it.unibo.wastemaster.domain.model.Vehicle;
 import it.unibo.wastemaster.domain.service.TripManager;
+import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
@@ -38,6 +39,19 @@ public class AddTripController {
     public void initialize() {
         
         operatorsList.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+        // listener per aggiornare la lista dei veicoli quando cambiano le date
+        departureDate.valueProperty().addListener((obs, oldVal, newVal) -> updateAvailableVehicles());
+        returnDate.valueProperty().addListener((obs, oldVal, newVal) -> updateAvailableVehicles());
+    }
+
+    private void updateAvailableVehicles() {
+        LocalDate dep = departureDate.getValue();
+        LocalDate ret = returnDate.getValue();
+        if (dep != null && ret != null && !ret.isBefore(dep)) {
+            vehicleCombo.setItems(FXCollections.observableArrayList(
+                    tripManager.getAvailableVehicles(dep.atStartOfDay(), ret.atStartOfDay())
+            ));
+        }
     }
 
     @FXML
