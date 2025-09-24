@@ -193,7 +193,7 @@ public abstract class AbstractDatabaseTest {
         oneTimeScheduleManager =
                 new OneTimeScheduleManager(oneTimeScheduleRepository, collectionManager);
         vehicleManager = new VehicleManager(vehicleRepository);
-        tripManager = new TripManager(tripRepository);
+        tripManager = new TripManager(tripRepository, collectionRepository);
         invoiceManager = new InvoiceManager(invoiceRepository);
     }
 

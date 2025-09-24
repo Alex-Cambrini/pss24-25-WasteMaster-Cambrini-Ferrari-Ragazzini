@@ -102,7 +102,7 @@ public class ServiceFactory {
         this.oneTimeScheduleManager =
                 new OneTimeScheduleManager(oneTimeScheduleRepository, collectionManager);
         this.vehicleManager = new VehicleManager(vehicleRepository);
-        this.tripManager = new TripManager(tripRepository);
+        this.tripManager = new TripManager(tripRepository, collectionRepository);
         this.invoiceManager = new InvoiceManager(invoiceRepository);
         this.employeeManager = new EmployeeManager(employeeRepository, accountManager);
         this.scheduleManager = new ScheduleManager(scheduleRepository);
