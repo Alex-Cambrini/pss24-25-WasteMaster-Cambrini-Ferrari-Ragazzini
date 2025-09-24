@@ -68,36 +68,37 @@ public final class InvoiceController {
         this.collectionManager = collectionManager;
     }
 
-    public void setCustomerManager( CustomerManager customerManager) {
+    public void setCustomerManager(CustomerManager customerManager) {
         this.customerManager = customerManager;
     }
 
     @FXML
     public void initialize() {
         owner = (Stage) MainLayoutController.getInstance().getRootPane().getScene().getWindow();
+
         idColumn.setCellValueFactory(new PropertyValueFactory<>(FILTER_ID));
         customerColumn.setCellValueFactory(new PropertyValueFactory<>(FILTER_CUSTOMER));
         amountColumn.setCellValueFactory(new PropertyValueFactory<>("amount"));
         statusColumn.setCellValueFactory(new PropertyValueFactory<>(FILTER_STATUS));
         dateColumn.setCellValueFactory(new PropertyValueFactory<>("date"));
+
         searchField.textProperty().addListener((obs, oldText, newText) -> handleSearch());
 
         invoiceTable.getSelectionModel().selectedItemProperty()
                 .addListener((obs, oldVal, newVal) -> updateButtons(newVal));
+
         statusFilterCombo.setItems(FXCollections.observableArrayList("ALL", "PAID", "UNPAID"));
-        statusFilterCombo.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> handleSearch());
+        statusFilterCombo.getSelectionModel().selectedItemProperty()
+                .addListener((obs, oldVal, newVal) -> handleSearch());
     }
 
-        public void initData() {
-        invoiceManager = AppContext.getServiceFactory().getInvoiceManager();
-        collectionManager = AppContext.getServiceFactory().getCollectionManager();
-        refresh();
-        startAutoRefresh();
-    }
+    public void initData() {
+        if (invoiceManager == null || collectionManager == null || customerManager == null) {
+            throw new IllegalStateException("Managers must be set before calling initData");
+        }
 
-    public void refresh() {
         loadInvoices();
-        handleSearch();
+        startAutoRefresh();
     }
 
     private void startAutoRefresh() {
@@ -141,6 +142,7 @@ public final class InvoiceController {
                                 ctrl.setCustomerManager(customerManager);
                                 ctrl.setCollectionManager(collectionManager);
                                 ctrl.setInvoiceManager(invoiceManager);
+                                ctrl.initData();
                             });
             
             if (controllerOpt.isPresent()) {
