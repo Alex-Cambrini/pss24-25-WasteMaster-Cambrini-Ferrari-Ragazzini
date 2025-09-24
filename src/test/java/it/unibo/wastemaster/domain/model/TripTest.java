@@ -146,11 +146,12 @@ class TripTest extends AbstractDatabaseTest {
         void testValidationTripFields() {
                 Trip invalid = new Trip();
                 var violations = it.unibo.wastemaster.infrastructure.utils.ValidateUtils.VALIDATOR.validate(invalid);
-                assertTrue(violations.stream().anyMatch(v -> v.getPropertyPath().toString().contains("departureTime")));
+
+                assertTrue(violations.stream().anyMatch(v -> v.getPropertyPath().toString().equals("departureTime")));
                 assertTrue(violations.stream()
-                                .anyMatch(v -> v.getPropertyPath().toString().contains("expectedReturnTime")));
-                assertTrue(violations.stream().anyMatch(v -> v.getPropertyPath().toString().contains("status")));
-                assertTrue(violations.stream().anyMatch(v -> v.getPropertyPath().toString().contains("collections")));
+                                .anyMatch(v -> v.getPropertyPath().toString().equals("expectedReturnTime")));
+                assertTrue(violations.stream().anyMatch(v -> v.getPropertyPath().toString().equals("status")));
+                assertTrue(violations.stream().noneMatch(v -> v.getPropertyPath().toString().equals("collections")));
         }
 
         @Test
