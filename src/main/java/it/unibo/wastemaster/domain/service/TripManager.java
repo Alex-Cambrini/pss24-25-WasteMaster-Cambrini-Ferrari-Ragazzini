@@ -34,7 +34,6 @@ public final class TripManager {
 
         for (Collection collection : collections) {
             collection.setTrip(trip);
-            trip.getCollections().add(collection);
         }
 
         tripRepository.save(trip);
