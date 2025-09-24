@@ -281,6 +281,8 @@ public final class MainLayoutController {
         if (controller != null) {
             controller.setTripManager(
                     AppContext.getServiceFactory().getTripManager());
+            controller.setVehicleManager(AppContext.getServiceFactory()
+                    .getVehicleManager());
             controller.initData();
         }
     }
