@@ -35,7 +35,7 @@ public final class InvoiceController {
             FILTER_ID, FILTER_CUSTOMER, FILTER_STATUS
     );
     private final ObservableList<InvoiceRow> allInvoices = FXCollections.observableArrayList();
-
+    private Stage owner;
     private InvoiceManager invoiceManager;
     private CollectionManager collectionManager;
     private Timeline refreshTimeline;
@@ -69,6 +69,7 @@ public final class InvoiceController {
 
     @FXML
     public void initialize() {
+        owner = (Stage) MainLayoutController.getInstance().getRootPane().getScene().getWindow();
         idColumn.setCellValueFactory(new PropertyValueFactory<>(FILTER_ID));
         customerColumn.setCellValueFactory(new PropertyValueFactory<>(FILTER_CUSTOMER));
         amountColumn.setCellValueFactory(new PropertyValueFactory<>("amount"));
@@ -129,15 +130,14 @@ public final class InvoiceController {
     @FXML
     private void handleAddInvoice() {
         try {
-            Stage mainStage = (Stage) MainLayoutController.getInstance().getRootPane().getScene().getWindow();
             Optional<AddInvoiceController> controllerOpt =
                     DialogUtils.showModalWithController("Add Invoice",
-                            "/layouts/invoice/AddInvoiceView.fxml", mainStage, ctrl -> {
+                            "/layouts/invoice/AddInvoiceView.fxml", owner, ctrl -> {
                                 ctrl.setInvoiceManager(invoiceManager);
                                 ctrl.setCollectionManager(collectionManager);
                             });
             
-            if (controllerOpt.isPresent() && controllerOpt.get().isInvoiceCreated()) {
+            if (controllerOpt.isPresent()) {
                 loadInvoices();
             }
         } catch (IOException e) {
@@ -273,4 +273,27 @@ public final class InvoiceController {
         controller.setManagers(collectionManager, invoiceManager);
         controller.setCustomer(customer);
     }
+
+    @FXML
+    private void handleDeleteInvoice() {
+        InvoiceRow selected = invoiceTable.getSelectionModel().getSelectedItem();
+        if (selected == null) {
+            DialogUtils.showError(TITLE_NO_SELECTION, "Please select an invoice to delete.", AppContext.getOwner());
+            return;
+        }
+        boolean confirmed = DialogUtils.showConfirmationDialog("Confirm Deletion",
+                "Are you sure you want to delete invoice ID " + selected.getId() + "?", AppContext.getOwner());
+        if (!confirmed) {
+            return;
+        }
+        boolean success = invoiceManager.cancelInvoice(selected.getIdAsInt());
+        if (success) {
+            DialogUtils.showSuccess("Invoice deleted successfully.", AppContext.getOwner());
+            loadInvoices();
+        } else {
+            DialogUtils.showError("Error", "Could not delete invoice.", AppContext.getOwner());
+        }
+    }
+
+
 }
