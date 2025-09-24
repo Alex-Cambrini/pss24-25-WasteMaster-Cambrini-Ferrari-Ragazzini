@@ -1,131 +1,152 @@
 package it.unibo.wastemaster.controller.invoice;
 
-import it.unibo.wastemaster.application.context.AppContext;
-import it.unibo.wastemaster.controller.utils.DialogUtils;
+import it.unibo.wastemaster.domain.model.Customer;
 import it.unibo.wastemaster.domain.model.Collection;
-import it.unibo.wastemaster.domain.model.Invoice.PaymentStatus;
 import it.unibo.wastemaster.domain.service.CollectionManager;
+import it.unibo.wastemaster.domain.service.CustomerManager;
 import it.unibo.wastemaster.domain.service.InvoiceManager;
+import it.unibo.wastemaster.viewmodels.CollectionRow;
+import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.collections.FXCollections;
-import javafx.event.ActionEvent;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
-import javafx.util.StringConverter;
 
 import java.util.List;
 
-/**
- * Controller for the Add Invoice modal form. Manages input validation and invoice creation logic.
- */
-public final class AddInvoiceController {
+public class AddInvoiceController {
 
-    @FXML
-    private ComboBox<Collection> collectionCombo;
+    @FXML private ComboBox<Customer> customerCombo;
+    @FXML private CheckBox selectAllCheck;
+    @FXML private TableView<CollectionRow> collectionsTable;
+    @FXML private TableColumn<CollectionRow, Boolean> selectCol;
+    @FXML private TableColumn<CollectionRow, Integer> idCol;
+    @FXML private TableColumn<CollectionRow, String> dateCol;
+    @FXML private TableColumn<CollectionRow, String> scheduleCol;
+    @FXML private TextField selectedCountField;
+    @FXML private Button cancelButton;
+    @FXML private Button saveButton;
 
-    @FXML
-    private TextField amountField;
-
-    @FXML
-    private ComboBox<PaymentStatus> statusCombo;
-
-    @FXML
-    private Button saveButton;
-
-    @FXML
-    private Button cancelButton;
-
-    private InvoiceManager invoiceManager;
     private CollectionManager collectionManager;
-    private List<Collection> allCollections;
-    private boolean invoiceCreated = false;
+    private CustomerManager customerManager;
+    private InvoiceManager invoiceManager;
 
-    public void setInvoiceManager(InvoiceManager invoiceManager) {
-        this.invoiceManager = invoiceManager;
+    private ObservableList<CollectionRow> availableCollections =
+            FXCollections.observableArrayList();
+
+    @FXML
+    public void initialize() {
+        setupCustomerCombo();
+        setupCollectionsTable();
+        setupSelectedCountField();
+        setupButtons();
+        setupSelectAllCheck();
     }
 
     public void setCollectionManager(CollectionManager collectionManager) {
         this.collectionManager = collectionManager;
     }
-
-    public boolean isInvoiceCreated() {
-    return invoiceCreated;
-    }
-    
-
-    /**
-     * Sets up UI components and listeners.
-     */
-    @FXML
-    public void initialize() {
-        if (invoiceManager == null) {
-            invoiceManager = AppContext.getServiceFactory().getInvoiceManager();
-        }
-        if (collectionManager == null) {
-            collectionManager = AppContext.getServiceFactory().getCollectionManager();
-        }
-        setupCollectionCombo();
-        setupStatusCombo();
+    public void setCustomerManager(CustomerManager customerManager) {
+        this.customerManager = customerManager;
     }
 
-    private void setupCollectionCombo() {
-        allCollections = collectionManager.getAllCollections();
-        collectionCombo.setItems(FXCollections.observableArrayList(allCollections));
-        collectionCombo.setConverter(new StringConverter<Collection>() {
-            @Override
-            public String toString(Collection collection) {
-                if (collection == null) return "";
-                return "ID: " + collection.getCollectionId();
-            }
+    public void setInvoiceManager(InvoiceManager invoiceManager) {
+        this.invoiceManager = invoiceManager;
+    }
 
-            @Override
-            public Collection fromString(String string) {
-                return null;
-            }
+    private void setupCustomerCombo() {
+        List<Customer> activeCustomers = customerManager.getAllActiveCustomers();
+        customerCombo.setItems(FXCollections.observableArrayList(activeCustomers));
+        customerCombo.getSelectionModel().selectedItemProperty().addListener((obs, old, newCustomer) -> {
+            loadCollectionsForCustomer(newCustomer);
         });
     }
 
-    private void setupStatusCombo() {
-        statusCombo.setItems(FXCollections.observableArrayList(PaymentStatus.values()));
-    }
+    private void loadCollectionsForCustomer(Customer customer) {
+        availableCollections.clear();
 
-    /**
-     * Handles the save action for the invoice.
-     */
-    @FXML
-    public void handleSaveInvoice(final ActionEvent event) {
-        try {
-            Collection selectedCollection = collectionCombo.getValue();
-            
-            PaymentStatus status = statusCombo.getValue();
-
-            if (selectedCollection == null) {
-                throw new IllegalArgumentException("- Please select a collection");
+        if (customer != null) {
+            List<Collection> collections = collectionManager.getCompletedNotBilledCollections(customer);
+            for (Collection c : collections) {
+                CollectionRow row = new CollectionRow(c);
+                row.selectedProperty().addListener((obs, old, newVal) -> updateTotal());
+                availableCollections.add(row);
             }
-            if (status == null) {
-                throw new IllegalArgumentException("- Please select a status");
-            }
-
-            
-            var customer = selectedCollection.getCustomer();
-
-            
-            invoiceManager.createInvoice(customer, List.of(selectedCollection));
-
-            invoiceCreated = true;
-
-            DialogUtils.showSuccess("Invoice saved successfully.", AppContext.getOwner());
-            DialogUtils.closeModal(event);
-
-        } catch (final Exception e) {
-            DialogUtils.showError("Validation error", e.getMessage(), AppContext.getOwner());
         }
+        updateTotal();
     }
 
-    /**
-     * Cancels and closes the invoice creation modal.
-     */
+
+    private void setupCollectionsTable() {
+        collectionsTable.setItems(availableCollections);
+
+        selectCol.setCellValueFactory(cell -> cell.getValue().selectedProperty());
+        idCol.setCellValueFactory(cell -> new ReadOnlyObjectWrapper<>(cell.getValue().getId()));
+        dateCol.setCellValueFactory(cell -> new ReadOnlyObjectWrapper<>(cell.getValue().getCollectionDate().toString()));
+        scheduleCol.setCellValueFactory(cell -> new ReadOnlyObjectWrapper<>(cell.getValue().getZone()));
+
+        // Listener per aggiornare totale
+        availableCollections.forEach(row -> row.selectedProperty().addListener((obs, old, newVal) -> updateTotal()));
+    }
+
+    private void setupSelectAllCheck() {
+        selectAllCheck.selectedProperty().addListener((obs, old, newVal) -> {
+            for (CollectionRow row : availableCollections) {
+                row.setSelected(newVal);
+            }
+            updateTotal();
+        });
+    }
+
+
+    private void updateTotal() {
+        long count = availableCollections.stream()
+                .filter(CollectionRow::isSelected)
+                .count();
+        selectedCountField.setText(String.valueOf(count));
+    }
+
+
+    private void setupSelectedCountField() {
+        selectedCountField.setText("0");
+        selectedCountField.setEditable(false);
+    }
+
+    private void setupButtons() {
+        cancelButton.setOnAction(e -> handleAbortInvoiceCreation());
+        saveButton.setOnAction(e -> handleSaveInvoice());
+    }
+
     @FXML
-    private void handleAbortInvoiceCreation(final ActionEvent event) {
-        DialogUtils.closeModal(event);
+    private void handleAbortInvoiceCreation() {
+        // chiudi finestra/modal
+        cancelButton.getScene().getWindow().hide();
+    }
+
+    @FXML
+    private void handleSaveInvoice() {
+        Customer selectedCustomer = customerCombo.getSelectionModel().getSelectedItem();
+        if (selectedCustomer == null) {
+            showAlert("Select a customer first.");
+            return;
+        }
+
+        List<Collection> selectedCollections = availableCollections.stream()
+                .filter(CollectionRow::isSelected)
+                .map(CollectionRow::getCollection)
+                .toList();
+
+        if (selectedCollections.isEmpty()) {
+            showAlert("Select at least one collection.");
+            return;
+        }
+
+        invoiceManager.createInvoice(selectedCustomer, selectedCollections);
+        saveButton.getScene().getWindow().hide();
+    }
+
+    private void showAlert(String message) {
+        Alert alert = new Alert(Alert.AlertType.WARNING, message, ButtonType.OK);
+        alert.showAndWait();
     }
 }
