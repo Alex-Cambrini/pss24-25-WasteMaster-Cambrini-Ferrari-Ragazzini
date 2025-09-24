@@ -107,7 +107,7 @@ class TripManagerTest extends AbstractDatabaseTest {
                 assertEquals(1, trips.size());
 
                 Trip trip = trips.get(0);
-                assertEquals("40100", trip.getPostalCodes());
+                assertEquals("40100", trip.getPostalCode());
                 assertEquals(2, trip.getOperators().size());
                 assertEquals(vehicle1.getPlate(), trip.getAssignedVehicle().getPlate());
                 assertEquals(Trip.TripStatus.ACTIVE, trip.getStatus());
@@ -131,7 +131,7 @@ class TripManagerTest extends AbstractDatabaseTest {
                 assertTrue(foundOpt.isPresent());
                 Trip found = foundOpt.get();
                 assertEquals(trip.getTripId(), found.getTripId());
-                assertEquals("40100", found.getPostalCodes());
+                assertEquals("40100", found.getPostalCode());
 
                 Optional<Trip> none = getTripManager().getTripById(999_999);
                 assertTrue(none.isEmpty());
@@ -185,7 +185,7 @@ class TripManagerTest extends AbstractDatabaseTest {
                 getTripManager().updateOperators(trip.getTripId(), new ArrayList<>(List.of(operator2)));
 
                 Trip updated = getTripManager().getTripById(trip.getTripId()).orElseThrow();
-                assertEquals("40100", updated.getPostalCodes());
+                assertEquals("40100", updated.getPostalCode());
                 assertEquals(vehicle2.getPlate(), updated.getAssignedVehicle().getPlate());
                 assertEquals(1, updated.getOperators().size());
                 assertEquals(operator2.getEmail(), updated.getOperators().get(0).getEmail());

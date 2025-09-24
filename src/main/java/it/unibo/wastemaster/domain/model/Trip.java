@@ -106,17 +106,17 @@ public final class Trip {
      *
      * @return the postal code
      */
-    public String getPostalCodes() {
+    public String getPostalCode() {
         return postalCode;
     }
 
     /**
      * Sets the postal code for the trip.
      *
-     * @param postalCodes the new postal code
+     * @param postalCode the new postal code
      */
-    public void setPostalCodes(final String postalCodes) {
-        this.postalCode = postalCodes;
+    public void setPostalCode(final String postalCode) {
+        this.postalCode = postalCode;
     }
 
     /**
