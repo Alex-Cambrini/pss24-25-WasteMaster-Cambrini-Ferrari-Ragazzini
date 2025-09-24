@@ -33,7 +33,7 @@ public final class AddVehicleController {
     private TextField yearField;
 
     @FXML
-    private TextField capacityField;
+    private TextField requiredOperatorsField;
 
     @FXML
     private ComboBox<RequiredLicence> licenceComboBox;
@@ -59,16 +59,7 @@ public final class AddVehicleController {
     @FXML
     private void handleSaveVehicle(final ActionEvent event) {
         try {
-            String plate = plateField.getText();
-            String brand = brandField.getText();
-            String model = modelField.getText();
-            int year = Integer.parseInt(yearField.getText());
-            int capacity = Integer.parseInt(capacityField.getText());
-            RequiredLicence licence = licenceComboBox.getValue();
-            VehicleStatus status = statusComboBox.getValue();
-
-            Vehicle vehicle =
-                    new Vehicle(plate, brand, model, year, licence, status, capacity);
+            Vehicle vehicle = getVehicle();
             vehicleManager.addVehicle(vehicle);
             showSuccess("Vehicle saved successfully.", AppContext.getOwner());
             closeModal(event);
@@ -79,6 +70,20 @@ public final class AddVehicleController {
             e.printStackTrace();
             showError("Unexpected error", e.getMessage(), AppContext.getOwner());
         }
+    }
+
+    private Vehicle getVehicle() {
+        String plate = plateField.getText();
+        String brand = brandField.getText();
+        String model = modelField.getText();
+        int year = Integer.parseInt(yearField.getText());
+        int requiredOperators = Integer.parseInt(requiredOperatorsField.getText());
+        RequiredLicence licence = licenceComboBox.getValue();
+        VehicleStatus status = statusComboBox.getValue();
+
+        Vehicle vehicle =
+                new Vehicle(plate, brand, model, year, licence, status, requiredOperators);
+        return vehicle;
     }
 
     @FXML
