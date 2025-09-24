@@ -36,11 +36,14 @@ public class AddInvoiceController {
 
     @FXML
     public void initialize() {
-        setupCustomerCombo();
         setupCollectionsTable();
         setupSelectedCountField();
         setupButtons();
         setupSelectAllCheck();
+    }
+
+    public void initData() {
+        setupCustomerCombo();
     }
 
     public void setCollectionManager(CollectionManager collectionManager) {
