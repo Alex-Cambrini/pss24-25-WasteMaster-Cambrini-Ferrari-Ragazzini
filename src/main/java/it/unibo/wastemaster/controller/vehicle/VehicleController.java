@@ -139,7 +139,6 @@ public final class VehicleController {
      * To be called after setting the vehicleManager.
      */
     public void initData() {
-        System.out.println("[DEBUG] initData VehicleController called");
         loadVehicles();
         startAutoRefresh();
     }
