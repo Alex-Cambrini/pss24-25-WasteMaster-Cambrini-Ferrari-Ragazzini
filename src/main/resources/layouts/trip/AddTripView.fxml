@@ -59,10 +59,10 @@
                 <ComboBox fx:id="postalCodeCombo" promptText="Select Location" GridPane.columnIndex="1" GridPane.rowIndex="2" />
 
                 <Label text="Vehicle" GridPane.columnIndex="0" GridPane.rowIndex="3" />
-            <HBox prefHeight="100.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="3">
+            <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="3">
                <children>
                       <ComboBox fx:id="vehicleCombo" promptText="Select Vehicle" />
-                  <Label fx:id="requiredLicence" text="">
+                  <Label fx:id="requiredLicence">
                      <HBox.margin>
                         <Insets left="10.0" />
                      </HBox.margin>
