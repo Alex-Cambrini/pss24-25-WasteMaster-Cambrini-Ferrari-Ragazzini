@@ -48,7 +48,7 @@ public final class VehicleController {
     private static final String LAST_MAINTENANCE_DATE = "lastMaintenanceDate";
     private static final String NEXT_MAINTENANCE_DATE = "nextMaintenanceDate";
     private static final String REGISTRATION_YEAR = "registrationYear";
-    private static final String CAPACITY = "capacity";
+    private static final String REQUIRED_OPERATORS = "requiredOperators";
     private final ObservableList<VehicleRow> allVehicles = FXCollections
             .observableArrayList();
     private final ObservableList<String> activeFilters =
@@ -86,7 +86,7 @@ public final class VehicleController {
     private TableColumn<VehicleRow, Integer> yearColumn;
 
     @FXML
-    private TableColumn<VehicleRow, Integer> capacityColumn;
+    private TableColumn<VehicleRow, Integer> requiredOperatorColumn;
 
     @FXML
     private TableColumn<VehicleRow, Vehicle.RequiredLicence> licenceTypeColumn;
@@ -110,7 +110,7 @@ public final class VehicleController {
         brandColumn.setCellValueFactory(new PropertyValueFactory<>(BRAND));
         modelColumn.setCellValueFactory(new PropertyValueFactory<>(MODEL));
         yearColumn.setCellValueFactory(new PropertyValueFactory<>(REGISTRATION_YEAR));
-        capacityColumn.setCellValueFactory(new PropertyValueFactory<>(CAPACITY));
+        requiredOperatorColumn.setCellValueFactory(new PropertyValueFactory<>(REQUIRED_OPERATORS));
         licenceTypeColumn.setCellValueFactory(new PropertyValueFactory<>(LICENCE_TYPE));
         vehicleStatusColumn.setCellValueFactory(new PropertyValueFactory<>(VEHICLE_STATUS));
         lastMaintenanceDateColumn.setCellValueFactory(new PropertyValueFactory<>(LAST_MAINTENANCE_DATE));

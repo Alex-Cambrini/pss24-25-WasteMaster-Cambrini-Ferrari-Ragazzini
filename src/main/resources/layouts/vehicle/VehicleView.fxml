@@ -29,7 +29,7 @@
             <TableColumn fx:id="brandColumn" prefWidth="120.0" text="Brand" />
             <TableColumn fx:id="modelColumn" prefWidth="130.0" text="Model" />
             <TableColumn fx:id="yearColumn" prefWidth="80.0" text="Year" />
-            <TableColumn fx:id="capacityColumn" prefWidth="100.0" text="Capacity" />
+            <TableColumn fx:id="requiredOperatorColumn" prefWidth="100.0" text="Required Operator" />
             <TableColumn fx:id="licenceTypeColumn" prefWidth="120.0" text="Required Licence" />
             <TableColumn fx:id="vehicleStatusColumn" prefWidth="120.0" text="Status" />
             <TableColumn fx:id="lastMaintenanceDateColumn" prefWidth="140.0" text="Last Maintenance" />

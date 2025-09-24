@@ -14,7 +14,7 @@ public final class VehicleRow {
     private final String brand;
     private final String model;
     private final int registrationYear;
-    private final int capacity;
+    private final int requiredOperators;
     private final RequiredLicence licenceType;
     private final VehicleStatus vehicleStatus;
     private final LocalDate lastMaintenanceDate;
@@ -30,7 +30,7 @@ public final class VehicleRow {
         this.brand = vehicle.getBrand();
         this.model = vehicle.getModel();
         this.registrationYear = vehicle.getRegistrationYear();
-        this.capacity = vehicle.getRequiredOperators();
+        this.requiredOperators = vehicle.getRequiredOperators();
         this.licenceType = vehicle.getRequiredLicence();
         this.vehicleStatus = vehicle.getVehicleStatus();
         this.lastMaintenanceDate = vehicle.getLastMaintenanceDate();
@@ -74,12 +74,12 @@ public final class VehicleRow {
     }
 
     /**
-     * Gets the capacity of the vehicle.
+     * Gets the required operators of the vehicle.
      *
-     * @return the capacity
+     * @return the requiredOperators
      */
-    public int getCapacity() {
-        return capacity;
+    public int getRequiredOperators() {
+        return requiredOperators;
     }
 
     /**
