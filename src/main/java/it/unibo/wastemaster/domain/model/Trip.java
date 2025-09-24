@@ -15,6 +15,7 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -29,7 +30,7 @@ public final class Trip {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer tripId;
 
-    @Column(nullable = false)
+    @Column(name = "postal_code", nullable = false)
     private String postalCode;
 
     @ManyToOne
@@ -59,7 +60,7 @@ public final class Trip {
 
     @NotNull(message = "collection cannot be null")
     @OneToMany(mappedBy = "trip")
-    private List<Collection> collections;
+    private List<Collection> collections = new ArrayList<>();
 
     /**
      * Default constructor for JPA.
