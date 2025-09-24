@@ -3,6 +3,7 @@ package it.unibo.wastemaster.controller.trip;
 import it.unibo.wastemaster.application.context.AppContext;
 import it.unibo.wastemaster.controller.utils.DialogUtils;
 import it.unibo.wastemaster.domain.model.Trip;
+import it.unibo.wastemaster.domain.service.CollectionManager;
 import it.unibo.wastemaster.domain.service.TripManager;
 import it.unibo.wastemaster.domain.service.VehicleManager;
 import it.unibo.wastemaster.viewmodels.TripRow;
@@ -39,6 +40,7 @@ public final class TripController {
     );
     private TripManager tripManager;
     private VehicleManager vehicleManager;
+    private CollectionManager collectionManager;
     private Timeline refreshTimeline;
     private ContextMenu filterMenu;
 
@@ -60,6 +62,10 @@ public final class TripController {
 
     public void setVehicleManager(VehicleManager vehicleManager) {
         this.vehicleManager = vehicleManager;
+    }
+
+    public void setCollectionManager(CollectionManager collectionManager) {
+        this.collectionManager  = collectionManager;
     }
 
     /**
@@ -127,6 +133,7 @@ public final class TripController {
                             AppContext.getOwner(), ctrl -> {
                                 ctrl.setTripManager(tripManager);
                                 ctrl.setVehicleManager(vehicleManager);
+                                ctrl.setCollectionManager(collectionManager);
                             });
             if (controllerOpt.isPresent()) {
                 loadTrips();
