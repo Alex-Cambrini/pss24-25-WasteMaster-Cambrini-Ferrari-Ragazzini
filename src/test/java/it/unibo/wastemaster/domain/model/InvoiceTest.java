@@ -1,6 +1,7 @@
 package it.unibo.wastemaster.domain.model;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -85,5 +86,14 @@ class InvoiceTest extends AbstractDatabaseTest {
 
         Optional<Invoice> deletedOpt = getInvoiceDAO().findById(foundId);
         assertTrue(deletedOpt.isEmpty());
+    }
+
+    @Test
+    void testIsDeletedSetterGetter() {
+    assertFalse(invoice.isDeleted());
+    invoice.setDeleted(true);
+    assertTrue(invoice.isDeleted());
+    invoice.setDeleted(false);
+    assertFalse(invoice.isDeleted());
     }
 }
