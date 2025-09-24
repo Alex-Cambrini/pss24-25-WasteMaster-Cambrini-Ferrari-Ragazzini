@@ -293,6 +293,10 @@ public final class MainLayoutController {
                 loadCenterWithController("/layouts/invoice/InvoiceView.fxml");
         if (controller != null) {
             controller.setInvoiceManager(AppContext.getServiceFactory().getInvoiceManager());
+            controller.setCustomerManager(AppContext.getServiceFactory()
+                    .getCustomerManager());
+            controller.setCollectionManager(AppContext.getServiceFactory()
+                    .getCollectionManager());
             controller.initData();
         }
     }
