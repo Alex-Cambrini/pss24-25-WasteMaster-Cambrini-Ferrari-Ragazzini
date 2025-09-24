@@ -1,5 +1,6 @@
 package it.unibo.wastemaster.domain.service;
 
+import it.unibo.wastemaster.domain.repository.CollectionRepository;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
@@ -79,8 +80,8 @@ public class InvoiceManager {
         Optional<Invoice> invoiceOpt = invoiceRepository.findById(invoiceId);
         if (invoiceOpt.isPresent()) {
             Invoice invoice = invoiceOpt.get();
-            if (invoice.isCanceled()) {
-                throw new IllegalStateException("Cannot modify a canceled invoice.");
+            if (invoice.isDeleted()) {
+                throw new IllegalStateException("Cannot modify a deleted invoice.");
             }
             invoice.setPaymentStatus(Invoice.PaymentStatus.PAID);
             invoiceRepository.update(invoice);
@@ -120,7 +121,7 @@ public class InvoiceManager {
         Optional<Invoice> invoiceOpt = invoiceRepository.findById(invoiceId);
         if (invoiceOpt.isPresent()) {
             Invoice invoice = invoiceOpt.get();
-            invoice.setCanceled(true);
+            invoice.setDeleted(true);
             for (Collection collection : invoice.getCollections()) {
                 collection.setIsBilled(false);
             }
