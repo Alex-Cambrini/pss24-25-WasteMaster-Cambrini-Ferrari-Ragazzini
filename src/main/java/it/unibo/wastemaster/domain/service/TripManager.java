@@ -6,11 +6,13 @@ import it.unibo.wastemaster.domain.model.Employee.Licence;
 import it.unibo.wastemaster.domain.model.Trip;
 import it.unibo.wastemaster.domain.model.Trip.TripStatus;
 import it.unibo.wastemaster.domain.model.Vehicle;
+import it.unibo.wastemaster.domain.repository.CollectionRepository;
 import it.unibo.wastemaster.domain.repository.TripRepository;
 import it.unibo.wastemaster.infrastructure.utils.ValidateUtils;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -20,23 +22,27 @@ import java.util.Optional;
 public final class TripManager {
 
     private final TripRepository tripRepository;
+    private final CollectionRepository collectionRepository;
 
-    public TripManager(final TripRepository tripRepository) {
+    public TripManager(final TripRepository tripRepository, final CollectionRepository collectionRepository) {
         this.tripRepository = tripRepository;
+        this.collectionRepository = collectionRepository;
     }
 
     public void createTrip(final String postalCode, final Vehicle assignedVehicle,
-            final List<Employee> operators, final LocalDateTime departureTime,
-            final LocalDateTime expectedReturnTime, final List<Collection> collections) {
+                           final List<Employee> operators, final LocalDateTime departureTime,
+                           final LocalDateTime expectedReturnTime, final List<Collection> collections) {
 
-        Trip trip = new Trip(postalCode, assignedVehicle, operators, departureTime,
-                expectedReturnTime, collections);
+        // Creo il Trip senza associare subito le collection
+        Trip trip = new Trip(postalCode, assignedVehicle, operators, departureTime, expectedReturnTime, new ArrayList<>());
+        tripRepository.save(trip); // persisto il Trip e ottengo l'ID
 
+        // Associo ogni Collection al Trip e le salvo singolarmente
         for (Collection collection : collections) {
             collection.setTrip(trip);
+            collectionRepository.save(collection);
+            trip.getCollections().add(collection); // aggiorno la lista nel Trip solo per coerenza in memoria
         }
-
-        tripRepository.save(trip);
     }
 
     public List<Vehicle> getAvailableVehicles(final LocalDateTime start, final LocalDateTime end) {
