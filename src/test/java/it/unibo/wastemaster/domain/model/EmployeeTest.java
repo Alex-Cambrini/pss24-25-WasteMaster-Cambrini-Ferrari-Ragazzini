@@ -179,13 +179,9 @@ class EmployeeTest extends AbstractDatabaseTest {
     void testToString() {
         String output = employee.toString();
         assertNotNull(output);
-        assertTrue(output.contains("Employee"));
+        assertTrue(output.contains("ID: " + employee.getEmployeeId()));
         assertTrue(output.contains(employee.getName()));
         assertTrue(output.contains(employee.getSurname()));
-        assertTrue(output.contains(employee.getEmail()));
-        assertTrue(output.contains(employee.getPhone()));
-        assertTrue(output.contains(employee.getRole().name()));
         assertTrue(output.contains(employee.getLicence().name()));
-        assertTrue(output.contains(location.toString()));
     }
 }

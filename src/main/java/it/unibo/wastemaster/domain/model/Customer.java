@@ -6,10 +6,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
-/**
- * Represents a customer entity extending the Person class. Maps to the "customer" table
- * in the database.
- */
 @Entity
 @Table(name = "customer")
 public class Customer extends Person {
@@ -50,17 +46,9 @@ public class Customer extends Person {
         return customerId;
     }
 
-    /**
-     * Returns a string representation of the customer, including ID, name, email, phone,
-     * and location.
-     *
-     * @return formatted string with customer details
-     */
+
     @Override
     public String toString() {
-        return String.format(
-                "Customer {ID: %d, Name: %s %s, Email: %s, Phone: %s, Location: %s}",
-                customerId, getName(), getSurname(), getEmail(), getPhone(),
-                getLocation() != null ? getLocation().toString() : "N/A");
+        return String.format("%s %s (%s)", getName(), getSurname(), getEmail());
     }
 }
