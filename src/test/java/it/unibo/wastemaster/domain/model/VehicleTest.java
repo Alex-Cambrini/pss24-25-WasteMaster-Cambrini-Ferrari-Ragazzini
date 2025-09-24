@@ -155,9 +155,7 @@ class VehicleTest extends AbstractDatabaseTest {
     void testToString() {
         String output = vehicle.toString();
         assertNotNull(output);
-        assertTrue(output.contains("Vehicle"));
-        assertTrue(output.contains(vehicle.getPlate()));
-        assertTrue(output.contains(vehicle.getBrand()));
-        assertTrue(output.contains(vehicle.getModel()));
+        String expected = "AB123CD Iveco Daily (3 operators)";
+        assertEquals(expected, output);
     }
 }

@@ -281,16 +281,7 @@ public final class Vehicle {
 
     @Override
     public String toString() {
-        return String.format(
-                "Vehicle {Plate: %s, Brand: %s, Model: %s, Year: %d,%n"
-                        + "RequiredLicence: %s, RequiredOperators: %d, Status: %s,%n"
-                        + "LastMaint: %s, NextMaint: %s}",
-                plate != null ? plate : "N/A", brand != null ? brand : "N/A",
-                model != null ? model : "N/A", registrationYear,
-                requiredLicence != null ? requiredLicence.name() : "N/A", requiredOperators,
-                vehicleStatus != null ? vehicleStatus.name() : "N/A",
-                lastMaintenanceDate != null ? lastMaintenanceDate.toString() : "N/A",
-                nextMaintenanceDate != null ? nextMaintenanceDate.toString() : "N/A");
+        return String.format("%s %s %s (%d operators)", plate, brand, model, requiredOperators);
     }
 
     /**
