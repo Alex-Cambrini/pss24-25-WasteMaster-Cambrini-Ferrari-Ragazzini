@@ -1,5 +1,6 @@
 package it.unibo.wastemaster.domain.service;
 
+import it.unibo.wastemaster.domain.repository.CollectionRepository;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
@@ -75,10 +76,13 @@ public class InvoiceManager {
      * @param invoiceId the ID of the invoice to mark as paid
      * @return true if the invoice was found and updated, false otherwise
      */
-    public boolean markInvoiceAsPaid(int invoiceId) {
+     public boolean markInvoiceAsPaid(int invoiceId) {
         Optional<Invoice> invoiceOpt = invoiceRepository.findById(invoiceId);
         if (invoiceOpt.isPresent()) {
             Invoice invoice = invoiceOpt.get();
+            if (invoice.isDeleted()) {
+                throw new IllegalStateException("Cannot modify a deleted invoice.");
+            }
             invoice.setPaymentStatus(Invoice.PaymentStatus.PAID);
             invoiceRepository.update(invoice);
             return true;
@@ -105,16 +109,26 @@ public class InvoiceManager {
         return total;
     }
 
-        public void updateInvoice(int invoiceId, List<Collection> collections, double amount, Invoice.PaymentStatus status) {
+
+    /**
+     * Cancels the invoice with the given ID (soft delete).
+     * Sets the invoice as canceled and marks all its collections as not billed.
+     *
+     * @param invoiceId the ID of the invoice to cancel
+     * @return true if the invoice was found and canceled, false otherwise
+     */
+    public boolean cancelInvoice(int invoiceId) {
         Optional<Invoice> invoiceOpt = invoiceRepository.findById(invoiceId);
         if (invoiceOpt.isPresent()) {
             Invoice invoice = invoiceOpt.get();
-            invoice.setCollections(collections);
-            invoice.setAmount(amount);
-            invoice.setPaymentStatus(status);
+            invoice.setDeleted(true);
+            for (Collection collection : invoice.getCollections()) {
+                collection.setIsBilled(false);
+            }
             invoiceRepository.update(invoice);
-        } else {
-            throw new IllegalArgumentException("Invoice not found");
+            return true;
         }
+        return false;
     }
+      
 }
