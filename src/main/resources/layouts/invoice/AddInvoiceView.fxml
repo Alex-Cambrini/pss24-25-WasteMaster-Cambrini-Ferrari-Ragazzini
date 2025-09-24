@@ -48,7 +48,7 @@
                 </TableView>
 
                 <Label text="Selected total:" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
-                <TextField fx:id="amountField"
+                <TextField fx:id="selectedCountField"
                            editable="false"
                            prefWidth="80.0" maxWidth="80.0"
                            GridPane.rowIndex="3" GridPane.columnIndex="1"/>
