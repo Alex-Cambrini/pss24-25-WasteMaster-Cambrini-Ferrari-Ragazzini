@@ -283,6 +283,8 @@ public final class MainLayoutController {
                     AppContext.getServiceFactory().getTripManager());
             controller.setVehicleManager(AppContext.getServiceFactory()
                     .getVehicleManager());
+            controller.setCollectionManager(AppContext.getServiceFactory()
+                    .getCollectionManager());
             controller.initData();
         }
     }
