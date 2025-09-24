@@ -18,7 +18,7 @@ public final class CollectionRow {
     private final String zone;
     private final CollectionStatus status;
     private final String customerName;
-
+    private final Collection collection;
     private final BooleanProperty selected = new SimpleBooleanProperty(false);
 
     /**
@@ -27,6 +27,7 @@ public final class CollectionRow {
      * @param collection the collection entity to represent
      */
     public CollectionRow(final Collection collection) {
+        this.collection = collection;
         this.id = collection.getCollectionId();
         this.wasteName = collection.getWaste().getWasteName();
         this.collectionDate = collection.getCollectionDate();
@@ -93,5 +94,9 @@ public final class CollectionRow {
      */
     public String getCustomerName() {
         return customerName;
+    }
+
+    public Collection getCollection() {
+        return collection;
     }
 }
