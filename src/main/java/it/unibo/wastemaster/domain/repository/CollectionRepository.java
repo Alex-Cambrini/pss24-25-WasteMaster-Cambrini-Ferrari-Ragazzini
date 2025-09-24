@@ -31,7 +31,4 @@ public interface CollectionRepository {
 
     List<Collection> findAll();
 
-    List<Collection> findByCustomer(Customer customer);
-    
-    List<Collection> findBilledByCustomer(Customer customer);
 }

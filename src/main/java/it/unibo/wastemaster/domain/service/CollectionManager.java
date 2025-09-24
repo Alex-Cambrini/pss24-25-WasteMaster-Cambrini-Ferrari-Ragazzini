@@ -150,17 +150,5 @@ public class CollectionManager {
         return collectionRepository.findAll();
     }
 
-    /**
-     * Returns the total number of collections for the given customer.
-     */
-    public long countCollectionsByCustomer(Customer customer) {
-        return collectionRepository.findByCustomer(customer).size();
-    }
-
-    /**
-     * Returns the number of billed collections for the given customer.
-     */
-    public long countBilledCollectionsByCustomer(Customer customer) {
-        return collectionRepository.findBilledByCustomer(customer).size();
-    }
+   
 }
