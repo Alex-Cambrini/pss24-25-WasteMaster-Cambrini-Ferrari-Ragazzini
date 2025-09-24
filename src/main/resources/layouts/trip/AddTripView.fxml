@@ -1,26 +1,67 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<VBox spacing="15" alignment="CENTER" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.unibo.wastemaster.controller.trip.AddTripController">
+
+<VBox maxHeight="-Infinity" maxWidth="-Infinity"
+      minHeight="-Infinity" minWidth="-Infinity"
+      prefHeight="400.0" prefWidth="600.0"
+      xmlns="http://javafx.com/javafx/23.0.1"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="it.unibo.wastemaster.controller.trip.AddTripController"
+      styleClass="center-pane, modal-pane">
+
     <children>
-        <Label text="Add Trip" styleClass="header"/>
-        <GridPane hgap="10" vgap="10">
+        <GridPane prefHeight="374.0" prefWidth="600.0" hgap="20" vgap="10">
+            <columnConstraints>
+                <ColumnConstraints hgrow="SOMETIMES" minWidth="130.0" prefWidth="150.0" maxWidth="290.0"/>
+                <ColumnConstraints hgrow="ALWAYS"   minWidth="10.0"  prefWidth="480.0" maxWidth="496.0"/>
+            </columnConstraints>
+            <rowConstraints>
+                <RowConstraints vgrow="SOMETIMES" prefHeight="30.0"/>
+                <RowConstraints vgrow="SOMETIMES" prefHeight="30.0"/>
+                <RowConstraints vgrow="ALWAYS"   prefHeight="120.0"/>
+                <RowConstraints vgrow="SOMETIMES" prefHeight="30.0"/>
+                <RowConstraints vgrow="SOMETIMES" prefHeight="30.0"/>
+            </rowConstraints>
+
             <children>
-                <Label text="Postal Code:" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
-                <TextField fx:id="postalCodesField" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
-                <Label text="Vehicle:" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
-                <ComboBox fx:id="vehicleCombo" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
-                <Label text="Operators:" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
-                <ListView fx:id="operatorsList" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
-                <Label text="Departure:" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
+                <Label text="Postal Code" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+                <TextField fx:id="postalCodesField" promptText="e.g. 40100, 40121"
+                           GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+
+                <Label text="Vehicle" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+                <ComboBox fx:id="vehicleCombo" promptText="Select vehicle"
+                          GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+
+                <Label text="Operators" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+                <VBox spacing="6" GridPane.rowIndex="2" GridPane.columnIndex="1">
+                    <children>
+                        <ListView fx:id="operatorsList" prefHeight="180.0"/>
+                        <Label fx:id="operatorsHint" styleClass="hint" text="0 / 0 selected"/>
+                    </children>
+                </VBox>
+
+                <Label text="Departure" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
                 <DatePicker fx:id="departureDate" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
-                <Label text="Return:" GridPane.rowIndex="4" GridPane.columnIndex="0"/>
+
+                <Label text="Return" GridPane.rowIndex="4" GridPane.columnIndex="0"/>
                 <DatePicker fx:id="returnDate" GridPane.rowIndex="4" GridPane.columnIndex="1"/>
             </children>
         </GridPane>
-        <HBox spacing="10" alignment="CENTER_RIGHT">
-            <Button text="Cancel" onAction="#onCancel"/>
-            <Button text="Save" onAction="#onSave"/>
+
+        <HBox alignment="TOP_RIGHT" prefHeight="100.0" prefWidth="200.0" spacing="10.0">
+            <children>
+                <Button text="Cancel" onAction="#onCancel" styleClass="danger"/>
+                <Button text="Save" onAction="#onSave" styleClass="success"/>
+            </children>
+            <padding>
+                <Insets right="20.0" top="10.0"/>
+            </padding>
         </HBox>
     </children>
+
+    <padding>
+        <Insets left="20.0" right="20.0"/>
+    </padding>
 </VBox>
