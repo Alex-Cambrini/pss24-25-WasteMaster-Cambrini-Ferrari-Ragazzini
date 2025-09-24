@@ -135,20 +135,4 @@ public class CollectionDAO extends GenericDAO<Collection> {
     }
 
 
-        public List<Collection> findByCustomer(Customer customer) {
-        return getEntityManager().createQuery(
-                "SELECT c FROM Collection c WHERE c.customer = :customer", Collection.class)
-                .setParameter("customer", customer)
-                .getResultList();
-        }
-
-        public List<Collection> findBilledByCustomer(Customer customer) {
-        return getEntityManager().createQuery(
-                "SELECT c FROM Collection c WHERE c.customer = :customer AND c.isBilled = true", Collection.class)
-                .setParameter("customer", customer)
-                .getResultList();
-        }
-
-
-
 }
