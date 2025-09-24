@@ -59,12 +59,6 @@ class TripManagerTest extends AbstractDatabaseTest {
                 expectedReturnTime = departureTime.plusHours(TRIP_EXPECTED_DURATION_HOURS);
         }
 
-        /**
-         * Crea due Collection NON persistite. Le entità dipendenti vengono invece
-         * persistite
-         * per avere FK valide. Le Collection sono usate solo per soddisfare @NotNull
-         * del Trip.
-         */
         private List<Collection> createCollections() {
                 Location cLoc1 = new Location("Via Roma", "10", "Bologna", "40100");
                 Location cLoc2 = new Location("Via Milano", "22", "Milano", "20100");
