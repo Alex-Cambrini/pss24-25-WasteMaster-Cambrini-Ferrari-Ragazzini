@@ -22,7 +22,7 @@ public class TripRepositoryImpl implements TripRepository {
 
     @Override
     public void save(Trip trip) {
-    tripDAO.update(trip);
+    tripDAO.insert(trip);
     }
 
     @Override
