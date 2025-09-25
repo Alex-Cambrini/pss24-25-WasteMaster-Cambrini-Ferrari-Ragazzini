@@ -21,7 +21,7 @@ public final class TripRow {
     public TripRow(final Trip trip) {
         this.trip = trip;
         this.id = String.valueOf(trip.getTripId());
-        this.postalCodes = trip.getPostalCode() != null ? trip.getPostalCode() : "";
+        this.postalCodes = trip.getPostalCodes() != null ? trip.getPostalCodes() : "";
         this.vehicle = trip.getAssignedVehicle() != null ? trip.getAssignedVehicle().getPlate() : "";
         this.operators = trip.getOperators() != null
                 ? trip.getOperators().stream()
