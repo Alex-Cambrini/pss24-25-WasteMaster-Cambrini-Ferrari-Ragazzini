@@ -7,6 +7,7 @@ import java.util.Optional;
 import it.unibo.wastemaster.domain.model.Collection;
 import it.unibo.wastemaster.domain.model.Customer;
 import it.unibo.wastemaster.domain.model.Invoice;
+import it.unibo.wastemaster.domain.model.Invoice.PaymentStatus;
 import it.unibo.wastemaster.domain.model.OneTimeSchedule;
 import it.unibo.wastemaster.domain.model.RecurringSchedule;
 import it.unibo.wastemaster.domain.repository.InvoiceRepository;
@@ -110,16 +111,20 @@ public class InvoiceManager {
 
 
     /**
-     * Cancels the invoice with the given ID (soft delete).
-     * Sets the invoice as canceled and marks all its collections as not billed.
+     * Deletes the invoice with the given ID (soft delete) if it is not already paid.
+     * Marks the invoice as deleted and sets all its collections as not billed.
      *
-     * @param invoiceId the ID of the invoice to cancel
-     * @return true if the invoice was found and canceled, false otherwise
+     * @param invoiceId the ID of the invoice to delete
+     * @return true if the invoice was found and deleted, false if the invoice
+     *         was not found or is already marked as PAID
      */
-    public boolean cancelInvoice(int invoiceId) {
+    public boolean deleteInvoice(int invoiceId) {
         Optional<Invoice> invoiceOpt = invoiceRepository.findById(invoiceId);
         if (invoiceOpt.isPresent()) {
             Invoice invoice = invoiceOpt.get();
+            if (PaymentStatus.PAID == invoice.getPaymentStatus()) {
+                return false;
+            }
             invoice.setDeleted(true);
             for (Collection collection : invoice.getCollections()) {
                 collection.setIsBilled(false);
@@ -129,5 +134,4 @@ public class InvoiceManager {
         }
         return false;
     }
-      
 }
