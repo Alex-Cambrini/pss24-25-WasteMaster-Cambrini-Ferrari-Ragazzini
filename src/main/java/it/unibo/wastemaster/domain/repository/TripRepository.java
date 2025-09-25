@@ -22,6 +22,8 @@ public interface TripRepository {
 
     List<Trip> findAll();
 
+    List<Trip> findByOperator(Employee operator);
+
     List<Vehicle> findAvailableVehicles(LocalDateTime start, LocalDateTime end);
 
     List<Employee> findQualifiedDrivers(LocalDateTime start, LocalDateTime end, List<Licence> allowedLicences);
