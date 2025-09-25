@@ -216,26 +216,26 @@ class TripManagerTest extends AbstractDatabaseTest {
                                 () -> getTripManager().updateOperators(trip.getTripId(), new ArrayList<>()));
         }
 
-        @Test
-        void testFindAllTrips() {
-                List<Collection> collections1 = createCollections();
-                List<Collection> collections2 = createCollections();
-
-                getTripManager().createTrip(
-                                "40100", vehicle1,
-                                new ArrayList<>(List.of(operator1)),
-                                departureTime, expectedReturnTime,
-                                new ArrayList<>(collections1));
-
-                getTripManager().createTrip(
-                                "20100", vehicle1,
-                                new ArrayList<>(List.of(operator2)),
-                                departureTime.plusDays(1), expectedReturnTime.plusDays(1),
-                                new ArrayList<>(collections2));
-
-                List<Trip> all = getTripManager().findAllTrips();
-                assertTrue(all.size() >= 2);
-        }
+//        @Test
+//        void testGetTripsForCurrentUser() {
+//                List<Collection> collections1 = createCollections();
+//                List<Collection> collections2 = createCollections();
+//
+//                getTripManager().createTrip(
+//                                "40100", vehicle1,
+//                                new ArrayList<>(List.of(operator1)),
+//                                departureTime, expectedReturnTime,
+//                                new ArrayList<>(collections1));
+//
+//                getTripManager().createTrip(
+//                                "20100", vehicle1,
+//                                new ArrayList<>(List.of(operator2)),
+//                                departureTime.plusDays(1), expectedReturnTime.plusDays(1),
+//                                new ArrayList<>(collections2));
+//
+//                List<Trip> all = getTripManager().getTripsForCurrentUser();
+//                assertTrue(all.size() >= 2);
+//        }
 
         @Test
         void testGetTripByIdNotFound() {

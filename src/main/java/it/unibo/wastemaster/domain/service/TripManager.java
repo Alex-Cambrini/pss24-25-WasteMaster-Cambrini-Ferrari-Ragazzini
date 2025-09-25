@@ -1,5 +1,8 @@
 package it.unibo.wastemaster.domain.service;
 
+import static it.unibo.wastemaster.domain.model.Employee.Role.ADMINISTRATOR;
+import static it.unibo.wastemaster.domain.model.Employee.Role.OFFICE_WORKER;
+
 import it.unibo.wastemaster.domain.model.Collection;
 import it.unibo.wastemaster.domain.model.Employee;
 import it.unibo.wastemaster.domain.model.Employee.Licence;
@@ -109,8 +112,12 @@ public final class TripManager {
         tripRepository.update(trip);
     }
 
-    public List<Trip> findAllTrips() {
-        return tripRepository.findAll();
+    public List<Trip> getTripsForCurrentUser(Employee currentUser) {
+        if (currentUser.getRole() == ADMINISTRATOR || currentUser.getRole() == OFFICE_WORKER) {
+            return tripRepository.findAll();
+        } else {
+            return tripRepository.findByOperator(currentUser);
+        }
     }
 
     public List<String> getAvailablePostalCodes(LocalDate date) {

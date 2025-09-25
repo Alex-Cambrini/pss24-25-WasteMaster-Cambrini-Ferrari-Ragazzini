@@ -46,6 +46,11 @@ public class TripRepositoryImpl implements TripRepository {
     }
 
     @Override
+    public List<Trip> findByOperator(Employee operator) {
+        return tripDAO.findByOperator(operator);
+    }
+
+    @Override
     public List<Vehicle> findAvailableVehicles(LocalDateTime start, LocalDateTime end) {
         return tripDAO.findAvailableVehicles(start, end);
     }

@@ -48,6 +48,13 @@ public class TripDAO extends GenericDAO<Trip> {
                 .getResultList();
     }
 
+    public List<Trip> findByOperator(Employee operator) {
+        String jpql = "SELECT t FROM Trip t JOIN t.operators o WHERE o = :operator";
+        return getEntityManager().createQuery(jpql, Trip.class)
+                .setParameter("operator", operator)
+                .getResultList();
+    }
+
     public List<Employee> findAvailableOperators(LocalDateTime start, LocalDateTime end) {
         String jpql = """
                 SELECT e FROM Employee e
