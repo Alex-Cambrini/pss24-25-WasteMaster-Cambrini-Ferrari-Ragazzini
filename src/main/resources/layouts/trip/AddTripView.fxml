@@ -21,7 +21,7 @@
     xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.unibo.wastemaster.controller.trip.AddTripController">
 
     <children>
-        <GridPane hgap="20" prefHeight="374.0" prefWidth="700.0" vgap="10">
+        <GridPane hgap="20" prefHeight="374.0" prefWidth="700.0" vgap="10" VBox.vgrow="ALWAYS">
             <columnConstraints>
                 <ColumnConstraints hgrow="SOMETIMES" maxWidth="290.0" minWidth="130.0" prefWidth="150.0" />
                 <ColumnConstraints hgrow="ALWAYS" maxWidth="496.0" minWidth="10.0" prefWidth="480.0" />
@@ -32,7 +32,7 @@
                 <RowConstraints prefHeight="30.0" vgrow="SOMETIMES" />
                 <RowConstraints prefHeight="30.0" vgrow="SOMETIMES" />
                 <RowConstraints prefHeight="30.0" vgrow="SOMETIMES" />
-                <RowConstraints prefHeight="120.0" vgrow="ALWAYS" />
+                <RowConstraints prefHeight="220.0" vgrow="ALWAYS" />
             </rowConstraints>
 
             <children>
@@ -81,9 +81,9 @@
                 <Label text="Operators" GridPane.columnIndex="0" GridPane.rowIndex="5" />
                 <VBox spacing="6" GridPane.columnIndex="1" GridPane.rowIndex="5" VBox.vgrow="ALWAYS">
                     <children>
-                        <ScrollPane fitToWidth="true" fitToHeight="true" prefHeight="250.0">
+                        <ScrollPane fitToWidth="true" fitToHeight="true" prefHeight="320.0">
                             <content>
-                                <TableView fx:id="operatorsTable" prefHeight="250.0" prefWidth="410.0">
+                                <TableView fx:id="operatorsTable" prefHeight="320.0" prefWidth="410.0">
                                     <columns>
                                         <TableColumn fx:id="opSelectCol" text="" prefWidth="40"/>
                                         <TableColumn fx:id="opNameCol" text="Name" prefWidth="180"/>

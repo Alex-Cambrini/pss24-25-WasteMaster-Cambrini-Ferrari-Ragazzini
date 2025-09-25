@@ -325,6 +325,13 @@ public class AddTripController {
                 .toList();
 
         int totalPeople = 1 + operators.size();
+
+        int required = seatCapacity.get();
+        if (totalPeople < required) {
+            showAlert("Not enough crew members selected (" + totalPeople + " / " + required
+                    + "). Please add more operators to meet the required crew size.");
+            return;
+        }
         if (totalPeople > seatCapacity.get()) {
             showAlert("Too many people for this vehicle (" + totalPeople + " / " + seatCapacity.get() + ").");
             return;
