@@ -1,8 +1,6 @@
 package it.unibo.wastemaster.viewmodels;
 
-import it.unibo.wastemaster.domain.model.Customer;
 import it.unibo.wastemaster.domain.model.Invoice;
-
 
 /**
  * ViewModel class that represents an invoice for the table view.
@@ -14,40 +12,31 @@ public final class InvoiceRow {
     private final String customer;
     private final String amount;
     private final String status;
+    private final String issueDate;
+    private final String serviceCounts; // recurringCount / onetimeCount
+    private final String totalAmounts;
 
-    public InvoiceRow(final Invoice invoice) {
+    public InvoiceRow(Invoice invoice) {
         this.invoice = invoice;
         this.id = String.valueOf(invoice.getInvoiceId());
-        this.customer = invoice.getCustomer() != null ? invoice.getCustomer().getName() : "";
+        this.customer = invoice.getCustomer() != null ?
+                invoice.getCustomer().getName() + " " + invoice.getCustomer().getSurname() : "";
         this.amount = String.format("%.2f", invoice.getAmount());
         this.status = invoice.getPaymentStatus() != null ? invoice.getPaymentStatus().toString() : "";
+        this.issueDate = invoice.getIssueDate() != null ? invoice.getIssueDate().toString() : "";
+        this.serviceCounts = "Recurring: " + invoice.getRecurringCount()
+                + ", One-time: " + invoice.getOnetimeCount();
+        this.totalAmounts = "Recurring: " + String.format("%.2f", invoice.getTotalRecurring())
+                + ", One-time: " + String.format("%.2f", invoice.getTotalOnetime());
     }
 
-     public Invoice getInvoice() {
-        return invoice;
-    }
+    public String getId() { return id; }
+    public String getCustomer() { return customer; }
+    public String getAmount() { return amount; }
+    public String getStatus() { return status; }
+    public String getIssueDate() { return issueDate; }
+    public String getServiceCounts() { return serviceCounts; }
+    public String getTotalAmounts() { return totalAmounts; }
 
-    public String getId() {
-        return id;
-    }
-
-    public int getIdAsInt() {
-        return invoice.getInvoiceId();
-    }
-
-    public String getCustomer() {
-        return customer;
-    }
-
-    public String getAmount() {
-        return amount;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public Customer getCustomerObject() {
-    return invoice.getCustomer();
-}
+    public Invoice getInvoice() { return invoice; }
 }
