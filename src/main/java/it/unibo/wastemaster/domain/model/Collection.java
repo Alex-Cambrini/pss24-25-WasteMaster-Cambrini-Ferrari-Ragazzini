@@ -242,6 +242,14 @@ public class Collection {
                 schedule != null ? schedule.getScheduleCategory() : "N/A");
     }
 
+    public void setTrip(Trip trip) {
+        this.trip = trip;
+    }
+
+    public Trip getTrip() {
+        return trip;
+    }
+
     /**
      * Possible statuses of the collection.
      */

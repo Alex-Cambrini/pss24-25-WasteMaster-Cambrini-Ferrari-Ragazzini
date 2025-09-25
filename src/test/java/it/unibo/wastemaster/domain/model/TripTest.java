@@ -64,8 +64,8 @@ class TripTest extends AbstractDatabaseTest {
                                 expectedReturnTime,
                                 Collections.emptyList());
 
-                trip.setPostalCodes("40200");
-                assertEquals("40200", trip.getPostalCodes());
+                trip.setPostalCode("40200");
+                assertEquals("40200", trip.getPostalCode());
 
                 trip.setDepartureTime(departureTime);
                 assertEquals(departureTime, trip.getDepartureTime());
@@ -126,7 +126,7 @@ class TripTest extends AbstractDatabaseTest {
                 assertTrue(foundOpt.isPresent());
 
                 Trip found = foundOpt.get();
-                assertEquals(createdTrip.getPostalCodes(), found.getPostalCodes());
+                assertEquals(createdTrip.getPostalCode(), found.getPostalCode());
 
                 int foundId = found.getTripId();
                 getTripDAO().delete(found);
@@ -146,11 +146,12 @@ class TripTest extends AbstractDatabaseTest {
         void testValidationTripFields() {
                 Trip invalid = new Trip();
                 var violations = it.unibo.wastemaster.infrastructure.utils.ValidateUtils.VALIDATOR.validate(invalid);
-                assertTrue(violations.stream().anyMatch(v -> v.getPropertyPath().toString().contains("departureTime")));
+
+                assertTrue(violations.stream().anyMatch(v -> v.getPropertyPath().toString().equals("departureTime")));
                 assertTrue(violations.stream()
-                                .anyMatch(v -> v.getPropertyPath().toString().contains("expectedReturnTime")));
-                assertTrue(violations.stream().anyMatch(v -> v.getPropertyPath().toString().contains("status")));
-                assertTrue(violations.stream().anyMatch(v -> v.getPropertyPath().toString().contains("collections")));
+                                .anyMatch(v -> v.getPropertyPath().toString().equals("expectedReturnTime")));
+                assertTrue(violations.stream().anyMatch(v -> v.getPropertyPath().toString().equals("status")));
+                assertTrue(violations.stream().noneMatch(v -> v.getPropertyPath().toString().equals("collections")));
         }
 
         @Test

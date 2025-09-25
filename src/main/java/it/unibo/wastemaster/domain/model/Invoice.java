@@ -46,6 +46,9 @@ public class Invoice {
     @Column(nullable = false)
     private int onetimeCount;
 
+    @Column(nullable = false)
+    private boolean isDeleted = false;
+
     public Invoice() {
         // required by Hibernate
     }
@@ -138,6 +141,14 @@ public class Invoice {
 
     public void setOnetimeCount(final int onetimeCount) {
         this.onetimeCount = onetimeCount;
+    }
+
+     public boolean isDeleted() {
+        return isDeleted;
+    }
+    
+    public void setDeleted(final boolean deleted) {
+        this.isDeleted = deleted;
     }
 
     public enum PaymentStatus {

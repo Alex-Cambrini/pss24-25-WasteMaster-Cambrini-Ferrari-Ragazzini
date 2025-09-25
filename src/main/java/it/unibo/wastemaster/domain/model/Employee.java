@@ -113,18 +113,15 @@ public class Employee extends Person {
     }
 
     /**
-     * Returns a string representation of the employee, including ID, name, email, phone,
-     * location, role, and licence.
+     * Returns a short string suitable for display in a ComboBox,
+     * showing ID, name, surname, and licence.
      *
-     * @return formatted string with employee details.
+     * @return compact string for ComboBox display.
      */
     @Override
     public String toString() {
-        return String.format("""
-                        Employee {ID: %d, Name: %s %s, Email: %s,
-                        Phone: %s, Location: %s, Role: %s, Licence: %s}
-                        """, employeeId, getName(), getSurname(), getEmail(), getPhone(),
-                getLocation() != null ? getLocation().toString() : "N/A", role, licence);
+        return String.format("ID: %d | %s %s | Licence: %s",
+                employeeId, getName(), getSurname(), licence);
     }
 
     /**

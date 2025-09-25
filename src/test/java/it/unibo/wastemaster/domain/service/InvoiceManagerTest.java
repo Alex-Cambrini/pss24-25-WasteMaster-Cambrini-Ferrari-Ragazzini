@@ -1,6 +1,9 @@
 package it.unibo.wastemaster.domain.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import it.unibo.wastemaster.infrastructure.AbstractDatabaseTest;
 import it.unibo.wastemaster.domain.model.Collection;
@@ -84,5 +87,36 @@ class InvoiceManagerTest extends AbstractDatabaseTest {
 
         double totalPaid = getInvoiceManager().getTotalPaidAmountForCustomer(customer);
         assertEquals(100.0, totalPaid, 0.001);
+    }
+
+
+    @Test
+    void testCancelInvoiceSetsDeletedAndUnbillsCollections() {
+        Collection c1 = insertCompletedCollection(LocalDate.now());
+        Invoice invoice = getInvoiceManager().createInvoice(customer, new ArrayList<>(List.of(c1)));
+        int invoiceId = invoice.getInvoiceId();
+
+        boolean canceled = getInvoiceManager().cancelInvoice(invoiceId);
+        assertTrue(canceled);
+
+        Invoice canceledInvoice = getInvoiceDAO().findById(invoiceId).get();
+        assertTrue(canceledInvoice.isDeleted());
+        for (Collection c : canceledInvoice.getCollections()) {
+            assertFalse(c.getIsBilled());
+        }
+    }
+
+    @Test
+    void testCannotModifyCanceledInvoice() {
+        Collection c1 = insertCompletedCollection(LocalDate.now());
+        Invoice invoice = getInvoiceManager().createInvoice(customer, new ArrayList<>(List.of(c1)));
+        int invoiceId = invoice.getInvoiceId();
+
+        getInvoiceManager().cancelInvoice(invoiceId);
+
+        Exception ex = assertThrows(IllegalStateException.class, () ->
+            getInvoiceManager().markInvoiceAsPaid(invoiceId)
+        );
+        assertEquals("Cannot modify a deleted invoice.", ex.getMessage());
     }
 }
