@@ -82,18 +82,19 @@ public class CollectionDAO extends GenericDAO<Collection> {
      * start and end dates (inclusive).
      *
      * @param start the start date of the range (inclusive)
-     * @param end   the end date of the range (inclusive)
+     * @param end the end date of the range (inclusive)
      * @return a list of Collection entities with dates between start and end
      */
     public List<Collection> findByDateRange(final LocalDate start, final LocalDate end) {
         return getEntityManager().createQuery("""
-                SELECT c FROM Collection c
-                WHERE c.date BETWEEN :start AND :end
-                """, Collection.class).setParameter("start", start)
+                        SELECT c FROM Collection c
+                        WHERE c.date BETWEEN :start AND :end
+                        """, Collection.class).setParameter("start", start)
                 .setParameter("end", end).getResultList();
     }
 
-    public List<Collection> findCollectionsByPostalCodeAndDate(final String postalCode, final LocalDate date) {
+    public List<Collection> findCollectionsByPostalCodeAndDate(final String postalCode,
+                                                               final LocalDate date) {
         final String jpql = """
                 SELECT c
                 FROM Collection c
@@ -113,26 +114,29 @@ public class CollectionDAO extends GenericDAO<Collection> {
     }
 
     /**
-     * Retrieves all completed collections that have not been billed for the given
-     * customer.
+     * Retrieves all completed collections that have not yet been billed
+     * for the specified customer.
      *
-     * @param customer the customer to filter collections by
-     * @return list of completed and not yet billed collections for the customer
+     * @param customer the customer whose collections are to be retrieved
+     * @return a list of completed and not yet billed collections for the given customer
      */
     public List<Collection> findCompletedNotBilledByCustomer(final Customer customer) {
         final String jpql = """
                 SELECT c
                 FROM Collection c
-                WHERE c.customer = :customer
+                WHERE c.customer.id = :customerId
                   AND c.collectionStatus = :completedStatus
                   AND c.isBilled = false
                 """;
 
-        return getEntityManager().createQuery(jpql, Collection.class)
-                .setParameter("customer", customer)
-                .setParameter("completedStatus", Collection.CollectionStatus.COMPLETED)
-                .getResultList();
-    }
+        List<Collection> collections =
+                getEntityManager().createQuery(jpql, Collection.class)
+                        .setParameter("customerId", customer.getCustomerId())
+                        .setParameter("completedStatus",
+                                Collection.CollectionStatus.COMPLETED)
+                        .getResultList();
 
+        return collections;
+    }
 
 }
