@@ -64,15 +64,23 @@ public final class TripManager {
     public boolean softDeleteTrip(final Trip trip) {
         try {
             ValidateUtils.requireArgNotNull(trip, "Trip cannot be null");
-            ValidateUtils.requireArgNotNull(trip.getTripId(),
-                    "Trip ID cannot be null");
+            ValidateUtils.requireArgNotNull(trip.getTripId(), "Trip ID cannot be null");
+
+            if (trip.getStatus() != TripStatus.ACTIVE) {
+                throw new IllegalArgumentException("Only ACTIVE trips can be canceled");
+            }
             trip.setStatus(TripStatus.CANCELED);
             tripRepository.update(trip);
+            for (Collection c : trip.getCollections()) {
+                c.setTrip(null);
+                collectionRepository.update(c);
+            }
             return true;
         } catch (IllegalArgumentException e) {
             return false;
         }
     }
+
 
     public void updateVehicle(int tripId, Vehicle newVehicle) {
         Optional<Trip> tripOpt = getTripById(tripId);
