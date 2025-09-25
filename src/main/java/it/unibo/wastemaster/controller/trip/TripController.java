@@ -88,6 +88,20 @@ public final class TripController {
                     editTripButton.setDisable(!rowSelected);
                     deleteTripButton.setDisable(!rowSelected);
                 });
+        tripTable.getSelectionModel().selectedItemProperty()
+                .addListener((obs, oldVal, newVal) -> {
+                    boolean rowSelected = newVal != null;
+                    if (rowSelected) {
+                        String status = newVal.getStatus();
+                        boolean disabled = "CANCELED".equals(status) || "COMPLETED".equals(status);
+                        editTripButton.setDisable(disabled);
+                        deleteTripButton.setDisable(disabled);
+                    } else {
+                        editTripButton.setDisable(true);
+                        deleteTripButton.setDisable(true);
+                    }
+                });
+
         // Carica i dati all'avvio
         loadTrips();
     }
