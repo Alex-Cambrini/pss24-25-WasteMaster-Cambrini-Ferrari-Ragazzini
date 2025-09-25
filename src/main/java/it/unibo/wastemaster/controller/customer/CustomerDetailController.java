@@ -26,14 +26,12 @@ public class CustomerDetailController {
     public void setCustomer(Customer customer) {
         customerNameLabel.setText("Customer: " + customer.getName());
 
-        long totalCollections = collectionManager.countCollectionsByCustomer(customer);
-        long billedCollections = collectionManager.countBilledCollectionsByCustomer(customer);
+
         double totalInvoiced = invoiceManager.getTotalBilledAmountForCustomer(customer);
         double totalPaid = invoiceManager.getTotalPaidAmountForCustomer(customer);
         double totalUnpaid = totalInvoiced - totalPaid;
 
-        totalCollectionsLabel.setText("Total Collections: " + totalCollections);
-        billedCollectionsLabel.setText("Billed Collections: " + billedCollections);
+
         totalInvoicedLabel.setText("Total Invoiced: " + String.format("%.2f", totalInvoiced));
         totalPaidLabel.setText("Total Paid: " + String.format("%.2f", totalPaid));
         totalUnpaidLabel.setText("Total Unpaid: " + String.format("%.2f", totalUnpaid));
