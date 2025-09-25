@@ -1,6 +1,5 @@
 package it.unibo.wastemaster.controller.invoice;
 import it.unibo.wastemaster.application.context.AppContext;
-import it.unibo.wastemaster.controller.customer.CustomerDetailController;
 import it.unibo.wastemaster.controller.main.MainLayoutController;
 import it.unibo.wastemaster.controller.utils.DialogUtils;
 import it.unibo.wastemaster.domain.model.Collection;
