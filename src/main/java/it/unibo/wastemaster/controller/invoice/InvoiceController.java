@@ -153,8 +153,6 @@ public final class InvoiceController {
         }
     }
 
-    
-
     @FXML
     private void handleSearch() {
     String query = searchField.getText().toLowerCase().trim();
@@ -251,7 +249,6 @@ public final class InvoiceController {
         }
     }
 
-
     @FXML
     private void handleMarkAsPaid() {
         InvoiceRow selected = invoiceTable.getSelectionModel().getSelectedItem();
@@ -268,19 +265,35 @@ public final class InvoiceController {
         }
     }
 
-//    @FXML
-//    private void handleViewCustomerDetail() {
-//        InvoiceRow selected = invoiceTable.getSelectionModel().getSelectedItem();
-//        if (selected == null) {
-//            DialogUtils.showError(TITLE_NO_SELECTION, "Please select an invoice.", AppContext.getOwner());
-//            return;
-//        }
-//        Customer customer = selected.getCustomerObject();
-//        CustomerDetailController controller = MainLayoutController.getInstance()
-//            .loadCenterWithController("/layouts/customer/CustomerDetailView.fxml");
-//        controller.setManagers(collectionManager, invoiceManager);
-//        controller.setCustomer(customer);
-//    }
+    @FXML
+    private void handleExportPdf() {
+        InvoiceRow selected = invoiceTable.getSelectionModel().getSelectedItem();
+        if (selected == null) {
+            DialogUtils.showError("No Selection", "Please select an invoice to export.", AppContext.getOwner());
+            return;
+        }
+
+        Optional<Invoice> invoiceOpt = invoiceManager.findInvoiceById(selected.getIdAsInt());
+        if (invoiceOpt.isEmpty()) {
+            DialogUtils.showError("Not Found", "Invoice not found.", AppContext.getOwner());
+            return;
+        }
+
+        try {
+            Invoice invoice = invoiceOpt.get();
+
+            java.nio.file.Path outputPath =
+                    java.nio.file.Paths.get("invoice-" + invoice.getInvoiceId() + ".pdf");
+            try (java.io.FileOutputStream fos = new java.io.FileOutputStream(outputPath.toFile())) {
+                new it.unibo.wastemaster.infrastructure.pdf.InvoicePdfService()
+                        .generateInvoicePdf(invoice, fos);
+            }
+            DialogUtils.showSuccess("PDF generated: " + outputPath.toAbsolutePath(), AppContext.getOwner());
+        } catch (Exception e) {
+            e.printStackTrace();
+            DialogUtils.showError("Export Error", "Could not generate PDF.", AppContext.getOwner());
+        }
+    }
 
     @FXML
     private void handleDeleteInvoice() {
