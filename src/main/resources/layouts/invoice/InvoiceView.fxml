@@ -17,7 +17,7 @@
                 <Button fx:id="addInvoiceButton" mnemonicParsing="false" onAction="#handleAddInvoice" styleClass="success" text="Add Invoice" />
                 <Region prefHeight="20" prefWidth="0.0" HBox.hgrow="ALWAYS" />
                 <Button fx:id="filterButton" onMouseClicked="#showFilterMenu" styleClass="accent" text="Filter ▼" />
-                <ComboBox fx:id="statusFilterCombo" promptText="Filter by Status"/>
+                <ComboBox fx:id="statusFilterCombo" promptText="Filter by Status" />
                 <TextField fx:id="searchField" promptText="Search..." />
                 <Button mnemonicParsing="false" onAction="#handleResetSearch" styleClass="accent, button-outlined" text="Reset" />
             </children>
@@ -36,9 +36,9 @@
         </TableView>
         <HBox alignment="TOP_RIGHT" minHeight="50.0" prefHeight="100.0" prefWidth="600.0" spacing="10.0">
             <children>
-                <Button fx:id="viewCollectionButton" disable="true" onAction="#handleViewCollection" mnemonicParsing="false" text="View Collection" styleClass="accent" />
+                <Button fx:id="viewCollectionButton" disable="true" mnemonicParsing="false" onAction="#handleViewCollection" styleClass="accent" text="View Collection" />
                 <Region prefHeight="200.0" prefWidth="200.0" HBox.hgrow="ALWAYS" />
-                <Button fx:id="viewCustomerButton" disable="true" mnemonicParsing="false" onAction="#handleViewCustomerDetail" styleClass="accent" text="View Customer" />
+                <Button fx:id="viewCustomerButton" disable="true" mnemonicParsing="false" styleClass="accent" text="View Customer" />
                 <Button fx:id="deleteInvoiceButton" disable="true" mnemonicParsing="false" onAction="#handleDeleteInvoice" styleClass="danger" text="Delete" />
                 <Button fx:id="markAsPaidButton" disable="true" mnemonicParsing="false" onAction="#handleMarkAsPaid" styleClass="success" text="Mark as Paid" />
             </children>

@@ -281,6 +281,10 @@ public final class MainLayoutController {
         if (controller != null) {
             controller.setTripManager(
                     AppContext.getServiceFactory().getTripManager());
+            controller.setVehicleManager(AppContext.getServiceFactory()
+                    .getVehicleManager());
+            controller.setCollectionManager(AppContext.getServiceFactory()
+                    .getCollectionManager());
             controller.initData();
         }
     }
@@ -293,6 +297,10 @@ public final class MainLayoutController {
                 loadCenterWithController("/layouts/invoice/InvoiceView.fxml");
         if (controller != null) {
             controller.setInvoiceManager(AppContext.getServiceFactory().getInvoiceManager());
+            controller.setCustomerManager(AppContext.getServiceFactory()
+                    .getCustomerManager());
+            controller.setCollectionManager(AppContext.getServiceFactory()
+                    .getCollectionManager());
             controller.initData();
         }
     }

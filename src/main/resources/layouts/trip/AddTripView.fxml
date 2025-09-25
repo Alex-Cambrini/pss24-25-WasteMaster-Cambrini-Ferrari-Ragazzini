@@ -1,26 +1,116 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
-<VBox spacing="15" alignment="CENTER" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.unibo.wastemaster.controller.trip.AddTripController">
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.Spinner?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.ScrollPane?>
+
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="550.0" prefWidth="700.0" styleClass="center-pane, modal-pane"
+    xmlns="http://javafx.com/javafx/23.0.1"
+    xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.unibo.wastemaster.controller.trip.AddTripController">
+
     <children>
-        <Label text="Add Trip" styleClass="header"/>
-        <GridPane hgap="10" vgap="10">
+        <GridPane hgap="20" prefHeight="374.0" prefWidth="700.0" vgap="10">
+            <columnConstraints>
+                <ColumnConstraints hgrow="SOMETIMES" maxWidth="290.0" minWidth="130.0" prefWidth="150.0" />
+                <ColumnConstraints hgrow="ALWAYS" maxWidth="496.0" minWidth="10.0" prefWidth="480.0" />
+            </columnConstraints>
+            <rowConstraints>
+                <RowConstraints prefHeight="30.0" vgrow="SOMETIMES" />
+                <RowConstraints prefHeight="30.0" vgrow="SOMETIMES" />
+                <RowConstraints prefHeight="30.0" vgrow="SOMETIMES" />
+                <RowConstraints prefHeight="30.0" vgrow="SOMETIMES" />
+                <RowConstraints prefHeight="30.0" vgrow="SOMETIMES" />
+                <RowConstraints prefHeight="120.0" vgrow="ALWAYS" />
+            </rowConstraints>
+
             <children>
-                <Label text="Postal Code:" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
-                <TextField fx:id="postalCodesField" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
-                <Label text="Vehicle:" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
-                <ComboBox fx:id="vehicleCombo" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
-                <Label text="Operators:" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
-                <ListView fx:id="operatorsList" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
-                <Label text="Departure:" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
-                <DatePicker fx:id="departureDate" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
-                <Label text="Return:" GridPane.rowIndex="4" GridPane.columnIndex="0"/>
-                <DatePicker fx:id="returnDate" GridPane.rowIndex="4" GridPane.columnIndex="1"/>
+                <Label text="Departure" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+                <HBox prefHeight="100.0" prefWidth="200.0" GridPane.columnIndex="1">
+                    <children>
+                        <DatePicker fx:id="departureDate" />
+                        <Spinner fx:id="departureTime">
+                            <HBox.margin>
+                                <Insets left="10.0" />
+                            </HBox.margin>
+                        </Spinner>
+                    </children>
+                </HBox>
+
+                <Label text="Return" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+                <HBox prefHeight="100.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                    <children>
+                        <DatePicker fx:id="returnDate" />
+                        <Spinner fx:id="returnTime">
+                            <HBox.margin>
+                                <Insets left="10.0" />
+                            </HBox.margin>
+                        </Spinner>
+                    </children>
+                </HBox>
+
+                <Label text="Postal Code" GridPane.columnIndex="0" GridPane.rowIndex="2" />
+                <ComboBox fx:id="postalCodeCombo" promptText="Select Location" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+
+                <Label text="Vehicle" GridPane.columnIndex="0" GridPane.rowIndex="3" />
+                <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="3">
+                    <children>
+                        <ComboBox fx:id="vehicleCombo" promptText="Select Vehicle" />
+                        <Label fx:id="requiredLicence">
+                            <HBox.margin>
+                                <Insets left="10.0" />
+                            </HBox.margin>
+                        </Label>
+                    </children>
+                </HBox>
+
+                <Label text="Driver" GridPane.columnIndex="0" GridPane.rowIndex="4" />
+                <ComboBox fx:id="driverCombo" promptText="Select Driver" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+
+                <Label text="Operators" GridPane.columnIndex="0" GridPane.rowIndex="5" />
+                <VBox spacing="6" GridPane.columnIndex="1" GridPane.rowIndex="5" VBox.vgrow="ALWAYS">
+                    <children>
+                        <ScrollPane fitToWidth="true" fitToHeight="true" prefHeight="250.0">
+                            <content>
+                                <TableView fx:id="operatorsTable" prefHeight="250.0" prefWidth="410.0">
+                                    <columns>
+                                        <TableColumn fx:id="opSelectCol" text="" prefWidth="40"/>
+                                        <TableColumn fx:id="opNameCol" text="Name" prefWidth="180"/>
+                                        <TableColumn fx:id="opRoleCol" text="Role" prefWidth="90"/>
+                                        <TableColumn fx:id="opLicCol" text="Licence" prefWidth="90"/>
+                                    </columns>
+                                </TableView>
+                            </content>
+                        </ScrollPane>
+                        <Label fx:id="operatorsHint" styleClass="hint" text="0 / 0 selected"/>
+                    </children>
+                </VBox>
             </children>
         </GridPane>
-        <HBox spacing="10" alignment="CENTER_RIGHT">
-            <Button text="Cancel" onAction="#onCancel"/>
-            <Button text="Save" onAction="#onSave"/>
+
+        <HBox alignment="TOP_RIGHT" prefHeight="100.0" prefWidth="200.0" spacing="10.0">
+            <children>
+                <Button onAction="#handleAbortTripCreation" styleClass="danger" text="Cancel" />
+                <Button onAction="#handleSaveTrip" styleClass="success" text="Save" />
+            </children>
+            <padding>
+                <Insets right="20.0" top="10.0" />
+            </padding>
         </HBox>
     </children>
+
+    <padding>
+        <Insets left="20.0" right="20.0" />
+    </padding>
 </VBox>

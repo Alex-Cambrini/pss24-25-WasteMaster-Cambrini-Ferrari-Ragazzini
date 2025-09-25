@@ -3,6 +3,8 @@ package it.unibo.wastemaster.viewmodels;
 import it.unibo.wastemaster.domain.model.Collection;
 import it.unibo.wastemaster.domain.model.Collection.CollectionStatus;
 import java.time.LocalDate;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 
 /**
  * ViewModel class representing a row in the collection table. It wraps a Collection
@@ -16,6 +18,8 @@ public final class CollectionRow {
     private final String zone;
     private final CollectionStatus status;
     private final String customerName;
+    private final Collection collection;
+    private final BooleanProperty selected = new SimpleBooleanProperty(false);
 
     /**
      * Constructs a CollectionRow based on a Collection entity.
@@ -23,6 +27,7 @@ public final class CollectionRow {
      * @param collection the collection entity to represent
      */
     public CollectionRow(final Collection collection) {
+        this.collection = collection;
         this.id = collection.getCollectionId();
         this.wasteName = collection.getWaste().getWasteName();
         this.collectionDate = collection.getCollectionDate();
@@ -31,6 +36,11 @@ public final class CollectionRow {
         this.customerName = collection.getCustomer().getName() + " "
                 + collection.getCustomer().getSurname();
     }
+
+
+    public BooleanProperty selectedProperty() { return selected; }
+    public boolean isSelected() { return selected.get(); }
+    public void setSelected(boolean value) { selected.set(value); }
 
     /**
      * Returns the ID of the collection.
@@ -84,5 +94,9 @@ public final class CollectionRow {
      */
     public String getCustomerName() {
         return customerName;
+    }
+
+    public Collection getCollection() {
+        return collection;
     }
 }
