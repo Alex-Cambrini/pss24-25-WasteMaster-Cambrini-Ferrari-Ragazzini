@@ -80,8 +80,8 @@ dependencies {
     // Dipendenza H2 per il database in memoria durante i test
     testImplementation("com.h2database:h2:2.1.214")
 
-    // iText PDF library
-    implementation("com.itextpdf:itextpdf:5.5.13.3")
+    //OpenPDF library
+    implementation("com.github.librepdf:openpdf:1.3.30")
 }
 
 tasks.withType<Test> {
