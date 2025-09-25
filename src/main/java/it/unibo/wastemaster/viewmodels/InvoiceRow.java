@@ -13,8 +13,9 @@ public final class InvoiceRow {
     private final String amount;
     private final String status;
     private final String issueDate;
-    private final String serviceCounts; // recurringCount / onetimeCount
+    private final String serviceCounts;
     private final String totalAmounts;
+    private final String isCancelled;
 
     public InvoiceRow(Invoice invoice) {
         this.invoice = invoice;
@@ -28,6 +29,7 @@ public final class InvoiceRow {
                 + ", One-time: " + invoice.getOnetimeCount();
         this.totalAmounts = "Recurring: " + String.format("%.2f", invoice.getTotalRecurring())
                 + ", One-time: " + String.format("%.2f", invoice.getTotalOnetime());
+        this.isCancelled = invoice.isDeleted() ? "Yes" : "No";
     }
 
     public String getId() { return id; }
@@ -37,6 +39,7 @@ public final class InvoiceRow {
     public String getIssueDate() { return issueDate; }
     public String getServiceCounts() { return serviceCounts; }
     public String getTotalAmounts() { return totalAmounts; }
+    public String getIsCancelled() { return isCancelled; }
 
     public Invoice getInvoice() { return invoice; }
 }
