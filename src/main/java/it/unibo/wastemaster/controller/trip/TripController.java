@@ -2,6 +2,7 @@ package it.unibo.wastemaster.controller.trip;
 
 import it.unibo.wastemaster.application.context.AppContext;
 import it.unibo.wastemaster.controller.utils.DialogUtils;
+import it.unibo.wastemaster.domain.model.Employee;
 import it.unibo.wastemaster.domain.model.Trip;
 import it.unibo.wastemaster.domain.service.CollectionManager;
 import it.unibo.wastemaster.domain.service.TripManager;
@@ -124,10 +125,13 @@ public final class TripController {
     }
 
     /**
-     * Loads all trips from the database and updates the trip table.
+     * Loads trips visible to the current user and updates the trip table.
+     * Operators see only their assigned trips, while admins and office workers see all trips.
      */
     public void loadTrips() {
-        List<Trip> trips = tripManager.findAllTrips();
+        Employee currentUser = AppContext.getCurrentAccount().getEmployee();
+        List<Trip> trips =
+                tripManager.getTripsForCurrentUser(currentUser);
         allTrips.clear();
         for (Trip trip : trips) {
             allTrips.add(new TripRow(trip));
