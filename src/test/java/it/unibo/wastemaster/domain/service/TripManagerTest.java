@@ -139,30 +139,44 @@ class TripManagerTest extends AbstractDatabaseTest {
 
         @Test
         void testUpdateTrip_and_SoftDeleteTrip() {
-                List<Collection> collections = createCollections();
-                getTripManager().createTrip(
-                                "40100",
-                                vehicle1,
-                                new ArrayList<>(List.of(operator1, operator2)),
-                                departureTime,
-                                expectedReturnTime,
-                                new ArrayList<>(collections));
+        List<Collection> collections = createCollections();
+        getTripManager().createTrip(
+                "40100",
+                vehicle1,
+                new ArrayList<>(List.of(operator1, operator2)),
+                departureTime,
+                expectedReturnTime,
+                new ArrayList<>(collections));
 
-                Trip trip = getTripDAO().findAll().get(0);
+        Trip trip = getTripDAO().findAll().get(0);
 
-                trip.setStatus(Trip.TripStatus.COMPLETED);
-                getTripManager().updateTrip(trip);
+        trip.setStatus(Trip.TripStatus.COMPLETED);
+        getTripManager().updateTrip(trip);
 
-                Trip afterUpdate = getTripDAO().findById(trip.getTripId()).orElseThrow();
-                assertEquals(Trip.TripStatus.COMPLETED, afterUpdate.getStatus());
+        Trip afterUpdate = getTripDAO().findById(trip.getTripId()).orElseThrow();
+        assertEquals(Trip.TripStatus.COMPLETED, afterUpdate.getStatus());
 
-                assertTrue(getTripManager().softDeleteTrip(afterUpdate));
-                Trip canceled = getTripManager().getTripById(trip.getTripId()).orElseThrow();
-                assertEquals(Trip.TripStatus.CANCELED, canceled.getStatus());
+        assertFalse(getTripManager().softDeleteTrip(afterUpdate));
 
-                assertFalse(getTripManager().softDeleteTrip(null));
-                Trip noId = new Trip();
-                assertFalse(getTripManager().softDeleteTrip(noId));
+        List<Collection> collections2 = createCollections();
+        getTripManager().createTrip(
+                "20100",
+                vehicle1,
+                new ArrayList<>(List.of(operator1)),
+                departureTime.plusDays(1),
+                expectedReturnTime.plusDays(1),
+                new ArrayList<>(collections2));
+        Trip activeTrip = getTripDAO().findAll().stream()
+                .filter(t -> t.getStatus() == Trip.TripStatus.ACTIVE)
+                .findFirst().orElseThrow();
+        assertTrue(getTripManager().softDeleteTrip(activeTrip));
+        Trip canceled = getTripManager().getTripById(activeTrip.getTripId()).orElseThrow();
+        assertEquals(Trip.TripStatus.CANCELED, canceled.getStatus());
+
+        assertFalse(getTripManager().softDeleteTrip(null));
+        Trip noId = new Trip();
+        noId.setCollections(new ArrayList<>());
+        assertFalse(getTripManager().softDeleteTrip(noId));
         }
 
         @Test
