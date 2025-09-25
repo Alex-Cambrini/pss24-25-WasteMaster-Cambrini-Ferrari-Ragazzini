@@ -159,10 +159,7 @@ public final class TripController {
                 "Are you sure you want to cancel this trip?",
                 AppContext.getOwner()
         );
-
-        if (!confirmed) {
-            return;
-        }
+        if (!confirmed) return;
 
         Optional<Trip> tripOpt = tripManager.getTripById(selected.getIdAsInt());
         if (tripOpt.isEmpty()) {
@@ -171,8 +168,9 @@ public final class TripController {
             return;
         }
 
-        var trip = tripOpt.get();
+        Trip trip = tripOpt.get();
         boolean success = tripManager.softDeleteTrip(trip);
+        trip.getCollections().clear(); // coerenza in memoria
         if (success) {
             loadTrips();
         } else {
