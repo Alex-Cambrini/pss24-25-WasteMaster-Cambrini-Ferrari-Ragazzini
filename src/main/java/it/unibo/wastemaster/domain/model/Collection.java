@@ -87,7 +87,9 @@ public class Collection {
     private Schedule schedule;
 
     /** True if the collection has been billed, false otherwise. */
-    private Boolean isBilled = false;
+    @Column(nullable = false)
+    private boolean isBilled = false;
+
 
     /**
      * Trip associated with the collection (optional).
