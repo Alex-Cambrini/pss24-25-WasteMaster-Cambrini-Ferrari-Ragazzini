@@ -1,14 +1,13 @@
 package it.unibo.wastemaster.infrastructure.dao;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.List;
-
 import it.unibo.wastemaster.domain.model.Collection.CollectionStatus;
 import it.unibo.wastemaster.domain.model.Employee;
 import it.unibo.wastemaster.domain.model.Trip;
 import it.unibo.wastemaster.domain.model.Vehicle;
 import jakarta.persistence.EntityManager;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * DAO class for managing Trip entities.
@@ -58,19 +57,21 @@ public class TripDAO extends GenericDAO<Trip> {
     public List<Employee> findAvailableOperators(LocalDateTime start, LocalDateTime end) {
         String jpql = """
                 SELECT e FROM Employee e
-                WHERE NOT EXISTS (
-                    SELECT 1 FROM Trip t JOIN t.operators o
-                    WHERE o = e
-                      AND t.status = :active
-                      AND t.departureTime < :tripEnd
-                      AND t.expectedReturnTime > :tripStart
-                )
+                WHERE e.role = :operatorRole
+                  AND NOT EXISTS (
+                      SELECT 1 FROM Trip t JOIN t.operators o
+                      WHERE o = e
+                        AND t.status = :active
+                        AND t.departureTime < :tripEnd
+                        AND t.expectedReturnTime > :tripStart
+                  )
                 """;
 
         return getEntityManager().createQuery(jpql, Employee.class)
                 .setParameter("active", Trip.TripStatus.ACTIVE)
                 .setParameter("tripStart", start)
                 .setParameter("tripEnd", end)
+                .setParameter("operatorRole", Employee.Role.OPERATOR)
                 .getResultList();
     }
 
