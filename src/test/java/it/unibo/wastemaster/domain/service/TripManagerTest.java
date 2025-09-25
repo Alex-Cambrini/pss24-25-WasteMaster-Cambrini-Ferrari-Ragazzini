@@ -306,4 +306,33 @@ class TripManagerTest extends AbstractDatabaseTest {
                 assertTrue(caps.contains("40100"));
         }
 
+
+        @Test
+        void testGetTripsForCurrentUser() {
+        List<Collection> collections1 = createCollections();
+        List<Collection> collections2 = createCollections();
+
+        getTripManager().createTrip(
+                "40100", vehicle1,
+                new ArrayList<>(List.of(operator1)),
+                departureTime, expectedReturnTime,
+                new ArrayList<>(collections1));
+
+        getTripManager().createTrip(
+                "20100", vehicle1,
+                new ArrayList<>(List.of(operator2)),
+                departureTime.plusDays(1), expectedReturnTime.plusDays(1),
+                new ArrayList<>(collections2));
+
+       
+        Employee admin = new Employee("Admin", "User", new Location("Via Admin", "1", "Bologna", "40100"),
+                "admin@example.com", "0000000000", Employee.Role.ADMINISTRATOR, Employee.Licence.C1);
+        List<Trip> allTrips = getTripManager().getTripsForCurrentUser(admin);
+        assertTrue(allTrips.size() >= 2);
+
+        List<Trip> operator1Trips = getTripManager().getTripsForCurrentUser(operator1);
+        assertTrue(operator1Trips.stream().allMatch(t -> t.getOperators().contains(operator1)));
+        List<Trip> operator2Trips = getTripManager().getTripsForCurrentUser(operator2);
+        assertTrue(operator2Trips.stream().allMatch(t -> t.getOperators().contains(operator2)));
+        }
 }
