@@ -91,12 +91,12 @@ class InvoiceManagerTest extends AbstractDatabaseTest {
 
 
     @Test
-    void testCancelInvoiceSetsDeletedAndUnbillsCollections() {
+    void testDeleteInvoiceSetsDeletedAndUnbillsCollections() {
         Collection c1 = insertCompletedCollection(LocalDate.now());
         Invoice invoice = getInvoiceManager().createInvoice(customer, new ArrayList<>(List.of(c1)));
         int invoiceId = invoice.getInvoiceId();
 
-        boolean canceled = getInvoiceManager().cancelInvoice(invoiceId);
+        boolean canceled = getInvoiceManager().deleteInvoice(invoiceId);
         assertTrue(canceled);
 
         Invoice canceledInvoice = getInvoiceDAO().findById(invoiceId).get();
@@ -112,7 +112,7 @@ class InvoiceManagerTest extends AbstractDatabaseTest {
         Invoice invoice = getInvoiceManager().createInvoice(customer, new ArrayList<>(List.of(c1)));
         int invoiceId = invoice.getInvoiceId();
 
-        getInvoiceManager().cancelInvoice(invoiceId);
+        getInvoiceManager().deleteInvoice(invoiceId);
 
         Exception ex = assertThrows(IllegalStateException.class, () ->
             getInvoiceManager().markInvoiceAsPaid(invoiceId)
