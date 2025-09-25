@@ -43,7 +43,7 @@ public class EditTripController {
 
     private void populateFields() {
         if (tripToEdit == null) return;
-        postalCodesField.setText(tripToEdit.getPostalCodes());
+        postalCodesField.setText(tripToEdit.getPostalCode());
         vehicleCombo.setValue(tripToEdit.getAssignedVehicle());
         operatorsList.getSelectionModel().clearSelection();
         for (Employee op : tripToEdit.getOperators()) {
@@ -74,7 +74,7 @@ public class EditTripController {
         LocalDateTime retDateTime = retDate.atStartOfDay();
 
         // Aggiorna direttamente i campi del trip
-        tripToEdit.setPostalCodes(postalCodes);
+        tripToEdit.setPostalCode(postalCodes);
         tripToEdit.setAssignedVehicle(vehicle);
         tripToEdit.setOperators(operators);
         tripToEdit.setDepartureTime(depDateTime);
