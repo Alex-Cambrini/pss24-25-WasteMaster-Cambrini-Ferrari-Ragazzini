@@ -12,8 +12,13 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.ScrollPane?>
 
-<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="700.0" styleClass="center-pane, modal-pane" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.unibo.wastemaster.controller.trip.AddTripController">
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="550.0" prefWidth="700.0" styleClass="center-pane, modal-pane"
+    xmlns="http://javafx.com/javafx/23.0.1"
+    xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.unibo.wastemaster.controller.trip.AddTripController">
 
     <children>
         <GridPane hgap="20" prefHeight="374.0" prefWidth="700.0" vgap="10">
@@ -32,52 +37,63 @@
 
             <children>
                 <Label text="Departure" GridPane.columnIndex="0" GridPane.rowIndex="0" />
-            <HBox prefHeight="100.0" prefWidth="200.0" GridPane.columnIndex="1">
-               <children>
-                      <DatePicker fx:id="departureDate" />
-                  <Spinner fx:id="departureTime">
-                     <HBox.margin>
-                        <Insets left="10.0" />
-                     </HBox.margin>
-                  </Spinner>
-               </children>
-            </HBox>
+                <HBox prefHeight="100.0" prefWidth="200.0" GridPane.columnIndex="1">
+                    <children>
+                        <DatePicker fx:id="departureDate" />
+                        <Spinner fx:id="departureTime">
+                            <HBox.margin>
+                                <Insets left="10.0" />
+                            </HBox.margin>
+                        </Spinner>
+                    </children>
+                </HBox>
 
                 <Label text="Return" GridPane.columnIndex="0" GridPane.rowIndex="1" />
-            <HBox prefHeight="100.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
-               <children>
-                      <DatePicker fx:id="returnDate" />
-                  <Spinner fx:id="returnTime">
-                     <HBox.margin>
-                        <Insets left="10.0" />
-                     </HBox.margin>
-                  </Spinner>
-               </children>
-            </HBox>
+                <HBox prefHeight="100.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                    <children>
+                        <DatePicker fx:id="returnDate" />
+                        <Spinner fx:id="returnTime">
+                            <HBox.margin>
+                                <Insets left="10.0" />
+                            </HBox.margin>
+                        </Spinner>
+                    </children>
+                </HBox>
 
                 <Label text="Postal Code" GridPane.columnIndex="0" GridPane.rowIndex="2" />
                 <ComboBox fx:id="postalCodeCombo" promptText="Select Location" GridPane.columnIndex="1" GridPane.rowIndex="2" />
 
                 <Label text="Vehicle" GridPane.columnIndex="0" GridPane.rowIndex="3" />
-            <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="3">
-               <children>
-                      <ComboBox fx:id="vehicleCombo" promptText="Select Vehicle" />
-                  <Label fx:id="requiredLicence">
-                     <HBox.margin>
-                        <Insets left="10.0" />
-                     </HBox.margin>
-                  </Label>
-               </children>
-            </HBox>
+                <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="3">
+                    <children>
+                        <ComboBox fx:id="vehicleCombo" promptText="Select Vehicle" />
+                        <Label fx:id="requiredLicence">
+                            <HBox.margin>
+                                <Insets left="10.0" />
+                            </HBox.margin>
+                        </Label>
+                    </children>
+                </HBox>
 
                 <Label text="Driver" GridPane.columnIndex="0" GridPane.rowIndex="4" />
                 <ComboBox fx:id="driverCombo" promptText="Select Driver" GridPane.columnIndex="1" GridPane.rowIndex="4" />
 
                 <Label text="Operators" GridPane.columnIndex="0" GridPane.rowIndex="5" />
-                <VBox spacing="6" GridPane.columnIndex="1" GridPane.rowIndex="5">
+                <VBox spacing="6" GridPane.columnIndex="1" GridPane.rowIndex="5" VBox.vgrow="ALWAYS">
                     <children>
-                        <ListView fx:id="operatorsList" prefHeight="159.0" prefWidth="410.0" />
-                        <Label fx:id="operatorsHint" styleClass="hint" text="0 / 0 selected" />
+                        <ScrollPane fitToWidth="true" fitToHeight="true" prefHeight="250.0">
+                            <content>
+                                <TableView fx:id="operatorsTable" prefHeight="250.0" prefWidth="410.0">
+                                    <columns>
+                                        <TableColumn fx:id="opSelectCol" text="" prefWidth="40"/>
+                                        <TableColumn fx:id="opNameCol" text="Name" prefWidth="180"/>
+                                        <TableColumn fx:id="opRoleCol" text="Role" prefWidth="90"/>
+                                        <TableColumn fx:id="opLicCol" text="Licence" prefWidth="90"/>
+                                    </columns>
+                                </TableView>
+                            </content>
+                        </ScrollPane>
+                        <Label fx:id="operatorsHint" styleClass="hint" text="0 / 0 selected"/>
                     </children>
                 </VBox>
             </children>
