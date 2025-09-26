@@ -9,6 +9,7 @@ import it.unibo.wastemaster.controller.trip.TripController;
 import it.unibo.wastemaster.controller.utils.DialogUtils;
 import it.unibo.wastemaster.controller.vehicle.VehicleController;
 import it.unibo.wastemaster.controller.waste.WasteController;
+import it.unibo.wastemaster.controller.utils.AutoRefreshable;
 import it.unibo.wastemaster.domain.model.Employee;
 import java.io.IOException;
 import java.net.URL;
@@ -32,8 +33,7 @@ public final class MainLayoutController {
 
     private static final int LOGIN_WINDOW_WIDTH = 400;
     private static final int LOGIN_WINDOW_HEIGHT = 300;
-    private static final Logger LOGGER =
-            Logger.getLogger(MainLayoutController.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(MainLayoutController.class.getName());
 
     private static final String ERROR_LOADING_FXML = "Error loading FXML";
     private static final String CUSTOMER_MANAGEMENT = "Customer Management";
@@ -99,7 +99,8 @@ public final class MainLayoutController {
     }
 
     /**
-     * Initializes the controller after its root element has been completely processed.
+     * Initializes the controller after its root element has been completely
+     * processed.
      */
     @FXML
     public void initialize() {
@@ -142,9 +143,10 @@ public final class MainLayoutController {
     }
 
     /**
-     * Loads the specified FXML file into the center pane and returns its controller.
+     * Loads the specified FXML file into the center pane and returns its
+     * controller.
      *
-     * @param <T> the type of the controller
+     * @param <T>      the type of the controller
      * @param fxmlPath the path to the FXML file
      * @return the controller instance, or null if loading fails
      */
@@ -193,8 +195,7 @@ public final class MainLayoutController {
         setPageTitle(CUSTOMER_MANAGEMENT);
 
         System.out.println("[DEBUG] Carico CustomersView.fxml...");
-        CustomersController controller =
-                loadCenterWithController("/layouts/customer/CustomersView.fxml");
+        CustomersController controller = loadCenterWithController("/layouts/customer/CustomersView.fxml");
 
         System.out.println("[DEBUG] Controller caricato: " + (controller != null));
 
@@ -203,6 +204,7 @@ public final class MainLayoutController {
             System.out.println("[DEBUG] CustomerManager: " + cm);
             controller.setCustomerManager(cm);
             controller.initData();
+        startAutoRefreshIfSupported(controller);
         }
     }
 
@@ -224,18 +226,19 @@ public final class MainLayoutController {
                     .getWasteScheduleManager());
         }
         controller.initData();
+        startAutoRefreshIfSupported(controller);
     }
 
     @FXML
     private void handleVehicle() {
         vehiclesLink.setVisited(false);
         setPageTitle(VEHICLE_MANAGEMENT);
-        VehicleController controller =
-                loadCenterWithController("/layouts/vehicle/VehicleView.fxml");
+        VehicleController controller = loadCenterWithController("/layouts/vehicle/VehicleView.fxml");
         if (controller != null) {
             controller.setVehicleManager(AppContext.getServiceFactory()
                     .getVehicleManager());
             controller.initData();
+            startAutoRefreshIfSupported(controller);
         }
     }
 
@@ -243,12 +246,12 @@ public final class MainLayoutController {
     private void handleEmployee() {
         employeesLink.setVisited(false);
         setPageTitle(EMPLOYEE_MANAGEMENT);
-        EmployeeController controller =
-                loadCenterWithController("/layouts/employee/EmployeeView.fxml");
+        EmployeeController controller = loadCenterWithController("/layouts/employee/EmployeeView.fxml");
         if (controller != null) {
             controller.setEmployeeManager(
                     AppContext.getServiceFactory().getEmployeeManager());
             controller.initData();
+            startAutoRefreshIfSupported(controller);
         }
     }
 
@@ -256,8 +259,7 @@ public final class MainLayoutController {
     private void handleSchedule() {
         schedulesLink.setVisited(false);
         setPageTitle(SCHEDULE_MANAGEMENT);
-        ScheduleController controller =
-                loadCenterWithController("/layouts/schedule/ScheduleView.fxml");
+        ScheduleController controller = loadCenterWithController("/layouts/schedule/ScheduleView.fxml");
         if (controller != null) {
             controller.setScheduleManager(
                     AppContext.getServiceFactory().getScheduleManager());
@@ -269,6 +271,7 @@ public final class MainLayoutController {
                     .getCollectionManager());
         }
         controller.initData();
+        startAutoRefreshIfSupported(controller);
     }
 
     @FXML
@@ -276,8 +279,7 @@ public final class MainLayoutController {
         tripsLink.setVisited(false);
         setPageTitle(TRIP_MANAGEMENT);
 
-        TripController controller =
-                loadCenterWithController("/layouts/trip/TripView.fxml");
+        TripController controller = loadCenterWithController("/layouts/trip/TripView.fxml");
         if (controller != null) {
             controller.setTripManager(
                     AppContext.getServiceFactory().getTripManager());
@@ -285,24 +287,25 @@ public final class MainLayoutController {
                     .getVehicleManager());
             controller.setCollectionManager(AppContext.getServiceFactory()
                     .getCollectionManager());
-            controller.initData();
         }
+        controller.initData();
+        startAutoRefreshIfSupported(controller);
     }
 
     @FXML
     private void handleInvoice() {
         invoicesLink.setVisited(false);
         setPageTitle(INVOICE_MANAGEMENT);
-        InvoiceController controller =
-                loadCenterWithController("/layouts/invoice/InvoiceView.fxml");
+        InvoiceController controller = loadCenterWithController("/layouts/invoice/InvoiceView.fxml");
         if (controller != null) {
             controller.setInvoiceManager(AppContext.getServiceFactory().getInvoiceManager());
             controller.setCustomerManager(AppContext.getServiceFactory()
                     .getCustomerManager());
             controller.setCollectionManager(AppContext.getServiceFactory()
                     .getCollectionManager());
-            controller.initData();
         }
+        controller.initData();
+        startAutoRefreshIfSupported(controller);
     }
 
     /**
@@ -342,18 +345,17 @@ public final class MainLayoutController {
                 "Are you sure you want to logout?",
                 AppContext.getOwner())) {
             try {
+                stopAutoRefreshIfSupported(currentController);
+                currentController = null;
+
                 AppContext.setCurrentAccount(null);
 
-                FXMLLoader loader = new FXMLLoader(getClass()
-                        .getResource("/layouts/login/LoginView.fxml"));
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("/layouts/login/LoginView.fxml"));
                 Parent loginRoot = loader.load();
 
                 Scene loginScene = new Scene(loginRoot);
                 loginScene.getStylesheets().add(
-                        Objects.requireNonNull(getClass()
-                                        .getResource("/css/primer-light.css"))
-                                .toExternalForm()
-                );
+                        Objects.requireNonNull(getClass().getResource("/css/primer-light.css")).toExternalForm());
 
                 Stage stage = AppContext.getOwner();
                 stage.setScene(loginScene);
@@ -363,9 +365,23 @@ public final class MainLayoutController {
                 stage.setMinWidth(LOGIN_WINDOW_WIDTH);
                 stage.setMinHeight(LOGIN_WINDOW_HEIGHT);
 
+                centerPane.getChildren().clear();
+
             } catch (IOException e) {
                 LOGGER.log(Level.SEVERE, "Error during logout", e);
             }
+        }
+    }
+
+    private void startAutoRefreshIfSupported(Object controller) {
+        if (controller instanceof AutoRefreshable ar) {
+            ar.startAutoRefresh();
+        }
+    }
+
+    private void stopAutoRefreshIfSupported(Object controller) {
+        if (controller instanceof AutoRefreshable ar) {
+            ar.stopAutoRefresh();
         }
     }
 }
