@@ -5,13 +5,15 @@ import it.unibo.wastemaster.controller.utils.DialogUtils;
 import it.unibo.wastemaster.domain.model.Employee;
 import it.unibo.wastemaster.domain.model.Trip;
 import it.unibo.wastemaster.domain.model.Vehicle;
-import it.unibo.wastemaster.domain.service.TripManager;
-import it.unibo.wastemaster.domain.repository.VehicleRepository;
 import it.unibo.wastemaster.domain.repository.EmployeeRepository;
+import it.unibo.wastemaster.domain.repository.VehicleRepository;
+import it.unibo.wastemaster.domain.service.TripManager;
+import java.util.List;
+import java.util.Optional;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
-import java.util.Optional;
+import javafx.scene.control.cell.TextFieldListCell;
 
 public final class EditTripController {
 
@@ -55,6 +57,18 @@ public final class EditTripController {
         }
         if (employeeRepository != null) {
             operatorsList.getItems().setAll(employeeRepository.findAllActive());
+            operatorsList.setCellFactory(list -> new ListCell<>() {
+                @Override
+                protected void updateItem(Employee emp, boolean empty) {
+                    super.updateItem(emp, empty);
+                    if (empty || emp == null) {
+                        setText(null);
+                    } else {
+                        setText(emp.getName() + " " + emp.getSurname() + " (" + emp.getEmail() + ")");
+                    }
+                }
+            });
+            operatorsList.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         }
     }
 
