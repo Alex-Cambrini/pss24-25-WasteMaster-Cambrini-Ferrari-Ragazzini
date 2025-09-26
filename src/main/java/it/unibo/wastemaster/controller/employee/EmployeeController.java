@@ -1,6 +1,7 @@
 package it.unibo.wastemaster.controller.employee;
 
 import it.unibo.wastemaster.controller.main.MainLayoutController;
+import it.unibo.wastemaster.controller.utils.AutoRefreshable;
 import it.unibo.wastemaster.controller.utils.DialogUtils;
 import it.unibo.wastemaster.domain.model.Employee;
 import it.unibo.wastemaster.domain.model.Employee.Licence;
@@ -28,10 +29,12 @@ import javafx.stage.Stage;
 import javafx.util.Duration;
 
 /**
- * Controller for managing the employee view. Handles loading, filtering, adding, editing,
- * and deleting employees, as well as managing the table and search functionalities.
+ * Controller for managing the employee view. Handles loading, filtering,
+ * adding, editing,
+ * and deleting employees, as well as managing the table and search
+ * functionalities.
  */
-public final class EmployeeController {
+public final class EmployeeController implements AutoRefreshable {
 
     private static final String FILTER_NAME = "name";
     private static final String FILTER_SURNAME = "surname";
@@ -41,11 +44,10 @@ public final class EmployeeController {
     private static final String FILTER_LOCATION = "location";
     private static final int REFRESH_INTERVAL_SECONDS = 30;
     private static final String ERROR_NAVIGATION = "Navigation error";
-    private final ObservableList<EmployeeRow> allEmployees =
-            FXCollections.observableArrayList();
-    private final ObservableList<String> activeFilters =
-            FXCollections.observableArrayList(FILTER_NAME, FILTER_SURNAME, FILTER_EMAIL,
-                    FILTER_ROLE, FILTER_LICENCE, FILTER_LOCATION);
+    private final ObservableList<EmployeeRow> allEmployees = FXCollections.observableArrayList();
+    private final ObservableList<String> activeFilters = FXCollections.observableArrayList(FILTER_NAME, FILTER_SURNAME,
+            FILTER_EMAIL,
+            FILTER_ROLE, FILTER_LICENCE, FILTER_LOCATION);
     private Timeline refreshTimeline;
     private ContextMenu filterMenu;
     private Stage owner;
@@ -141,31 +143,38 @@ public final class EmployeeController {
     public void initData() {
         System.out.println("[DEBUG] initData EmployeeController called");
         loadEmployee();
-        startAutoRefresh();
     }
 
-
-    private void startAutoRefresh() {
-        refreshTimeline =
-                new Timeline(new KeyFrame(Duration.seconds(REFRESH_INTERVAL_SECONDS),
-                        event -> loadEmployee()));
+    @Override
+    public void startAutoRefresh() {
+        if (refreshTimeline != null || employeeManager == null) {
+            return;
+        }
+        refreshTimeline = new Timeline(new KeyFrame(
+                Duration.seconds(REFRESH_INTERVAL_SECONDS),
+                event -> loadEmployee()));
         refreshTimeline.setCycleCount(javafx.animation.Animation.INDEFINITE);
         refreshTimeline.play();
     }
 
     /**
-     * Stops the automatic refresh of the employee table, if it is currently active. This
+     * Stops the automatic refresh of the employee table, if it is currently active.
+     * This
      * is typically used when the view is being closed or refreshed manually.
      */
+    @Override
     public void stopAutoRefresh() {
         if (refreshTimeline != null) {
             refreshTimeline.stop();
+            refreshTimeline = null;
         }
     }
 
     /**
-     * Loads the employee data from the database and populates the employee table. This
-     * method retrieves all employee details, clears the existing list, and adds new rows
+     * Loads the employee data from the database and populates the employee table.
+     * This
+     * method retrieves all employee details, clears the existing list, and adds new
+     * rows
      * to the table.
      */
     public void loadEmployee() {
@@ -198,17 +207,17 @@ public final class EmployeeController {
             if ((activeFilters.contains(FILTER_NAME)
                     && row.getName().toLowerCase().contains(query))
                     || (activeFilters.contains(FILTER_SURNAME)
-                    && row.getSurname().toLowerCase().contains(query))
+                            && row.getSurname().toLowerCase().contains(query))
                     || (activeFilters.contains(FILTER_EMAIL)
-                    && row.getEmail().toLowerCase().contains(query))
+                            && row.getEmail().toLowerCase().contains(query))
                     || (activeFilters.contains(FILTER_ROLE)
-                    && formatEnumOrNone(row.getRole()).toLowerCase()
-                    .contains(query))
+                            && formatEnumOrNone(row.getRole()).toLowerCase()
+                                    .contains(query))
                     || (activeFilters.contains(FILTER_LICENCE)
-                    && formatEnumOrNone(row.getLicence()).toLowerCase()
-                    .contains(query))
+                            && formatEnumOrNone(row.getLicence()).toLowerCase()
+                                    .contains(query))
                     || (activeFilters.contains(FILTER_LOCATION)
-                    && row.getFullLocation().toLowerCase().contains(query))) {
+                            && row.getFullLocation().toLowerCase().contains(query))) {
 
                 filtered.add(row);
             }
@@ -229,15 +238,13 @@ public final class EmployeeController {
         boolean confirmed = DialogUtils.showConfirmationDialog(
                 "Confirm Deletion",
                 "Are you sure you want to delete this employee?",
-                owner
-        );
+                owner);
 
         if (!confirmed) {
             return;
         }
 
-        Optional<Employee> employeeOpt =
-                employeeManager.findEmployeeByEmail(selected.getEmail());
+        Optional<Employee> employeeOpt = employeeManager.findEmployeeByEmail(selected.getEmail());
         if (employeeOpt.isEmpty()) {
             DialogUtils.showError("Not Found",
                     "The selected employee could not be found.", owner);
@@ -258,12 +265,11 @@ public final class EmployeeController {
     @FXML
     private void handleAddEmployee() {
         try {
-            Optional<AddEmployeeController> controllerOpt =
-                    DialogUtils.showModalWithController("Add Employee",
-                            "/layouts/employee/AddEmployeeView.fxml", owner,
-                            ctrl -> {
-                                ctrl.setEmployeeManager(employeeManager);
-                            });
+            Optional<AddEmployeeController> controllerOpt = DialogUtils.showModalWithController("Add Employee",
+                    "/layouts/employee/AddEmployeeView.fxml", owner,
+                    ctrl -> {
+                        ctrl.setEmployeeManager(employeeManager);
+                    });
 
             if (controllerOpt.isPresent()) {
                 loadEmployee();
@@ -286,8 +292,7 @@ public final class EmployeeController {
             return;
         }
 
-        Optional<Employee> employeeOpt =
-                employeeManager.findEmployeeByEmail(selected.getEmail());
+        Optional<Employee> employeeOpt = employeeManager.findEmployeeByEmail(selected.getEmail());
         if (employeeOpt.isEmpty()) {
             DialogUtils.showError("Not Found",
                     "Employee not found.", owner);
@@ -296,14 +301,12 @@ public final class EmployeeController {
 
         Employee employee = employeeOpt.get();
         try {
-            Optional<EditEmployeeController> controllerOpt =
-                    DialogUtils.showModalWithController("Edit Employee",
-                            "/layouts/employee/EditEmployeeView.fxml", owner,
-                            ctrl -> {
-                                ctrl.setEmployeeToEdit(employee);
-                                ctrl.setEmployeeManager(employeeManager);
-                            }
-                    );
+            Optional<EditEmployeeController> controllerOpt = DialogUtils.showModalWithController("Edit Employee",
+                    "/layouts/employee/EditEmployeeView.fxml", owner,
+                    ctrl -> {
+                        ctrl.setEmployeeToEdit(employee);
+                        ctrl.setEmployeeManager(employeeManager);
+                    });
 
             if (controllerOpt.isPresent()) {
                 loadEmployee();
@@ -334,9 +337,9 @@ public final class EmployeeController {
 
         filterMenu = new ContextMenu();
 
-        String[] fields = {FILTER_NAME, FILTER_SURNAME, FILTER_EMAIL, FILTER_ROLE,
-                FILTER_LICENCE, FILTER_LOCATION};
-        String[] labels = {"Name", "Surname", "Email", "Role", "Licence", "Location"};
+        String[] fields = { FILTER_NAME, FILTER_SURNAME, FILTER_EMAIL, FILTER_ROLE,
+                FILTER_LICENCE, FILTER_LOCATION };
+        String[] labels = { "Name", "Surname", "Email", "Role", "Licence", "Location" };
 
         for (int i = 0; i < fields.length; i++) {
             String key = fields[i];
@@ -346,8 +349,8 @@ public final class EmployeeController {
             checkBox.setSelected(activeFilters.contains(key));
 
             checkBox.selectedProperty().addListener((obs,
-                                                     wasSelected,
-                                                     isSelected) -> {
+                    wasSelected,
+                    isSelected) -> {
                 if (isSelected != null && isSelected) {
                     if (!activeFilters.contains(key)) {
                         activeFilters.add(key);
@@ -378,8 +381,10 @@ public final class EmployeeController {
     }
 
     /**
-     * Returns to the employee view by loading the appropriate FXML layout. Restores the
-     * previous title and loads the employee management screen. Displays an error dialog
+     * Returns to the employee view by loading the appropriate FXML layout. Restores
+     * the
+     * previous title and loads the employee management screen. Displays an error
+     * dialog
      * if the view fails to load.
      */
     public void returnToEmployeeView() {

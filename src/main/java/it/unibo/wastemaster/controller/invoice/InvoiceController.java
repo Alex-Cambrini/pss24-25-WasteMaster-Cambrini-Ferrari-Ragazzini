@@ -2,6 +2,7 @@ package it.unibo.wastemaster.controller.invoice;
 
 import it.unibo.wastemaster.application.context.AppContext;
 import it.unibo.wastemaster.controller.main.MainLayoutController;
+import it.unibo.wastemaster.controller.utils.AutoRefreshable;
 import it.unibo.wastemaster.controller.utils.DialogUtils;
 import it.unibo.wastemaster.domain.model.Collection;
 import it.unibo.wastemaster.domain.model.Invoice;
@@ -30,7 +31,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
-public final class InvoiceController {
+public final class InvoiceController implements AutoRefreshable {
 
     private static final int REFRESH_INTERVAL_SECONDS = 30;
 
@@ -179,23 +180,29 @@ public final class InvoiceController {
                     "Managers must be set before calling initData");
         }
         loadInvoices();
-        startAutoRefresh();
     }
 
-    private void startAutoRefresh() {
-        refreshTimeline = new Timeline(new KeyFrame(Duration.seconds(REFRESH_INTERVAL_SECONDS),
-                e -> loadInvoices()));
+    @Override
+    public void startAutoRefresh() {
+        if (refreshTimeline != null)
+            return;
+        refreshTimeline = new Timeline(
+                new KeyFrame(Duration.seconds(REFRESH_INTERVAL_SECONDS), e -> loadInvoices()));
         refreshTimeline.setCycleCount(Timeline.INDEFINITE);
         refreshTimeline.play();
     }
 
+    @Override
     public void stopAutoRefresh() {
         if (refreshTimeline != null) {
             refreshTimeline.stop();
+            refreshTimeline = null;
         }
     }
 
     private void loadInvoices() {
+        if (AppContext.getCurrentAccount() == null)
+            return;
         allInvoices.clear();
         List<Invoice> invoices = invoiceManager.getAllInvoices();
         for (Invoice invoice : invoices) {
