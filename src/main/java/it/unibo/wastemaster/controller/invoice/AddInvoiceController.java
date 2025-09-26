@@ -23,7 +23,7 @@ public class AddInvoiceController {
     @FXML private TableColumn<CollectionRow, Integer> idCol;
     @FXML private TableColumn<CollectionRow, String> dateCol;
     @FXML private TableColumn<CollectionRow, String> scheduleCol;
-    @FXML private TextField selectedCountField;
+    @FXML private Label selectedCountField;
     @FXML private Button cancelButton;
     @FXML private Button saveButton;
 
@@ -112,7 +112,6 @@ public class AddInvoiceController {
 
     private void setupSelectedCountField() {
         selectedCountField.setText("0");
-        selectedCountField.setEditable(false);
     }
 
     private void setupButtons() {
