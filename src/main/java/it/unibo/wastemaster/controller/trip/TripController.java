@@ -73,6 +73,12 @@ public final class TripController {
     private TableColumn<TripRow, String> returnColumn;
     @FXML
     private TableColumn<TripRow, String> statusColumn;
+    @FXML
+    private CheckBox showActiveCheckBox;
+    @FXML
+    private CheckBox showCancelledCheckBox;
+    @FXML
+    private CheckBox showCompletedCheckBox;
 
     public void setTripManager(TripManager tripManager) {
         this.tripManager = tripManager;
@@ -100,6 +106,14 @@ public final class TripController {
         returnColumn.setCellValueFactory(new PropertyValueFactory<>(FIELD_RETURN));
         statusColumn.setCellValueFactory(new PropertyValueFactory<>(FIELD_STATUS));
 
+        showActiveCheckBox.setSelected(true);
+        showCancelledCheckBox.setSelected(false);
+        showCompletedCheckBox.setSelected(false);
+
+        showActiveCheckBox.selectedProperty().addListener((o, ov, nv) -> refresh());
+        showCancelledCheckBox.selectedProperty().addListener((o, ov, nv) -> refresh());
+        showCompletedCheckBox.selectedProperty().addListener((o, ov, nv) -> refresh());
+
         searchField.textProperty().addListener((obs, oldText, newText) -> handleSearch());
         tripTable.getSelectionModel().selectedItemProperty()
                 .addListener((obs, oldVal, newVal) -> {
@@ -122,10 +136,15 @@ public final class TripController {
                 });
 
         loadTrips();
+        handleSearch();
     }
 
     public void initData() {
         startAutoRefresh();
+    }
+
+    public void refresh() {
+        handleSearch();
     }
 
     private void startAutoRefresh() {
@@ -250,18 +269,39 @@ public final class TripController {
     private void handleSearch() {
         String query = searchField.getText().toLowerCase().trim();
 
+        ObservableList<TripRow> base = FXCollections.observableArrayList(allTrips);
+        ObservableList<TripRow> byStatus = FXCollections.observableArrayList();
+        for (TripRow row : base) {
+            if (shouldShowByStatus(row.getStatus())) {
+                byStatus.add(row);
+            }
+        }
         if (query.isEmpty()) {
-            tripTable.setItems(FXCollections.observableArrayList(allTrips));
+            tripTable.setItems(byStatus);
             return;
         }
 
         ObservableList<TripRow> filtered = FXCollections.observableArrayList();
-        for (TripRow row : allTrips) {
+        for (TripRow row : byStatus) {
             if (matchesQuery(row, query)) {
                 filtered.add(row);
             }
         }
         tripTable.setItems(filtered);
+    }
+
+    private boolean shouldShowByStatus(String status) {
+        if (status == null)
+            return false;
+        String s = status.toUpperCase();
+
+        boolean isActive = "ACTIVE".equals(s);
+        boolean isCancelled = "CANCELED".equals(s) || "CANCELLED".equals(s);
+        boolean isCompleted = "COMPLETED".equals(s);
+
+        return (isActive && showActiveCheckBox.isSelected())
+                || (isCancelled && showCancelledCheckBox.isSelected())
+                || (isCompleted && showCompletedCheckBox.isSelected());
     }
 
     private boolean matchesQuery(final TripRow row, final String query) {
@@ -285,6 +325,9 @@ public final class TripController {
         activeFilters.clear();
         activeFilters.addAll(FIELD_ID, FIELD_POSTAL_CODES, FIELD_VEHICLE_MODEL, FIELD_VEHICLE_CAPACITY,
                 FIELD_OPERATORS, FIELD_STATUS);
+        showActiveCheckBox.setSelected(true);
+        showCancelledCheckBox.setSelected(false);
+        showCompletedCheckBox.setSelected(false);
         loadTrips();
     }
 

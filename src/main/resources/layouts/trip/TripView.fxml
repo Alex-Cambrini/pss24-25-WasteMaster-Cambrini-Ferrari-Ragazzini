@@ -8,6 +8,7 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.control.CheckBox?>
 
 <VBox alignment="TOP_CENTER" prefWidth="640.0"
     xmlns="http://javafx.com/javafx/23.0.1"
@@ -23,6 +24,17 @@
                 <TextField fx:id="searchField" promptText="Search..." />
                 <Button onAction="#handleResetSearch" styleClass="accent, button-outlined" text="Reset" />
             </children>
+        </HBox>
+
+        <HBox alignment="CENTER_RIGHT" prefHeight="30.0" spacing="10.0">
+            <children>
+                <CheckBox fx:id="showActiveCheckBox" text="Show Active"/>
+                <CheckBox fx:id="showCancelledCheckBox" text="Show Cancelled"/>
+                <CheckBox fx:id="showCompletedCheckBox" text="Show Completed"/>
+            </children>
+            <VBox.margin>
+                <Insets bottom="5.0"/>
+            </VBox.margin>
         </HBox>
 
         <TableView fx:id="tripTable" prefHeight="300.0" prefWidth="600.0" styleClass="table-view" VBox.vgrow="ALWAYS">
