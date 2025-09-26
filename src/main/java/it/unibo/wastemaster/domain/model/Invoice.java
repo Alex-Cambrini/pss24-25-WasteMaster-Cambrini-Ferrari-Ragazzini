@@ -3,6 +3,7 @@ package it.unibo.wastemaster.domain.model;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -15,7 +16,7 @@ public class Invoice {
 
     @OneToMany
     @JoinColumn(name = "invoice_id")
-    private List<Collection> collections;
+    private List<Collection> collections = new ArrayList<>();
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "customer_id", nullable = false)
@@ -57,7 +58,7 @@ public class Invoice {
                 double totalRecurring, double totalOnetime, 
                 int recurringCount, int onetimeCount, LocalDate issueDate) {
         this.customer = customer;
-        this.collections = collections;
+        this.collections = new ArrayList<>(collections);
         this.totalRecurring = totalRecurring;
         this.totalOnetime = totalOnetime;
         this.recurringCount = recurringCount;
