@@ -507,7 +507,7 @@ public final class ScheduleController implements AutoRefreshable {
     }
 
     @FXML
-    private void handleShowAssociatedCollections() {
+    private void handleShowRelatedCollections() {
         ScheduleRow selected = scheduleTable.getSelectionModel().getSelectedItem();
         if (selected == null) {
             DialogUtils.showError(TITLE_NO_SELECTION,
