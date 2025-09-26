@@ -1,6 +1,5 @@
 package it.unibo.wastemaster.infrastructure.pdf;
 
-
 import com.lowagie.text.Chunk;
 import com.lowagie.text.Document;
 import com.lowagie.text.Element;
@@ -29,53 +28,47 @@ public class InvoicePdfService {
         PdfWriter.getInstance(document, out);
         document.open();
 
-        // Titolo
-        Paragraph title = new Paragraph("FATTURA", TITLE_FONT);
+        Paragraph title = new Paragraph("INVOICE", TITLE_FONT);
         title.setAlignment(Element.ALIGN_CENTER);
         document.add(title);
 
         document.add(Chunk.NEWLINE);
 
-        // Dati fattura
         Paragraph invoiceData = new Paragraph(
-                "ID Fattura: " + invoice.getInvoiceId() + "\n" +
-                        "Data: " + invoice.getIssueDate().format(DateTimeFormatter.ISO_DATE) + "\n" +
-                        "Stato pagamento: " + invoice.getPaymentStatus().name(),
+                "Invoice ID: " + invoice.getInvoiceId() + "\n" +
+                        "Date: " + invoice.getIssueDate().format(DateTimeFormatter.ISO_DATE) + "\n" +
+                        "Payment status: " + invoice.getPaymentStatus().name(),
                 NORMAL_FONT);
         document.add(invoiceData);
 
         document.add(Chunk.NEWLINE);
 
-        // Dati cliente
         Paragraph customerData = new Paragraph(
-                "Cliente:\n" +
+                "Customer:\n" +
                         invoice.getCustomer().getName() + "\n" +
                         invoice.getCustomer().getSurname() + "\n" +
                         invoice.getCustomer().getLocation() + "\n" +
-                        invoice.getCustomer().getEmail() + "\n" +
-                NORMAL_FONT);
+                        invoice.getCustomer().getEmail() + "\n"
+        );
         document.add(customerData);
 
         document.add(Chunk.NEWLINE);
 
-        // Tabella dettagli collection
-        PdfPTable table = new PdfPTable(4); // 4 colonne
+        PdfPTable table = new PdfPTable(4);
         table.setWidthPercentage(100);
-        table.setWidths(new float[]{2, 3, 3, 2}); // proporzioni colonne
+        table.setWidths(new float[]{2, 3, 3, 2});
 
-        // Intestazioni
         addTableHeader(table, "ID");
-        addTableHeader(table, "Data");
-        addTableHeader(table, "Tipo");
-        addTableHeader(table, "Prezzo (€)");
+        addTableHeader(table, "Date");
+        addTableHeader(table, "Type");
+        addTableHeader(table, "Price (€)");
 
-        // Riga dati
         for (Collection c : invoice.getCollections()) {
             table.addCell(new PdfPCell(new Phrase(String.valueOf(c.getCollectionId()), NORMAL_FONT)));
             table.addCell(new PdfPCell(new Phrase(c.getCollectionDate().format(DateTimeFormatter.ISO_DATE), NORMAL_FONT)));
             String type = c.getSchedule() instanceof it.unibo.wastemaster.domain.model.RecurringSchedule
-                    ? "Ricorrente"
-                    : "Una tantum";
+                    ? "Recurring"
+                    : "One-time";
             table.addCell(new PdfPCell(new Phrase(type, NORMAL_FONT)));
             double price = c.getSchedule() instanceof it.unibo.wastemaster.domain.model.RecurringSchedule
                     ? 0.25
@@ -87,11 +80,10 @@ public class InvoicePdfService {
 
         document.add(Chunk.NEWLINE);
 
-        // Totali
         Paragraph totals = new Paragraph(
-                "Totale Ricorrenti: € " + String.format("%.2f", invoice.getTotalRecurring()) + "\n" +
-                        "Totale Una Tantum: € " + String.format("%.2f", invoice.getTotalOnetime()) + "\n" +
-                        "Totale Fattura: € " + String.format("%.2f", invoice.getAmount()),
+                "Total Recurring: € " + String.format("%.2f", invoice.getTotalRecurring()) + "\n" +
+                        "Total One-time: € " + String.format("%.2f", invoice.getTotalOnetime()) + "\n" +
+                        "Total Amount: € " + String.format("%.2f", invoice.getAmount()),
                 HEADER_FONT);
         totals.setAlignment(Element.ALIGN_RIGHT);
         document.add(totals);
