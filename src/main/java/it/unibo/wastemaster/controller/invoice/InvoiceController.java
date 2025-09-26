@@ -253,8 +253,10 @@ public final class InvoiceController implements AutoRefreshable {
         String query = searchField.getText().toLowerCase().trim();
 
         boolean showDeleted = showDeletedCheckBox != null && showDeletedCheckBox.isSelected();
-        boolean showPaid = showPaidCheckBox == null || showPaidCheckBox.isSelected(); // default true se null
-        boolean showUnpaid = showNotPaidCheckBox == null || showNotPaidCheckBox.isSelected(); // default true se null
+        boolean showPaid = showPaidCheckBox == null || showPaidCheckBox.isSelected();
+        boolean showUnpaid = showNotPaidCheckBox == null || showNotPaidCheckBox.isSelected();
+
+        boolean anyStatusSelected = showPaid || showUnpaid;
 
         ObservableList<InvoiceRow> filtered = FXCollections.observableArrayList();
 
@@ -266,13 +268,15 @@ public final class InvoiceController implements AutoRefreshable {
                     || (activeFilters.contains(FILTER_AMOUNT) && row.getAmount().toLowerCase().contains(query));
 
             boolean isCancelled = "Yes".equalsIgnoreCase(row.getIsCancelled());
-            boolean matchesDeleted = showDeleted || !isCancelled;
-
             String status = row.getStatus();
-            boolean allowedByCheckbox = ("PAID".equalsIgnoreCase(status) && showPaid)
+
+            boolean matchesCancelled = showDeleted ? isCancelled : !isCancelled;
+
+            boolean matchesStatus = !anyStatusSelected
+                    || ("PAID".equalsIgnoreCase(status) && showPaid)
                     || ("UNPAID".equalsIgnoreCase(status) && showUnpaid);
 
-            if (matchesQuery && matchesDeleted && allowedByCheckbox) {
+            if (matchesQuery && matchesCancelled && matchesStatus) {
                 filtered.add(row);
             }
         }
@@ -400,7 +404,8 @@ public final class InvoiceController implements AutoRefreshable {
         java.io.File file = outputPath.toFile();
 
         if (file.exists() && !file.renameTo(file)) {
-            DialogUtils.showError("File in use", "The PDF is already open in another program. Close it and try again.", AppContext.getOwner());
+            DialogUtils.showError("File in use", "The PDF is already open in another program. Close it and try again.",
+                    AppContext.getOwner());
             return;
         }
 
@@ -412,7 +417,6 @@ public final class InvoiceController implements AutoRefreshable {
             DialogUtils.showError("Export Error", "Could not generate PDF.", AppContext.getOwner());
         }
     }
-
 
     @FXML
     private void handleDeleteInvoice() {
