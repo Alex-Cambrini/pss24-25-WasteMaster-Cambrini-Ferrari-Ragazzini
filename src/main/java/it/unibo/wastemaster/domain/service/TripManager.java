@@ -149,6 +149,10 @@ public final class TripManager {
         return tripRepository.findAvailablePostalCodes(date);
     }
 
+    public List<Collection> getCollectionsByTrip(Trip trip) {
+        return trip.getCollections();
+    }
+
     public void updateTrip(Trip trip) {
     tripRepository.update(trip); 
     }
