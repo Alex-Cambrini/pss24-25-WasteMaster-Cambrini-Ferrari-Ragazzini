@@ -9,8 +9,12 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.Tooltip?>
 
-<VBox alignment="TOP_CENTER" prefWidth="640.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.unibo.wastemaster.controller.invoice.InvoiceController">
+<VBox alignment="TOP_CENTER" prefWidth="640.0"
+    xmlns="http://javafx.com/javafx/21"
+    xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.unibo.wastemaster.controller.invoice.InvoiceController">
     <children>
         <HBox alignment="TOP_CENTER" minHeight="40.0" prefHeight="40.0" prefWidth="600.0" spacing="10.0">
             <children>
@@ -23,6 +27,18 @@
             </children>
             <VBox.margin>
                 <Insets bottom="10.0" />
+            </VBox.margin>
+        </HBox>
+        <HBox alignment="CENTER_RIGHT" prefHeight="30.0" prefWidth="30.0" spacing="10.0">
+            <children>
+                <CheckBox fx:id="showDeletedCheckBox" text="Show Deleted">
+                    <tooltip>
+                        <Tooltip text="Show Deleted" />
+                    </tooltip>
+                </CheckBox>
+            </children>
+            <VBox.margin>
+                <Insets bottom="5.0" />
             </VBox.margin>
         </HBox>
         <TableView fx:id="invoiceTable" prefHeight="300.0" prefWidth="600.0" styleClass="table-view" VBox.vgrow="ALWAYS">
@@ -39,7 +55,7 @@
         </TableView>
         <HBox alignment="TOP_RIGHT" minHeight="50.0" prefHeight="100.0" prefWidth="600.0" spacing="10.0">
             <children>
-            <Button fx:id="exportPdfButton" mnemonicParsing="false" onAction="#handleExportPdf" text="Export PDF" />
+                <Button fx:id="exportPdfButton" mnemonicParsing="false" onAction="#handleExportPdf" text="Export PDF" />
                 <Region prefHeight="200.0" prefWidth="200.0" HBox.hgrow="ALWAYS" />
                 <Button fx:id="viewCustomerButton" disable="true" mnemonicParsing="false" styleClass="accent" text="View Customer" />
                 <Button fx:id="deleteInvoiceButton" disable="true" mnemonicParsing="false" onAction="#handleDeleteInvoice" styleClass="danger" text="Delete" />
