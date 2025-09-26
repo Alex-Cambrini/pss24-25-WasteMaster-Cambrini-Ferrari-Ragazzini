@@ -41,6 +41,8 @@ public class AddInvoiceController {
     private CollectionManager collectionManager;
     private CustomerManager customerManager;
     private InvoiceManager invoiceManager;
+    private boolean updatingFromSelectAll = false;
+    private boolean updatingFromRows = false;
 
     private ObservableList<CollectionRow> availableCollections = FXCollections.observableArrayList();
 
@@ -83,11 +85,41 @@ public class AddInvoiceController {
             List<Collection> collections = collectionManager.getCompletedNotBilledCollections(customer);
             for (Collection c : collections) {
                 CollectionRow row = new CollectionRow(c);
-                row.selectedProperty().addListener((obs, old, newVal) -> updateTotal());
+                row.selectedProperty().addListener((obs, old, newVal) -> {
+                    updateTotal();
+                    if (!updatingFromSelectAll) {
+                        updateSelectAllCheck();
+                    }
+                });
                 availableCollections.add(row);
             }
         }
         updateTotal();
+        updateSelectAllCheck();
+    }
+
+    private void updateSelectAllCheck() {
+        if (availableCollections.isEmpty()) {
+            selectAllCheck.setIndeterminate(false);
+            selectAllCheck.setSelected(false);
+            return;
+        }
+
+        boolean allSelected = availableCollections.stream().allMatch(CollectionRow::isSelected);
+        boolean noneSelected = availableCollections.stream().noneMatch(CollectionRow::isSelected);
+
+        updatingFromRows = true;
+        if (allSelected) {
+            selectAllCheck.setIndeterminate(false);
+            selectAllCheck.setSelected(true);
+        } else if (noneSelected) {
+            selectAllCheck.setIndeterminate(false);
+            selectAllCheck.setSelected(false);
+        } else {
+            selectAllCheck.setSelected(false);
+            selectAllCheck.setIndeterminate(true);
+        }
+        updatingFromRows = false;
     }
 
     private void setupCollectionsTable() {
@@ -106,9 +138,14 @@ public class AddInvoiceController {
 
     private void setupSelectAllCheck() {
         selectAllCheck.selectedProperty().addListener((obs, old, newVal) -> {
+            if (updatingFromRows) {
+                return;
+            }
+            updatingFromSelectAll = true;
             for (CollectionRow row : availableCollections) {
                 row.setSelected(newVal);
             }
+            updatingFromSelectAll = false;
             updateTotal();
         });
     }
@@ -131,7 +168,6 @@ public class AddInvoiceController {
 
     @FXML
     private void handleAbortInvoiceCreation() {
-        // chiudi finestra/modal
         cancelButton.getScene().getWindow().hide();
     }
 
