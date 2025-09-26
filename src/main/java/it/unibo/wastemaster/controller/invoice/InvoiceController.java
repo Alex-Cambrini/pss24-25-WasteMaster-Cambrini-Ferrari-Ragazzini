@@ -385,36 +385,34 @@ public final class InvoiceController implements AutoRefreshable {
     private void handleExportPdf() {
         InvoiceRow selected = invoiceTable.getSelectionModel().getSelectedItem();
         if (selected == null) {
-            DialogUtils.showError("No Selection", "Please select an invoice to export.",
-                    AppContext.getOwner());
+            DialogUtils.showError("No Selection", "Please select an invoice to export.", AppContext.getOwner());
             return;
         }
 
-        Optional<Invoice> invoiceOpt = invoiceManager.findInvoiceById(selected.getInvoice()
-                .getInvoiceId());
+        Optional<Invoice> invoiceOpt = invoiceManager.findInvoiceById(selected.getInvoice().getInvoiceId());
         if (invoiceOpt.isEmpty()) {
-            DialogUtils.showError("Not Found", "Invoice not found.",
-                    AppContext.getOwner());
+            DialogUtils.showError("Not Found", "Invoice not found.", AppContext.getOwner());
             return;
         }
 
-        try {
-            Invoice invoice = invoiceOpt.get();
+        Invoice invoice = invoiceOpt.get();
+        java.nio.file.Path outputPath = java.nio.file.Paths.get("invoice-" + invoice.getInvoiceId() + ".pdf");
+        java.io.File file = outputPath.toFile();
 
-            java.nio.file.Path outputPath = java.nio.file.Paths.get("invoice-" + invoice.getInvoiceId() + ".pdf");
-            try (java.io.FileOutputStream fos = new java.io.FileOutputStream(
-                    outputPath.toFile())) {
-                new it.unibo.wastemaster.infrastructure.pdf.InvoicePdfService()
-                        .generateInvoicePdf(invoice, fos);
-            }
-            DialogUtils.showSuccess("PDF generated: " + outputPath.toAbsolutePath(),
-                    AppContext.getOwner());
+        if (file.exists() && !file.renameTo(file)) {
+            DialogUtils.showError("File in use", "The PDF is already open in another program. Close it and try again.", AppContext.getOwner());
+            return;
+        }
+
+        try (java.io.FileOutputStream fos = new java.io.FileOutputStream(file)) {
+            new it.unibo.wastemaster.infrastructure.pdf.InvoicePdfService().generateInvoicePdf(invoice, fos);
+            DialogUtils.showSuccess("PDF generated: " + outputPath.toAbsolutePath(), AppContext.getOwner());
         } catch (Exception e) {
             e.printStackTrace();
-            DialogUtils.showError("Export Error", "Could not generate PDF.",
-                    AppContext.getOwner());
+            DialogUtils.showError("Export Error", "Could not generate PDF.", AppContext.getOwner());
         }
     }
+
 
     @FXML
     private void handleDeleteInvoice() {
