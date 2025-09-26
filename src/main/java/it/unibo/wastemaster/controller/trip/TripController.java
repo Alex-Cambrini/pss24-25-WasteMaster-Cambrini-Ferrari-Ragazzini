@@ -1,13 +1,18 @@
 package it.unibo.wastemaster.controller.trip;
 
 import it.unibo.wastemaster.application.context.AppContext;
+import it.unibo.wastemaster.controller.collection.CollectionController;
+import it.unibo.wastemaster.controller.main.MainLayoutController;
 import it.unibo.wastemaster.controller.utils.AutoRefreshable;
 import it.unibo.wastemaster.controller.utils.DialogUtils;
+import it.unibo.wastemaster.domain.model.Collection;
 import it.unibo.wastemaster.domain.model.Employee;
+import it.unibo.wastemaster.domain.model.Schedule;
 import it.unibo.wastemaster.domain.model.Trip;
 import it.unibo.wastemaster.domain.service.CollectionManager;
 import it.unibo.wastemaster.domain.service.TripManager;
 import it.unibo.wastemaster.domain.service.VehicleManager;
+import it.unibo.wastemaster.viewmodels.ScheduleRow;
 import it.unibo.wastemaster.viewmodels.TripRow;
 import java.util.List;
 import java.util.Optional;
@@ -50,6 +55,7 @@ public final class TripController implements AutoRefreshable {
             FIELD_VEHICLE_CAPACITY, FIELD_OPERATORS,
             FIELD_STATUS);
 
+
     private TripManager tripManager;
     private VehicleManager vehicleManager;
     private CollectionManager collectionManager;
@@ -58,7 +64,10 @@ public final class TripController implements AutoRefreshable {
     private Employee currentUser;
 
     @FXML
-    public Button completeTripButton;
+    private Button showRelatedCollections;
+
+    @FXML
+    private Button completeTripButton;
 
     @FXML
     private Button filterButton;
@@ -161,12 +170,21 @@ public final class TripController implements AutoRefreshable {
                         editTripButton.setDisable(!isActive);
                         deleteTripButton.setDisable(!isActive);
                         completeTripButton.setDisable(!isActive);
+
+                        boolean isNotCancelled = !"CANCELED".equalsIgnoreCase(status)
+                                && !"CANCELLED".equalsIgnoreCase(status);
+                        showRelatedCollections.setDisable(!isNotCancelled);
+
                     } else {
                         editTripButton.setDisable(true);
                         deleteTripButton.setDisable(true);
                         completeTripButton.setDisable(true);
+                        showRelatedCollections.setDisable(true);
                     }
                 });
+
+
+
         currentUser = AppContext.getCurrentAccount().getEmployee();
         boolean isAllowedToCompleteTrip = currentUser.getRole() == Employee.Role.ADMINISTRATOR
                 || currentUser.getRole() == Employee.Role.OPERATOR;
@@ -440,5 +458,36 @@ public final class TripController implements AutoRefreshable {
                     "Unable to complete the selected trip.", AppContext.getOwner());
         }
 
+    }
+
+    @FXML
+    private void handleShowRelatedCollections() {
+        TripRow selected = tripTable.getSelectionModel().getSelectedItem();
+        if (selected == null) {
+            DialogUtils.showError("No Selection",
+                    "Please select a trip to view its collections.", AppContext.getOwner());
+            return;
+        }
+
+        Optional<Trip> tripOpt = tripManager.getTripById(selected.getIdAsInt());
+        if (tripOpt.isEmpty()) {
+            DialogUtils.showError("Not Found",
+                    "The selected trip could not be found.", AppContext.getOwner());
+            return;
+        }
+
+        Trip trip = tripOpt.get();
+        List<Collection> collections = tripManager.getCollectionsByTrip(trip);
+
+        try {
+            MainLayoutController.getInstance().setPageTitle("Trip Related Collections");
+            CollectionController controller = MainLayoutController.getInstance()
+                    .loadCenterWithController("/layouts/collection/CollectionView.fxml");
+            controller.setCollections(collections);
+        } catch (Exception e) {
+            DialogUtils.showError("Navigation error",
+                    "Could not load Associated Collections view.", AppContext.getOwner());
+            e.printStackTrace();
+        }
     }
 }
