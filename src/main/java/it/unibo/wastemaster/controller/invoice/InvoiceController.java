@@ -105,6 +105,9 @@ public final class InvoiceController {
     @FXML
     private CheckBox showNotPaidCheckBox;
 
+    @FXML
+    private Button exportPdfButton;
+
     public void setInvoiceManager(InvoiceManager invoiceManager) {
         this.invoiceManager = invoiceManager;
     }
@@ -205,6 +208,7 @@ public final class InvoiceController {
         if (selected == null) {
             markAsPaidButton.setDisable(true);
             deleteInvoiceButton.setDisable(true);
+            exportPdfButton.setDisable(true);
             return;
         }
 
@@ -213,6 +217,7 @@ public final class InvoiceController {
 
         markAsPaidButton.setDisable(isPaid || isCancelled);
         deleteInvoiceButton.setDisable(isPaid || isCancelled);
+        exportPdfButton.setDisable(isCancelled);
     }
 
     @FXML
