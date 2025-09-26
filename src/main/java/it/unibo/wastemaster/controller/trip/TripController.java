@@ -1,6 +1,7 @@
 package it.unibo.wastemaster.controller.trip;
 
 import it.unibo.wastemaster.application.context.AppContext;
+import it.unibo.wastemaster.controller.utils.AutoRefreshable;
 import it.unibo.wastemaster.controller.utils.DialogUtils;
 import it.unibo.wastemaster.domain.model.Employee;
 import it.unibo.wastemaster.domain.model.Trip;
@@ -30,7 +31,7 @@ import javafx.util.Duration;
  * Controller for managing the trips view, including search, filters and CRUD
  * operations.
  */
-public final class TripController {
+public final class TripController implements AutoRefreshable {
 
     private static final String FIELD_ID = "id";
     private static final String FIELD_POSTAL_CODES = "postalCodes";
@@ -44,12 +45,10 @@ public final class TripController {
     private static final int REFRESH_SECONDS = 30;
 
     private final ObservableList<TripRow> allTrips = FXCollections.observableArrayList();
-    private final ObservableList<String> activeFilters =
-            FXCollections.observableArrayList(
-                    FIELD_ID, FIELD_POSTAL_CODES, FIELD_VEHICLE_MODEL,
-                    FIELD_VEHICLE_CAPACITY, FIELD_OPERATORS,
-                    FIELD_STATUS);
-
+    private final ObservableList<String> activeFilters = FXCollections.observableArrayList(
+            FIELD_ID, FIELD_POSTAL_CODES, FIELD_VEHICLE_MODEL,
+            FIELD_VEHICLE_CAPACITY, FIELD_OPERATORS,
+            FIELD_STATUS);
 
     private TripManager tripManager;
     private VehicleManager vehicleManager;
@@ -158,7 +157,7 @@ public final class TripController {
                     boolean rowSelected = newVal != null;
                     if (rowSelected) {
                         String status = newVal.getStatus();
-                        boolean isActive  = "ACTIVE".equalsIgnoreCase(status);
+                        boolean isActive = "ACTIVE".equalsIgnoreCase(status);
                         editTripButton.setDisable(!isActive);
                         deleteTripButton.setDisable(!isActive);
                         completeTripButton.setDisable(!isActive);
@@ -169,31 +168,38 @@ public final class TripController {
                     }
                 });
         currentUser = AppContext.getCurrentAccount().getEmployee();
-        boolean isAllowedToCompleteTrip =
-                currentUser.getRole() == Employee.Role.ADMINISTRATOR || currentUser.getRole() == Employee.Role.OPERATOR;
+        boolean isAllowedToCompleteTrip = currentUser.getRole() == Employee.Role.ADMINISTRATOR
+                || currentUser.getRole() == Employee.Role.OPERATOR;
         completeTripButton.setVisible(isAllowedToCompleteTrip);
         loadTrips();
         handleSearch();
     }
 
     public void initData() {
-        startAutoRefresh();
+        loadTrips();
     }
 
     public void refresh() {
         handleSearch();
     }
 
-    private void startAutoRefresh() {
-        refreshTimeline = new Timeline(new KeyFrame(Duration.seconds(REFRESH_SECONDS),
+    @Override
+    public void startAutoRefresh() {
+        if (refreshTimeline != null || tripManager == null) {
+            return;
+        }
+        refreshTimeline = new Timeline(new KeyFrame(
+                Duration.seconds(REFRESH_SECONDS),
                 event -> loadTrips()));
         refreshTimeline.setCycleCount(Animation.INDEFINITE);
         refreshTimeline.play();
     }
 
+    @Override
     public void stopAutoRefresh() {
         if (refreshTimeline != null) {
             refreshTimeline.stop();
+            refreshTimeline = null;
         }
     }
 
@@ -217,14 +223,13 @@ public final class TripController {
     @FXML
     private void handleAddTrip() {
         try {
-            Optional<AddTripController> controllerOpt =
-                    DialogUtils.showModalWithController("Add Trip",
-                            "/layouts/trip/AddTripView.fxml",
-                            AppContext.getOwner(), ctrl -> {
-                                ctrl.setTripManager(tripManager);
-                                ctrl.setVehicleManager(vehicleManager);
-                                ctrl.setCollectionManager(collectionManager);
-                            });
+            Optional<AddTripController> controllerOpt = DialogUtils.showModalWithController("Add Trip",
+                    "/layouts/trip/AddTripView.fxml",
+                    AppContext.getOwner(), ctrl -> {
+                        ctrl.setTripManager(tripManager);
+                        ctrl.setVehicleManager(vehicleManager);
+                        ctrl.setCollectionManager(collectionManager);
+                    });
             if (controllerOpt.isPresent()) {
                 loadTrips();
             }
@@ -287,14 +292,13 @@ public final class TripController {
         }
 
         try {
-            Optional<EditTripController> controllerOpt =
-                    DialogUtils.showModalWithController("Edit Trip",
-                            "/layouts/trip/EditTripView.fxml",
-                            AppContext.getOwner(), ctrl -> {
-                                ctrl.setTripToEdit(tripOpt.get());
-                                ctrl.setTripController(this);
-                                ctrl.setTripManager(tripManager);
-                            });
+            Optional<EditTripController> controllerOpt = DialogUtils.showModalWithController("Edit Trip",
+                    "/layouts/trip/EditTripView.fxml",
+                    AppContext.getOwner(), ctrl -> {
+                        ctrl.setTripToEdit(tripOpt.get());
+                        ctrl.setTripController(this);
+                        ctrl.setTripManager(tripManager);
+                    });
 
             controllerOpt.ifPresent(ctrl -> loadTrips());
         } catch (Exception e) {
@@ -347,15 +351,15 @@ public final class TripController {
         return (activeFilters.contains(FIELD_ID)
                 && row.getId().toLowerCase().contains(query))
                 || (activeFilters.contains(FIELD_POSTAL_CODES)
-                && row.getPostalCodes().toLowerCase().contains(query))
+                        && row.getPostalCodes().toLowerCase().contains(query))
                 || (activeFilters.contains(FIELD_VEHICLE_MODEL)
-                && row.getVehicleModel().toLowerCase().contains(query))
+                        && row.getVehicleModel().toLowerCase().contains(query))
                 || (activeFilters.contains(FIELD_VEHICLE_CAPACITY)
-                && String.valueOf(row.getVehicleCapacity()).contains(query))
+                        && String.valueOf(row.getVehicleCapacity()).contains(query))
                 || (activeFilters.contains(FIELD_OPERATORS)
-                && row.getOperators().toLowerCase().contains(query))
+                        && row.getOperators().toLowerCase().contains(query))
                 || (activeFilters.contains(FIELD_STATUS)
-                && row.getStatus().toLowerCase().contains(query));
+                        && row.getStatus().toLowerCase().contains(query));
     }
 
     @FXML
@@ -379,12 +383,11 @@ public final class TripController {
         }
 
         filterMenu = new ContextMenu();
-        String[] fields = {FIELD_ID, FIELD_POSTAL_CODES, FIELD_VEHICLE_MODEL,
+        String[] fields = { FIELD_ID, FIELD_POSTAL_CODES, FIELD_VEHICLE_MODEL,
                 FIELD_VEHICLE_CAPACITY,
-                FIELD_OPERATORS, FIELD_STATUS};
-        String[] labels =
-                {"ID", "Postal Codes", "Vehicle", "Vehicle Capacity", "Operators",
-                        "Status"};
+                FIELD_OPERATORS, FIELD_STATUS };
+        String[] labels = { "ID", "Postal Codes", "Vehicle", "Vehicle Capacity", "Operators",
+                "Status" };
 
         for (int i = 0; i < fields.length; i++) {
             String key = fields[i];

@@ -2,6 +2,7 @@ package it.unibo.wastemaster.controller.waste;
 
 import it.unibo.wastemaster.application.context.AppContext;
 import it.unibo.wastemaster.controller.main.MainLayoutController;
+import it.unibo.wastemaster.controller.utils.AutoRefreshable;
 import it.unibo.wastemaster.controller.utils.DialogUtils;
 import it.unibo.wastemaster.domain.model.Waste;
 import it.unibo.wastemaster.domain.model.WasteSchedule;
@@ -31,12 +32,11 @@ import javafx.util.Duration;
 /**
  * Controller for managing the waste types and their collection schedules.
  */
-public final class WasteController {
+public final class WasteController implements AutoRefreshable {
 
     private static final int REFRESH_INTERVAL_SECONDS = 30;
     private static final String ERROR_TITLE = "Error";
-    private final ObservableList<WasteRow> allWastes =
-            FXCollections.observableArrayList();
+    private final ObservableList<WasteRow> allWastes = FXCollections.observableArrayList();
 
     @FXML
     private Button addWasteButton;
@@ -98,22 +98,18 @@ public final class WasteController {
     public void initialize() {
         nameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
         recyclableColumn.setCellValueFactory(
-                new PropertyValueFactory<>("recyclable")
-        );
+                new PropertyValueFactory<>("recyclable"));
         dangerousColumn.setCellValueFactory(
-                new PropertyValueFactory<>("dangerous")
-        );
+                new PropertyValueFactory<>("dangerous"));
         dayOfWeekColumn.setCellValueFactory(
-                new PropertyValueFactory<>("dayOfWeek")
-        );
+                new PropertyValueFactory<>("dayOfWeek"));
 
         dayOfWeekColumn.setCellFactory(
                 col -> new TableCell<WasteRow, DayOfWeek>() {
                     @Override
                     protected void updateItem(
                             final DayOfWeek item,
-                            final boolean empty
-                    ) {
+                            final boolean empty) {
                         super.updateItem(item, empty);
                         String displayText;
                         if (empty) {
@@ -125,8 +121,7 @@ public final class WasteController {
                         }
                         setText(displayText);
                     }
-                }
-        );
+                });
 
         searchField.textProperty()
                 .addListener((obs, oldText, newText) -> handleSearch());
@@ -150,11 +145,9 @@ public final class WasteController {
                         return;
                     }
 
-                    final boolean hasProgram =
-                            newRow.getDayOfWeek() != null;
+                    final boolean hasProgram = newRow.getDayOfWeek() != null;
                     addProgramButton.setDisable(
-                            hasProgram
-                    );
+                            hasProgram);
                     changeDayButton.setDisable(!hasProgram);
                     deleteButton.setDisable(false);
                     deleteProgramButton.setDisable(!hasProgram);
@@ -163,20 +156,18 @@ public final class WasteController {
 
     public void initData() {
         loadWastes();
-        startAutoRefresh();
     }
-
 
     /**
      * Starts the automatic refresh of the waste list every fixed interval.
      */
-    private void startAutoRefresh() {
+    @Override
+    public void startAutoRefresh() {
+        if (refreshTimeline != null || wasteManager == null || wasteScheduleManager == null) {
+            return;
+        }
         refreshTimeline = new Timeline(
-                new KeyFrame(
-                        Duration.seconds(REFRESH_INTERVAL_SECONDS),
-                        event -> loadWastes()
-                )
-        );
+                new KeyFrame(Duration.seconds(REFRESH_INTERVAL_SECONDS), event -> loadWastes()));
         refreshTimeline.setCycleCount(Animation.INDEFINITE);
         refreshTimeline.play();
     }
@@ -184,9 +175,11 @@ public final class WasteController {
     /**
      * Stops the automatic refresh if it is running.
      */
+    @Override
     public void stopAutoRefresh() {
         if (refreshTimeline != null) {
             refreshTimeline.stop();
+            refreshTimeline = null;
         }
     }
 
@@ -200,7 +193,7 @@ public final class WasteController {
                 schedule = wasteScheduleManager
                         .getWasteScheduleByWaste(waste);
             } catch (IllegalStateException ignored) {
-                // It's acceptable if no schedule exists 
+                // It's acceptable if no schedule exists
                 // for this waste; skip it.
             }
             allWastes.add(new WasteRow(waste, schedule));
@@ -222,15 +215,13 @@ public final class WasteController {
             final Stage mainStage = (Stage) MainLayoutController.getInstance()
                     .getRootPane().getScene().getWindow();
 
-            final Optional<AddWasteController> controllerOpt =
-                    DialogUtils.showModalWithController(
-                            "Add Waste",
-                            "/layouts/waste/AddWasteView.fxml",
-                            mainStage,
-                            ctrl -> {
-                                ctrl.setWasteManager(wasteManager);
-                            }
-                    );
+            final Optional<AddWasteController> controllerOpt = DialogUtils.showModalWithController(
+                    "Add Waste",
+                    "/layouts/waste/AddWasteView.fxml",
+                    mainStage,
+                    ctrl -> {
+                        ctrl.setWasteManager(wasteManager);
+                    });
 
             if (controllerOpt.isPresent()) {
                 loadWastes();
@@ -239,8 +230,7 @@ public final class WasteController {
             DialogUtils.showError(
                     "Navigation error",
                     "Could not load Add Waste view.",
-                    AppContext.getOwner()
-            );
+                    AppContext.getOwner());
             e.printStackTrace();
         }
     }
@@ -262,16 +252,14 @@ public final class WasteController {
             final Stage mainStage = (Stage) MainLayoutController.getInstance()
                     .getRootPane().getScene().getWindow();
 
-            final Optional<AddProgramController> controllerOpt =
-                    DialogUtils.showModalWithController(
-                            "Add Program",
-                            "/layouts/waste/AddProgramView.fxml",
-                            mainStage,
-                            ctrl -> {
-                                ctrl.setWaste(selectedWaste);
-                                ctrl.setWasteScheduleManager(wasteScheduleManager);
-                            }
-                    );
+            final Optional<AddProgramController> controllerOpt = DialogUtils.showModalWithController(
+                    "Add Program",
+                    "/layouts/waste/AddProgramView.fxml",
+                    mainStage,
+                    ctrl -> {
+                        ctrl.setWaste(selectedWaste);
+                        ctrl.setWasteScheduleManager(wasteScheduleManager);
+                    });
 
             if (controllerOpt.isPresent()) {
                 loadWastes();
@@ -280,8 +268,7 @@ public final class WasteController {
             DialogUtils.showError(
                     "Navigation error",
                     "Could not load Add Program view.",
-                    AppContext.getOwner()
-            );
+                    AppContext.getOwner());
             e.printStackTrace();
         }
     }
@@ -298,8 +285,7 @@ public final class WasteController {
             DialogUtils.showError(
                     "No Selection",
                     "Please select a waste with a program assigned.",
-                    AppContext.getOwner()
-            );
+                    AppContext.getOwner());
             return;
         }
 
@@ -312,24 +298,22 @@ public final class WasteController {
                     .getScene()
                     .getWindow();
 
-            final Optional<ChangeDayDialogController> controllerOpt =
-                    DialogUtils.showModalWithController(
-                            "Change Collection Day",
-                            "/layouts/waste/ChangeDayDialog.fxml",
-                            stage,
-                            ctrl -> {
-                                ctrl.setSchedule(schedule);
-                                ctrl.setCurrentDay(schedule
-                                        .getDayOfWeek());
-                            }
-                    );
+            final Optional<ChangeDayDialogController> controllerOpt = DialogUtils.showModalWithController(
+                    "Change Collection Day",
+                    "/layouts/waste/ChangeDayDialog.fxml",
+                    stage,
+                    ctrl -> {
+                        ctrl.setSchedule(schedule);
+                        ctrl.setCurrentDay(schedule
+                                .getDayOfWeek());
+                    });
 
             if (controllerOpt.isPresent()) {
                 final DayOfWeek newDay = controllerOpt.get()
                         .getSelectedDay();
                 if (newDay != null
                         && !newDay.equals(schedule
-                        .getDayOfWeek())) {
+                                .getDayOfWeek())) {
                     wasteScheduleManager
                             .changeCollectionDay(schedule, newDay);
                     loadWastes();
@@ -339,8 +323,7 @@ public final class WasteController {
             DialogUtils.showError(
                     ERROR_TITLE,
                     "Failed to load the change day dialog.",
-                    AppContext.getOwner()
-            );
+                    AppContext.getOwner());
             e.printStackTrace();
         }
     }
@@ -358,8 +341,7 @@ public final class WasteController {
         boolean confirmed = DialogUtils.showConfirmationDialog(
                 "Confirm Deletion",
                 "Are you sure you want to delete this waste?",
-                AppContext.getOwner()
-        );
+                AppContext.getOwner());
 
         if (!confirmed) {
             return;
@@ -394,8 +376,7 @@ public final class WasteController {
         boolean confirmed = DialogUtils.showConfirmationDialog(
                 "Confirm Deletion",
                 "Are you sure you want to delete the collection program for this waste?",
-                AppContext.getOwner()
-        );
+                AppContext.getOwner());
 
         if (!confirmed) {
             return;
@@ -431,15 +412,13 @@ public final class WasteController {
             boolean matchesName = row.getName().toLowerCase().contains(query);
             boolean matchesDayOfWeek = row.getDayOfWeek() != null
                     && formatEnum(row.getDayOfWeek())
-                    .toLowerCase()
-                    .contains(query);
+                            .toLowerCase()
+                            .contains(query);
 
-            boolean matchesCheckRecyclable =
-                    !showRecyclableCheckBox.isSelected()
-                            || row.isRecyclable();
-            boolean matchesCheckDangerous =
-                    !showDangerousCheckBox.isSelected()
-                            || row.isDangerous();
+            boolean matchesCheckRecyclable = !showRecyclableCheckBox.isSelected()
+                    || row.isRecyclable();
+            boolean matchesCheckDangerous = !showDangerousCheckBox.isSelected()
+                    || row.isDangerous();
 
             if ((query.isEmpty() || matchesName || matchesDayOfWeek)
                     && matchesCheckRecyclable
