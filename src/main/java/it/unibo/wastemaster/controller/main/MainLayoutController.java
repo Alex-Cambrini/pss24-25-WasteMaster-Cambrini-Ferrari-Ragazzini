@@ -132,7 +132,7 @@ public final class MainLayoutController {
      */
     public void loadCenter(final String fxmlPath) {
         try {
-            invokeStopAutoRefresh();
+            stopAutoRefreshIfSupported(currentController);
             final FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
             final Pane view = loader.load();
             currentController = loader.getController();
@@ -153,7 +153,7 @@ public final class MainLayoutController {
     public <T> T loadCenterWithController(final String fxmlPath) {
         System.out.println("[DEBUG] Loading FXML from path: " + fxmlPath);
         try {
-            invokeStopAutoRefresh();
+            stopAutoRefreshIfSupported(currentController);
             final URL resource = getClass().getResource(fxmlPath);
             System.out.println("[DEBUG] Resolved resource URL: " + resource);
             if (resource == null) {
@@ -175,18 +175,6 @@ public final class MainLayoutController {
         }
     }
 
-    private void invokeStopAutoRefresh() {
-        if (currentController != null) {
-            try {
-                currentController.getClass().getMethod("stopAutoRefresh")
-                        .invoke(currentController);
-            } catch (NoSuchMethodException e) {
-                // Method stopAutoRefresh does not exist; safe to ignore.
-            } catch (Exception e) {
-                LOGGER.log(Level.SEVERE, "Error invoking stopAutoRefresh", e);
-            }
-        }
-    }
 
     @FXML
     private void handleCustomers() {
