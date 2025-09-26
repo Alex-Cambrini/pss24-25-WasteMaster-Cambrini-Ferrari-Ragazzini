@@ -20,7 +20,6 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
-import javafx.scene.control.ComboBox;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.CustomMenuItem;
 import javafx.scene.control.TableColumn;
@@ -98,10 +97,13 @@ public final class InvoiceController {
     private TextField searchField;
 
     @FXML
-    private ComboBox<String> statusFilterCombo;
+    private CheckBox showDeletedCheckBox;
 
     @FXML
-    private CheckBox showDeletedCheckBox;
+    private CheckBox showPaidCheckBox;
+
+    @FXML
+    private CheckBox showNotPaidCheckBox;
 
     public void setInvoiceManager(InvoiceManager invoiceManager) {
         this.invoiceManager = invoiceManager;
@@ -136,15 +138,17 @@ public final class InvoiceController {
         invoiceTable.getSelectionModel().selectedItemProperty()
                 .addListener((obs, oldVal, newVal) -> updateButtons(newVal));
 
-        statusFilterCombo.setItems(
-                FXCollections.observableArrayList("ALL", "PAID", "UNPAID"));
-        statusFilterCombo.getSelectionModel().select("ALL");
-        statusFilterCombo.getSelectionModel().selectedItemProperty()
-                .addListener((obs, oldVal, newVal) -> handleSearch());
-
         if (showDeletedCheckBox != null) {
             showDeletedCheckBox.setSelected(false);
-            showDeletedCheckBox.selectedProperty().addListener((obs, oldVal, newVal) -> handleSearch());
+            showDeletedCheckBox.selectedProperty().addListener((obs, o, n) -> handleSearch());
+        }
+        if (showPaidCheckBox != null) {
+            showPaidCheckBox.setSelected(true);
+            showPaidCheckBox.selectedProperty().addListener((obs, o, n) -> handleSearch());
+        }
+        if (showNotPaidCheckBox != null) {
+            showNotPaidCheckBox.setSelected(true);
+            showNotPaidCheckBox.selectedProperty().addListener((obs, o, n) -> handleSearch());
         }
 
         invoiceTable.setRowFactory(tv -> new TableRow<InvoiceRow>() {
@@ -235,31 +239,28 @@ public final class InvoiceController {
     @FXML
     private void handleSearch() {
         String query = searchField.getText().toLowerCase().trim();
-        String statusFilter = statusFilterCombo.getValue();
+
         boolean showDeleted = showDeletedCheckBox != null && showDeletedCheckBox.isSelected();
+        boolean showPaid = showPaidCheckBox == null || showPaidCheckBox.isSelected(); // default true se null
+        boolean showUnpaid = showNotPaidCheckBox == null || showNotPaidCheckBox.isSelected(); // default true se null
 
         ObservableList<InvoiceRow> filtered = FXCollections.observableArrayList();
 
         for (InvoiceRow row : allInvoices) {
-            boolean matchesQuery = query.isEmpty() ||
-                    (activeFilters.contains(FILTER_ID) && row.getId().toLowerCase()
-                            .contains(query))
-                    ||
-                    (activeFilters.contains(FILTER_CUSTOMER) && row.getCustomer()
-                            .toLowerCase().contains(query))
-                    ||
-                    (activeFilters.contains(FILTER_STATUS) && row.getStatus()
-                            .toLowerCase().contains(query))
-                    ||
-                    (activeFilters.contains(FILTER_AMOUNT) && row.getAmount()
-                            .toLowerCase().contains(query));
+            boolean matchesQuery = query.isEmpty()
+                    || (activeFilters.contains(FILTER_ID) && row.getId().toLowerCase().contains(query))
+                    || (activeFilters.contains(FILTER_CUSTOMER) && row.getCustomer().toLowerCase().contains(query))
+                    || (activeFilters.contains(FILTER_STATUS) && row.getStatus().toLowerCase().contains(query))
+                    || (activeFilters.contains(FILTER_AMOUNT) && row.getAmount().toLowerCase().contains(query));
 
-            boolean matchesStatus = "ALL".equals(statusFilter) ||
-                    row.getStatus().equalsIgnoreCase(statusFilter);
             boolean isCancelled = "Yes".equalsIgnoreCase(row.getIsCancelled());
             boolean matchesDeleted = showDeleted || !isCancelled;
 
-            if (matchesQuery && matchesStatus && matchesDeleted) {
+            String status = row.getStatus();
+            boolean allowedByCheckbox = ("PAID".equalsIgnoreCase(status) && showPaid)
+                    || ("UNPAID".equalsIgnoreCase(status) && showUnpaid);
+
+            if (matchesQuery && matchesDeleted && allowedByCheckbox) {
                 filtered.add(row);
             }
         }
@@ -272,12 +273,14 @@ public final class InvoiceController {
         searchField.clear();
         activeFilters.clear();
         activeFilters.addAll(FILTER_ID, FILTER_CUSTOMER, FILTER_STATUS);
-        if (showDeletedCheckBox != null) {
+
+        if (showDeletedCheckBox != null)
             showDeletedCheckBox.setSelected(false);
-        }
-        if (statusFilterCombo != null) {
-            statusFilterCombo.getSelectionModel().select("ALL");
-        }
+        if (showPaidCheckBox != null)
+            showPaidCheckBox.setSelected(true);
+        if (showNotPaidCheckBox != null)
+            showNotPaidCheckBox.setSelected(true);
+
         loadInvoices();
     }
 
