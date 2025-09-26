@@ -16,7 +16,13 @@ import javafx.animation.Timeline;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.ContextMenu;
+import javafx.scene.control.CustomMenuItem;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
+import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.util.Duration;
 
@@ -38,45 +44,68 @@ public final class TripController {
     private static final int REFRESH_SECONDS = 30;
 
     private final ObservableList<TripRow> allTrips = FXCollections.observableArrayList();
-    private final ObservableList<String> activeFilters = FXCollections.observableArrayList(
-            FIELD_ID, FIELD_POSTAL_CODES, FIELD_VEHICLE_MODEL, FIELD_VEHICLE_CAPACITY, FIELD_OPERATORS,
-            FIELD_STATUS);
+    private final ObservableList<String> activeFilters =
+            FXCollections.observableArrayList(
+                    FIELD_ID, FIELD_POSTAL_CODES, FIELD_VEHICLE_MODEL,
+                    FIELD_VEHICLE_CAPACITY, FIELD_OPERATORS,
+                    FIELD_STATUS);
+
+
     private TripManager tripManager;
     private VehicleManager vehicleManager;
     private CollectionManager collectionManager;
     private Timeline refreshTimeline;
     private ContextMenu filterMenu;
+    private Employee currentUser;
+
+    @FXML
+    public Button completeTripButton;
 
     @FXML
     private Button filterButton;
+
     @FXML
     private Button editTripButton;
+
     @FXML
     private Button deleteTripButton;
+
     @FXML
     private TextField searchField;
+
     @FXML
     private TableView<TripRow> tripTable;
+
     @FXML
     private TableColumn<TripRow, String> postalCodeColumn;
+
     @FXML
     private TableColumn<TripRow, String> vehicleColumn;
+
     @FXML
     private TableColumn<TripRow, String> vehicleModelColumn;
+
     @FXML
     private TableColumn<TripRow, Integer> vehicleCapacityColumn;
+
     @FXML
     private TableColumn<TripRow, String> operatorsColumn;
+
     @FXML
     private TableColumn<TripRow, String> departureColumn;
+
     @FXML
     private TableColumn<TripRow, String> returnColumn;
+
     @FXML
     private TableColumn<TripRow, String> statusColumn;
+
     @FXML
     private CheckBox showActiveCheckBox;
+
     @FXML
     private CheckBox showCancelledCheckBox;
+
     @FXML
     private CheckBox showCompletedCheckBox;
 
@@ -98,9 +127,12 @@ public final class TripController {
     @FXML
     public void initialize() {
         tripManager = AppContext.getServiceFactory().getTripManager();
-        postalCodeColumn.setCellValueFactory(new PropertyValueFactory<>(FIELD_POSTAL_CODES));
-        vehicleColumn.setCellValueFactory(new PropertyValueFactory<>(FIELD_VEHICLE_MODEL));
-        vehicleCapacityColumn.setCellValueFactory(new PropertyValueFactory<>(FIELD_VEHICLE_CAPACITY));
+        postalCodeColumn.setCellValueFactory(
+                new PropertyValueFactory<>(FIELD_POSTAL_CODES));
+        vehicleColumn.setCellValueFactory(
+                new PropertyValueFactory<>(FIELD_VEHICLE_MODEL));
+        vehicleCapacityColumn.setCellValueFactory(
+                new PropertyValueFactory<>(FIELD_VEHICLE_CAPACITY));
         operatorsColumn.setCellValueFactory(new PropertyValueFactory<>(FIELD_OPERATORS));
         departureColumn.setCellValueFactory(new PropertyValueFactory<>(FIELD_DEPARTURE));
         returnColumn.setCellValueFactory(new PropertyValueFactory<>(FIELD_RETURN));
@@ -126,15 +158,20 @@ public final class TripController {
                     boolean rowSelected = newVal != null;
                     if (rowSelected) {
                         String status = newVal.getStatus();
-                        boolean disabled = "CANCELED".equals(status) || "COMPLETED".equals(status);
-                        editTripButton.setDisable(disabled);
-                        deleteTripButton.setDisable(disabled);
+                        boolean isActive  = "ACTIVE".equalsIgnoreCase(status);
+                        editTripButton.setDisable(!isActive);
+                        deleteTripButton.setDisable(!isActive);
+                        completeTripButton.setDisable(!isActive);
                     } else {
                         editTripButton.setDisable(true);
                         deleteTripButton.setDisable(true);
+                        completeTripButton.setDisable(true);
                     }
                 });
-
+        currentUser = AppContext.getCurrentAccount().getEmployee();
+        boolean isAllowedToCompleteTrip =
+                currentUser.getRole() == Employee.Role.ADMINISTRATOR || currentUser.getRole() == Employee.Role.OPERATOR;
+        completeTripButton.setVisible(isAllowedToCompleteTrip);
         loadTrips();
         handleSearch();
     }
@@ -166,7 +203,6 @@ public final class TripController {
      * all trips.
      */
     public void loadTrips() {
-        Employee currentUser = AppContext.getCurrentAccount().getEmployee();
         List<Trip> trips = tripManager.getTripsForCurrentUser(currentUser);
         allTrips.clear();
         for (Trip trip : trips) {
@@ -181,20 +217,20 @@ public final class TripController {
     @FXML
     private void handleAddTrip() {
         try {
-            Optional<AddTripController> controllerOpt = DialogUtils.showModalWithController("Add Trip",
-                    "/layouts/trip/AddTripView.fxml",
-                    AppContext.getOwner(), ctrl -> {
-                        ctrl.setTripManager(tripManager);
-                        ctrl.setVehicleManager(vehicleManager);
-                        ctrl.setCollectionManager(collectionManager);
-                    });
+            Optional<AddTripController> controllerOpt =
+                    DialogUtils.showModalWithController("Add Trip",
+                            "/layouts/trip/AddTripView.fxml",
+                            AppContext.getOwner(), ctrl -> {
+                                ctrl.setTripManager(tripManager);
+                                ctrl.setVehicleManager(vehicleManager);
+                                ctrl.setCollectionManager(collectionManager);
+                            });
             if (controllerOpt.isPresent()) {
                 loadTrips();
             }
         } catch (Exception e) {
             DialogUtils.showError(NAVIGATION_ERROR, "Could not load Add Trip view.",
                     AppContext.getOwner());
-            e.printStackTrace();
         }
     }
 
@@ -211,8 +247,9 @@ public final class TripController {
                 "Confirm Cancellation",
                 "Are you sure you want to cancel this trip?",
                 AppContext.getOwner());
-        if (!confirmed)
+        if (!confirmed) {
             return;
+        }
 
         Optional<Trip> tripOpt = tripManager.getTripById(selected.getIdAsInt());
         if (tripOpt.isEmpty()) {
@@ -250,13 +287,14 @@ public final class TripController {
         }
 
         try {
-            Optional<EditTripController> controllerOpt = DialogUtils.showModalWithController("Edit Trip",
-                    "/layouts/trip/EditTripView.fxml",
-                    AppContext.getOwner(), ctrl -> {
-                        ctrl.setTripToEdit(tripOpt.get());
-                        ctrl.setTripController(this);
-                        ctrl.setTripManager(tripManager);
-                    });
+            Optional<EditTripController> controllerOpt =
+                    DialogUtils.showModalWithController("Edit Trip",
+                            "/layouts/trip/EditTripView.fxml",
+                            AppContext.getOwner(), ctrl -> {
+                                ctrl.setTripToEdit(tripOpt.get());
+                                ctrl.setTripController(this);
+                                ctrl.setTripManager(tripManager);
+                            });
 
             controllerOpt.ifPresent(ctrl -> loadTrips());
         } catch (Exception e) {
@@ -291,8 +329,9 @@ public final class TripController {
     }
 
     private boolean shouldShowByStatus(String status) {
-        if (status == null)
+        if (status == null) {
             return false;
+        }
         String s = status.toUpperCase();
 
         boolean isActive = "ACTIVE".equals(s);
@@ -308,22 +347,23 @@ public final class TripController {
         return (activeFilters.contains(FIELD_ID)
                 && row.getId().toLowerCase().contains(query))
                 || (activeFilters.contains(FIELD_POSTAL_CODES)
-                        && row.getPostalCodes().toLowerCase().contains(query))
+                && row.getPostalCodes().toLowerCase().contains(query))
                 || (activeFilters.contains(FIELD_VEHICLE_MODEL)
-                        && row.getVehicleModel().toLowerCase().contains(query))
+                && row.getVehicleModel().toLowerCase().contains(query))
                 || (activeFilters.contains(FIELD_VEHICLE_CAPACITY)
-                        && String.valueOf(row.getVehicleCapacity()).contains(query))
+                && String.valueOf(row.getVehicleCapacity()).contains(query))
                 || (activeFilters.contains(FIELD_OPERATORS)
-                        && row.getOperators().toLowerCase().contains(query))
+                && row.getOperators().toLowerCase().contains(query))
                 || (activeFilters.contains(FIELD_STATUS)
-                        && row.getStatus().toLowerCase().contains(query));
+                && row.getStatus().toLowerCase().contains(query));
     }
 
     @FXML
     private void handleResetSearch() {
         searchField.clear();
         activeFilters.clear();
-        activeFilters.addAll(FIELD_ID, FIELD_POSTAL_CODES, FIELD_VEHICLE_MODEL, FIELD_VEHICLE_CAPACITY,
+        activeFilters.addAll(FIELD_ID, FIELD_POSTAL_CODES, FIELD_VEHICLE_MODEL,
+                FIELD_VEHICLE_CAPACITY,
                 FIELD_OPERATORS, FIELD_STATUS);
         showActiveCheckBox.setSelected(true);
         showCancelledCheckBox.setSelected(false);
@@ -339,10 +379,12 @@ public final class TripController {
         }
 
         filterMenu = new ContextMenu();
-        String[] fields = { FIELD_ID, FIELD_POSTAL_CODES, FIELD_VEHICLE_MODEL, FIELD_VEHICLE_CAPACITY,
-                FIELD_OPERATORS, FIELD_STATUS };
-        String[] labels = { "ID", "Postal Codes", "Vehicle", "Vehicle Capacity", "Operators",
-                "Status" };
+        String[] fields = {FIELD_ID, FIELD_POSTAL_CODES, FIELD_VEHICLE_MODEL,
+                FIELD_VEHICLE_CAPACITY,
+                FIELD_OPERATORS, FIELD_STATUS};
+        String[] labels =
+                {"ID", "Postal Codes", "Vehicle", "Vehicle Capacity", "Operators",
+                        "Status"};
 
         for (int i = 0; i < fields.length; i++) {
             String key = fields[i];
@@ -365,5 +407,10 @@ public final class TripController {
         }
 
         filterMenu.show(filterButton, event.getScreenX(), event.getScreenY());
+    }
+
+    @FXML
+    private void handleCompleteTrip() {
+
     }
 }
