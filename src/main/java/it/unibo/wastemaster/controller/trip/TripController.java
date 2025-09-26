@@ -409,6 +409,36 @@ public final class TripController implements AutoRefreshable {
 
     @FXML
     private void handleCompleteTrip() {
+        TripRow selected = tripTable.getSelectionModel().getSelectedItem();
+        if (selected == null) {
+            DialogUtils.showError("No Selection",
+                    "Please select a trip to complete.", AppContext.getOwner());
+            return;
+        }
+
+        boolean confirmed = DialogUtils.showConfirmationDialog(
+                "Confirm Completion",
+                "Are you sure you want to mark this trip as completed?",
+                AppContext.getOwner());
+        if (!confirmed) {
+            return;
+        }
+
+        Optional<Trip> tripOpt = tripManager.getTripById(selected.getIdAsInt());
+        if (tripOpt.isEmpty()) {
+            DialogUtils.showError("Not Found",
+                    "The selected trip could not be found.", AppContext.getOwner());
+            return;
+        }
+
+        Trip trip = tripOpt.get();
+        boolean success = tripManager.setTripAsCompleted(trip);
+        if (success) {
+            loadTrips();
+        } else {
+            DialogUtils.showError("Completion Failed",
+                    "Unable to complete the selected trip.", AppContext.getOwner());
+        }
 
     }
 }
