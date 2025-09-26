@@ -42,12 +42,9 @@ public final class InvoiceController {
 
     private static final String TITLE_NO_SELECTION = "No Selection";
 
-    private final ObservableList<String> activeFilters =
-            FXCollections.observableArrayList(
-                    FILTER_ID, FILTER_CUSTOMER, FILTER_STATUS
-            );
-    private final ObservableList<InvoiceRow> allInvoices =
-            FXCollections.observableArrayList();
+    private final ObservableList<String> activeFilters = FXCollections.observableArrayList(
+            FILTER_ID, FILTER_CUSTOMER, FILTER_STATUS);
+    private final ObservableList<InvoiceRow> allInvoices = FXCollections.observableArrayList();
     private Stage owner;
     private InvoiceManager invoiceManager;
     private CollectionManager collectionManager;
@@ -103,6 +100,9 @@ public final class InvoiceController {
     @FXML
     private ComboBox<String> statusFilterCombo;
 
+    @FXML
+    private CheckBox showDeletedCheckBox;
+
     public void setInvoiceManager(InvoiceManager invoiceManager) {
         this.invoiceManager = invoiceManager;
     }
@@ -138,8 +138,14 @@ public final class InvoiceController {
 
         statusFilterCombo.setItems(
                 FXCollections.observableArrayList("ALL", "PAID", "UNPAID"));
+        statusFilterCombo.getSelectionModel().select("ALL");
         statusFilterCombo.getSelectionModel().selectedItemProperty()
                 .addListener((obs, oldVal, newVal) -> handleSearch());
+
+        if (showDeletedCheckBox != null) {
+            showDeletedCheckBox.setSelected(false);
+            showDeletedCheckBox.selectedProperty().addListener((obs, oldVal, newVal) -> handleSearch());
+        }
 
         invoiceTable.setRowFactory(tv -> new TableRow<InvoiceRow>() {
             @Override
@@ -170,9 +176,8 @@ public final class InvoiceController {
     }
 
     private void startAutoRefresh() {
-        refreshTimeline =
-                new Timeline(new KeyFrame(Duration.seconds(REFRESH_INTERVAL_SECONDS),
-                        e -> loadInvoices()));
+        refreshTimeline = new Timeline(new KeyFrame(Duration.seconds(REFRESH_INTERVAL_SECONDS),
+                e -> loadInvoices()));
         refreshTimeline.setCycleCount(Timeline.INDEFINITE);
         refreshTimeline.play();
     }
@@ -189,7 +194,7 @@ public final class InvoiceController {
         for (Invoice invoice : invoices) {
             allInvoices.add(new InvoiceRow(invoice));
         }
-        invoiceTable.setItems(allInvoices);
+        handleSearch();
     }
 
     private void updateButtons(final InvoiceRow selected) {
@@ -202,7 +207,6 @@ public final class InvoiceController {
         boolean isPaid = "PAID".equalsIgnoreCase(selected.getStatus());
         boolean isCancelled = "Yes".equalsIgnoreCase(selected.getIsCancelled());
 
-        // disabilita entrambi i bottoni se pagata o cancellata
         markAsPaidButton.setDisable(isPaid || isCancelled);
         deleteInvoiceButton.setDisable(isPaid || isCancelled);
     }
@@ -210,14 +214,13 @@ public final class InvoiceController {
     @FXML
     private void handleAddInvoice() {
         try {
-            Optional<AddInvoiceController> controllerOpt =
-                    DialogUtils.showModalWithController("Add Invoice",
-                            "/layouts/invoice/AddInvoiceView.fxml", owner, ctrl -> {
-                                ctrl.setCustomerManager(customerManager);
-                                ctrl.setCollectionManager(collectionManager);
-                                ctrl.setInvoiceManager(invoiceManager);
-                                ctrl.initData();
-                            });
+            Optional<AddInvoiceController> controllerOpt = DialogUtils.showModalWithController("Add Invoice",
+                    "/layouts/invoice/AddInvoiceView.fxml", owner, ctrl -> {
+                        ctrl.setCustomerManager(customerManager);
+                        ctrl.setCollectionManager(collectionManager);
+                        ctrl.setInvoiceManager(invoiceManager);
+                        ctrl.initData();
+                    });
 
             if (controllerOpt.isPresent()) {
                 loadInvoices();
@@ -233,24 +236,30 @@ public final class InvoiceController {
     private void handleSearch() {
         String query = searchField.getText().toLowerCase().trim();
         String statusFilter = statusFilterCombo.getValue();
+        boolean showDeleted = showDeletedCheckBox != null && showDeletedCheckBox.isSelected();
 
         ObservableList<InvoiceRow> filtered = FXCollections.observableArrayList();
 
         for (InvoiceRow row : allInvoices) {
             boolean matchesQuery = query.isEmpty() ||
                     (activeFilters.contains(FILTER_ID) && row.getId().toLowerCase()
-                            .contains(query)) ||
+                            .contains(query))
+                    ||
                     (activeFilters.contains(FILTER_CUSTOMER) && row.getCustomer()
-                            .toLowerCase().contains(query)) ||
+                            .toLowerCase().contains(query))
+                    ||
                     (activeFilters.contains(FILTER_STATUS) && row.getStatus()
-                            .toLowerCase().contains(query)) ||
+                            .toLowerCase().contains(query))
+                    ||
                     (activeFilters.contains(FILTER_AMOUNT) && row.getAmount()
                             .toLowerCase().contains(query));
 
             boolean matchesStatus = "ALL".equals(statusFilter) ||
                     row.getStatus().equalsIgnoreCase(statusFilter);
+            boolean isCancelled = "Yes".equalsIgnoreCase(row.getIsCancelled());
+            boolean matchesDeleted = showDeleted || !isCancelled;
 
-            if (matchesQuery && matchesStatus) {
+            if (matchesQuery && matchesStatus && matchesDeleted) {
                 filtered.add(row);
             }
         }
@@ -263,6 +272,12 @@ public final class InvoiceController {
         searchField.clear();
         activeFilters.clear();
         activeFilters.addAll(FILTER_ID, FILTER_CUSTOMER, FILTER_STATUS);
+        if (showDeletedCheckBox != null) {
+            showDeletedCheckBox.setSelected(false);
+        }
+        if (statusFilterCombo != null) {
+            statusFilterCombo.getSelectionModel().select("ALL");
+        }
         loadInvoices();
     }
 
@@ -273,8 +288,8 @@ public final class InvoiceController {
             return;
         }
         filterMenu = new ContextMenu();
-        String[] fields = {FILTER_ID, FILTER_CUSTOMER, FILTER_STATUS};
-        String[] labels = {"ID", "Customer", "Status"};
+        String[] fields = { FILTER_ID, FILTER_CUSTOMER, FILTER_STATUS };
+        String[] labels = { "ID", "Customer", "Status" };
         for (int i = 0; i < fields.length; i++) {
             String key = fields[i];
             String label = labels[i];
@@ -305,9 +320,8 @@ public final class InvoiceController {
                     AppContext.getOwner());
             return;
         }
-        Optional<Invoice> invoiceOpt =
-                invoiceManager.findInvoiceById(selected.getInvoice()
-                        .getInvoiceId());
+        Optional<Invoice> invoiceOpt = invoiceManager.findInvoiceById(selected.getInvoice()
+                .getInvoiceId());
         if (invoiceOpt.isEmpty()) {
             DialogUtils.showError("Not Found", "Invoice not found.",
                     AppContext.getOwner());
@@ -322,8 +336,8 @@ public final class InvoiceController {
         }
         try {
             MainLayoutController.getInstance().setPageTitle("Associated Collections");
-            it.unibo.wastemaster.controller.collection.CollectionController controller =
-                    MainLayoutController.getInstance().loadCenterWithController(
+            it.unibo.wastemaster.controller.collection.CollectionController controller = MainLayoutController
+                    .getInstance().loadCenterWithController(
                             "/layouts/collection/CollectionView.fxml");
             controller.setCollections(collections);
         } catch (Exception e) {
@@ -361,9 +375,8 @@ public final class InvoiceController {
             return;
         }
 
-        Optional<Invoice> invoiceOpt =
-                invoiceManager.findInvoiceById(selected.getInvoice()
-                        .getInvoiceId());
+        Optional<Invoice> invoiceOpt = invoiceManager.findInvoiceById(selected.getInvoice()
+                .getInvoiceId());
         if (invoiceOpt.isEmpty()) {
             DialogUtils.showError("Not Found", "Invoice not found.",
                     AppContext.getOwner());
@@ -373,8 +386,7 @@ public final class InvoiceController {
         try {
             Invoice invoice = invoiceOpt.get();
 
-            java.nio.file.Path outputPath =
-                    java.nio.file.Paths.get("invoice-" + invoice.getInvoiceId() + ".pdf");
+            java.nio.file.Path outputPath = java.nio.file.Paths.get("invoice-" + invoice.getInvoiceId() + ".pdf");
             try (java.io.FileOutputStream fos = new java.io.FileOutputStream(
                     outputPath.toFile())) {
                 new it.unibo.wastemaster.infrastructure.pdf.InvoicePdfService()

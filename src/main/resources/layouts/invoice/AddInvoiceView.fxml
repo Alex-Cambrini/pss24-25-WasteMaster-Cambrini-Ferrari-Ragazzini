@@ -3,18 +3,15 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity"
-      prefHeight="400.0" prefWidth="600.0"
-      xmlns="http://javafx.com/javafx/21"
-      xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="it.unibo.wastemaster.controller.invoice.AddInvoiceController"
-      styleClass="center-pane, modal-pane">
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0"
+    xmlns="http://javafx.com/javafx/21"
+    xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.unibo.wastemaster.controller.invoice.AddInvoiceController" styleClass="center-pane, modal-pane">
 
     <children>
         <GridPane prefHeight="374.0" prefWidth="600.0" hgap="20" vgap="10">
             <columnConstraints>
                 <ColumnConstraints hgrow="SOMETIMES" minWidth="130.0" prefWidth="150.0" maxWidth="290.0"/>
-                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0"  prefWidth="480.0" maxWidth="496.0"/>
+                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="480.0" maxWidth="496.0"/>
             </columnConstraints>
             <rowConstraints>
                 <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
@@ -25,11 +22,9 @@
 
             <children>
                 <Label text="Customer" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
-                <ComboBox fx:id="customerCombo" promptText="Select a customer"
-                          GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+                <ComboBox fx:id="customerCombo" promptText="Select a customer" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
 
-                <HBox spacing="12.0" alignment="CENTER_LEFT"
-                      GridPane.rowIndex="1" GridPane.columnIndex="1">
+                <HBox spacing="12.0" alignment="CENTER_LEFT" GridPane.rowIndex="1" GridPane.columnIndex="1">
                     <children>
                         <CheckBox fx:id="selectAllCheck" text="Select all"/>
                         <Label text="Unbilled collections of the selected customer"/>
@@ -37,8 +32,7 @@
                 </HBox>
 
 
-                <TableView fx:id="collectionsTable" prefHeight="200.0"
-                           GridPane.rowIndex="2" GridPane.columnIndex="0" GridPane.columnSpan="2">
+                <TableView fx:id="collectionsTable" prefHeight="200.0" GridPane.rowIndex="2" GridPane.columnIndex="0" GridPane.columnSpan="2">
                     <columns>
                         <TableColumn fx:id="selectCol" text="✓" prefWidth="40.0"/>
                         <TableColumn fx:id="idCol" text="ID" prefWidth="120.0"/>
@@ -47,20 +41,19 @@
                     </columns>
                 </TableView>
 
-                <Label text="Selected total:" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
-                <TextField fx:id="selectedCountField"
-                           editable="false"
-                           prefWidth="80.0" maxWidth="80.0"
-                           GridPane.rowIndex="3" GridPane.columnIndex="1"/>
+                <HBox spacing="5.0" GridPane.rowIndex="3" GridPane.columnIndex="0" GridPane.columnSpan="2">
+                    <children>
+                        <Label text="Selected total:"/>
+                        <Label fx:id="selectedCountField" text="0"/>
+                    </children>
+                </HBox>
             </children>
         </GridPane>
 
         <HBox alignment="TOP_RIGHT" prefHeight="100.0" prefWidth="200.0" spacing="10.0">
             <children>
-                <Button fx:id="cancelButton" text="Cancel"
-                        onAction="#handleAbortInvoiceCreation" styleClass="danger"/>
-                <Button fx:id="saveButton" text="Save"
-                        onAction="#handleSaveInvoice" styleClass="success"/>
+                <Button fx:id="cancelButton" text="Cancel" onAction="#handleAbortInvoiceCreation" styleClass="danger"/>
+                <Button fx:id="saveButton" text="Save" onAction="#handleSaveInvoice" styleClass="success"/>
             </children>
             <padding>
                 <Insets right="20.0" top="10.0"/>

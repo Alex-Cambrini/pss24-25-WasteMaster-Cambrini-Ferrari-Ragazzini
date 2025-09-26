@@ -21,13 +21,15 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.util.Duration;
 
 /**
- * Controller for managing the trips view, including search, filters and CRUD operations.
+ * Controller for managing the trips view, including search, filters and CRUD
+ * operations.
  */
 public final class TripController {
 
     private static final String FIELD_ID = "id";
     private static final String FIELD_POSTAL_CODES = "postalCodes";
-    private static final String FIELD_VEHICLE = "vehicle";
+    private static final String FIELD_VEHICLE_MODEL = "vehicleModel";
+    private static final String FIELD_VEHICLE_CAPACITY = "vehicleCapacity";
     private static final String FIELD_OPERATORS = "operators";
     private static final String FIELD_DEPARTURE = "departure";
     private static final String FIELD_RETURN = "returnTime";
@@ -37,25 +39,40 @@ public final class TripController {
 
     private final ObservableList<TripRow> allTrips = FXCollections.observableArrayList();
     private final ObservableList<String> activeFilters = FXCollections.observableArrayList(
-            FIELD_ID, FIELD_POSTAL_CODES, FIELD_VEHICLE, FIELD_OPERATORS, FIELD_STATUS
-    );
+            FIELD_ID, FIELD_POSTAL_CODES, FIELD_VEHICLE_MODEL, FIELD_VEHICLE_CAPACITY, FIELD_OPERATORS,
+            FIELD_STATUS);
     private TripManager tripManager;
     private VehicleManager vehicleManager;
     private CollectionManager collectionManager;
     private Timeline refreshTimeline;
     private ContextMenu filterMenu;
 
-    @FXML private Button filterButton;
-    @FXML private Button editTripButton;
-    @FXML private Button deleteTripButton;
-    @FXML private TextField searchField;
-    @FXML private TableView<TripRow> tripTable;
-    @FXML private TableColumn<TripRow, String> postalCodeColumn;
-    @FXML private TableColumn<TripRow, String> vehicleColumn;
-    @FXML private TableColumn<TripRow, String> operatorsColumn;
-    @FXML private TableColumn<TripRow, String> departureColumn;
-    @FXML private TableColumn<TripRow, String> returnColumn;
-    @FXML private TableColumn<TripRow, String> statusColumn;
+    @FXML
+    private Button filterButton;
+    @FXML
+    private Button editTripButton;
+    @FXML
+    private Button deleteTripButton;
+    @FXML
+    private TextField searchField;
+    @FXML
+    private TableView<TripRow> tripTable;
+    @FXML
+    private TableColumn<TripRow, String> postalCodeColumn;
+    @FXML
+    private TableColumn<TripRow, String> vehicleColumn;
+    @FXML
+    private TableColumn<TripRow, String> vehicleModelColumn;
+    @FXML
+    private TableColumn<TripRow, Integer> vehicleCapacityColumn;
+    @FXML
+    private TableColumn<TripRow, String> operatorsColumn;
+    @FXML
+    private TableColumn<TripRow, String> departureColumn;
+    @FXML
+    private TableColumn<TripRow, String> returnColumn;
+    @FXML
+    private TableColumn<TripRow, String> statusColumn;
 
     public void setTripManager(TripManager tripManager) {
         this.tripManager = tripManager;
@@ -66,7 +83,7 @@ public final class TripController {
     }
 
     public void setCollectionManager(CollectionManager collectionManager) {
-        this.collectionManager  = collectionManager;
+        this.collectionManager = collectionManager;
     }
 
     /**
@@ -76,7 +93,8 @@ public final class TripController {
     public void initialize() {
         tripManager = AppContext.getServiceFactory().getTripManager();
         postalCodeColumn.setCellValueFactory(new PropertyValueFactory<>(FIELD_POSTAL_CODES));
-        vehicleColumn.setCellValueFactory(new PropertyValueFactory<>(FIELD_VEHICLE));
+        vehicleColumn.setCellValueFactory(new PropertyValueFactory<>(FIELD_VEHICLE_MODEL));
+        vehicleCapacityColumn.setCellValueFactory(new PropertyValueFactory<>(FIELD_VEHICLE_CAPACITY));
         operatorsColumn.setCellValueFactory(new PropertyValueFactory<>(FIELD_OPERATORS));
         departureColumn.setCellValueFactory(new PropertyValueFactory<>(FIELD_DEPARTURE));
         returnColumn.setCellValueFactory(new PropertyValueFactory<>(FIELD_RETURN));
@@ -103,7 +121,6 @@ public final class TripController {
                     }
                 });
 
-        // Carica i dati all'avvio
         loadTrips();
     }
 
@@ -126,12 +143,12 @@ public final class TripController {
 
     /**
      * Loads trips visible to the current user and updates the trip table.
-     * Operators see only their assigned trips, while admins and office workers see all trips.
+     * Operators see only their assigned trips, while admins and office workers see
+     * all trips.
      */
     public void loadTrips() {
         Employee currentUser = AppContext.getCurrentAccount().getEmployee();
-        List<Trip> trips =
-                tripManager.getTripsForCurrentUser(currentUser);
+        List<Trip> trips = tripManager.getTripsForCurrentUser(currentUser);
         allTrips.clear();
         for (Trip trip : trips) {
             allTrips.add(new TripRow(trip));
@@ -145,14 +162,13 @@ public final class TripController {
     @FXML
     private void handleAddTrip() {
         try {
-            Optional<AddTripController> controllerOpt =
-                    DialogUtils.showModalWithController("Add Trip",
-                            "/layouts/trip/AddTripView.fxml",
-                            AppContext.getOwner(), ctrl -> {
-                                ctrl.setTripManager(tripManager);
-                                ctrl.setVehicleManager(vehicleManager);
-                                ctrl.setCollectionManager(collectionManager);
-                            });
+            Optional<AddTripController> controllerOpt = DialogUtils.showModalWithController("Add Trip",
+                    "/layouts/trip/AddTripView.fxml",
+                    AppContext.getOwner(), ctrl -> {
+                        ctrl.setTripManager(tripManager);
+                        ctrl.setVehicleManager(vehicleManager);
+                        ctrl.setCollectionManager(collectionManager);
+                    });
             if (controllerOpt.isPresent()) {
                 loadTrips();
             }
@@ -175,9 +191,9 @@ public final class TripController {
         boolean confirmed = DialogUtils.showConfirmationDialog(
                 "Confirm Cancellation",
                 "Are you sure you want to cancel this trip?",
-                AppContext.getOwner()
-        );
-        if (!confirmed) return;
+                AppContext.getOwner());
+        if (!confirmed)
+            return;
 
         Optional<Trip> tripOpt = tripManager.getTripById(selected.getIdAsInt());
         if (tripOpt.isEmpty()) {
@@ -188,7 +204,7 @@ public final class TripController {
 
         Trip trip = tripOpt.get();
         boolean success = tripManager.softDeleteTrip(trip);
-        trip.getCollections().clear(); // coerenza in memoria
+        trip.getCollections().clear();
         if (success) {
             loadTrips();
         } else {
@@ -215,14 +231,13 @@ public final class TripController {
         }
 
         try {
-            Optional<EditTripController> controllerOpt =
-                    DialogUtils.showModalWithController("Edit Trip",
-                            "/layouts/trip/EditTripView.fxml",
-                            AppContext.getOwner(), ctrl -> {
-                                ctrl.setTripToEdit(tripOpt.get());
-                                ctrl.setTripController(this);
-                                ctrl.setTripManager(tripManager);
-                            });
+            Optional<EditTripController> controllerOpt = DialogUtils.showModalWithController("Edit Trip",
+                    "/layouts/trip/EditTripView.fxml",
+                    AppContext.getOwner(), ctrl -> {
+                        ctrl.setTripToEdit(tripOpt.get());
+                        ctrl.setTripController(this);
+                        ctrl.setTripManager(tripManager);
+                    });
 
             controllerOpt.ifPresent(ctrl -> loadTrips());
         } catch (Exception e) {
@@ -231,7 +246,7 @@ public final class TripController {
         }
     }
 
-     @FXML
+    @FXML
     private void handleSearch() {
         String query = searchField.getText().toLowerCase().trim();
 
@@ -253,20 +268,23 @@ public final class TripController {
         return (activeFilters.contains(FIELD_ID)
                 && row.getId().toLowerCase().contains(query))
                 || (activeFilters.contains(FIELD_POSTAL_CODES)
-                && row.getPostalCodes().toLowerCase().contains(query))
-                || (activeFilters.contains(FIELD_VEHICLE)
-                && row.getVehicle().toLowerCase().contains(query))
+                        && row.getPostalCodes().toLowerCase().contains(query))
+                || (activeFilters.contains(FIELD_VEHICLE_MODEL)
+                        && row.getVehicleModel().toLowerCase().contains(query))
+                || (activeFilters.contains(FIELD_VEHICLE_CAPACITY)
+                        && String.valueOf(row.getVehicleCapacity()).contains(query))
                 || (activeFilters.contains(FIELD_OPERATORS)
-                && row.getOperators().toLowerCase().contains(query))
+                        && row.getOperators().toLowerCase().contains(query))
                 || (activeFilters.contains(FIELD_STATUS)
-                && row.getStatus().toLowerCase().contains(query));
+                        && row.getStatus().toLowerCase().contains(query));
     }
 
-      @FXML
+    @FXML
     private void handleResetSearch() {
         searchField.clear();
         activeFilters.clear();
-        activeFilters.addAll(FIELD_ID, FIELD_POSTAL_CODES, FIELD_VEHICLE, FIELD_OPERATORS, FIELD_STATUS);
+        activeFilters.addAll(FIELD_ID, FIELD_POSTAL_CODES, FIELD_VEHICLE_MODEL, FIELD_VEHICLE_CAPACITY,
+                FIELD_OPERATORS, FIELD_STATUS);
         loadTrips();
     }
 
@@ -278,8 +296,10 @@ public final class TripController {
         }
 
         filterMenu = new ContextMenu();
-        String[] fields = {FIELD_ID, FIELD_POSTAL_CODES, FIELD_VEHICLE, FIELD_OPERATORS, FIELD_STATUS};
-        String[] labels = {"ID", "Postal Codes", "Vehicle", "Operators", "Status"};
+        String[] fields = { FIELD_ID, FIELD_POSTAL_CODES, FIELD_VEHICLE_MODEL, FIELD_VEHICLE_CAPACITY,
+                FIELD_OPERATORS, FIELD_STATUS };
+        String[] labels = { "ID", "Postal Codes", "Vehicle", "Vehicle Capacity", "Operators",
+                "Status" };
 
         for (int i = 0; i < fields.length; i++) {
             String key = fields[i];

@@ -1,35 +1,31 @@
 package it.unibo.wastemaster.controller.trip;
 
-
+import it.unibo.wastemaster.application.context.AppContext;
+import it.unibo.wastemaster.controller.utils.DialogUtils;
 import it.unibo.wastemaster.domain.model.Employee;
 import it.unibo.wastemaster.domain.model.Trip;
 import it.unibo.wastemaster.domain.model.Vehicle;
 import it.unibo.wastemaster.domain.service.TripManager;
+import it.unibo.wastemaster.domain.repository.VehicleRepository;
+import it.unibo.wastemaster.domain.repository.EmployeeRepository;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
-import javafx.stage.Stage;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.List;
+import java.util.Optional;
 
-public class EditTripController {
+public final class EditTripController {
 
-    @FXML private TextField postalCodesField;
+    private Trip tripToEdit;
+    private TripController tripController;
+    private TripManager tripManager;
+    private VehicleRepository vehicleRepository;
+    private EmployeeRepository employeeRepository;
+
+    @FXML private TextField postalCodeField;
     @FXML private ComboBox<Vehicle> vehicleCombo;
     @FXML private ListView<Employee> operatorsList;
     @FXML private DatePicker departureDate;
     @FXML private DatePicker returnDate;
-    @FXML private Button saveButton;
-    @FXML private Button cancelButton;
-
-    private Trip tripToEdit;
-    private TripManager tripManager;
-    private TripController tripController;
-
-    public void setTripToEdit(Trip trip) {
-        this.tripToEdit = trip;
-        populateFields();
-    }
 
     public void setTripManager(TripManager tripManager) {
         this.tripManager = tripManager;
@@ -39,11 +35,32 @@ public class EditTripController {
         this.tripController = tripController;
     }
 
-   
+    public void setVehicleRepository(VehicleRepository vehicleRepository) {
+        this.vehicleRepository = vehicleRepository;
+    }
+
+    public void setEmployeeRepository(EmployeeRepository employeeRepository) {
+        this.employeeRepository = employeeRepository;
+    }
+
+    public void setTripToEdit(final Trip trip) {
+        this.tripToEdit = trip;
+        populateFields();
+    }
+
+    @FXML
+    public void initialize() {
+        if (vehicleRepository != null) {
+            vehicleCombo.getItems().setAll(vehicleRepository.findAll());
+        }
+        if (employeeRepository != null) {
+            operatorsList.getItems().setAll(employeeRepository.findAllActive());
+        }
+    }
 
     private void populateFields() {
         if (tripToEdit == null) return;
-        postalCodesField.setText(tripToEdit.getPostalCode());
+        postalCodeField.setText(tripToEdit.getPostalCode());
         vehicleCombo.setValue(tripToEdit.getAssignedVehicle());
         operatorsList.getSelectionModel().clearSelection();
         for (Employee op : tripToEdit.getOperators()) {
@@ -58,47 +75,48 @@ public class EditTripController {
     }
 
     @FXML
-    private void onSave() {
-        String postalCodes = postalCodesField.getText().trim();
-        Vehicle vehicle = vehicleCombo.getValue();
-        List<Employee> operators = operatorsList.getSelectionModel().getSelectedItems();
-        LocalDate depDate = departureDate.getValue();
-        LocalDate retDate = returnDate.getValue();
+    private void handleUpdateTrip(final ActionEvent event) {
+        try {
+            Optional<Trip> originalOpt = tripManager.getTripById(tripToEdit.getTripId());
+            if (originalOpt.isEmpty()) {
+                DialogUtils.showError("Error", "Trip not found.", AppContext.getOwner());
+                return;
+            }
+            Trip original = originalOpt.get();
 
-        if (postalCodes.isEmpty() || vehicle == null || operators.isEmpty() || depDate == null || retDate == null) {
-            showAlert("All fields are required.");
-            return;
-        }
+            boolean changed = !original.getPostalCode().equals(postalCodeField.getText())
+                    || !original.getAssignedVehicle().equals(vehicleCombo.getValue())
+                    || !original.getOperators().equals(operatorsList.getSelectionModel().getSelectedItems())
+                    || !original.getDepartureTime().toLocalDate().equals(departureDate.getValue())
+                    || !original.getExpectedReturnTime().toLocalDate().equals(returnDate.getValue());
 
-        LocalDateTime depDateTime = depDate.atStartOfDay();
-        LocalDateTime retDateTime = retDate.atStartOfDay();
+            if (!changed) {
+                DialogUtils.showError("No changes", "No fields were modified.", AppContext.getOwner());
+                return;
+            }
 
-        // Aggiorna direttamente i campi del trip
-        tripToEdit.setPostalCode(postalCodes);
-        tripToEdit.setAssignedVehicle(vehicle);
-        tripToEdit.setOperators(operators);
-        tripToEdit.setDepartureTime(depDateTime);
-        tripToEdit.setExpectedReturnTime(retDateTime);
+            tripToEdit.setPostalCode(postalCodeField.getText());
+            tripToEdit.setAssignedVehicle(vehicleCombo.getValue());
+            tripToEdit.setOperators(operatorsList.getSelectionModel().getSelectedItems());
+            tripToEdit.setDepartureTime(departureDate.getValue().atStartOfDay());
+            tripToEdit.setExpectedReturnTime(returnDate.getValue().atStartOfDay());
 
-        // Salva le modifiche
-        tripManager.updateTrip(tripToEdit);
-        close();
-        if (tripController != null) {
-            tripController.loadTrips();
+            tripManager.updateTrip(tripToEdit);
+
+            if (this.tripController != null) {
+                this.tripController.loadTrips();
+            }
+
+            DialogUtils.showSuccess("Trip updated successfully.", AppContext.getOwner());
+            DialogUtils.closeModal(event);
+
+        } catch (IllegalArgumentException e) {
+            DialogUtils.showError("Validation error", e.getMessage(), AppContext.getOwner());
         }
     }
 
     @FXML
-    private void onCancel() {
-        close();
-    }
-
-    private void close() {
-        ((Stage) postalCodesField.getScene().getWindow()).close();
-    }
-
-    private void showAlert(String msg) {
-        Alert alert = new Alert(Alert.AlertType.ERROR, msg, ButtonType.OK);
-        alert.showAndWait();
+    private void handleAbortTripEdit(final ActionEvent event) {
+        DialogUtils.closeModal(event);
     }
 }
