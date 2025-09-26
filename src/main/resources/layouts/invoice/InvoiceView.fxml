@@ -2,21 +2,18 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
-<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextField?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.Region?>
-<?import javafx.scene.layout.VBox?>
-<?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.Tooltip?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
 
-<VBox alignment="TOP_CENTER" prefWidth="640.0"
-    xmlns="http://javafx.com/javafx/21"
-    xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.unibo.wastemaster.controller.invoice.InvoiceController">
+<VBox alignment="TOP_CENTER" prefWidth="640.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.unibo.wastemaster.controller.invoice.InvoiceController">
     <children>
         <HBox alignment="TOP_CENTER" minHeight="40.0" prefHeight="40.0" prefWidth="600.0" spacing="10.0">
             <children>
@@ -32,6 +29,19 @@
         </HBox>
         <HBox alignment="CENTER_RIGHT" prefHeight="30.0" prefWidth="30.0" spacing="10.0">
             <children>
+                <Button fx:id="exportPdfButton" mnemonicParsing="false" onAction="#handleExportPdf" styleClass="accent, button-outlined">
+                    <graphic>
+                        <ImageView fitHeight="20" fitWidth="20" preserveRatio="true">
+                            <image>
+                                <Image url="@/images/pdfIcon.png" />
+                            </image>
+                        </ImageView>
+                    </graphic>
+                    <tooltip>
+                        <Tooltip text="Export PDF" />
+                    </tooltip>
+                </Button>
+            <Region prefHeight="200.0" prefWidth="200.0" HBox.hgrow="ALWAYS" />
                 <CheckBox fx:id="showDeletedCheckBox" text="Show Deleted">
                     <tooltip>
                         <Tooltip text="Show Deleted" />
@@ -67,22 +77,10 @@
         </TableView>
         <HBox alignment="TOP_RIGHT" minHeight="50.0" prefHeight="100.0" prefWidth="600.0" spacing="10.0">
             <children>
-                <Button fx:id="exportPdfButton" mnemonicParsing="false" onAction="#handleExportPdf" styleClass="accent, button-outlined">
-                    <graphic>
-                        <ImageView fitHeight="20" fitWidth="20" preserveRatio="true">
-                            <image>
-                                <Image url="@/images/pdfIcon.png" />
-                            </image>
-                        </ImageView>
-                    </graphic>
-                    <tooltip>
-                        <Tooltip text="Export PDF" />
-                    </tooltip>
-                </Button>
-                <Region prefHeight="200.0" prefWidth="200.0" HBox.hgrow="ALWAYS" />
-                <Button fx:id="viewCustomerButton" disable="true" mnemonicParsing="false" styleClass="accent" text="View Customer" />
-                <Button fx:id="deleteInvoiceButton" disable="true" mnemonicParsing="false" onAction="#handleDeleteInvoice" styleClass="danger" text="Delete" />
                 <Button fx:id="markAsPaidButton" disable="true" mnemonicParsing="false" onAction="#handleMarkAsPaid" styleClass="success" text="Mark as Paid" />
+                <Button fx:id="viewCustomerButton" disable="true" mnemonicParsing="false" styleClass="accent" text="View Customer" />
+                <Region prefHeight="90.0" prefWidth="82.0" HBox.hgrow="ALWAYS" />
+                <Button fx:id="deleteInvoiceButton" disable="true" mnemonicParsing="false" onAction="#handleDeleteInvoice" styleClass="danger" text="Delete" />
             </children>
             <padding>
                 <Insets top="10.0" />
