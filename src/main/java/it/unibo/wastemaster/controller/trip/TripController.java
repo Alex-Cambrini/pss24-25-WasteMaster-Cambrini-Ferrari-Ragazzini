@@ -208,10 +208,7 @@ public final class TripController {
         for (Trip trip : trips) {
             allTrips.add(new TripRow(trip));
         }
-        tripTable.setItems(FXCollections.observableArrayList(allTrips));
-        if (!searchField.getText().isBlank()) {
-            handleSearch();
-        }
+        handleSearch();
     }
 
     @FXML
