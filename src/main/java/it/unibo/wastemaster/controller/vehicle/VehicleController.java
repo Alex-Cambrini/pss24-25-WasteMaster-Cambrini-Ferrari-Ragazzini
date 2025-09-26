@@ -2,6 +2,7 @@ package it.unibo.wastemaster.controller.vehicle;
 
 import it.unibo.wastemaster.application.context.AppContext;
 import it.unibo.wastemaster.controller.main.MainLayoutController;
+import it.unibo.wastemaster.controller.utils.AutoRefreshable;
 import it.unibo.wastemaster.controller.utils.DialogUtils;
 import it.unibo.wastemaster.domain.model.Vehicle;
 import it.unibo.wastemaster.domain.service.VehicleManager;
@@ -36,7 +37,7 @@ import javafx.util.Duration;
  * Supports periodic automatic refresh of the vehicle list and interaction with the JavaFX
  * UI.
  */
-public final class VehicleController {
+public final class VehicleController implements AutoRefreshable {
 
     private static final int REFRESH_INTERVAL_SECONDS = 30;
     private static final String PLATE = "plate";
@@ -140,7 +141,6 @@ public final class VehicleController {
      */
     public void initData() {
         loadVehicles();
-        startAutoRefresh();
     }
 
     private void setLicenceTypeCellFactory() {
@@ -193,7 +193,11 @@ public final class VehicleController {
                 });
     }
 
-    private void startAutoRefresh() {
+    @Override
+    public void startAutoRefresh() {
+        if (refreshTimeline != null || vehicleManager == null) {
+            return;
+        }
         refreshTimeline =
                 new Timeline(new KeyFrame(Duration.seconds(REFRESH_INTERVAL_SECONDS),
                         event -> loadVehicles()));
@@ -201,9 +205,11 @@ public final class VehicleController {
         refreshTimeline.play();
     }
 
-    private void stopAutoRefresh() {
+    @Override
+    public void stopAutoRefresh() {
         if (refreshTimeline != null) {
             refreshTimeline.stop();
+            refreshTimeline = null;
         }
     }
 
