@@ -84,7 +84,7 @@ public final class ScheduleController implements AutoRefreshable {
     private Button toggleStatusButton;
 
     @FXML
-    private Button viewAssociatedCollectionsButton;
+    private Button showRelatedCollectionsButton;
 
     @FXML
     private Button deleteButton;
@@ -196,7 +196,7 @@ public final class ScheduleController implements AutoRefreshable {
             toggleStatusButton.setDisable(!isRecurring && selected == null);
 
             deleteButton.setDisable(false);
-            viewAssociatedCollectionsButton.setDisable(false);
+            showRelatedCollectionsButton.setDisable(false);
 
             ScheduleStatus status = selected.getStatus();
 
@@ -227,7 +227,7 @@ public final class ScheduleController implements AutoRefreshable {
             changeFrequencyButton.setDisable(true);
             toggleStatusButton.setDisable(true);
             deleteButton.setDisable(true);
-            viewAssociatedCollectionsButton.setDisable(true);
+            showRelatedCollectionsButton.setDisable(true);
         }
     }
 
@@ -507,7 +507,7 @@ public final class ScheduleController implements AutoRefreshable {
     }
 
     @FXML
-    private void handleViewAssociatedCollections() {
+    private void handleShowAssociatedCollections() {
         ScheduleRow selected = scheduleTable.getSelectionModel().getSelectedItem();
         if (selected == null) {
             DialogUtils.showError(TITLE_NO_SELECTION,
