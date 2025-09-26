@@ -28,8 +28,7 @@
         <TableView fx:id="tripTable" prefHeight="300.0" prefWidth="600.0" styleClass="table-view" VBox.vgrow="ALWAYS">
             <columns>
                 <TableColumn fx:id="postalCodeColumn" prefWidth="100.0" text="Postal Code" />
-                <TableColumn fx:id="vehicleColumn" prefWidth="100.0" text="Vehicle" />
-                <TableColumn fx:id="vehicleModelColumn" prefWidth="140.0" text="Model"/>
+                <TableColumn fx:id="vehicleColumn" prefWidth="160.0" text="Vehicle" />
                 <TableColumn fx:id="vehicleCapacityColumn" prefWidth="120.0" text="Seats"/>
                 <TableColumn fx:id="operatorsColumn" prefWidth="150.0" text="Operators" />
                 <TableColumn fx:id="departureColumn" prefWidth="150.0" text="Departure" />

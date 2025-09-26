@@ -11,9 +11,6 @@ import it.unibo.wastemaster.domain.repository.EmployeeRepository;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Optional;
 
 public final class EditTripController {

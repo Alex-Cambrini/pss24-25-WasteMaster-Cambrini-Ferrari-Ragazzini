@@ -28,7 +28,6 @@ public final class TripController {
 
     private static final String FIELD_ID = "id";
     private static final String FIELD_POSTAL_CODES = "postalCodes";
-    private static final String FIELD_VEHICLE = "vehicle";
     private static final String FIELD_VEHICLE_MODEL = "vehicleModel";
     private static final String FIELD_VEHICLE_CAPACITY = "vehicleCapacity";
     private static final String FIELD_OPERATORS = "operators";
@@ -40,7 +39,7 @@ public final class TripController {
 
     private final ObservableList<TripRow> allTrips = FXCollections.observableArrayList();
     private final ObservableList<String> activeFilters = FXCollections.observableArrayList(
-            FIELD_ID, FIELD_POSTAL_CODES, FIELD_VEHICLE, FIELD_VEHICLE_MODEL, FIELD_VEHICLE_CAPACITY, FIELD_OPERATORS,
+            FIELD_ID, FIELD_POSTAL_CODES, FIELD_VEHICLE_MODEL, FIELD_VEHICLE_CAPACITY, FIELD_OPERATORS,
             FIELD_STATUS);
     private TripManager tripManager;
     private VehicleManager vehicleManager;
@@ -94,8 +93,7 @@ public final class TripController {
     public void initialize() {
         tripManager = AppContext.getServiceFactory().getTripManager();
         postalCodeColumn.setCellValueFactory(new PropertyValueFactory<>(FIELD_POSTAL_CODES));
-        vehicleColumn.setCellValueFactory(new PropertyValueFactory<>(FIELD_VEHICLE));
-        vehicleModelColumn.setCellValueFactory(new PropertyValueFactory<>(FIELD_VEHICLE_MODEL));
+        vehicleColumn.setCellValueFactory(new PropertyValueFactory<>(FIELD_VEHICLE_MODEL));
         vehicleCapacityColumn.setCellValueFactory(new PropertyValueFactory<>(FIELD_VEHICLE_CAPACITY));
         operatorsColumn.setCellValueFactory(new PropertyValueFactory<>(FIELD_OPERATORS));
         departureColumn.setCellValueFactory(new PropertyValueFactory<>(FIELD_DEPARTURE));
@@ -123,7 +121,6 @@ public final class TripController {
                     }
                 });
 
-        // Carica i dati all'avvio
         loadTrips();
     }
 
@@ -272,8 +269,6 @@ public final class TripController {
                 && row.getId().toLowerCase().contains(query))
                 || (activeFilters.contains(FIELD_POSTAL_CODES)
                         && row.getPostalCodes().toLowerCase().contains(query))
-                || (activeFilters.contains(FIELD_VEHICLE)
-                        && row.getVehicle().toLowerCase().contains(query))
                 || (activeFilters.contains(FIELD_VEHICLE_MODEL)
                         && row.getVehicleModel().toLowerCase().contains(query))
                 || (activeFilters.contains(FIELD_VEHICLE_CAPACITY)
@@ -288,7 +283,7 @@ public final class TripController {
     private void handleResetSearch() {
         searchField.clear();
         activeFilters.clear();
-        activeFilters.addAll(FIELD_ID, FIELD_POSTAL_CODES, FIELD_VEHICLE, FIELD_VEHICLE_MODEL, FIELD_VEHICLE_CAPACITY,
+        activeFilters.addAll(FIELD_ID, FIELD_POSTAL_CODES, FIELD_VEHICLE_MODEL, FIELD_VEHICLE_CAPACITY,
                 FIELD_OPERATORS, FIELD_STATUS);
         loadTrips();
     }
@@ -301,9 +296,9 @@ public final class TripController {
         }
 
         filterMenu = new ContextMenu();
-        String[] fields = { FIELD_ID, FIELD_POSTAL_CODES, FIELD_VEHICLE, FIELD_VEHICLE_MODEL, FIELD_VEHICLE_CAPACITY,
+        String[] fields = { FIELD_ID, FIELD_POSTAL_CODES, FIELD_VEHICLE_MODEL, FIELD_VEHICLE_CAPACITY,
                 FIELD_OPERATORS, FIELD_STATUS };
-        String[] labels = { "ID", "Postal Codes", "Vehicle", "Vehicle Model", "Vehicle Capacity", "Operators",
+        String[] labels = { "ID", "Postal Codes", "Vehicle", "Vehicle Capacity", "Operators",
                 "Status" };
 
         for (int i = 0; i < fields.length; i++) {

@@ -56,13 +56,17 @@ public final class TripRow {
 
     public String getVehicleModel() {
         var v = trip.getAssignedVehicle();
-        return v != null ? v.getModel() : "";
+        if (v == null)
+            return "";
+        String brand = v.getBrand() != null ? v.getBrand() : "";
+        String model = v.getModel() != null ? v.getModel() : "";
+        return (brand + " " + model).trim();
     }
 
     public int getVehicleCapacity() {
-        var v = trip.getAssignedVehicle();
-        return v != null ? v.getRequiredOperators() : 0;
-    }
+    var v = trip.getAssignedVehicle();
+    return v != null ? v.getRequiredOperators() : 0;
+}
 
     public String getOperators() {
         return operators;
