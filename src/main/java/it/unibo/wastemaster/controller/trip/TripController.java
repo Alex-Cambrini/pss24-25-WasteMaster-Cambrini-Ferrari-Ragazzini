@@ -171,8 +171,6 @@ public final class TripController implements AutoRefreshable {
         boolean isAllowedToCompleteTrip = currentUser.getRole() == Employee.Role.ADMINISTRATOR
                 || currentUser.getRole() == Employee.Role.OPERATOR;
         completeTripButton.setVisible(isAllowedToCompleteTrip);
-        loadTrips();
-        handleSearch();
     }
 
     public void initData() {
