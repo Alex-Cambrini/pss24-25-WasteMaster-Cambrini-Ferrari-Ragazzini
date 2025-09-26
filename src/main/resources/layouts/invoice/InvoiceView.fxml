@@ -23,7 +23,6 @@
                 <Button fx:id="addInvoiceButton" mnemonicParsing="false" onAction="#handleAddInvoice" styleClass="success" text="Add Invoice" />
                 <Region prefHeight="20" prefWidth="0.0" HBox.hgrow="ALWAYS" />
                 <Button fx:id="filterButton" onMouseClicked="#showFilterMenu" styleClass="accent" text="Filter ▼" />
-                <ComboBox fx:id="statusFilterCombo" promptText="Filter by Status" />
                 <TextField fx:id="searchField" promptText="Search..." />
                 <Button mnemonicParsing="false" onAction="#handleResetSearch" styleClass="accent, button-outlined" text="Reset" />
             </children>
@@ -38,11 +37,22 @@
                         <Tooltip text="Show Deleted" />
                     </tooltip>
                 </CheckBox>
+                <CheckBox fx:id="showPaidCheckBox" text="Show Paid">
+                    <tooltip>
+                        <Tooltip text="Show Paid" />
+                    </tooltip>
+                </CheckBox>
+                <CheckBox fx:id="showNotPaidCheckBox" text="Show Not Paid">
+                    <tooltip>
+                        <Tooltip text="Show Not Paid" />
+                    </tooltip>
+                </CheckBox>
             </children>
             <VBox.margin>
                 <Insets bottom="5.0" />
             </VBox.margin>
         </HBox>
+
         <TableView fx:id="invoiceTable" prefHeight="300.0" prefWidth="600.0" styleClass="table-view" VBox.vgrow="ALWAYS">
             <columns>
                 <TableColumn fx:id="idColumn" prefWidth="80" text="ID" />

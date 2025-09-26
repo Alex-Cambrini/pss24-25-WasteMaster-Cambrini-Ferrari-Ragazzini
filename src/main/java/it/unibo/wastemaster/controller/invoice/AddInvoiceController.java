@@ -10,29 +10,39 @@ import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.scene.control.cell.CheckBoxTableCell;
 import javafx.scene.control.*;
 
 import java.util.List;
 
 public class AddInvoiceController {
 
-    @FXML private ComboBox<Customer> customerCombo;
-    @FXML private CheckBox selectAllCheck;
-    @FXML private TableView<CollectionRow> collectionsTable;
-    @FXML private TableColumn<CollectionRow, Boolean> selectCol;
-    @FXML private TableColumn<CollectionRow, Integer> idCol;
-    @FXML private TableColumn<CollectionRow, String> dateCol;
-    @FXML private TableColumn<CollectionRow, String> scheduleCol;
-    @FXML private Label selectedCountField;
-    @FXML private Button cancelButton;
-    @FXML private Button saveButton;
+    @FXML
+    private ComboBox<Customer> customerCombo;
+    @FXML
+    private CheckBox selectAllCheck;
+    @FXML
+    private TableView<CollectionRow> collectionsTable;
+    @FXML
+    private TableColumn<CollectionRow, Boolean> selectCol;
+    @FXML
+    private TableColumn<CollectionRow, Integer> idCol;
+    @FXML
+    private TableColumn<CollectionRow, String> dateCol;
+    @FXML
+    private TableColumn<CollectionRow, String> scheduleCol;
+    @FXML
+    private Label selectedCountField;
+    @FXML
+    private Button cancelButton;
+    @FXML
+    private Button saveButton;
 
     private CollectionManager collectionManager;
     private CustomerManager customerManager;
     private InvoiceManager invoiceManager;
 
-    private ObservableList<CollectionRow> availableCollections =
-            FXCollections.observableArrayList();
+    private ObservableList<CollectionRow> availableCollections = FXCollections.observableArrayList();
 
     @FXML
     public void initialize() {
@@ -49,6 +59,7 @@ public class AddInvoiceController {
     public void setCollectionManager(CollectionManager collectionManager) {
         this.collectionManager = collectionManager;
     }
+
     public void setCustomerManager(CustomerManager customerManager) {
         this.customerManager = customerManager;
     }
@@ -79,17 +90,18 @@ public class AddInvoiceController {
         updateTotal();
     }
 
-
     private void setupCollectionsTable() {
         collectionsTable.setItems(availableCollections);
 
         selectCol.setCellValueFactory(cell -> cell.getValue().selectedProperty());
         idCol.setCellValueFactory(cell -> new ReadOnlyObjectWrapper<>(cell.getValue().getId()));
-        dateCol.setCellValueFactory(cell -> new ReadOnlyObjectWrapper<>(cell.getValue().getCollectionDate().toString()));
+        dateCol.setCellValueFactory(
+                cell -> new ReadOnlyObjectWrapper<>(cell.getValue().getCollectionDate().toString()));
         scheduleCol.setCellValueFactory(cell -> new ReadOnlyObjectWrapper<>(cell.getValue().getZone()));
 
-        // Listener per aggiornare totale
-        availableCollections.forEach(row -> row.selectedProperty().addListener((obs, old, newVal) -> updateTotal()));
+        collectionsTable.setEditable(true);
+        selectCol.setEditable(true);
+        selectCol.setCellFactory(CheckBoxTableCell.forTableColumn(selectCol));
     }
 
     private void setupSelectAllCheck() {
@@ -101,14 +113,12 @@ public class AddInvoiceController {
         });
     }
 
-
     private void updateTotal() {
         long count = availableCollections.stream()
                 .filter(CollectionRow::isSelected)
                 .count();
         selectedCountField.setText(String.valueOf(count));
     }
-
 
     private void setupSelectedCountField() {
         selectedCountField.setText("0");
