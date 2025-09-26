@@ -84,6 +84,31 @@ public final class TripManager {
         }
     }
 
+    public boolean setTripAsCompleted(final Trip trip) {
+        try {
+            ValidateUtils.requireArgNotNull(trip, "Trip cannot be null");
+            ValidateUtils.requireArgNotNull(trip.getTripId(), "Trip ID cannot be null");
+
+            if (trip.getStatus() != TripStatus.ACTIVE) {
+                throw new IllegalArgumentException("Only ACTIVE trips can be set as COMPLETED");
+            }
+
+            for (Collection c : trip.getCollections()) {
+                if (c.getCollectionStatus() != Collection.CollectionStatus.ACTIVE) {
+                    throw new IllegalArgumentException("All collections must be ACTIVE to complete the trip");
+                }
+                c.setCollectionStatus(Collection.CollectionStatus.COMPLETED);
+                collectionRepository.update(c);
+            }
+
+            trip.setStatus(TripStatus.COMPLETED);
+            tripRepository.update(trip);
+
+            return true;
+        } catch (IllegalArgumentException e) {
+            return false;
+        }
+    }
 
     public void updateVehicle(int tripId, Vehicle newVehicle) {
         Optional<Trip> tripOpt = getTripById(tripId);

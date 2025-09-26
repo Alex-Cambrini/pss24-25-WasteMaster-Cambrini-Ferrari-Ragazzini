@@ -335,4 +335,53 @@ class TripManagerTest extends AbstractDatabaseTest {
         List<Trip> operator2Trips = getTripManager().getTripsForCurrentUser(operator2);
         assertTrue(operator2Trips.stream().allMatch(t -> t.getOperators().contains(operator2)));
         }
+
+        @Test
+        void testSetTripAsCompleted_allCases() {
+        // Create an ACTIVE trip with ACTIVE collections
+        List<Collection> collections = createCollections();
+        collections.forEach(c -> c.setCollectionStatus(Collection.CollectionStatus.ACTIVE));
+        getTripManager().createTrip(
+                "40100",
+                vehicle1,
+                new ArrayList<>(List.of(operator1, operator2)),
+                departureTime,
+                expectedReturnTime,
+                new ArrayList<>(collections));
+        Trip trip = getTripDAO().findAll().get(0);
+
+        // Case 1: ACTIVE trip -> should become COMPLETED and all collections should be COMPLETED
+        assertEquals(Trip.TripStatus.ACTIVE, trip.getStatus());
+        boolean completed = getTripManager().setTripAsCompleted(trip);
+        assertTrue(completed);
+        Trip updated = getTripManager().getTripById(trip.getTripId()).orElseThrow();
+        assertEquals(Trip.TripStatus.COMPLETED, updated.getStatus());
+        updated.getCollections().forEach(c ->
+                assertEquals(Collection.CollectionStatus.COMPLETED, c.getCollectionStatus())
+        );
+
+        // Case 2: already COMPLETED trip -> should not change
+        boolean completedAgain = getTripManager().setTripAsCompleted(updated);
+        assertFalse(completedAgain);
+
+        // Case 3: CANCELED trip -> should not change
+        updated.setStatus(Trip.TripStatus.CANCELED);
+        getTripManager().updateTrip(updated);
+        boolean completedCanceled = getTripManager().setTripAsCompleted(updated);
+        assertFalse(completedCanceled);
+
+        // Case 4: trip with NON ACTIVE collections -> should not change
+        updated.setStatus(Trip.TripStatus.ACTIVE);
+        getTripManager().updateTrip(updated);
+        updated.getCollections().forEach(c -> c.setCollectionStatus(Collection.CollectionStatus.COMPLETED));
+        updated.getCollections().forEach(c -> getCollectionDAO().update(c));
+        boolean completedWithNonActiveCollections = getTripManager().setTripAsCompleted(updated);
+        assertFalse(completedWithNonActiveCollections);
+
+        // Case 5: null trip -> should not change
+        boolean completedNull = getTripManager().setTripAsCompleted(null);
+        assertFalse(completedNull);
+        }
+
+
 }
