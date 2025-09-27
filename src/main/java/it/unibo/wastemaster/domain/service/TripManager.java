@@ -90,6 +90,16 @@ public final class TripManager {
         }
     }
 
+    public List<Employee> getAvailableOperatorsExcludeDriverToEdit(LocalDateTime depDateTime, LocalDateTime retDateTime, Employee selectedDriver,
+                                                                   Trip tripToEdit) {
+        return tripRepository.findAvailableOperatorsExcludeDriverToEdit(depDateTime,
+                retDateTime, selectedDriver, tripToEdit);
+    }
+
+    public List<Employee> getQualifiedDriversToEdit(LocalDateTime depDateTime, LocalDateTime retDateTime, List<Licence> allowedLicences, Trip tripToEdit) {
+        return tripRepository.findQualifiedDriversToEdit(depDateTime, retDateTime, allowedLicences, tripToEdit);
+    }
+
     public enum CancellationResult {
         CANCELLED_AND_NOTIFIED,
         CANCELLED_NOTIFICATION_FAILED,
