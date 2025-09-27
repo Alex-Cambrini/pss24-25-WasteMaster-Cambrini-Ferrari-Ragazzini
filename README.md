@@ -2,76 +2,78 @@
 
 ## Componenti del gruppo
 
-- **Lorenzo Ferrari**: lorenzo.ferrari27@studio.unibo.it
-- **Alex Cambrini**: alex.cambrini@studio.unibo.it
-- **Manuel Ragazzini**: manuel.ragazzini3@studio.unibo.it
+- **Lorenzo Ferrari** — lorenzo.ferrari27@studio.unibo.it
+- **Alex Cambrini** — alex.cambrini@studio.unibo.it
+- **Manuel Ragazzini** — manuel.ragazzini3@studio.unibo.it
 
-## Obiettivo del progetto
-
-Realizzare un’applicazione per la gestione completa delle attività di un’azienda specializzata nello smaltimento dei rifiuti, con particolare attenzione all’efficienza operativa, alla sostenibilità e alla gestione sicura delle informazioni.
+---
 
 # Analisi
 
 ## Requisiti
 
-L’applicazione deve consentire:
+L'applicazione gestisce le attività di un'azienda di smaltimento rifiuti, fornendo gli strumenti per la pianificazione, il monitoraggio e l'amministrazione dei servizi.  
+**Requisiti funzionali:**
+- Gestione anagrafiche clienti e operatori (dati dettagliati, ruoli)
+- Amministrazione risorse aziendali (mezzi/personale, stato operativo)
+- Gestione rifiuti (classificazione, smaltimento, riciclaggio)
+- Pianificazione raccolte programmate settimanali (modificabili)
+- Gestione raccolte speciali/aggiuntive (prenotazione, annullamento con preavviso)
+- Monitoraggio raccolte (stato: completata/fallita, segnalazioni operatori)
+- Gestione fatturazione e pagamenti
+- Pianificazione e modifica rotte per i camion
 
-- Gestione delle anagrafiche di clienti e operatori, con dati dettagliati.
-- Amministrazione delle risorse aziendali (mezzi e personale) con stato operativo aggiornato.
-- Gestione dei rifiuti con classificazione, smaltimento e riciclaggio.
-- Pianificazione delle raccolte programmate settimanali con possibilità di modifica.
-- Gestione delle raccolte speciali o aggiuntive, con prenotazione e opzione di annullamento del ritiro settimanale con preavviso di almeno 2 giorni.
-- Monitoraggio delle raccolte, con stato che può avanzare automaticamente a "Completata" o "Raccolta Fallita" in base alle segnalazioni degli operatori.
-- Gestione della fatturazione e dei pagamenti.
-- Pianificazione delle rotte per i camion con assegnazione manuale e possibilità di modifica in caso di imprevisti.
+**Requisiti opzionali:**
+- Dashboard monitoraggio/statistiche
+- Notifiche e alert automatici
+- Segnalazioni clienti su problemi
+- Calendario visuale raccolte
+- Gestione manutenzione mezzi
 
-**Funzionalità opzionali:**
-- Dashboard di monitoraggio con statistiche sulle raccolte e quantità di rifiuti.
-- Notifiche e alert automatici.
-- Gestione delle segnalazioni da parte dei clienti.
-- Visualizzazione di un calendario integrato.
-- Gestione della manutenzione dei mezzi.
+**Challenge principali:**
+- Protezione dati sensibili/anagrafiche
+- Pianificazione dinamica raccolte/rotte
+- Automazione fatturazione
+- Notifiche, dashboard, gestione segnalazioni
+- Manutenzione preventiva mezzi
+
+---
 
 ## Analisi e modello del dominio
 
-### Entità principali
+**Entità principali:**
+- Cliente
+- Operatore
+- Mezzo
+- Rifiuto
+- Raccolta
+- Rotta
+- Fattura
+- Segnalazione
+- Manutenzione
 
-- **Cliente**
-- **Operatore**
-- **Mezzo**
-- **Rifiuto**
-- **Raccolta**
-- **Rotta**
-- **Fattura**
-- **Segnalazione**
-- **Manutenzione**
+**Relazioni:**
+- Raccolta ↔ Cliente/Operatore/Mezzo/Rifiuto/Rotta/Fattura
+- Mezzo ↔ Raccolta/Manutenzione
+- Cliente ↔ Segnalazione
+- Raccolta → genera Fattura
 
-### Relazioni
+**Descrizione a parole:**  
+Ogni raccolta rappresenta un servizio pianificato o speciale di ritiro rifiuti, coinvolge uno o più clienti, operatori e mezzi, e genera una fattura. I mezzi sono assegnati a rotte dinamiche e sono soggetti a manutenzione. I clienti possono inviare segnalazioni legate al servizio.
 
-- Una raccolta coinvolge uno o più clienti, operatori e un mezzo.
-- Ogni mezzo può essere coinvolto in più raccolte ed essere soggetto a manutenzione.
-- Ogni raccolta può generare una fattura.
-- I clienti possono inviare segnalazioni.
-- Le rotte sono collegate alle raccolte e ai mezzi.
-
-### Difficoltà principali
-
-- Correlare dinamicamente richieste, disponibilità delle risorse e pianificazione.
-- Gestione sicura dei dati sensibili.
-- Flessibilità nella modifica delle rotte e raccolte.
-- Automazione della fatturazione.
+**Schema UML del dominio:**
 
 ```mermaid
 classDiagram
-    Cliente
-    Operatore
-    Mezzo
-    Rifiuto
-    Raccolta
-    Rotta
-    Fattura
-    Segnalazione
-    Manutenzione
+    class Cliente
+    class Operatore
+    class Mezzo
+    class Rifiuto
+    class Raccolta
+    class Rotta
+    class Fattura
+    class Segnalazione
+    class Manutenzione
 
     Cliente "1" -- "0..*" Raccolta
     Operatore "1" -- "0..*" Raccolta
@@ -83,22 +85,19 @@ classDiagram
     Raccolta "1" -- "0..*" Rifiuto
 ```
 
+---
+
 # Design
 
 ## Architettura
 
-Il sistema adotta una struttura modulare, ispirata al pattern MVC (Model-View-Controller), dove:
+Il sistema adotta un'architettura modulare ispirata a MVC:
 
-- **Model:** rappresenta le entità e la logica di dominio (Clienti, Raccolte, Rifiuti, ecc).
-- **View:** gestisce la visualizzazione dei dati e l’interazione con l’utente.
-- **Controller:** coordina le operazioni tra modello e vista, gestendo le richieste dell’utente.
+- **Model:** entità di dominio e logica (Cliente, Mezzo, Raccolta, ecc.)
+- **View:** interfaccia utente, dashboard, notifiche
+- **Controller:** coordinamento richieste, flusso operazioni e orchestrazione
 
-Le principali componenti architetturali sono:
-- Gestione anagrafiche
-- Pianificazione raccolte e rotte
-- Monitoraggio operazioni
-- Gestione fatturazione e pagamenti
-- Dashboard e notifiche (opzionali)
+**Schema architetturale:**
 
 ```mermaid
 classDiagram
@@ -116,15 +115,17 @@ classDiagram
     View o-- Controller
 ```
 
-# Design dettagliato
+---
 
-## Gestione anagrafiche (Responsabile: Ferrari)
+## Design dettagliato
 
-**Problema:**  
-Necessità di gestire in modo sicuro e aggiornabile tutte le anagrafiche di clienti e operatori, con notifiche automatiche al sistema in caso di modifiche.
+### Gestione anagrafiche
+
+**Problema:** Gestire clienti/operatori in modo sicuro e aggiornabile, con notifica delle modifiche.
 
 **Soluzione:**  
-Si adotta il pattern Repository per la gestione delle entità e il pattern Observer per notificare automaticamente modifiche alle altre componenti (es. aggiornamento dashboard o planner raccolte).
+- **Pattern Repository:** separa logica di accesso ai dati e servizi.
+- **Pattern Observer:** aggiorna componenti interessate a variazioni.
 
 ```mermaid
 classDiagram
@@ -137,19 +138,15 @@ classDiagram
     AnagraficaRepository <|.. Operatore
 ```
 
-**Pattern usati:**  
-- Repository per separare logica di accesso ai dati dal resto dell'applicazione.
-- Observer per notificare aggiornamenti.
-
 ---
 
-## Pianificazione raccolte (Responsabile: Cambrini)
+### Pianificazione raccolte
 
-**Problema:**  
-Gestire in modo flessibile e dinamico la pianificazione delle raccolte, sia programmate che speciali, tenendo conto di richieste last-minute e disponibilità delle risorse.
+**Problema:** Gestire raccolte programmate/speciali, modificabili dinamicamente in base a richieste e disponibilità.
 
 **Soluzione:**  
-Si adotta il pattern Strategy per la gestione delle politiche di pianificazione (es. raccolta standard vs speciale), e il pattern State per gestire lo stato della raccolta (es. pianificata, in corso, completata, fallita).
+- **Pattern Strategy:** politiche di pianificazione (standard/speciale)
+- **Pattern State:** gestione stato raccolta (pianificata, in corso, completata, fallita)
 
 ```mermaid
 classDiagram
@@ -170,19 +167,15 @@ classDiagram
     PianificatoreRaccolte o-- Raccolta
 ```
 
-**Pattern usati:**  
-- Strategy per permettere diverse modalità di pianificazione.
-- State per gestire il ciclo di vita di una raccolta.
-
 ---
 
-## Gestione fatturazione e pagamenti (Responsabile: Ragazzini)
+### Gestione fatturazione e pagamenti
 
-**Problema:**  
-Automatizzare la generazione delle fatture e il tracciamento dei pagamenti, integrando notifiche verso i clienti e gestione delle anomalie.
+**Problema:** Automatizzare generazione fatture e tracciamento pagamenti.
 
 **Soluzione:**  
-Pattern Factory Method per la creazione di fatture (standard o speciali), e Observer per notificare cambiamenti di stato nei pagamenti.
+- **Pattern Factory Method:** creazione fatture standard/speciali
+- **Pattern Observer:** notifica cambiamenti stato pagamento
 
 ```mermaid
 classDiagram
@@ -201,19 +194,15 @@ classDiagram
     GestorePagamenti o-- Observer
 ```
 
-**Pattern usati:**  
-- Factory Method per la creazione di fatture differenti.
-- Observer per aggiornare il cliente all’avanzare dei pagamenti.
-
 ---
 
-## Pianificazione rotte (Responsabile: Ragazzini)
+### Pianificazione rotte
 
-**Problema:**  
-Ottimizzare e aggiornare dinamicamente le rotte dei mezzi, considerando raccolte, traffico, manutenzioni e imprevisti.
+**Problema:** Ottimizzare e aggiornare dinamicamente le rotte dei mezzi.
 
 **Soluzione:**  
-Si adotta il pattern Command per gestire richieste di modifica rotta e Undo/Redo, e il pattern Iterator per scorrere le tappe di una rotta.
+- **Pattern Command:** gestione richieste modifica rotta e undo/redo
+- **Pattern Iterator:** scorrimento tappe rotta
 
 ```mermaid
 classDiagram
@@ -229,19 +218,15 @@ classDiagram
     PianificatoreRotte o-- ComandoModificaRotta
 ```
 
-**Pattern usati:**  
-- Command per gestire modifiche e annullamenti delle rotte.
-- Iterator per gestire sequenze di tappe.
-
 ---
 
-## Dashboard e notifiche (Responsabile: Cambrini, opzionale)
+### Dashboard e notifiche
 
-**Problema:**  
-Fornire una panoramica aggiornata e interattiva delle attività aziendali e notificare tempestivamente anomalie o eventi rilevanti.
+**Problema:** Panoramica aggiornata attività e notifiche automatiche su anomalie.
 
 **Soluzione:**  
-Pattern Observer per aggiornare automaticamente la dashboard e il sistema di notifiche, Decorator per arricchire i messaggi di alert con dati specifici (es. priorità, destinatario…).
+- **Pattern Observer:** aggiornamento realtime dashboard/notifiche
+- **Pattern Decorator:** messaggi alert arricchiti
 
 ```mermaid
 classDiagram
@@ -257,19 +242,15 @@ classDiagram
     DecoratorMessaggio <|-- Messaggio
 ```
 
-**Pattern usati:**  
-- Observer per propagare cambiamenti in tempo reale.
-- Decorator per arricchire i messaggi con informazioni aggiuntive.
-
 ---
 
-## Gestione manutenzione mezzi (Tutti, opzionale)
+### Gestione manutenzione mezzi
 
-**Problema:**  
-Pianificare e tracciare interventi di manutenzione sui mezzi senza interrompere le attività operative.
+**Problema:** Pianificare e tracciare manutenzioni senza interrompere l’operatività.
 
 **Soluzione:**  
-Pattern Template Method per definire la sequenza di operazioni standard di manutenzione, e Strategy per gestire tipi diversi di manutenzione (ordinaria, straordinaria).
+- **Pattern Template Method:** sequenza fasi intervento
+- **Pattern Strategy:** tipi diversi di manutenzione (ordinaria, straordinaria)
 
 ```mermaid
 classDiagram
@@ -285,182 +266,168 @@ classDiagram
     Mezzo o-- ManutenzioneTemplate
 ```
 
-**Pattern usati:**  
-- Template Method per la sequenza di operazioni.
-- Strategy per specializzare i tipi di manutenzione.
-
 ---
 
-*(Ogni membro del gruppo può ampliare la propria sezione con dettagli sul proprio contributo, scelte di design, pattern e motivazioni.)*
-
-# Sviluppo
-
-## Testing automatizzato
+# Sviluppo e Testing automatizzato
 
 Sono stati sviluppati test automatici per:
-- Verifica della corretta creazione e modifica delle anagrafiche.
-- Pianificazione e modifica delle raccolte.
-- Generazione automatica delle fatture e verifica dei pagamenti.
-- Integrazione tra pianificazione delle rotte e disponibilità dei mezzi.
 
-Viene utilizzato un framework di test (ad esempio JUnit) e i test sono ripetibili e automatizzati.
+- Creazione e modifica delle anagrafiche
+- Pianificazione e modifica raccolte e rotte
+- Generazione fatture e verifica pagamenti
+- Integrazione tra raccolte, rotte e disponibilità mezzi
+
+Il testing utilizza JUnit (o equivalente), è automatico e ripetibile, con test di unità e integrazione per le funzionalità core.
+
+---
 
 # Note di sviluppo
 
-## Lorenzo Ferrari
+## Gestione anagrafiche
 
-### 1. Uso degli Stream API per filtrare le anagrafiche
-**Dove:** `src/main/java/wastemaster/anagrafica/AnagraficaService.java`
-```java
-public List<Cliente> ricercaClientiPerNome(String nome) {
-    return clienti.stream()
-        .filter(cliente -> cliente.getNome().equalsIgnoreCase(nome))
-        .collect(Collectors.toList());
-}
-```
-**Descrizione:**  
-Utilizzo delle Stream API di Java per scrivere in modo compatto e funzionale la ricerca di clienti per nome, migliorando la leggibilità rispetto ai classici cicli for.
+- **Uso avanzato di Stream e Optional**  
+  *File:* `src/main/java/wastemaster/anagrafica/AnagraficaService.java`  
+  ```java
+  public Optional<Cliente> cercaClientePerEmail(String email) {
+      return clienti.stream()
+          .filter(cliente -> cliente.getEmail().equalsIgnoreCase(email))
+          .findFirst();
+  }
+  ```
+  *Permette ricerca e gestione sicura (null-safe) dei risultati.*
 
----
+- **Validazione con annotazioni custom**  
+  *File:* `src/main/java/wastemaster/anagrafica/Cliente.java`  
+  ```java
+  @NotNull
+  @Email
+  private String email;
+  ```
+  *Garantisce correttezza dati in input grazie all’uso di Bean Validation.*
 
-### 2. Validazione con annotazioni custom
-**Dove:** `src/main/java/wastemaster/anagrafica/Cliente.java`
-```java
-@NotNull
-@Email
-private String email;
-```
-**Descrizione:**  
-Implementazione di annotazioni custom per la validazione dei dati (richiede l’uso di Bean Validation o di una libreria custom), così da garantire la correttezza delle informazioni inserite.
-
----
-
-### 3. Uso dei tipi generici nella gestione delle risorse
-**Dove:** `src/main/java/wastemaster/resources/ResourceRepository.java`
-```java
-public class ResourceRepository<T extends Risorsa> {
-    private List<T> risorse;
-    // metodi generici per aggiunta, rimozione e ricerca
-}
-```
-**Descrizione:**  
-Utilizzo di classi generiche per riutilizzare il codice nella gestione di diversi tipi di risorse (mezzi, operatori, ecc.), migliorando l’estendibilità del sistema.
+- **Uso di generics per repository risorse**  
+  *File:* `src/main/java/wastemaster/resources/ResourceRepository.java`  
+  ```java
+  public class ResourceRepository<T extends Risorsa> { ... }
+  ```
+  *Permette riuso e tipizzazione sicura nella gestione di diversi tipi di risorse.*
 
 ---
 
-## Alex Cambrini
+## Pianificazione raccolte
 
-### 1. Algoritmo di pianificazione dinamica delle raccolte
-**Dove:** `src/main/java/wastemaster/raccolta/PianificatoreRaccolte.java`
-```java
-public void pianificaRaccolte() {
-    raccolte.sort(Comparator.comparing(Raccolta::getPriorita).reversed());
-    // Assegna raccolte alle risorse disponibili in base a priorità e disponibilità
-}
-```
-**Descrizione:**  
-Uso di Comparator e sort per la pianificazione dinamica delle raccolte, con ordinamento automatico secondo priorità e gestione intelligente delle risorse.
+- **Algoritmo pianificazione dinamica**  
+  *File:* `src/main/java/wastemaster/raccolta/PianificatoreRaccolte.java`  
+  ```java
+  raccolte.sort(Comparator.comparing(Raccolta::getPriorita).reversed());
+  ```
+  *Ottimizza l’assegnazione delle risorse in base a priorità e disponibilità.*
 
----
+- **Integrazione raccolte speciali con calendario**  
+  *File:* `src/main/java/wastemaster/raccolta/RaccoltaSpeciale.java`  
+  ```java
+  calendario.addEvento(this.getData(), "Raccolta Speciale: " + this.getDescrizione());
+  ```
+  *Gestione unificata eventi e raccolte straordinarie.*
 
-### 2. Integrazione delle raccolte speciali nel calendario
-**Dove:** `src/main/java/wastemaster/raccolta/RaccoltaSpeciale.java`
-```java
-public void aggiungiAlCalendario(Calendar calendario) {
-    calendario.addEvento(this.getData(), "Raccolta Speciale: " + this.getDescrizione());
-}
-```
-**Descrizione:**  
-Estensione del sistema di calendario per integrare facilmente eventi di raccolta speciale, con evidenziazione e gestione separata dagli appuntamenti standard.
-
----
-
-### 3. Observer pattern per il monitoraggio dello stato raccolta
-**Dove:** `src/main/java/wastemaster/raccolta/Raccolta.java`
-```java
-private List<RaccoltaObserver> observers = new ArrayList<>();
-public void notificaStato() {
-    observers.forEach(o -> o.aggiorna(this));
-}
-```
-**Descrizione:**  
-Implementazione del pattern Observer per notificare in tempo reale eventuali cambiamenti di stato delle raccolte a dashboard e sistemi di alert.
+- **Pattern Observer per monitoraggio raccolte**  
+  *File:* `src/main/java/wastemaster/raccolta/Raccolta.java`  
+  ```java
+  private List<RaccoltaObserver> observers = new ArrayList<>();
+  public void notificaStato() {
+      observers.forEach(o -> o.aggiorna(this));
+  }
+  ```
+  *Notifica automatica di avanzamento stato a dashboard e operatori.*
 
 ---
 
-## Manuel Ragazzini
+## Fatturazione e rotte
 
-### 1. Generazione e invio automatico delle fatture via email
-**Dove:** `src/main/java/wastemaster/fatturazione/FatturazioneService.java`
-```java
-public void inviaFattura(Fattura fattura, String emailCliente) {
-    EmailSender.send(emailCliente, "La tua fattura", fattura.toString());
-}
-```
-**Descrizione:**  
-Automazione dell’invio delle fatture tramite integrazione con un servizio email, riducendo il lavoro manuale e migliorando la tempestività nei confronti del cliente.
+- **Generazione e invio automatico fatture**  
+  *File:* `src/main/java/wastemaster/fatturazione/FatturazioneService.java`  
+  ```java
+  EmailSender.send(emailCliente, "La tua fattura", fattura.toString());
+  ```
+  *Automatizza comunicazione con il cliente.*
+
+- **Algoritmo calcolo rotte con gestione imprevisti**  
+  *File:* `src/main/java/wastemaster/rotte/PianificatoreRotte.java`  
+  ```java
+  return algoritmoOttimizzazione.calcola(mezzo, raccolte);
+  ```
+  *Ricalcola percorso in tempo reale in risposta a eventi imprevisti.*
+
+- **Integrazione pagamenti e notifiche cliente**  
+  *File:* `src/main/java/wastemaster/fatturazione/PagamentiService.java`  
+  ```java
+  fattura.setPagata(true);
+  Notificatore.avvisaCliente(fattura.getCliente(), "Pagamento ricevuto. Grazie!");
+  ```
+  *Aggiornamento stato pagamenti e comunicazione tempestiva.*
 
 ---
 
-### 2. Calcolo dinamico delle rotte con gestione imprevisti
-**Dove:** `src/main/java/wastemaster/rotte/PianificatoreRotte.java`
-```java
-public List<Tappa> pianificaRotta(Mezzo mezzo, List<Raccolta> raccolte) {
-    // Algoritmo che ricalcola la rotta in caso di imprevisto
-    return algoritmoOttimizzazione.calcola(mezzo, raccolte);
-}
-```
-**Descrizione:**  
-Uso di un algoritmo dedicato (ad esempio Dijkstra o altro) per ricalcolare rapidamente le rotte in caso di segnalazione di imprevisti, mantenendo efficiente il servizio.
+## Dashboard, manutenzione, notifiche
 
----
+- **Dashboard aggiornata via Observer**  
+  *File:* `src/main/java/wastemaster/dashboard/Dashboard.java`  
+  ```java
+  raccolta.addObserver(this::aggiornaDashboard);
+  ```
+  *Aggiornamento automatico vista operativa.*
 
-### 3. Integrazione pagamenti e notifiche al cliente
-**Dove:** `src/main/java/wastemaster/fatturazione/PagamentiService.java`
-```java
-public void registraPagamento(Fattura fattura) {
-    fattura.setPagata(true);
-    Notificatore.avvisaCliente(fattura.getCliente(), "Pagamento ricevuto. Grazie!");
-}
-```
-**Descrizione:**  
-Automazione delle notifiche verso il cliente al momento della ricezione di un pagamento, per una migliore comunicazione e trasparenza.
+- **Gestione Template Method in manutenzione**  
+  *File:* `src/main/java/wastemaster/manutenzione/ManutenzioneTemplate.java`  
+  ```java
+  public final void eseguiManutenzione() {
+      verificaCondizioni();
+      eseguiIntervento();
+      aggiornaStorico();
+  }
+  ```
+  *Sequenza fasi standard e personalizzazione per ciascun tipo di intervento.*
+
+- **Notifiche avanzate con Decorator**  
+  *File:* `src/main/java/wastemaster/notifiche/DecoratorMessaggio.java`  
+  ```java
+  Messaggio alert = new PrioritaDecorator(new MessaggioBase("Raccolta fallita!"));
+  ```
+  *Permette arricchimento dei messaggi di allerta.*
 
 ---
 
 ## Codice di terze parti o adattato
 
-Alcuni frammenti di codice per l’invio email e la validazione dati sono stati adattati da esempi open source trovati su StackOverflow e dalla documentazione delle librerie JavaMail e Hibernate Validator, opportunamente rivisti per lo stile e le esigenze del progetto.
+- L’invio email si basa su esempi della documentazione JavaMail.
+- La validazione dati utilizza Hibernate Validator.
+- Algoritmi di routing ispirati a esempi open source (Dijkstra, A*).
+- L’uso di Observer e Decorator segue le best practice Java/GoF.
 
+---
 
 # Commenti finali
 
-## Autovalutazione e lavori futuri
+*(Sezione da compilare da ciascun membro: autovalutazione, punti di forza/debolezza, ruolo nel gruppo.)*
 
-**Ferrari:**  
-Mi sono occupato principalmente della gestione delle anagrafiche e delle risorse. Punto di forza: modularità e riusabilità del codice. Da migliorare la gestione delle eccezioni.
-
-**Cambrini:**  
-Ho curato la pianificazione delle raccolte e il monitoraggio. Ho migliorato la flessibilità del sistema, ma l’integrazione con le notifiche può essere approfondita.
-
-**Ragazzini:**  
-Ho lavorato su fatturazione, pagamenti e rotte. Sono soddisfatto dell’automazione raggiunta, ma il sistema di statistiche può essere potenziato.
-
-## Difficoltà incontrate e commenti per i docenti
-
-Abbiamo riscontrato complessità nella modellazione flessibile delle raccolte speciali e nella gestione degli imprevisti sulle rotte. Il progetto ci ha permesso di approfondire i principali pattern architetturali e migliorare la collaborazione in team.
+---
 
 # Guida utente
 
-All’avvio, l’utente può autenticarsi come operatore o amministratore.  
-Le funzioni principali sono accessibili da menu:  
-- Anagrafiche: aggiungi/modifica/elimina clienti e operatori.
-- Raccolte: pianifica nuove raccolte, visualizza e modifica quelle esistenti, gestisci raccolte speciali.
-- Mezzi: visualizza disponibilità e manutenzione.
-- Fatture: genera e consulta fatture, registra pagamenti.
-- Rotte: visualizza e modifica le rotte assegnate.
-- Dashboard: monitora statistiche operative (se attiva).
+1. **Accesso:** Login come operatore o amministratore.
+2. **Gestione anagrafiche:**  
+   - Aggiungi/modifica/elimina clienti e operatori.
+3. **Raccolte:**  
+   - Pianifica nuove raccolte, visualizza/modifica raccolte esistenti, gestisci raccolte speciali.
+4. **Mezzi:**  
+   - Visualizza stato, pianifica manutenzione.
+5. **Fatture:**  
+   - Genera/consulta fatture, registra pagamenti.
+6. **Rotte:**  
+   - Visualizza/modifica rotte assegnate.
+7. **Dashboard:**  
+   - Monitora statistiche operative e ricevi notifiche.
 
-Il sistema guida l’utente attraverso form, notifiche e messaggi di conferma/errore per ogni operazione.
+*Il sistema guida l’utente con form, messaggi di conferma ed errori. Le funzionalità opzionali (dashboard, notifiche, manutenzione avanzata) sono accessibili tramite l’apposito menu.*
 
 ---
