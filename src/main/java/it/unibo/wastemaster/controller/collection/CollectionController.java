@@ -1,6 +1,15 @@
 package it.unibo.wastemaster.controller.collection;
 
+import it.unibo.wastemaster.controller.main.MainLayoutController;
+import it.unibo.wastemaster.controller.schedule.ScheduleController;
+import it.unibo.wastemaster.controller.trip.TripController;
 import it.unibo.wastemaster.domain.model.Collection;
+import it.unibo.wastemaster.domain.service.CollectionManager;
+import it.unibo.wastemaster.domain.service.OneTimeScheduleManager;
+import it.unibo.wastemaster.domain.service.RecurringScheduleManager;
+import it.unibo.wastemaster.domain.service.ScheduleManager;
+import it.unibo.wastemaster.domain.service.TripManager;
+import it.unibo.wastemaster.domain.service.VehicleManager;
 import it.unibo.wastemaster.viewmodels.CollectionRow;
 import java.util.List;
 import javafx.collections.FXCollections;
@@ -16,6 +25,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
  * Controller for displaying and filtering waste collections in the view.
  */
 public final class CollectionController {
+
 
     @FXML
     private Label totalLabel;
@@ -59,7 +69,46 @@ public final class CollectionController {
     private final ObservableList<CollectionRow> allSchedules =
             FXCollections.observableArrayList();
 
-    private List<Collection> collections;
+    private CollectionManager collectionManager;
+    private OneTimeScheduleManager oneTimeScheduleManager;
+    private RecurringScheduleManager recurringScheduleManager;
+    private ScheduleManager scheduleManager;
+    private TripManager tripManager;
+    private VehicleManager vehicleManager;
+    private String previousPage;
+
+    public void setPreviousPage(String previousPage) {
+        this.previousPage = previousPage;
+    }
+
+    public void setScheduleManager(ScheduleManager scheduleManager) {
+        this.scheduleManager = scheduleManager;
+    }
+
+    public void setRecurringScheduleManager(
+            RecurringScheduleManager recurringScheduleManager) {
+        this.recurringScheduleManager = recurringScheduleManager;
+    }
+
+    public void setOneTimeScheduleManager(OneTimeScheduleManager oneTimeScheduleManager) {
+        this.oneTimeScheduleManager = oneTimeScheduleManager;
+    }
+
+    public void setTripManager(TripManager tripManager) {
+        this.tripManager = tripManager;
+    }
+
+    public void setVehicleManager(VehicleManager vehicleManager) {
+        this.vehicleManager = vehicleManager;
+    }
+
+    public void setCollectionManager(CollectionManager collectionManager) {
+        this.collectionManager = collectionManager;
+    }
+
+
+
+        private List<Collection> collections;
 
     /**
      * Sets the list of collections and refreshes the table and statistics.
@@ -155,5 +204,27 @@ public final class CollectionController {
             case ACTIVE -> showActiveCheckBox.isSelected();
             default -> false;
         };
+    }
+
+    @FXML
+    private void handleBack() {
+        if ("SCHEDULE".equals(previousPage)) {
+            MainLayoutController.getInstance().setPageTitle("Schedule Management");
+            ScheduleController controller = MainLayoutController.getInstance()
+                    .loadCenterWithController("/layouts/schedule/ScheduleView.fxml");
+            controller.setCollectionManager(collectionManager);
+            controller.setScheduleManager(scheduleManager);
+            controller.setOneTimeScheduleManager(oneTimeScheduleManager);
+            controller.setRecurringScheduleManager(recurringScheduleManager);
+            controller.initData();
+        } else if ("TRIP".equals(previousPage)) {
+            MainLayoutController.getInstance().setPageTitle("Trip Management");
+            TripController controller = MainLayoutController.getInstance()
+                    .loadCenterWithController("/layouts/trip/TripView.fxml");
+            controller.setTripManager(tripManager);
+            controller.setVehicleManager(vehicleManager);
+            controller.setCollectionManager(collectionManager);
+            controller.initData();
+        }
     }
 }
