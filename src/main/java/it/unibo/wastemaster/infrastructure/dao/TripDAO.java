@@ -75,6 +75,32 @@ public class TripDAO extends GenericDAO<Trip> {
                 .getResultList();
     }
 
+    public List<Employee> findAvailableOperatorsForEdit(LocalDateTime start,
+                                                        LocalDateTime end,
+                                                        Trip tripToEdit) {
+        String jpql = """
+            SELECT e FROM Employee e
+            WHERE e.role = :operatorRole
+              AND NOT EXISTS (
+                  SELECT 1 FROM Trip t JOIN t.operators o
+                  WHERE o = e
+                    AND t.status = :active
+                    AND t.departureTime < :tripEnd
+                    AND t.expectedReturnTime > :tripStart
+                    AND t.tripId <> :currentTripId
+              )
+            """;
+
+        return getEntityManager().createQuery(jpql, Employee.class)
+                .setParameter("active", Trip.TripStatus.ACTIVE)
+                .setParameter("tripStart", start)
+                .setParameter("tripEnd", end)
+                .setParameter("operatorRole", Employee.Role.OPERATOR)
+                .setParameter("currentTripId", tripToEdit.getTripId())
+                .getResultList();
+    }
+
+
     public List<String> findAvailablePostalCodes(LocalDate date) {
         String jpql = """
                 SELECT DISTINCT loc.postalCode
