@@ -4,6 +4,7 @@ import static it.unibo.wastemaster.domain.model.Employee.Role.ADMINISTRATOR;
 import static it.unibo.wastemaster.domain.model.Employee.Role.OFFICE_WORKER;
 
 import it.unibo.wastemaster.domain.model.Collection;
+import it.unibo.wastemaster.domain.model.Customer;
 import it.unibo.wastemaster.domain.model.Employee;
 import it.unibo.wastemaster.domain.model.Employee.Licence;
 import it.unibo.wastemaster.domain.model.Trip;
@@ -17,6 +18,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -26,6 +28,7 @@ public final class TripManager {
 
     private final TripRepository tripRepository;
     private final CollectionRepository collectionRepository;
+    private NotificationService notificationService;
 
     public TripManager(final TripRepository tripRepository, final CollectionRepository collectionRepository) {
         this.tripRepository = tripRepository;
@@ -33,18 +36,17 @@ public final class TripManager {
     }
 
     public void createTrip(final String postalCode, final Vehicle assignedVehicle,
-                           final List<Employee> operators, final LocalDateTime departureTime,
-                           final LocalDateTime expectedReturnTime, final List<Collection> collections) {
+            final List<Employee> operators, final LocalDateTime departureTime,
+            final LocalDateTime expectedReturnTime, final List<Collection> collections) {
 
-        // Creo il Trip senza associare subito le collection
-        Trip trip = new Trip(postalCode, assignedVehicle, operators, departureTime, expectedReturnTime, new ArrayList<>());
-        tripRepository.save(trip); // persisto il Trip e ottengo l'ID
+        Trip trip = new Trip(postalCode, assignedVehicle, operators, departureTime, expectedReturnTime,
+                new ArrayList<>());
+        tripRepository.save(trip);
 
-        // Associo ogni Collection al Trip e le salvo singolarmente
         for (Collection collection : collections) {
             collection.setTrip(trip);
             collectionRepository.save(collection);
-            trip.getCollections().add(collection); // aggiorno la lista nel Trip solo per coerenza in memoria
+            trip.getCollections().add(collection);
         }
     }
 
@@ -64,6 +66,10 @@ public final class TripManager {
         return tripRepository.findById(tripId);
     }
 
+    public void setNotificationService(final NotificationService notificationService) {
+        this.notificationService = notificationService;
+    }
+
     public boolean softDeleteTrip(final Trip trip) {
         try {
             ValidateUtils.requireArgNotNull(trip, "Trip cannot be null");
@@ -81,6 +87,46 @@ public final class TripManager {
             return true;
         } catch (IllegalArgumentException e) {
             return false;
+        }
+    }
+
+    public enum CancellationResult {
+        CANCELLED_AND_NOTIFIED,
+        CANCELLED_NOTIFICATION_FAILED,
+        CANCEL_FAILED
+    }
+
+    public CancellationResult cancelTripAndNotify(final Trip trip) {
+        final String subject = "Trip cancellation due to technical issues";
+        final String body = "Dear customer,\n\n" +
+                "We regret to inform you that your trip has been cancelled due to technical issues. " +
+                "We apologize for the inconvenience and remain available to reschedule.\n\n" +
+                "Best regards,\nWasteMaster";
+        return cancelTripAndNotify(trip, subject, body);
+    }
+
+    public CancellationResult cancelTripAndNotify(final Trip trip,
+            final String subject,
+            final String body) {
+        final boolean cancelled = softDeleteTrip(trip);
+        if (!cancelled) {
+            return CancellationResult.CANCEL_FAILED;
+        }
+        if (notificationService == null) {
+            return CancellationResult.CANCELLED_NOTIFICATION_FAILED;
+        }
+        try {
+            List<String> recipients = trip.getCollections().stream()
+                    .map(Collection::getCustomer)
+                    .filter(Objects::nonNull)
+                    .map(Customer::getEmail)
+                    .distinct()
+                    .toList();
+
+            notificationService.notifyTripCancellation(recipients, subject, body);
+            return CancellationResult.CANCELLED_AND_NOTIFIED;
+        } catch (Exception ex) {
+            return CancellationResult.CANCELLED_NOTIFICATION_FAILED;
         }
     }
 
@@ -154,7 +200,7 @@ public final class TripManager {
     }
 
     public void updateTrip(Trip trip) {
-    tripRepository.update(trip); 
+        tripRepository.update(trip);
     }
 
     public enum IssueType {
