@@ -116,15 +116,15 @@ classDiagram
     View o-- Controller
 ```
 
-## Design dettagliato
+# Design dettagliato
 
-(Questa sezione va compilata da ogni membro. Esempio per uno dei componenti, da dettagliare per ciascun vostro ambito.)
+## Gestione anagrafiche (Responsabile: Ferrari)
 
-### Gestione anagrafiche (Responsabile: Ferrari)
+**Problema:**  
+Necessità di gestire in modo sicuro e aggiornabile tutte le anagrafiche di clienti e operatori, con notifiche automatiche al sistema in caso di modifiche.
 
-**Problema:** Necessità di gestire in modo sicuro, aggiornabile e consultabile tutte le anagrafiche di clienti e operatori.
-
-**Soluzione:** Si adotta il pattern Repository per la gestione delle entità e il pattern Observer per notificare automaticamente modifiche alle altre componenti (es. aggiornamento dashboard o planner raccolte).
+**Soluzione:**  
+Si adotta il pattern Repository per la gestione delle entità e il pattern Observer per notificare automaticamente modifiche alle altre componenti (es. aggiornamento dashboard o planner raccolte).
 
 ```mermaid
 classDiagram
@@ -137,7 +137,159 @@ classDiagram
     AnagraficaRepository <|.. Operatore
 ```
 
-*(Ripetere per le altre aree: pianificazione raccolte, fatturazione, rotte, dashboard, etc. Esplicitando pattern, motivazioni e soluzioni.)*
+**Pattern usati:**  
+- Repository per separare logica di accesso ai dati dal resto dell'applicazione.
+- Observer per notificare aggiornamenti.
+
+---
+
+## Pianificazione raccolte (Responsabile: Cambrini)
+
+**Problema:**  
+Gestire in modo flessibile e dinamico la pianificazione delle raccolte, sia programmate che speciali, tenendo conto di richieste last-minute e disponibilità delle risorse.
+
+**Soluzione:**  
+Si adotta il pattern Strategy per la gestione delle politiche di pianificazione (es. raccolta standard vs speciale), e il pattern State per gestire lo stato della raccolta (es. pianificata, in corso, completata, fallita).
+
+```mermaid
+classDiagram
+    class Raccolta {
+      +pianifica()
+      +cambiaStato()
+    }
+    interface PianificazioneStrategy
+    class RaccoltaStandard
+    class RaccoltaSpeciale
+    class StatoRaccolta
+    class PianificatoreRaccolte
+
+    Raccolta o-- PianificazioneStrategy
+    PianificazioneStrategy <|-- RaccoltaStandard
+    PianificazioneStrategy <|-- RaccoltaSpeciale
+    Raccolta o-- StatoRaccolta
+    PianificatoreRaccolte o-- Raccolta
+```
+
+**Pattern usati:**  
+- Strategy per permettere diverse modalità di pianificazione.
+- State per gestire il ciclo di vita di una raccolta.
+
+---
+
+## Gestione fatturazione e pagamenti (Responsabile: Ragazzini)
+
+**Problema:**  
+Automatizzare la generazione delle fatture e il tracciamento dei pagamenti, integrando notifiche verso i clienti e gestione delle anomalie.
+
+**Soluzione:**  
+Pattern Factory Method per la creazione di fatture (standard o speciali), e Observer per notificare cambiamenti di stato nei pagamenti.
+
+```mermaid
+classDiagram
+    class FatturaFactory
+    class Fattura
+    class FatturaStandard
+    class FatturaSpeciale
+    class GestorePagamenti
+    class Cliente
+
+    FatturaFactory <|-- FatturaStandard
+    FatturaFactory <|-- FatturaSpeciale
+    GestorePagamenti o-- Fattura
+    GestorePagamenti o-- Cliente
+    Fattura <|.. Observer
+    GestorePagamenti o-- Observer
+```
+
+**Pattern usati:**  
+- Factory Method per la creazione di fatture differenti.
+- Observer per aggiornare il cliente all’avanzare dei pagamenti.
+
+---
+
+## Pianificazione rotte (Responsabile: Ragazzini)
+
+**Problema:**  
+Ottimizzare e aggiornare dinamicamente le rotte dei mezzi, considerando raccolte, traffico, manutenzioni e imprevisti.
+
+**Soluzione:**  
+Si adotta il pattern Command per gestire richieste di modifica rotta e Undo/Redo, e il pattern Iterator per scorrere le tappe di una rotta.
+
+```mermaid
+classDiagram
+    class Rotta
+    class Mezzo
+    class Tappa
+    class ComandoModificaRotta
+    class PianificatoreRotte
+
+    Rotta o-- Tappa
+    Rotta o-- Mezzo
+    PianificatoreRotte o-- Rotta
+    PianificatoreRotte o-- ComandoModificaRotta
+```
+
+**Pattern usati:**  
+- Command per gestire modifiche e annullamenti delle rotte.
+- Iterator per gestire sequenze di tappe.
+
+---
+
+## Dashboard e notifiche (Responsabile: Cambrini, opzionale)
+
+**Problema:**  
+Fornire una panoramica aggiornata e interattiva delle attività aziendali e notificare tempestivamente anomalie o eventi rilevanti.
+
+**Soluzione:**  
+Pattern Observer per aggiornare automaticamente la dashboard e il sistema di notifiche, Decorator per arricchire i messaggi di alert con dati specifici (es. priorità, destinatario…).
+
+```mermaid
+classDiagram
+    class Dashboard
+    class Notifica
+    class Alert
+    class Messaggio
+    class DecoratorMessaggio
+
+    Dashboard o-- Notifica
+    Notifica <|-- Alert
+    Alert o-- Messaggio
+    DecoratorMessaggio <|-- Messaggio
+```
+
+**Pattern usati:**  
+- Observer per propagare cambiamenti in tempo reale.
+- Decorator per arricchire i messaggi con informazioni aggiuntive.
+
+---
+
+## Gestione manutenzione mezzi (Tutti, opzionale)
+
+**Problema:**  
+Pianificare e tracciare interventi di manutenzione sui mezzi senza interrompere le attività operative.
+
+**Soluzione:**  
+Pattern Template Method per definire la sequenza di operazioni standard di manutenzione, e Strategy per gestire tipi diversi di manutenzione (ordinaria, straordinaria).
+
+```mermaid
+classDiagram
+    abstract class ManutenzioneTemplate
+    class ManutenzioneOrdinaria
+    class ManutenzioneStraordinaria
+    class Mezzo
+
+    ManutenzioneTemplate <|-- ManutenzioneOrdinaria
+    ManutenzioneTemplate <|-- ManutenzioneStraordinaria
+    Mezzo o-- ManutenzioneTemplate
+```
+
+**Pattern usati:**  
+- Template Method per la sequenza di operazioni.
+- Strategy per specializzare i tipi di manutenzione.
+
+---
+
+*(Ogni membro del gruppo può ampliare la propria sezione con dettagli sul proprio contributo, scelte di design, pattern e motivazioni.)*
 
 # Sviluppo
 
