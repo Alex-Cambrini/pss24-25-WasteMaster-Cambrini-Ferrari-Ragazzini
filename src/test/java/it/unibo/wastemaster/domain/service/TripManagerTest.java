@@ -383,5 +383,41 @@ class TripManagerTest extends AbstractDatabaseTest {
         assertFalse(completedNull);
         }
 
+        @Test
+        void testGetCollectionsByTrip() {
+        // Create a trip with two collections
+        List<Collection> collections = createCollections();
+        getTripManager().createTrip(
+                "40100",
+                vehicle1,
+                new ArrayList<>(List.of(operator1, operator2)),
+                departureTime,
+                expectedReturnTime,
+                new ArrayList<>(collections));
+        Trip trip = getTripDAO().findAll().get(0);
+
+        // Should return all collections associated with the trip
+        List<Collection> result = getTripManager().getCollectionsByTrip(trip);
+        assertEquals(collections.size(), result.size());
+        assertTrue(result.containsAll(collections));
+
+        // Edge case: trip with no collections
+        getTripManager().createTrip(
+                "20100",
+                vehicle1,
+                new ArrayList<>(List.of(operator1)),
+                departureTime.plusDays(1),
+                expectedReturnTime.plusDays(1),
+                new ArrayList<>());
+        Trip emptyTrip = getTripDAO().findAll().stream()
+                .filter(t -> t.getPostalCode().equals("20100"))
+                .findFirst().orElseThrow();
+        List<Collection> emptyResult = getTripManager().getCollectionsByTrip(emptyTrip);
+        assertTrue(emptyResult.isEmpty());
+
+        // Edge case: null trip
+        assertThrows(NullPointerException.class, () -> getTripManager().getCollectionsByTrip(null));
+        }
+
 
 }
