@@ -7,12 +7,10 @@ import it.unibo.wastemaster.controller.utils.AutoRefreshable;
 import it.unibo.wastemaster.controller.utils.DialogUtils;
 import it.unibo.wastemaster.domain.model.Collection;
 import it.unibo.wastemaster.domain.model.Employee;
-import it.unibo.wastemaster.domain.model.Schedule;
 import it.unibo.wastemaster.domain.model.Trip;
 import it.unibo.wastemaster.domain.service.CollectionManager;
 import it.unibo.wastemaster.domain.service.TripManager;
 import it.unibo.wastemaster.domain.service.VehicleManager;
-import it.unibo.wastemaster.viewmodels.ScheduleRow;
 import it.unibo.wastemaster.viewmodels.TripRow;
 import java.util.List;
 import java.util.Optional;
@@ -22,7 +20,10 @@ import javafx.animation.Timeline;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonBar;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.CustomMenuItem;
@@ -55,7 +56,6 @@ public final class TripController implements AutoRefreshable {
             FIELD_VEHICLE_CAPACITY, FIELD_OPERATORS,
             FIELD_STATUS);
 
-
     private TripManager tripManager;
     private VehicleManager vehicleManager;
     private CollectionManager collectionManager;
@@ -77,6 +77,9 @@ public final class TripController implements AutoRefreshable {
 
     @FXML
     private Button deleteTripButton;
+
+    @FXML
+    private Button deleteAndNotifyButton;
 
     @FXML
     private TextField searchField;
@@ -160,6 +163,9 @@ public final class TripController implements AutoRefreshable {
                     boolean rowSelected = newVal != null;
                     editTripButton.setDisable(!rowSelected);
                     deleteTripButton.setDisable(!rowSelected);
+                    if (deleteAndNotifyButton != null) {
+                        deleteAndNotifyButton.setDisable(!rowSelected);
+                    }
                 });
         tripTable.getSelectionModel().selectedItemProperty()
                 .addListener((obs, oldVal, newVal) -> {
@@ -170,6 +176,9 @@ public final class TripController implements AutoRefreshable {
                         editTripButton.setDisable(!isActive);
                         deleteTripButton.setDisable(!isActive);
                         completeTripButton.setDisable(!isActive);
+                        if (deleteAndNotifyButton != null) {
+                            deleteAndNotifyButton.setDisable(!isActive);
+                        }
 
                         boolean isNotCancelled = !"CANCELED".equalsIgnoreCase(status)
                                 && !"CANCELLED".equalsIgnoreCase(status);
@@ -180,10 +189,11 @@ public final class TripController implements AutoRefreshable {
                         deleteTripButton.setDisable(true);
                         completeTripButton.setDisable(true);
                         showRelatedCollections.setDisable(true);
+                        if (deleteAndNotifyButton != null) {
+                            deleteAndNotifyButton.setDisable(true);
+                        }
                     }
                 });
-
-
 
         currentUser = AppContext.getCurrentAccount().getEmployee();
         boolean isAllowedToCompleteTrip = currentUser.getRole() == Employee.Role.ADMINISTRATOR
@@ -253,39 +263,82 @@ public final class TripController implements AutoRefreshable {
     }
 
     @FXML
-    private void handleDeleteTrip() {
-        TripRow selected = tripTable.getSelectionModel().getSelectedItem();
-        if (selected == null) {
-            DialogUtils.showError("No Selection",
-                    "Please select a trip to cancel.", AppContext.getOwner());
-            return;
-        }
+private void handleDeleteTrip() {
+    TripRow selected = tripTable.getSelectionModel().getSelectedItem();
+    if (selected == null) {
+        DialogUtils.showError("No Selection",
+                "Please select a trip to cancel.", AppContext.getOwner());
+        return;
+    }
 
-        boolean confirmed = DialogUtils.showConfirmationDialog(
-                "Confirm Cancellation",
-                "Are you sure you want to cancel this trip?",
-                AppContext.getOwner());
-        if (!confirmed) {
-            return;
-        }
+    ButtonType deleteBtn       = new ButtonType("Delete", ButtonBar.ButtonData.OK_DONE);
+    ButtonType deleteNotifyBtn = new ButtonType("Delete & Notify", ButtonBar.ButtonData.YES);
+    ButtonType cancelBtn       = new ButtonType("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE);
 
-        Optional<Trip> tripOpt = tripManager.getTripById(selected.getIdAsInt());
-        if (tripOpt.isEmpty()) {
-            DialogUtils.showError("Not Found",
-                    "The selected trip could not be found.", AppContext.getOwner());
-            return;
-        }
+    Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+    alert.initOwner(AppContext.getOwner());
+    alert.setTitle("Cancel Trip");
+    alert.setHeaderText("Choose how to cancel this trip");
+    alert.setContentText("You can delete the trip, or delete it and notify customers.");
+    alert.getButtonTypes().setAll(deleteBtn, deleteNotifyBtn, cancelBtn);
 
-        Trip trip = tripOpt.get();
+    alert.getDialogPane().getScene().getStylesheets()
+         .addAll(AppContext.getOwner().getScene().getStylesheets());
+
+    ((Button) alert.getDialogPane().lookupButton(deleteBtn))
+            .getStyleClass().addAll("danger");                       
+    ((Button) alert.getDialogPane().lookupButton(deleteNotifyBtn))
+            .getStyleClass().addAll("danger", "button-outlined");
+    ((Button) alert.getDialogPane().lookupButton(cancelBtn))
+            .getStyleClass().addAll("accent", "button-outlined");
+
+    Optional<ButtonType> choice = alert.showAndWait();
+    if (choice.isEmpty() || choice.get() == cancelBtn) {
+        return;
+    }
+
+    Optional<Trip> tripOpt = tripManager.getTripById(selected.getIdAsInt());
+    if (tripOpt.isEmpty()) {
+        DialogUtils.showError("Not Found",
+                "The selected trip could not be found.", AppContext.getOwner());
+        return;
+    }
+
+    Trip trip = tripOpt.get();
+
+    if (choice.get() == deleteBtn) {
         boolean success = tripManager.softDeleteTrip(trip);
-        trip.getCollections().clear();
         if (success) {
+            trip.getCollections().clear();
             loadTrips();
+            DialogUtils.showSuccess("Trip cancelled.", AppContext.getOwner());
         } else {
             DialogUtils.showError("Cancellation Failed",
                     "Unable to cancel the selected trip.", AppContext.getOwner());
         }
+        return;
     }
+
+    if (choice.get() == deleteNotifyBtn) {
+        TripManager.CancellationResult res = tripManager.cancelTripAndNotify(trip);
+        switch (res) {
+            case CANCELLED_AND_NOTIFIED -> {
+                loadTrips();
+                DialogUtils.showSuccess("Trip cancelled and customers have been notified.", AppContext.getOwner());
+            }
+            case CANCELLED_NOTIFICATION_FAILED -> {
+                loadTrips();
+                DialogUtils.showError("Notification Failed",
+                        "Trip cancelled, but failed to notify customers.", AppContext.getOwner());
+            }
+            case CANCEL_FAILED -> DialogUtils.showError("Cancellation Failed",
+                    "Unable to cancel the selected trip.", AppContext.getOwner());
+            default -> DialogUtils.showError("Cancellation Failed",
+                    "Unable to cancel the selected trip.", AppContext.getOwner());
+        }
+    }
+}
+
 
     @FXML
     private void handleEditTrip() {
