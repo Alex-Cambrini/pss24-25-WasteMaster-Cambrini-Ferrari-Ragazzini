@@ -483,7 +483,11 @@ public final class TripController implements AutoRefreshable {
             MainLayoutController.getInstance().setPageTitle("Trip Related Collections");
             CollectionController controller = MainLayoutController.getInstance()
                     .loadCenterWithController("/layouts/collection/CollectionView.fxml");
-            controller.setCollections(collections);
+            controller.setPreviousPage("TRIP");
+            controller.setTripManager(tripManager);
+            controller.setVehicleManager(vehicleManager);
+            controller.setCollectionManager(collectionManager);
+
         } catch (Exception e) {
             DialogUtils.showError("Navigation error",
                     "Could not load Associated Collections view.", AppContext.getOwner());
