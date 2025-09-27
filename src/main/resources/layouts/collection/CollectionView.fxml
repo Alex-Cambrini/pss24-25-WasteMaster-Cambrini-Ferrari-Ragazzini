@@ -1,31 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
 <?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
 <?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.Tooltip?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
-<VBox alignment="TOP_CENTER"
-      prefWidth="640.0"
-      xmlns="http://javafx.com/javafx/21"
-      xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="it.unibo.wastemaster.controller.collection.CollectionController">
+
+<VBox alignment="TOP_CENTER" prefWidth="640.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.unibo.wastemaster.controller.collection.CollectionController">
     <children>
-        <HBox alignment="TOP_CENTER"
-              minHeight="40.0"
-              prefHeight="40.0"
-              prefWidth="600.0"
-              spacing="10.0">
+        <HBox alignment="TOP_CENTER" minHeight="40.0" prefHeight="40.0" prefWidth="600.0" spacing="10.0">
             <VBox.margin>
                 <Insets bottom="10.0" />
             </VBox.margin>
             <children>
-                <Label fx:id="totalLabel" text="Total: 0" styleClass="title-4, text-bold" />
-                <Label fx:id="completedLabel" text="Completed: 0" styleClass="title-4, text-bold, text, success" />
-                <Label fx:id="cancelledLabel" text="Cancelled: 0" styleClass="title-4, text-bold, danger" />
-                <Label fx:id="activeLabel" text="Active: 0" styleClass="title-4, text-bold, text, accent" />
+                <Label fx:id="totalLabel" styleClass="title-4, text-bold" text="Total: 0" />
+                <Label fx:id="completedLabel" styleClass="title-4, text-bold, text, success" text="Completed: 0" />
+                <Label fx:id="cancelledLabel" styleClass="title-4, text-bold, danger" text="Cancelled: 0" />
+                <Label fx:id="activeLabel" styleClass="title-4, text-bold, text, accent" text="Active: 0" />
+            <Region prefHeight="200.0" prefWidth="200.0" HBox.hgrow="ALWAYS" />
+            <Button mnemonicParsing="false" text="Back" styleClass="accent" onAction="#handleBack"/>
             </children>
         </HBox>
         <HBox alignment="CENTER_RIGHT" prefHeight="30.0" prefWidth="30.0" spacing="10.0">
@@ -50,11 +48,7 @@
                 <Insets bottom="5.0" />
             </VBox.margin>
         </HBox>
-        <TableView fx:id="collectionTable"
-                   prefHeight="300.0"
-                   prefWidth="600.0"
-                   styleClass="table-view"
-                   VBox.vgrow="ALWAYS">
+        <TableView fx:id="collectionTable" prefHeight="300.0" prefWidth="600.0" styleClass="table-view" VBox.vgrow="ALWAYS">
             <columns>
                 <TableColumn fx:id="wasteNameColumn" prefWidth="100" text="Waste Name" />
                 <TableColumn fx:id="dateColumn" prefWidth="120" text="Date" />
