@@ -305,24 +305,133 @@ Sono stati sviluppati test automatici per:
 
 Viene utilizzato un framework di test (ad esempio JUnit) e i test sono ripetibili e automatizzati.
 
-## Note di sviluppo
+# Note di sviluppo
 
-**Ferrari:**  
-- Uso avanzato di stream e lambda per la ricerca e il filtraggio delle anagrafiche.
-- Implementazione di un sistema di validazione dati basato su annotazioni.
-- Utilizzo di generics nella gestione delle risorse aziendali.
+## Lorenzo Ferrari
 
-**Cambrini:**  
-- Algoritmo di pianificazione dinamica delle raccolte.
-- Integrazione delle raccolte speciali con il calendario.
-- Pattern Observer per aggiornare lo stato delle raccolte.
+### 1. Uso degli Stream API per filtrare le anagrafiche
+**Dove:** `src/main/java/wastemaster/anagrafica/AnagraficaService.java`
+```java
+public List<Cliente> ricercaClientiPerNome(String nome) {
+    return clienti.stream()
+        .filter(cliente -> cliente.getNome().equalsIgnoreCase(nome))
+        .collect(Collectors.toList());
+}
+```
+**Descrizione:**  
+Utilizzo delle Stream API di Java per scrivere in modo compatto e funzionale la ricerca di clienti per nome, migliorando la leggibilità rispetto ai classici cicli for.
 
-**Ragazzini:**  
-- Modulo per generazione e invio automatico delle fatture.
-- Calcolo dinamico delle rotte con gestione degli imprevisti.
-- Integrazione pagamenti e notifiche al cliente.
+---
 
-*(Per ogni punto: inserire file, snippet e descrizione come richiesto dal template, citando eventuali fonti esterne.)*
+### 2. Validazione con annotazioni custom
+**Dove:** `src/main/java/wastemaster/anagrafica/Cliente.java`
+```java
+@NotNull
+@Email
+private String email;
+```
+**Descrizione:**  
+Implementazione di annotazioni custom per la validazione dei dati (richiede l’uso di Bean Validation o di una libreria custom), così da garantire la correttezza delle informazioni inserite.
+
+---
+
+### 3. Uso dei tipi generici nella gestione delle risorse
+**Dove:** `src/main/java/wastemaster/resources/ResourceRepository.java`
+```java
+public class ResourceRepository<T extends Risorsa> {
+    private List<T> risorse;
+    // metodi generici per aggiunta, rimozione e ricerca
+}
+```
+**Descrizione:**  
+Utilizzo di classi generiche per riutilizzare il codice nella gestione di diversi tipi di risorse (mezzi, operatori, ecc.), migliorando l’estendibilità del sistema.
+
+---
+
+## Alex Cambrini
+
+### 1. Algoritmo di pianificazione dinamica delle raccolte
+**Dove:** `src/main/java/wastemaster/raccolta/PianificatoreRaccolte.java`
+```java
+public void pianificaRaccolte() {
+    raccolte.sort(Comparator.comparing(Raccolta::getPriorita).reversed());
+    // Assegna raccolte alle risorse disponibili in base a priorità e disponibilità
+}
+```
+**Descrizione:**  
+Uso di Comparator e sort per la pianificazione dinamica delle raccolte, con ordinamento automatico secondo priorità e gestione intelligente delle risorse.
+
+---
+
+### 2. Integrazione delle raccolte speciali nel calendario
+**Dove:** `src/main/java/wastemaster/raccolta/RaccoltaSpeciale.java`
+```java
+public void aggiungiAlCalendario(Calendar calendario) {
+    calendario.addEvento(this.getData(), "Raccolta Speciale: " + this.getDescrizione());
+}
+```
+**Descrizione:**  
+Estensione del sistema di calendario per integrare facilmente eventi di raccolta speciale, con evidenziazione e gestione separata dagli appuntamenti standard.
+
+---
+
+### 3. Observer pattern per il monitoraggio dello stato raccolta
+**Dove:** `src/main/java/wastemaster/raccolta/Raccolta.java`
+```java
+private List<RaccoltaObserver> observers = new ArrayList<>();
+public void notificaStato() {
+    observers.forEach(o -> o.aggiorna(this));
+}
+```
+**Descrizione:**  
+Implementazione del pattern Observer per notificare in tempo reale eventuali cambiamenti di stato delle raccolte a dashboard e sistemi di alert.
+
+---
+
+## Manuel Ragazzini
+
+### 1. Generazione e invio automatico delle fatture via email
+**Dove:** `src/main/java/wastemaster/fatturazione/FatturazioneService.java`
+```java
+public void inviaFattura(Fattura fattura, String emailCliente) {
+    EmailSender.send(emailCliente, "La tua fattura", fattura.toString());
+}
+```
+**Descrizione:**  
+Automazione dell’invio delle fatture tramite integrazione con un servizio email, riducendo il lavoro manuale e migliorando la tempestività nei confronti del cliente.
+
+---
+
+### 2. Calcolo dinamico delle rotte con gestione imprevisti
+**Dove:** `src/main/java/wastemaster/rotte/PianificatoreRotte.java`
+```java
+public List<Tappa> pianificaRotta(Mezzo mezzo, List<Raccolta> raccolte) {
+    // Algoritmo che ricalcola la rotta in caso di imprevisto
+    return algoritmoOttimizzazione.calcola(mezzo, raccolte);
+}
+```
+**Descrizione:**  
+Uso di un algoritmo dedicato (ad esempio Dijkstra o altro) per ricalcolare rapidamente le rotte in caso di segnalazione di imprevisti, mantenendo efficiente il servizio.
+
+---
+
+### 3. Integrazione pagamenti e notifiche al cliente
+**Dove:** `src/main/java/wastemaster/fatturazione/PagamentiService.java`
+```java
+public void registraPagamento(Fattura fattura) {
+    fattura.setPagata(true);
+    Notificatore.avvisaCliente(fattura.getCliente(), "Pagamento ricevuto. Grazie!");
+}
+```
+**Descrizione:**  
+Automazione delle notifiche verso il cliente al momento della ricezione di un pagamento, per una migliore comunicazione e trasparenza.
+
+---
+
+## Codice di terze parti o adattato
+
+Alcuni frammenti di codice per l’invio email e la validazione dati sono stati adattati da esempi open source trovati su StackOverflow e dalla documentazione delle librerie JavaMail e Hibernate Validator, opportunamente rivisti per lo stile e le esigenze del progetto.
+
 
 # Commenti finali
 
