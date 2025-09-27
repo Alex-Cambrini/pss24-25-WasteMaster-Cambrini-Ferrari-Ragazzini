@@ -309,8 +309,9 @@ public final class TripController implements AutoRefreshable {
                     "/layouts/trip/EditTripView.fxml",
                     AppContext.getOwner(), ctrl -> {
                         ctrl.setTripToEdit(tripOpt.get());
-                        ctrl.setTripController(this);
                         ctrl.setTripManager(tripManager);
+                        ctrl.setVehicleManager(vehicleManager);
+                        ctrl.initData();
                     });
 
             controllerOpt.ifPresent(ctrl -> loadTrips());
