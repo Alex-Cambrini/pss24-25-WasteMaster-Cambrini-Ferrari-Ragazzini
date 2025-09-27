@@ -273,7 +273,9 @@ Pattern Template Method per definire la sequenza di operazioni standard di manut
 
 ```mermaid
 classDiagram
-    abstract class ManutenzioneTemplate
+    class ManutenzioneTemplate {
+        <<abstract>>
+    }
     class ManutenzioneOrdinaria
     class ManutenzioneStraordinaria
     class Mezzo
