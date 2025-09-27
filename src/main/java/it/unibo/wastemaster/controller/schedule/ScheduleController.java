@@ -34,6 +34,7 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
@@ -76,7 +77,7 @@ public final class ScheduleController implements AutoRefreshable {
 
     @FXML
     private CheckBox showCompletedCheckBox;
-    // buttons
+
     @FXML
     private Button changeFrequencyButton;
 
@@ -535,7 +536,11 @@ public final class ScheduleController implements AutoRefreshable {
             MainLayoutController.getInstance().setPageTitle("Associated Collections");
             CollectionController controller = MainLayoutController.getInstance()
                     .loadCenterWithController("/layouts/collection/CollectionView.fxml");
-            controller.setCollections(collections);
+            controller.setPreviousPage("SCHEDULE");
+            controller.setCollectionManager(collectionManager);
+            controller.setScheduleManager(scheduleManager);
+            controller.setOneTimeScheduleManager(oneTimeScheduleManager);
+            controller.setRecurringScheduleManager(recurringScheduleManager);
         } catch (Exception e) {
             DialogUtils.showError("Navigation error",
                     "Could not load Associated Collections view.", AppContext.getOwner());
