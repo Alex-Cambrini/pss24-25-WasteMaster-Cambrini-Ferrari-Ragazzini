@@ -10,8 +10,13 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TableColumn?>
 
-<VBox prefWidth="600.0" styleClass="center-pane, modal-pane" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.unibo.wastemaster.controller.trip.EditTripController">
+<VBox prefWidth="600.0" styleClass="center-pane, modal-pane"
+    xmlns="http://javafx.com/javafx/23.0.1"
+    xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.unibo.wastemaster.controller.trip.EditTripController">
 
     <padding>
         <Insets left="20.0" right="20.0" />
@@ -29,7 +34,7 @@
                 <RowConstraints vgrow="SOMETIMES" />
                 <RowConstraints vgrow="SOMETIMES" />
                 <RowConstraints vgrow="SOMETIMES" />
-            <RowConstraints />
+                <RowConstraints />
             </rowConstraints>
 
             <children>
@@ -41,7 +46,23 @@
                 <Label fx:id="postalCodeLabel" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="2" />
                 <Label text="Vehicle" GridPane.rowIndex="3" />
                 <Label text="Operators" GridPane.rowIndex="5" />
-                <ListView fx:id="operatorsList" prefHeight="80.0" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+                <VBox spacing="6" GridPane.columnIndex="1" GridPane.rowIndex="5" VBox.vgrow="ALWAYS">
+                    <children>
+                        <ScrollPane fitToWidth="true" fitToHeight="true" prefHeight="200.0">
+                            <content>
+                                <TableView fx:id="operatorsTable" prefHeight="200.0" prefWidth="410.0">
+                                    <columns>
+                                        <TableColumn fx:id="opSelectCol" text="" prefWidth="40"/>
+                                        <TableColumn fx:id="opNameCol" text="Name" prefWidth="180"/>
+                                        <TableColumn fx:id="opRoleCol" text="Role" prefWidth="90"/>
+                                        <TableColumn fx:id="opLicCol" text="Licence" prefWidth="90"/>
+                                    </columns>
+                                </TableView>
+                            </content>
+                        </ScrollPane>
+                        <Label fx:id="operatorsHint" styleClass="hint" text="0 / 0 selected"/>
+                    </children>
+                </VBox>
                 <Label text="Driver" GridPane.rowIndex="4" />
                 <ComboBox fx:id="driverCombo" prefWidth="150.0" GridPane.columnIndex="1" GridPane.rowIndex="4" />
                 <ComboBox fx:id="vehicleCombo" prefWidth="150.0" GridPane.columnIndex="1" GridPane.rowIndex="3" />
@@ -53,9 +74,9 @@
                 <Button onAction="#handleAbortTripEdit" styleClass="danger" text="Cancel" />
                 <Button onAction="#handleUpdateTrip" styleClass="success" text="Save" />
             </children>
-         <padding>
-            <Insets bottom="20.0" right="10.0" top="20.0" />
-         </padding>
+            <padding>
+                <Insets bottom="20.0" right="10.0" top="20.0" />
+            </padding>
         </HBox>
     </children>
 </VBox>
