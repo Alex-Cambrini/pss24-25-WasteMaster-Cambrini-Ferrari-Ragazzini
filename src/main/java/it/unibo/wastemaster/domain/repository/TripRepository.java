@@ -4,7 +4,6 @@ import it.unibo.wastemaster.domain.model.Employee;
 import it.unibo.wastemaster.domain.model.Employee.Licence;
 import it.unibo.wastemaster.domain.model.Trip;
 import it.unibo.wastemaster.domain.model.Vehicle;
-
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -26,9 +25,21 @@ public interface TripRepository {
 
     List<Vehicle> findAvailableVehicles(LocalDateTime start, LocalDateTime end);
 
-    List<Employee> findQualifiedDrivers(LocalDateTime start, LocalDateTime end, List<Licence> allowedLicences);
+    List<Employee> findQualifiedDrivers(LocalDateTime start, LocalDateTime end,
+                                        List<Licence> allowedLicences);
 
-    List<Employee> findAvailableOperatorsExcludeDriver(LocalDateTime start, LocalDateTime end, Employee driver);
+    List<Employee> findAvailableOperatorsExcludeDriver(LocalDateTime start,
+                                                       LocalDateTime end,
+                                                       Employee driver);
+
+    List<Employee> findQualifiedDriversToEdit(LocalDateTime start, LocalDateTime end,
+                                              List<Licence> allowedLicences,
+                                              Trip tripToEdit);
+
+    List<Employee> findAvailableOperatorsExcludeDriverToEdit(LocalDateTime start,
+                                                             LocalDateTime end,
+                                                             Employee driver,
+                                                             Trip tripToEdit);
 
     List<String> findAvailablePostalCodes(LocalDate date);
 }
