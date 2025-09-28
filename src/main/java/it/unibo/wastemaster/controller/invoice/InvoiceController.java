@@ -1,10 +1,12 @@
 package it.unibo.wastemaster.controller.invoice;
 
 import it.unibo.wastemaster.application.context.AppContext;
+import it.unibo.wastemaster.controller.customerstatistics.CustomerStatisticsController;
 import it.unibo.wastemaster.controller.main.MainLayoutController;
 import it.unibo.wastemaster.controller.utils.AutoRefreshable;
 import it.unibo.wastemaster.controller.utils.DialogUtils;
 import it.unibo.wastemaster.domain.model.Collection;
+import it.unibo.wastemaster.domain.model.Customer;
 import it.unibo.wastemaster.domain.model.Invoice;
 import it.unibo.wastemaster.domain.service.CollectionManager;
 import it.unibo.wastemaster.domain.service.CustomerManager;
@@ -18,7 +20,10 @@ import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ContextMenu;
@@ -28,6 +33,7 @@ import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
@@ -141,6 +147,7 @@ public final class InvoiceController implements AutoRefreshable {
 
         invoiceTable.getSelectionModel().selectedItemProperty()
                 .addListener((obs, oldVal, newVal) -> updateButtons(newVal));
+   
 
         if (showDeletedCheckBox != null) {
             showDeletedCheckBox.setSelected(false);
@@ -441,6 +448,35 @@ public final class InvoiceController implements AutoRefreshable {
         } else {
             DialogUtils.showError("Error", "Could not delete invoice.",
                     AppContext.getOwner());
+        }
+    }
+
+    @FXML
+    private void handleViewCustomer(ActionEvent event) {
+        InvoiceRow selectedRow = invoiceTable.getSelectionModel().getSelectedItem();
+        if (selectedRow == null) {
+            DialogUtils.showError("No Selection", "Please select an invoice.", AppContext.getOwner());
+            return;
+        }
+        Customer customer = selectedRow.getInvoice().getCustomer();
+
+        try {
+            Optional<CustomerStatisticsController> controllerOpt = DialogUtils.showModalWithController(
+                    "Customer Statistics",
+                    "/layouts/customerstatistics/CustomerStatisticsView.fxml",
+                    AppContext.getOwner(),
+                    ctrl -> {
+                        ctrl.setCustomerManager(customerManager);
+                        ctrl.setInvoiceManager(invoiceManager);
+                        ctrl.setCollectionManager(collectionManager);
+                        // Seleziona direttamente il customer nella ComboBox
+                        ctrl.getCustomerCombo().setValue(customer);
+                    });
+
+            // Nessuna azione post-dialog necessaria
+        } catch (IOException e) {
+            e.printStackTrace();
+            DialogUtils.showError("Loading Error", "Could not load Customer Statistics dialog.", AppContext.getOwner());
         }
     }
 }
