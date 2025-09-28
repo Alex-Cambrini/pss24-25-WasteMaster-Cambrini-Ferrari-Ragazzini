@@ -9,9 +9,7 @@
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox alignment="TOP_CENTER" prefWidth="640.0"
-   xmlns="http://javafx.com/javafx/21"
-   xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.unibo.wastemaster.controller.vehicle.VehicleController">
+<VBox alignment="TOP_CENTER" prefWidth="640.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.unibo.wastemaster.controller.vehicle.VehicleController">
    <children>
       <HBox alignment="TOP_CENTER" minHeight="40" prefHeight="60" prefWidth="600.0" spacing="10.0">
          <children>
@@ -39,11 +37,11 @@
 
       <HBox alignment="TOP_RIGHT" minHeight="50.0" prefHeight="100.0" prefWidth="600.0" spacing="10.0">
          <children>
-            <Button fx:id="editVehicleButton" mnemonicParsing="false" onAction="#handleEditVehicle" styleClass="accent" text="Edit" disable="true"/>
-            <Button fx:id="deleteVehicleButton" mnemonicParsing="false" onAction="#handleDeleteVehicle" styleClass="danger" text="Delete" disable="true"/>
+            <Button fx:id="editVehicleButton" disable="true" mnemonicParsing="false" onAction="#handleEditVehicle" styleClass="accent" text="Edit" />
+            <Button fx:id="deleteVehicleButton" disable="true" mnemonicParsing="false" onAction="#handleDeleteVehicle" styleClass="danger" text="Delete" />
          </children>
          <padding>
-            <Insets right="20.0" top="10.0" />
+            <Insets top="10.0" />
          </padding>
       </HBox>
    </children>

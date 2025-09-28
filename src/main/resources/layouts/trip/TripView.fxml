@@ -10,7 +10,7 @@
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox alignment="TOP_CENTER" prefWidth="640.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.unibo.wastemaster.controller.trip.TripController">
+<VBox alignment="TOP_CENTER" prefWidth="640.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.unibo.wastemaster.controller.trip.TripController">
 
     <children>
 
@@ -49,13 +49,14 @@
 
         <HBox alignment="TOP_RIGHT" minHeight="50.0" prefHeight="100.0" prefWidth="600.0" spacing="10.0">
             <children>
-            <Button fx:id="completeTripButton" minWidth="95.0" mnemonicParsing="false" styleClass="success" text="Complete Trip" disable="true" visible="false" onAction="#handleCompleteTrip"/>
-            <Region prefHeight="90.0" prefWidth="427.0" HBox.hgrow="ALWAYS" />
+            <Button fx:id="completeTripButton" disable="true" minWidth="95.0" mnemonicParsing="false" onAction="#handleCompleteTrip" styleClass="success" text="Complete Trip" visible="false" />
+            <Button fx:id="showRelatedCollections" disable="true" minWidth="105.0" mnemonicParsing="false" onAction="#handleShowRelatedCollections" styleClass="accent" text="Show collections" />
+            <Region prefHeight="90.0" prefWidth="95.0" HBox.hgrow="ALWAYS" />
                 <Button fx:id="editTripButton" disable="true" onAction="#handleEditTrip" styleClass="accent" text="Edit" />
                 <Button fx:id="deleteTripButton" disable="true" onAction="#handleDeleteTrip" styleClass="danger" text="Delete" />
             </children>
             <padding>
-                <Insets right="20.0" top="10.0" />
+                <Insets top="10.0" />
             </padding>
         </HBox>
 
