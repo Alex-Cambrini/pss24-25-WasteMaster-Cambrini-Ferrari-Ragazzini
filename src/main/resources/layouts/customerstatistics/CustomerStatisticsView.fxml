@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox xmlns="http://javafx.com/javafx/21"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="it.unibo.wastemaster.controller.customerstatistics.CustomerStatisticsController"
+      spacing="18" styleClass="center-pane">
+    <padding>
+        <Insets top="20" right="20" bottom="20" left="20"/>
+    </padding>
+    <children>
+        <Label text="Customer Statistics" styleClass="header-label"/>
+        <HBox spacing="10">
+            <Label text="Select Customer:"/>
+            <ComboBox fx:id="customerCombo" prefWidth="250"/>
+        </HBox>
+        <GridPane hgap="20" vgap="10">
+            <columnConstraints>
+                <ColumnConstraints minWidth="120"/>
+                <ColumnConstraints minWidth="120"/>
+            </columnConstraints>
+            <children>
+                <Label text="Total Invoices:" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+                <Label fx:id="totalInvoicesLabel" text="-" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+                <Label text="Total Collections:" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
+                <Label fx:id="totalCollectionsLabel" text="-" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+                <Label text="Total Amount:" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
+                <Label fx:id="totalAmountLabel" text="-" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
+            </children>
+        </GridPane>
+        <Label text="Invoices"/>
+        <TableView fx:id="invoicesTable" prefHeight="140">
+            <columns>
+                <TableColumn text="ID" prefWidth="60"/>
+                <TableColumn text="Date" prefWidth="120"/>
+                <TableColumn text="Amount" prefWidth="100"/>
+                <TableColumn text="Status" prefWidth="100"/>
+            </columns>
+        </TableView>
+        <Label text="Collections"/>
+        <TableView fx:id="collectionsTable" prefHeight="140">
+            <columns>
+                <TableColumn text="ID" prefWidth="60"/>
+                <TableColumn text="Date" prefWidth="120"/>
+                <TableColumn text="Waste" prefWidth="120"/>
+                <TableColumn text="Status" prefWidth="100"/>
+            </columns>
+        </TableView>
+    </children>
+</VBox>
