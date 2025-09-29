@@ -13,9 +13,9 @@
     </padding>
     <children>
         <Label text="Customer Statistics" styleClass="title-3"/>
-        <HBox spacing="10">
+        <HBox spacing="6">
             <Label text="Customer:" styleClass="title-4"/>
-            <Label fx:id="customerNameLabel" text="-" styleClass="header-label"/>
+            <Label fx:id="customerNameLabel" text="-" />
         </HBox>
         <GridPane hgap="20" vgap="10">
             <columnConstraints>
@@ -23,31 +23,17 @@
                 <ColumnConstraints minWidth="120"/>
             </columnConstraints>
             <children>
-                <Label text="Total Invoices:" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+                <Label text="Total Invoices:" GridPane.columnIndex="0" GridPane.rowIndex="0" styleClass="title-4"/>
                 <Label fx:id="totalInvoicesLabel" text="-" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
-                <Label text="Total Collections:" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
+                <Label text="Total Collections:" GridPane.columnIndex="0" GridPane.rowIndex="1" styleClass="title-4"/>
                 <Label fx:id="totalCollectionsLabel" text="-" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
-                <Label text="Total Amount:" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
-                <Label fx:id="totalAmountLabel" text="-" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
+                <Label text="Total Amount:" GridPane.columnIndex="0" GridPane.rowIndex="2" styleClass="title-4"/>
+                <Label fx:id="totalAmountLabel" text="-" GridPane.columnIndex="1" GridPane.rowIndex="2" styleClass="accent"/>
+                <Label text="Unpaid Amount:" GridPane.columnIndex="0" GridPane.rowIndex="3" styleClass="title-4"/>
+                <Label fx:id="unpaidAmountLabel" text="-" GridPane.columnIndex="1" GridPane.rowIndex="3" styleClass="danger"/>
+                <Label text="Paid Amount:" GridPane.columnIndex="0" GridPane.rowIndex="4" styleClass="title-4"/>
+                <Label fx:id="paidAmountLabel" text="-" GridPane.columnIndex="1" GridPane.rowIndex="4" styleClass="success"/>
             </children>
         </GridPane>
-        <Label text="Invoices"/>
-        <TableView fx:id="invoicesTable" prefHeight="140">
-            <columns>
-                <TableColumn fx:id="invoiceIdColumn" text="ID" prefWidth="60"/>
-                <TableColumn fx:id="invoiceDateColumn" text="Date" prefWidth="120"/>
-                <TableColumn fx:id="invoiceAmountColumn" text="Amount" prefWidth="100"/>
-                <TableColumn fx:id="invoiceStatusColumn" text="Status" prefWidth="100"/>
-            </columns>
-        </TableView>
-        <Label text="Collections"/>
-        <TableView fx:id="collectionsTable" prefHeight="140">
-            <columns>
-                <TableColumn fx:id="collectionIdColumn" text="ID" prefWidth="60"/>
-                <TableColumn fx:id="collectionDateColumn" text="Date" prefWidth="120"/>
-                <TableColumn fx:id="collectionWasteColumn" text="Waste" prefWidth="120"/>
-                <TableColumn fx:id="collectionStatusColumn" text="Status" prefWidth="100"/>
-            </columns>
-        </TableView>
     </children>
 </VBox>
