@@ -6,10 +6,8 @@ import it.unibo.wastemaster.domain.model.Collection;
 import it.unibo.wastemaster.domain.service.CustomerManager;
 import it.unibo.wastemaster.domain.service.InvoiceManager;
 import it.unibo.wastemaster.domain.service.CollectionManager;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
-import javafx.scene.control.*;
+import javafx.scene.control.Label;
 
 import java.util.List;
 
@@ -19,18 +17,8 @@ public class CustomerStatisticsController {
     @FXML private Label totalInvoicesLabel;
     @FXML private Label totalCollectionsLabel;
     @FXML private Label totalAmountLabel;
-    @FXML private TableView<Invoice> invoicesTable;
-    @FXML private TableView<Collection> collectionsTable;
-    @FXML private TableColumn<Invoice, String> invoiceIdColumn;
-
-    @FXML private TableColumn<Invoice, String> invoiceDateColumn;
-    @FXML private TableColumn<Invoice, String> invoiceAmountColumn;
-    @FXML private TableColumn<Invoice, String> invoiceStatusColumn;
-
-    @FXML private TableColumn<Collection, String> collectionIdColumn;
-    @FXML private TableColumn<Collection, String> collectionDateColumn;
-    @FXML private TableColumn<Collection, String> collectionWasteColumn;
-    @FXML private TableColumn<Collection, String> collectionStatusColumn;
+    @FXML private Label unpaidAmountLabel;
+    @FXML private Label paidAmountLabel;
 
     private CustomerManager customerManager;
     private InvoiceManager invoiceManager;
@@ -54,19 +42,7 @@ public class CustomerStatisticsController {
 
     @FXML
     public void initialize() {
-    clearStatistics();
-
-    // Invoice table columns
-    invoiceIdColumn.setCellValueFactory(data -> new SimpleStringProperty(String.valueOf(data.getValue().getInvoiceId())));
-    invoiceDateColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getIssueDate().toString()));
-    invoiceAmountColumn.setCellValueFactory(data -> new SimpleStringProperty(String.format("%.2f €", data.getValue().getAmount())));
-    invoiceStatusColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getPaymentStatus().toString()));
-
-    // Collection table columns
-    collectionIdColumn.setCellValueFactory(data -> new SimpleStringProperty(String.valueOf(data.getValue().getCollectionId())));
-    collectionDateColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getCollectionDate().toString()));
-    collectionWasteColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getWaste().getWasteName()));
-    collectionStatusColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getCollectionStatus().toString()));
+        clearStatistics();
     }
 
     private void updateStatistics() {
@@ -89,8 +65,17 @@ public class CustomerStatisticsController {
         double totalAmount = invoices.stream().mapToDouble(Invoice::getAmount).sum();
         totalAmountLabel.setText(String.format("%.2f €", totalAmount));
 
-        invoicesTable.setItems(FXCollections.observableArrayList(invoices));
-        collectionsTable.setItems(FXCollections.observableArrayList(collections));
+        double unpaidAmount = invoices.stream()
+            .filter(inv -> !inv.getPaymentStatus().toString().equalsIgnoreCase("PAID"))
+            .mapToDouble(Invoice::getAmount)
+            .sum();
+        double paidAmount = invoices.stream()
+            .filter(inv -> inv.getPaymentStatus().toString().equalsIgnoreCase("PAID"))
+            .mapToDouble(Invoice::getAmount)
+            .sum();
+
+        unpaidAmountLabel.setText(String.format("%.2f €", unpaidAmount));
+        paidAmountLabel.setText(String.format("%.2f €", paidAmount));
     }
 
     private void clearStatistics() {
@@ -98,7 +83,7 @@ public class CustomerStatisticsController {
         totalInvoicesLabel.setText("-");
         totalCollectionsLabel.setText("-");
         totalAmountLabel.setText("-");
-        invoicesTable.getItems().clear();
-        collectionsTable.getItems().clear();
+        unpaidAmountLabel.setText("-");
+        paidAmountLabel.setText("-");
     }
 }
