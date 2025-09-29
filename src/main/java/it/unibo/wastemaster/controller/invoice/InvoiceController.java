@@ -115,6 +115,9 @@ public final class InvoiceController implements AutoRefreshable {
     @FXML
     private Button exportPdfButton;
 
+    @FXML
+    private Button viewCustomerButton;
+
     public void setInvoiceManager(InvoiceManager invoiceManager) {
         this.invoiceManager = invoiceManager;
     }
@@ -146,8 +149,11 @@ public final class InvoiceController implements AutoRefreshable {
         searchField.textProperty().addListener((obs, oldText, newText) -> handleSearch());
 
         invoiceTable.getSelectionModel().selectedItemProperty()
-                .addListener((obs, oldVal, newVal) -> updateButtons(newVal));
-   
+        .addListener((obs, oldVal, newVal) -> {
+            updateButtons(newVal);
+            // Dinamicamente abilita/disabilita il bottone "View Customer"
+            viewCustomerButton.setDisable(newVal == null);
+        });
 
         if (showDeletedCheckBox != null) {
             showDeletedCheckBox.setSelected(false);
