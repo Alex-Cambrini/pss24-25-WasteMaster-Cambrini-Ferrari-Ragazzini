@@ -12,10 +12,10 @@
         <Insets top="20" right="20" bottom="20" left="20"/>
     </padding>
     <children>
-        <Label text="Customer Statistics" styleClass="header-label"/>
+        <Label text="Customer Statistics" styleClass="title-3"/>
         <HBox spacing="10">
-            <Label text="Select Customer:"/>
-            <ComboBox fx:id="customerCombo" prefWidth="250"/>
+            <Label text="Customer:" styleClass="title-4"/>
+            <Label fx:id="customerNameLabel" text="-" styleClass="header-label"/>
         </HBox>
         <GridPane hgap="20" vgap="10">
             <columnConstraints>
@@ -34,19 +34,19 @@
         <Label text="Invoices"/>
         <TableView fx:id="invoicesTable" prefHeight="140">
             <columns>
-                <TableColumn text="ID" prefWidth="60"/>
-                <TableColumn text="Date" prefWidth="120"/>
-                <TableColumn text="Amount" prefWidth="100"/>
-                <TableColumn text="Status" prefWidth="100"/>
+                <TableColumn fx:id="invoiceIdColumn" text="ID" prefWidth="60"/>
+                <TableColumn fx:id="invoiceDateColumn" text="Date" prefWidth="120"/>
+                <TableColumn fx:id="invoiceAmountColumn" text="Amount" prefWidth="100"/>
+                <TableColumn fx:id="invoiceStatusColumn" text="Status" prefWidth="100"/>
             </columns>
         </TableView>
         <Label text="Collections"/>
         <TableView fx:id="collectionsTable" prefHeight="140">
             <columns>
-                <TableColumn text="ID" prefWidth="60"/>
-                <TableColumn text="Date" prefWidth="120"/>
-                <TableColumn text="Waste" prefWidth="120"/>
-                <TableColumn text="Status" prefWidth="100"/>
+                <TableColumn fx:id="collectionIdColumn" text="ID" prefWidth="60"/>
+                <TableColumn fx:id="collectionDateColumn" text="Date" prefWidth="120"/>
+                <TableColumn fx:id="collectionWasteColumn" text="Waste" prefWidth="120"/>
+                <TableColumn fx:id="collectionStatusColumn" text="Status" prefWidth="100"/>
             </columns>
         </TableView>
     </children>
