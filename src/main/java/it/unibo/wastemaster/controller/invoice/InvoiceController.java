@@ -461,19 +461,19 @@ public final class InvoiceController implements AutoRefreshable {
         Customer customer = selectedRow.getInvoice().getCustomer();
 
         try {
-            Optional<CustomerStatisticsController> controllerOpt = DialogUtils.showModalWithController(
-                    "Customer Statistics",
-                    "/layouts/customerstatistics/CustomerStatisticsView.fxml",
-                    AppContext.getOwner(),
-                    ctrl -> {
-                        ctrl.setCustomerManager(customerManager);
-                        ctrl.setInvoiceManager(invoiceManager);
-                        ctrl.setCollectionManager(collectionManager);
-                        // Seleziona direttamente il customer nella ComboBox
-                        ctrl.getCustomerCombo().setValue(customer);
-                    });
+        Optional<CustomerStatisticsController> controllerOpt = DialogUtils.showModalWithController(
+                "Customer Statistics",
+                "/layouts/customerstatistics/CustomerStatisticsView.fxml",
+                AppContext.getOwner(),
+                ctrl -> {
+                    ctrl.setCustomerManager(customerManager);
+                    ctrl.setInvoiceManager(invoiceManager);
+                    ctrl.setCollectionManager(collectionManager);
+                    ctrl.setCustomer(customer); 
+                });
 
-            // Nessuna azione post-dialog necessaria
+
+            
         } catch (IOException e) {
             e.printStackTrace();
             DialogUtils.showError("Loading Error", "Could not load Customer Statistics dialog.", AppContext.getOwner());
