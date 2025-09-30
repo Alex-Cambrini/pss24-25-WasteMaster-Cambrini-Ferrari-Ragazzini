@@ -198,7 +198,18 @@ public final class MainLayoutController {
 
     @FXML
     private void handleDashboard() {
-        // Future implementation
+    dashboardLink.setVisited(false);
+    setPageTitle("Dashboard");
+
+    
+    var controller = loadCenterWithController("/layouts/dashboard/DashboardView.fxml");
+    if (controller != null && controller instanceof it.unibo.wastemaster.controller.dashboard.DashboardController dashCtrl) {
+        dashCtrl.setCustomerManager(AppContext.getServiceFactory().getCustomerManager());
+        dashCtrl.setCollectionManager(AppContext.getServiceFactory().getCollectionManager());
+        dashCtrl.setInvoiceManager(AppContext.getServiceFactory().getInvoiceManager());
+        dashCtrl.setTripManager(AppContext.getServiceFactory().getTripManager());
+        dashCtrl.updateDashboard();
+    }
     }
 
     @FXML
