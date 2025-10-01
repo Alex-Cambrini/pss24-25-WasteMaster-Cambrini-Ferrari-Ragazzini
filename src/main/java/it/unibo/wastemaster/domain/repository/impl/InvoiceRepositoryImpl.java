@@ -5,6 +5,7 @@ import it.unibo.wastemaster.domain.model.Invoice;
 import it.unibo.wastemaster.domain.repository.InvoiceRepository;
 import it.unibo.wastemaster.infrastructure.dao.InvoiceDAO;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 public class InvoiceRepositoryImpl implements InvoiceRepository {
@@ -48,5 +49,24 @@ public class InvoiceRepositoryImpl implements InvoiceRepository {
     public List<Invoice> findByCustomer(Customer customer) {
         return invoiceDAO.findByCustomer(customer);
     }
+
+    @Override
+    public List<Invoice> findLast5InvoicesEvent() {
+        List<Invoice> created = invoiceDAO.findLast5Created();
+        List<Invoice> paid = invoiceDAO.findLast5Paid();
+
+        List<Invoice> combined = new ArrayList<>();
+        combined.addAll(created);
+        combined.addAll(paid);
+
+        combined.sort((i1, i2) -> {
+            LocalDate d1 = i1.getPaymentDate() != null ? i1.getPaymentDate() : i1.getIssueDate();
+            LocalDate d2 = i2.getPaymentDate() != null ? i2.getPaymentDate() : i2.getIssueDate();
+            return d2.compareTo(d1);
+        });
+
+        return combined.stream().limit(5).toList();
+    }
+
 }
 
