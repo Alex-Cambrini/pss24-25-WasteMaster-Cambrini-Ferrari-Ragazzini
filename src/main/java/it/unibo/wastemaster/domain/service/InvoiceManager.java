@@ -136,7 +136,4 @@ public class InvoiceManager {
         return false;
     }
 
-    public List<Invoice> getLast5InvoicesEvent() {
-        return invoiceRepository.findLast5InvoicesEvent();
-    }
 }

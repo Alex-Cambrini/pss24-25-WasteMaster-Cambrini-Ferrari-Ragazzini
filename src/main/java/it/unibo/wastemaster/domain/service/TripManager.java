@@ -232,10 +232,6 @@ public final class TripManager {
     }
 
 
-    public List<Trip> getLast5Trips() {
-        return tripRepository.findLast5Inserted();
-    }
-
     public enum IssueType {
         VEHICLE_PROBLEM,
         OPERATOR_PROBLEM,
