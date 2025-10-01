@@ -4,6 +4,7 @@ import it.unibo.wastemaster.domain.service.*;
 import it.unibo.wastemaster.domain.model.*;
 import javafx.fxml.FXML;
 import javafx.scene.chart.BarChart;
+import javafx.scene.chart.StackedBarChart;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
@@ -25,7 +26,7 @@ public class DashboardController {
     @FXML private Label totalTripsLabel;
     @FXML private Label invoicesToPayLabel;
     @FXML private ListView<String> notificationsList;
-    @FXML private BarChart<String, Number> collectionsChart;
+    @FXML private StackedBarChart<String, Number> collectionsChart;
 
     private CustomerManager customerManager;
     private CollectionManager collectionManager;
@@ -51,7 +52,6 @@ public class DashboardController {
 
     @FXML
     public void initialize() {
-        
     }
 
     public void updateDashboard() {
@@ -69,30 +69,44 @@ public class DashboardController {
             invoicesToPayLabel.setText(String.valueOf(toPay));
         }
 
-        
         if (collectionsChart != null && collectionManager != null) {
-            collectionsChart.getData().clear();
+        collectionsChart.getData().clear();
 
-            Map<String, Long> collectionsPerMonth = collectionManager.getAllCollections().stream()
-                .collect(Collectors.groupingBy(
-                    c -> c.getCollectionDate().getMonth().getDisplayName(TextStyle.SHORT, Locale.ENGLISH),
-                    Collectors.counting()
-                ));
+        XYChart.Series<String, Number> cancelledSeries = new XYChart.Series<>();
+        cancelledSeries.setName("Cancelled"); 
 
-            XYChart.Series<String, Number> series = new XYChart.Series<>();
-            series.setName("Collections");
+        XYChart.Series<String, Number> toPaySeries = new XYChart.Series<>();
+        toPaySeries.setName("To Pay"); 
 
-            
-            List<String> monthOrder = List.of("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec");
-            for (String month : monthOrder) {
-                long value = collectionsPerMonth.getOrDefault(month, 0L);
-                series.getData().add(new XYChart.Data<>(month, value));
-            }
+        XYChart.Series<String, Number> completedSeries = new XYChart.Series<>();
+        completedSeries.setName("Completed"); 
 
-            collectionsChart.getData().add(series);
+        List<String> monthOrder = List.of("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec");
+
+        for (String month : monthOrder) {
+            long cancelled = collectionManager.getAllCollections().stream()
+                .filter(c -> c.getCollectionDate().getMonth().getDisplayName(TextStyle.SHORT, Locale.ENGLISH).equals(month))
+                .filter(c -> c.getCollectionStatus() == Collection.CollectionStatus.CANCELLED)
+                .count();
+
+            long toPay = collectionManager.getAllCollections().stream()
+                .filter(c -> c.getCollectionDate().getMonth().getDisplayName(TextStyle.SHORT, Locale.ENGLISH).equals(month))
+                .filter(c -> c.getCollectionStatus() == Collection.CollectionStatus.ACTIVE)
+                .count();
+
+            long completed = collectionManager.getAllCollections().stream()
+                .filter(c -> c.getCollectionDate().getMonth().getDisplayName(TextStyle.SHORT, Locale.ENGLISH).equals(month))
+                .filter(c -> c.getCollectionStatus() == Collection.CollectionStatus.COMPLETED)
+                .count();
+
+            cancelledSeries.getData().add(new XYChart.Data<>(month, cancelled));
+            toPaySeries.getData().add(new XYChart.Data<>(month, toPay));
+            completedSeries.getData().add(new XYChart.Data<>(month, completed));
         }
 
-        
+        collectionsChart.getData().addAll(cancelledSeries, toPaySeries, completedSeries);
+    }
+
         List<String> notifications = new ArrayList<>();
 
         if (collectionManager != null && !collectionManager.getAllCollections().isEmpty()) {
