@@ -13,7 +13,9 @@ import it.unibo.wastemaster.domain.model.RecurringSchedule;
 import it.unibo.wastemaster.domain.model.Trip;
 import it.unibo.wastemaster.domain.model.Vehicle;
 import it.unibo.wastemaster.domain.model.Waste;
+import it.unibo.wastemaster.domain.model.WasteSchedule;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -77,6 +79,12 @@ class TripManagerTest extends AbstractDatabaseTest {
                 Waste waste2 = new Waste("Carta", true, false);
                 getWasteDAO().insert(waste1);
                 getWasteDAO().insert(waste2);
+                DayOfWeek cartaDay = LocalDate.now().plusDays(NEXT_COLLECTION_DAYS).getDayOfWeek();
+                WasteSchedule cartaSchedule = new WasteSchedule(waste2, cartaDay);
+                getWasteScheduleDAO().insert(cartaSchedule);
+                DayOfWeek organicoDay = LocalDate.now().getDayOfWeek();
+                WasteSchedule organicoSchedule = new WasteSchedule(waste1, organicoDay);
+                getWasteScheduleDAO().insert(organicoSchedule);
 
                 OneTimeSchedule oneTime1 = new OneTimeSchedule(customer1, waste1, LocalDate.now().plusDays(1));
                 RecurringSchedule recurring = new RecurringSchedule(customer2, waste2, LocalDate.now(),
@@ -139,44 +147,44 @@ class TripManagerTest extends AbstractDatabaseTest {
 
         @Test
         void testUpdateTrip_and_SoftDeleteTrip() {
-        List<Collection> collections = createCollections();
-        getTripManager().createTrip(
-                "40100",
-                vehicle1,
-                new ArrayList<>(List.of(operator1, operator2)),
-                departureTime,
-                expectedReturnTime,
-                new ArrayList<>(collections));
+                List<Collection> collections = createCollections();
+                getTripManager().createTrip(
+                                "40100",
+                                vehicle1,
+                                new ArrayList<>(List.of(operator1, operator2)),
+                                departureTime,
+                                expectedReturnTime,
+                                new ArrayList<>(collections));
 
-        Trip trip = getTripDAO().findAll().get(0);
+                Trip trip = getTripDAO().findAll().get(0);
 
-        trip.setStatus(Trip.TripStatus.COMPLETED);
-        getTripManager().updateTrip(trip);
+                trip.setStatus(Trip.TripStatus.COMPLETED);
+                getTripManager().updateTrip(trip);
 
-        Trip afterUpdate = getTripDAO().findById(trip.getTripId()).orElseThrow();
-        assertEquals(Trip.TripStatus.COMPLETED, afterUpdate.getStatus());
+                Trip afterUpdate = getTripDAO().findById(trip.getTripId()).orElseThrow();
+                assertEquals(Trip.TripStatus.COMPLETED, afterUpdate.getStatus());
 
-        assertFalse(getTripManager().softDeleteTrip(afterUpdate));
+                assertFalse(getTripManager().softDeleteTrip(afterUpdate));
 
-        List<Collection> collections2 = createCollections();
-        getTripManager().createTrip(
-                "20100",
-                vehicle1,
-                new ArrayList<>(List.of(operator1)),
-                departureTime.plusDays(1),
-                expectedReturnTime.plusDays(1),
-                new ArrayList<>(collections2));
-        Trip activeTrip = getTripDAO().findAll().stream()
-                .filter(t -> t.getStatus() == Trip.TripStatus.ACTIVE)
-                .findFirst().orElseThrow();
-        assertTrue(getTripManager().softDeleteTrip(activeTrip));
-        Trip canceled = getTripManager().getTripById(activeTrip.getTripId()).orElseThrow();
-        assertEquals(Trip.TripStatus.CANCELED, canceled.getStatus());
+                List<Collection> collections2 = createCollections();
+                getTripManager().createTrip(
+                                "20100",
+                                vehicle1,
+                                new ArrayList<>(List.of(operator1)),
+                                departureTime.plusDays(1),
+                                expectedReturnTime.plusDays(1),
+                                new ArrayList<>(collections2));
+                Trip activeTrip = getTripDAO().findAll().stream()
+                                .filter(t -> t.getStatus() == Trip.TripStatus.ACTIVE)
+                                .findFirst().orElseThrow();
+                assertTrue(getTripManager().softDeleteTrip(activeTrip));
+                Trip canceled = getTripManager().getTripById(activeTrip.getTripId()).orElseThrow();
+                assertEquals(Trip.TripStatus.CANCELED, canceled.getStatus());
 
-        assertFalse(getTripManager().softDeleteTrip(null));
-        Trip noId = new Trip();
-        noId.setCollections(new ArrayList<>());
-        assertFalse(getTripManager().softDeleteTrip(noId));
+                assertFalse(getTripManager().softDeleteTrip(null));
+                Trip noId = new Trip();
+                noId.setCollections(new ArrayList<>());
+                assertFalse(getTripManager().softDeleteTrip(noId));
         }
 
         @Test
@@ -215,27 +223,6 @@ class TripManagerTest extends AbstractDatabaseTest {
                 assertThrows(IllegalArgumentException.class,
                                 () -> getTripManager().updateOperators(trip.getTripId(), new ArrayList<>()));
         }
-
-//        @Test
-//        void testGetTripsForCurrentUser() {
-//                List<Collection> collections1 = createCollections();
-//                List<Collection> collections2 = createCollections();
-//
-//                getTripManager().createTrip(
-//                                "40100", vehicle1,
-//                                new ArrayList<>(List.of(operator1)),
-//                                departureTime, expectedReturnTime,
-//                                new ArrayList<>(collections1));
-//
-//                getTripManager().createTrip(
-//                                "20100", vehicle1,
-//                                new ArrayList<>(List.of(operator2)),
-//                                departureTime.plusDays(1), expectedReturnTime.plusDays(1),
-//                                new ArrayList<>(collections2));
-//
-//                List<Trip> all = getTripManager().getTripsForCurrentUser();
-//                assertTrue(all.size() >= 2);
-//        }
 
         @Test
         void testGetTripByIdNotFound() {
@@ -306,118 +293,145 @@ class TripManagerTest extends AbstractDatabaseTest {
                 assertTrue(caps.contains("40100"));
         }
 
-
         @Test
         void testGetTripsForCurrentUser() {
-        List<Collection> collections1 = createCollections();
-        List<Collection> collections2 = createCollections();
+                List<Collection> collections1 = createCollections();
+                List<Collection> collections2 = createCollections();
 
-        getTripManager().createTrip(
-                "40100", vehicle1,
-                new ArrayList<>(List.of(operator1)),
-                departureTime, expectedReturnTime,
-                new ArrayList<>(collections1));
+                getTripManager().createTrip(
+                                "40100", vehicle1,
+                                new ArrayList<>(List.of(operator1)),
+                                departureTime, expectedReturnTime,
+                                new ArrayList<>(collections1));
 
-        getTripManager().createTrip(
-                "20100", vehicle1,
-                new ArrayList<>(List.of(operator2)),
-                departureTime.plusDays(1), expectedReturnTime.plusDays(1),
-                new ArrayList<>(collections2));
+                getTripManager().createTrip(
+                                "20100", vehicle1,
+                                new ArrayList<>(List.of(operator2)),
+                                departureTime.plusDays(1), expectedReturnTime.plusDays(1),
+                                new ArrayList<>(collections2));
 
-       
-        Employee admin = new Employee("Admin", "User", new Location("Via Admin", "1", "Bologna", "40100"),
-                "admin@example.com", "0000000000", Employee.Role.ADMINISTRATOR, Employee.Licence.C1);
-        List<Trip> allTrips = getTripManager().getTripsForCurrentUser(admin);
-        assertTrue(allTrips.size() >= 2);
+                Employee admin = new Employee("Admin", "User", new Location("Via Admin", "1", "Bologna", "40100"),
+                                "admin@example.com", "0000000000", Employee.Role.ADMINISTRATOR, Employee.Licence.C1);
+                List<Trip> allTrips = getTripManager().getTripsForCurrentUser(admin);
+                assertTrue(allTrips.size() >= 2);
 
-        List<Trip> operator1Trips = getTripManager().getTripsForCurrentUser(operator1);
-        assertTrue(operator1Trips.stream().allMatch(t -> t.getOperators().contains(operator1)));
-        List<Trip> operator2Trips = getTripManager().getTripsForCurrentUser(operator2);
-        assertTrue(operator2Trips.stream().allMatch(t -> t.getOperators().contains(operator2)));
+                List<Trip> operator1Trips = getTripManager().getTripsForCurrentUser(operator1);
+                assertTrue(operator1Trips.stream().allMatch(t -> t.getOperators().contains(operator1)));
+                List<Trip> operator2Trips = getTripManager().getTripsForCurrentUser(operator2);
+                assertTrue(operator2Trips.stream().allMatch(t -> t.getOperators().contains(operator2)));
         }
 
         @Test
         void testSetTripAsCompleted_allCases() {
-        // Create an ACTIVE trip with ACTIVE collections
-        List<Collection> collections = createCollections();
-        collections.forEach(c -> c.setCollectionStatus(Collection.CollectionStatus.ACTIVE));
-        getTripManager().createTrip(
-                "40100",
-                vehicle1,
-                new ArrayList<>(List.of(operator1, operator2)),
-                departureTime,
-                expectedReturnTime,
-                new ArrayList<>(collections));
-        Trip trip = getTripDAO().findAll().get(0);
+                // Create an ACTIVE trip with ACTIVE collections
+                List<Collection> collections = createCollections();
+                collections.forEach(c -> c.setCollectionStatus(Collection.CollectionStatus.ACTIVE));
+                getTripManager().createTrip(
+                                "40100",
+                                vehicle1,
+                                new ArrayList<>(List.of(operator1, operator2)),
+                                departureTime,
+                                expectedReturnTime,
+                                new ArrayList<>(collections));
+                Trip trip = getTripDAO().findAll().get(0);
 
-        // Case 1: ACTIVE trip -> should become COMPLETED and all collections should be COMPLETED
-        assertEquals(Trip.TripStatus.ACTIVE, trip.getStatus());
-        boolean completed = getTripManager().setTripAsCompleted(trip);
-        assertTrue(completed);
-        Trip updated = getTripManager().getTripById(trip.getTripId()).orElseThrow();
-        assertEquals(Trip.TripStatus.COMPLETED, updated.getStatus());
-        updated.getCollections().forEach(c ->
-                assertEquals(Collection.CollectionStatus.COMPLETED, c.getCollectionStatus())
-        );
+                // Case 1: ACTIVE trip -> should become COMPLETED and all collections should be
+                // COMPLETED
+                assertEquals(Trip.TripStatus.ACTIVE, trip.getStatus());
+                boolean completed = getTripManager().setTripAsCompleted(trip);
+                assertTrue(completed);
+                Trip updated = getTripManager().getTripById(trip.getTripId()).orElseThrow();
+                assertEquals(Trip.TripStatus.COMPLETED, updated.getStatus());
+                updated.getCollections().forEach(
+                                c -> assertEquals(Collection.CollectionStatus.COMPLETED, c.getCollectionStatus()));
 
-        // Case 2: already COMPLETED trip -> should not change
-        boolean completedAgain = getTripManager().setTripAsCompleted(updated);
-        assertFalse(completedAgain);
+                // Case 2: already COMPLETED trip -> should not change
+                boolean completedAgain = getTripManager().setTripAsCompleted(updated);
+                assertFalse(completedAgain);
 
-        // Case 3: CANCELED trip -> should not change
-        updated.setStatus(Trip.TripStatus.CANCELED);
-        getTripManager().updateTrip(updated);
-        boolean completedCanceled = getTripManager().setTripAsCompleted(updated);
-        assertFalse(completedCanceled);
+                // Case 3: CANCELED trip -> should not change
+                updated.setStatus(Trip.TripStatus.CANCELED);
+                getTripManager().updateTrip(updated);
+                boolean completedCanceled = getTripManager().setTripAsCompleted(updated);
+                assertFalse(completedCanceled);
 
-        // Case 4: trip with NON ACTIVE collections -> should not change
-        updated.setStatus(Trip.TripStatus.ACTIVE);
-        getTripManager().updateTrip(updated);
-        updated.getCollections().forEach(c -> c.setCollectionStatus(Collection.CollectionStatus.COMPLETED));
-        updated.getCollections().forEach(c -> getCollectionDAO().update(c));
-        boolean completedWithNonActiveCollections = getTripManager().setTripAsCompleted(updated);
-        assertFalse(completedWithNonActiveCollections);
+                // Case 4: trip with NON ACTIVE collections -> should not change
+                updated.setStatus(Trip.TripStatus.ACTIVE);
+                getTripManager().updateTrip(updated);
+                updated.getCollections().forEach(c -> c.setCollectionStatus(Collection.CollectionStatus.COMPLETED));
+                updated.getCollections().forEach(c -> getCollectionDAO().update(c));
+                boolean completedWithNonActiveCollections = getTripManager().setTripAsCompleted(updated);
+                assertFalse(completedWithNonActiveCollections);
 
-        // Case 5: null trip -> should not change
-        boolean completedNull = getTripManager().setTripAsCompleted(null);
-        assertFalse(completedNull);
+                // Case 5: null trip -> should not change
+                boolean completedNull = getTripManager().setTripAsCompleted(null);
+                assertFalse(completedNull);
         }
 
         @Test
         void testGetCollectionsByTrip() {
-        // Create a trip with two collections
-        List<Collection> collections = createCollections();
-        getTripManager().createTrip(
-                "40100",
-                vehicle1,
-                new ArrayList<>(List.of(operator1, operator2)),
-                departureTime,
-                expectedReturnTime,
-                new ArrayList<>(collections));
-        Trip trip = getTripDAO().findAll().get(0);
+                List<Collection> collections = createCollections();
+                getTripManager().createTrip(
+                                "40100",
+                                vehicle1,
+                                new ArrayList<>(List.of(operator1, operator2)),
+                                departureTime,
+                                expectedReturnTime,
+                                new ArrayList<>(collections));
+                Trip trip = getTripDAO().findAll().get(0);
 
-        // Should return all collections associated with the trip
-        List<Collection> result = getTripManager().getCollectionsByTrip(trip);
-        assertEquals(collections.size(), result.size());
-        assertTrue(result.containsAll(collections));
+                List<Collection> result = getTripManager().getCollectionsByTrip(trip);
+                assertEquals(collections.size(), result.size());
+                assertTrue(result.containsAll(collections));
 
-        // Edge case: trip with no collections
-        getTripManager().createTrip(
-                "20100",
-                vehicle1,
-                new ArrayList<>(List.of(operator1)),
-                departureTime.plusDays(1),
-                expectedReturnTime.plusDays(1),
-                new ArrayList<>());
-        Trip emptyTrip = getTripDAO().findAll().stream()
-                .filter(t -> t.getPostalCode().equals("20100"))
-                .findFirst().orElseThrow();
-        List<Collection> emptyResult = getTripManager().getCollectionsByTrip(emptyTrip);
-        assertTrue(emptyResult.isEmpty());
+                getTripManager().createTrip(
+                                "20100",
+                                vehicle1,
+                                new ArrayList<>(List.of(operator1)),
+                                departureTime.plusDays(1),
+                                expectedReturnTime.plusDays(1),
+                                new ArrayList<>());
+                Trip emptyTrip = getTripDAO().findAll().stream()
+                                .filter(t -> t.getPostalCode().equals("20100"))
+                                .findFirst().orElseThrow();
+                List<Collection> emptyResult = getTripManager().getCollectionsByTrip(emptyTrip);
+                assertTrue(emptyResult.isEmpty());
 
-        // Edge case: null trip
-        assertThrows(NullPointerException.class, () -> getTripManager().getCollectionsByTrip(null));
+                assertThrows(NullPointerException.class, () -> getTripManager().getCollectionsByTrip(null));
         }
 
+        @Test
+        void testSoftDeleteAndRescheduleNextCollection() {
+                List<Collection> collections = createCollections();
 
+                collections.forEach(c -> c.setCollectionStatus(Collection.CollectionStatus.ACTIVE));
+                getTripManager().createTrip(
+                                "40100",
+                                vehicle1,
+                                new ArrayList<>(List.of(operator1, operator2)),
+                                departureTime,
+                                expectedReturnTime,
+                                new ArrayList<>(collections));
+                Trip trip = getTripDAO().findAll().get(0);
+                assertEquals(Trip.TripStatus.ACTIVE, trip.getStatus());
+
+                RecurringSchedule recurring = getRecurringScheduleDAO().findAll().stream()
+                                .findFirst().orElseThrow();
+                LocalDate oldNext = recurring.getNextCollectionDate();
+                DayOfWeek allowedDay = oldNext.getDayOfWeek();
+                WasteSchedule cartaSchedule = new WasteSchedule(recurring.getWaste(), allowedDay);
+                getWasteScheduleDAO().insert(cartaSchedule);
+
+                boolean ok = getTripManager().softDeleteAndRescheduleNextCollection(trip);
+                assertTrue(ok, "Soft delete + reschedule should succeed");
+
+                Trip updatedTrip = getTripManager().getTripById(trip.getTripId()).orElseThrow();
+                assertEquals(Trip.TripStatus.CANCELED, updatedTrip.getStatus());
+                updatedTrip.getCollections().forEach(
+                                c -> assertEquals(Collection.CollectionStatus.CANCELLED, c.getCollectionStatus()));
+
+                RecurringSchedule after = getRecurringScheduleDAO().findById(recurring.getScheduleId()).orElseThrow();
+                assertEquals(oldNext.plusDays(NEXT_COLLECTION_DAYS), after.getNextCollectionDate(),
+                                "NextCollectionDate should be moved forward by the frequency");
+        }
 }

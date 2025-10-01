@@ -32,8 +32,8 @@ public final class TripManager {
     private NotificationService notificationService;
 
     public TripManager(final TripRepository tripRepository,
-                       final CollectionRepository collectionRepository,
-                       final RecurringScheduleManager recurringScheduleManager) {
+            final CollectionRepository collectionRepository,
+            final RecurringScheduleManager recurringScheduleManager) {
         this.tripRepository = tripRepository;
         this.collectionRepository = collectionRepository;
         this.recurringScheduleManager = recurringScheduleManager;
@@ -101,19 +101,21 @@ public final class TripManager {
         }
         for (Collection collection : trip.getCollections()) {
             collection.setCollectionStatus(Collection.CollectionStatus.CANCELLED);
-                collectionRepository.update(collection);
-                recurringScheduleManager.rescheduleNextCollection(collection);
+            collectionRepository.update(collection);
+            recurringScheduleManager.rescheduleNextCollection(collection);
         }
         return true;
     }
 
-    public List<Employee> getAvailableOperatorsExcludeDriverToEdit(LocalDateTime depDateTime, LocalDateTime retDateTime, Employee selectedDriver,
-                                                                   Trip tripToEdit) {
+    public List<Employee> getAvailableOperatorsExcludeDriverToEdit(LocalDateTime depDateTime, LocalDateTime retDateTime,
+            Employee selectedDriver,
+            Trip tripToEdit) {
         return tripRepository.findAvailableOperatorsExcludeDriverToEdit(depDateTime,
                 retDateTime, selectedDriver, tripToEdit);
     }
 
-    public List<Employee> getQualifiedDriversToEdit(LocalDateTime depDateTime, LocalDateTime retDateTime, List<Licence> allowedLicences, Trip tripToEdit) {
+    public List<Employee> getQualifiedDriversToEdit(LocalDateTime depDateTime, LocalDateTime retDateTime,
+            List<Licence> allowedLicences, Trip tripToEdit) {
         return tripRepository.findQualifiedDriversToEdit(depDateTime, retDateTime, allowedLicences, tripToEdit);
     }
 
@@ -231,6 +233,9 @@ public final class TripManager {
         tripRepository.update(trip);
     }
 
+    public int countCompletedTrips() {
+        return tripRepository.countCompleted();
+    }
 
     public enum IssueType {
         VEHICLE_PROBLEM,

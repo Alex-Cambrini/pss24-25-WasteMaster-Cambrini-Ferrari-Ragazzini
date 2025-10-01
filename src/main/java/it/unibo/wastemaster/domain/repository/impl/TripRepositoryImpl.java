@@ -56,7 +56,7 @@ public class TripRepositoryImpl implements TripRepository {
 
     @Override
     public List<Employee> findQualifiedDrivers(LocalDateTime start, LocalDateTime end,
-                                               List<Licence> allowedLicences) {
+            List<Licence> allowedLicences) {
         List<Employee> available = tripDAO.findAvailableOperators(start, end);
 
         return available.stream()
@@ -66,8 +66,8 @@ public class TripRepositoryImpl implements TripRepository {
 
     @Override
     public List<Employee> findAvailableOperatorsExcludeDriver(LocalDateTime start,
-                                                              LocalDateTime end,
-                                                              Employee driver) {
+            LocalDateTime end,
+            Employee driver) {
         List<Employee> available = tripDAO.findAvailableOperators(start, end);
         if (driver != null) {
             available.remove(driver);
@@ -77,11 +77,10 @@ public class TripRepositoryImpl implements TripRepository {
 
     @Override
     public List<Employee> findQualifiedDriversToEdit(LocalDateTime start,
-                                                     LocalDateTime end,
-                                                     List<Licence> allowedLicences,
-                                                     Trip tripToEdit) {
-        List<Employee> available =
-                tripDAO.findAvailableOperatorsForEdit(start, end, tripToEdit);
+            LocalDateTime end,
+            List<Licence> allowedLicences,
+            Trip tripToEdit) {
+        List<Employee> available = tripDAO.findAvailableOperatorsForEdit(start, end, tripToEdit);
         return available.stream()
                 .filter(e -> allowedLicences.contains(e.getLicence()))
                 .toList();
@@ -89,11 +88,10 @@ public class TripRepositoryImpl implements TripRepository {
 
     @Override
     public List<Employee> findAvailableOperatorsExcludeDriverToEdit(LocalDateTime start,
-                                                                    LocalDateTime end,
-                                                                    Employee driver,
-                                                                    Trip tripToEdit) {
-        List<Employee> available =
-                tripDAO.findAvailableOperatorsForEdit(start, end, tripToEdit);
+            LocalDateTime end,
+            Employee driver,
+            Trip tripToEdit) {
+        List<Employee> available = tripDAO.findAvailableOperatorsForEdit(start, end, tripToEdit);
         if (driver != null) {
             available.remove(driver);
         }
@@ -109,5 +107,9 @@ public class TripRepositoryImpl implements TripRepository {
     public List<Trip> findLast5Inserted() {
         return tripDAO.findLast5Inserted();
     }
-}
 
+    @Override
+    public int countCompleted() {
+        return tripDAO.countCompleted();
+    }
+}
