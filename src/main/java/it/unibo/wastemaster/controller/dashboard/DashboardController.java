@@ -24,6 +24,7 @@ public class DashboardController {
     private CollectionManager collectionManager;
     private InvoiceManager invoiceManager;
     private TripManager tripManager;
+    private Employee currentUser;
 
     public void setCustomerManager(CustomerManager customerManager) {
         this.customerManager = customerManager;
@@ -37,6 +38,9 @@ public class DashboardController {
     public void setTripManager(TripManager tripManager) {
         this.tripManager = tripManager;
     }
+    public void setCurrentUser(Employee currentUser) {
+        this.currentUser = currentUser;
+    }
 
     @FXML
     public void initialize() {
@@ -45,61 +49,71 @@ public class DashboardController {
 
     public void updateDashboard() {
 
-        System.out.println("Customers: " + (customerManager != null ? customerManager.getAllCustomers().size() : "null"));
-        System.out.println("Collections: " + (collectionManager != null ? collectionManager.getAllCollections().size() : "null"));
-        System.out.println("Trips: " + (tripManager != null ? tripManager.getTripsForCurrentUser(null).size() : "null"));
-        System.out.println("Invoices: " + (invoiceManager != null ? invoiceManager.getAllInvoices().size() : "null"));
-
-    List<String> notifications = new ArrayList<>();
-
-    if (collectionManager != null && !collectionManager.getAllCollections().isEmpty()) {
-        Collection lastCollection = collectionManager.getAllCollections().stream()
-            .max(Comparator.comparing(Collection::getCollectionDate))
-            .orElse(null);
-        if (lastCollection != null) {
-            String customerName = lastCollection.getSchedule().getCustomer().getSurname();
-            notifications.add("Last collection: " + customerName + ", " + lastCollection.getCollectionDate());
+       
+        
+        if (customerManager != null)
+            totalCustomersLabel.setText(String.valueOf(customerManager.getAllCustomers().size()));
+        if (collectionManager != null)
+            totalCollectionsLabel.setText(String.valueOf(collectionManager.getAllCollections().size()));
+        if (tripManager != null && currentUser != null)
+            totalTripsLabel.setText(String.valueOf(tripManager.getTripsForCurrentUser(currentUser).size()));
+        if (invoiceManager != null) {
+            long toPay = invoiceManager.getAllInvoices().stream()
+                .filter(inv -> inv.getPaymentStatus() != Invoice.PaymentStatus.PAID)
+                .count();
+            invoicesToPayLabel.setText(String.valueOf(toPay));
         }
-    }
 
-    if (tripManager != null && !tripManager.getTripsForCurrentUser(null).isEmpty()) {
-        Trip lastTrip = tripManager.getTripsForCurrentUser(null).stream()
-            .max(Comparator.comparing(Trip::getDepartureTime))
-            .orElse(null);
-        if (lastTrip != null) {
-            String vehiclePlate = lastTrip.getAssignedVehicle() != null ? lastTrip.getAssignedVehicle().getPlate() : "N/A";
-            notifications.add("Last trip: " + vehiclePlate + ", " + lastTrip.getDepartureTime());
+        List<String> notifications = new ArrayList<>();
+
+        if (collectionManager != null && !collectionManager.getAllCollections().isEmpty()) {
+            Collection lastCollection = collectionManager.getAllCollections().stream()
+                .max(Comparator.comparing(Collection::getCollectionDate))
+                .orElse(null);
+            if (lastCollection != null) {
+                String customerName = lastCollection.getSchedule().getCustomer().getSurname();
+                notifications.add("Last collection: " + customerName + ", " + lastCollection.getCollectionDate());
+            }
         }
-    }
 
-    if (invoiceManager != null && !invoiceManager.getAllInvoices().isEmpty()) {
-        Invoice lastInvoice = invoiceManager.getAllInvoices().stream()
-            .max(Comparator.comparing(Invoice::getIssueDate))
-            .orElse(null);
-        if (lastInvoice != null) {
-            notifications.add("Last invoice: #" + lastInvoice.getInvoiceId() + ", " + lastInvoice.getIssueDate());
+        if (tripManager != null && currentUser != null && !tripManager.getTripsForCurrentUser(currentUser).isEmpty()) {
+            Trip lastTrip = tripManager.getTripsForCurrentUser(currentUser).stream()
+                .max(Comparator.comparing(Trip::getDepartureTime))
+                .orElse(null);
+            if (lastTrip != null) {
+                String vehiclePlate = lastTrip.getAssignedVehicle() != null ? lastTrip.getAssignedVehicle().getPlate() : "N/A";
+                notifications.add("Last trip: " + vehiclePlate + ", " + lastTrip.getDepartureTime());
+            }
         }
-    }
 
-    if (customerManager != null && !customerManager.getAllCustomers().isEmpty()) {
-        List<Customer> customers = customerManager.getAllCustomers();
-        Customer lastCustomer = customers.get(customers.size() - 1);
-        notifications.add("New customer: " + lastCustomer.getSurname());
-    }
+        if (invoiceManager != null && !invoiceManager.getAllInvoices().isEmpty()) {
+            Invoice lastInvoice = invoiceManager.getAllInvoices().stream()
+                .max(Comparator.comparing(Invoice::getIssueDate))
+                .orElse(null);
+            if (lastInvoice != null) {
+                notifications.add("Last invoice: #" + lastInvoice.getInvoiceId() + ", " + lastInvoice.getIssueDate());
+            }
+        }
 
-    if (invoiceManager != null && !invoiceManager.getAllInvoices().isEmpty()) {
-        Optional<Invoice> nextDueOpt = invoiceManager.getAllInvoices().stream()
-            .filter(inv -> inv.getPaymentStatus() != Invoice.PaymentStatus.PAID)
-            .min(Comparator.comparing(Invoice::getIssueDate));
-        nextDueOpt.ifPresent(nextDue -> {
-            notifications.add("Upcoming invoice: #" + nextDue.getInvoiceId());
-        });
-    }
+        if (customerManager != null && !customerManager.getAllCustomers().isEmpty()) {
+            List<Customer> customers = customerManager.getAllCustomers();
+            Customer lastCustomer = customers.get(customers.size() - 1);
+            notifications.add("New customer: " + lastCustomer.getSurname());
+        }
 
-    List<String> displayNotifications = notifications.isEmpty()
-        ? List.of()
-        : List.of(notifications.get(notifications.size() - 1));
+        if (invoiceManager != null && !invoiceManager.getAllInvoices().isEmpty()) {
+            Optional<Invoice> nextDueOpt = invoiceManager.getAllInvoices().stream()
+                .filter(inv -> inv.getPaymentStatus() != Invoice.PaymentStatus.PAID)
+                .min(Comparator.comparing(Invoice::getIssueDate));
+            nextDueOpt.ifPresent(nextDue -> {
+                notifications.add("Upcoming invoice: #" + nextDue.getInvoiceId());
+            });
+        }
 
-    notificationsList.setItems(FXCollections.observableArrayList(displayNotifications));
+        List<String> displayNotifications = notifications.isEmpty()
+            ? List.of()
+            : List.of(notifications.get(notifications.size() - 1));
+
+        notificationsList.setItems(FXCollections.observableArrayList(displayNotifications));
     }
 }
