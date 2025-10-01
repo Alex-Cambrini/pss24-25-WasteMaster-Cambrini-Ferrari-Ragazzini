@@ -15,7 +15,7 @@ public class NotificationManager {
     private final InvoiceRepository invoiceRepository;
     private final CustomerRepository customerRepository;
 
-    private NotificationManager(TripRepository tripRepository,
+    public NotificationManager(TripRepository tripRepository,
                                 InvoiceRepository invoiceRepository,
                                 CustomerRepository customerRepository) {
         this.tripRepository = tripRepository;
