@@ -8,6 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import it.unibo.wastemaster.infrastructure.AbstractDatabaseTest;
 import it.unibo.wastemaster.domain.model.Collection.CollectionStatus;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -46,7 +47,7 @@ class InvoiceTest extends AbstractDatabaseTest {
 
         invoice = new Invoice(customer, List.of(collection), 0, 0, 0, 0, null);
         invoice.setAmount(100.0);
-        invoice.setIssueDate(LocalDate.now());
+        invoice.setIssueDate(LocalDateTime.now());
         invoice.setPaymentStatus(Invoice.PaymentStatus.PAID);
     }
 

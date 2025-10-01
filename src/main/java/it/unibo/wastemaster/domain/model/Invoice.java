@@ -1,8 +1,19 @@
 package it.unibo.wastemaster.domain.model;
 
-import jakarta.persistence.*;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,10 +36,10 @@ public class Invoice {
 
     @Column(nullable = false)
     @NotNull(message = "The issue date cannot be null")
-    private LocalDate issueDate;
+    private LocalDateTime issueDate;
 
     @Column
-    private LocalDate paymentDate;
+    private LocalDateTime paymentDate;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -59,7 +70,7 @@ public class Invoice {
 
     public Invoice(Customer customer, List<Collection> collections, 
                 double totalRecurring, double totalOnetime, 
-                int recurringCount, int onetimeCount, LocalDate issueDate) {
+                int recurringCount, int onetimeCount, LocalDateTime issueDate) {
         this.customer = customer;
         this.collections = new ArrayList<>(collections);
         this.totalRecurring = totalRecurring;
@@ -91,11 +102,11 @@ public class Invoice {
         this.customer = customer;
     }
 
-    public LocalDate getIssueDate() {
+    public LocalDateTime getIssueDate() {
         return issueDate;
     }
 
-    public void setIssueDate(final LocalDate issueDate) {
+    public void setIssueDate(final LocalDateTime issueDate) {
         this.issueDate = issueDate;
     }
 
@@ -127,11 +138,11 @@ public class Invoice {
         return totalOnetime;
     }
 
-    public LocalDate getPaymentDate() {
+    public LocalDateTime getPaymentDate() {
         return paymentDate;
     }
 
-    public void setPaymentDate(final LocalDate paymentDate) {
+    public void setPaymentDate(final LocalDateTime paymentDate) {
         this.paymentDate = paymentDate;
     }
 
