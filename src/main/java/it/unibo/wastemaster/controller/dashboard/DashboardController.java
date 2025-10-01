@@ -2,7 +2,8 @@ package it.unibo.wastemaster.controller.dashboard;
 
 import it.unibo.wastemaster.domain.service.*;
 import it.unibo.wastemaster.domain.model.*;
-import javafx.fxml.FXML;import javafx.scene.chart.StackedBarChart;
+import javafx.fxml.FXML;
+import javafx.scene.chart.StackedBarChart;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
@@ -14,12 +15,18 @@ import java.util.Locale;
 
 public class DashboardController {
 
-    @FXML private Label totalCustomersLabel;
-    @FXML private Label totalCollectionsLabel;
-    @FXML private Label totalTripsLabel;
-    @FXML private Label invoicesToPayLabel;
-    @FXML private ListView<String> notificationsList;
-    @FXML private StackedBarChart<String, Number> collectionsChart;
+    @FXML
+    private Label totalCustomersLabel;
+    @FXML
+    private Label totalCollectionsLabel;
+    @FXML
+    private Label totalTripsLabel;
+    @FXML
+    private Label invoicesToPayLabel;
+    @FXML
+    private ListView<String> notificationsList;
+    @FXML
+    private StackedBarChart<String, Number> collectionsChart;
 
     private CustomerManager customerManager;
     private CollectionManager collectionManager;
@@ -28,15 +35,29 @@ public class DashboardController {
     private NotificationManager notificationManager;
 
     // --- Setters ---
-    public void setCustomerManager(CustomerManager customerManager) { this.customerManager = customerManager; }
-    public void setCollectionManager(CollectionManager collectionManager) { this.collectionManager = collectionManager; }
-    public void setInvoiceManager(InvoiceManager invoiceManager) { this.invoiceManager = invoiceManager; }
-    public void setTripManager(TripManager tripManager) { this.tripManager = tripManager; }
-    public void setNotificationManager(NotificationManager notificationManager) { this.notificationManager = notificationManager; }
+    public void setCustomerManager(CustomerManager customerManager) {
+        this.customerManager = customerManager;
+    }
 
+    public void setCollectionManager(CollectionManager collectionManager) {
+        this.collectionManager = collectionManager;
+    }
+
+    public void setInvoiceManager(InvoiceManager invoiceManager) {
+        this.invoiceManager = invoiceManager;
+    }
+
+    public void setTripManager(TripManager tripManager) {
+        this.tripManager = tripManager;
+    }
+
+    public void setNotificationManager(NotificationManager notificationManager) {
+        this.notificationManager = notificationManager;
+    }
 
     @FXML
-    public void initialize() { }
+    public void initialize() {
+    }
 
     // --- Main dashboard update ---
     public void initData() {
@@ -51,6 +72,8 @@ public class DashboardController {
             totalCustomersLabel.setText(String.valueOf(customerManager.getAllCustomers().size()));
         if (collectionManager != null)
             totalCollectionsLabel.setText(String.valueOf(collectionManager.getAllCollections().size()));
+        if (tripManager != null)
+            totalTripsLabel.setText(String.valueOf(tripManager.countCompletedTrips()));
         if (invoiceManager != null) {
             long toPay = invoiceManager.getAllInvoices().stream()
                     .filter(inv -> inv.getPaymentStatus() != Invoice.PaymentStatus.PAID)
@@ -61,7 +84,8 @@ public class DashboardController {
 
     // --- Collections chart ---
     private void updateCollectionsChart() {
-        if (collectionsChart == null || collectionManager == null) return;
+        if (collectionsChart == null || collectionManager == null)
+            return;
 
         collectionsChart.getData().clear();
 
@@ -72,19 +96,23 @@ public class DashboardController {
         XYChart.Series<String, Number> completedSeries = new XYChart.Series<>();
         completedSeries.setName("Completed");
 
-        List<String> monthOrder = List.of("Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec");
+        List<String> monthOrder = List.of("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov",
+                "Dec");
 
         for (String month : monthOrder) {
             long cancelled = collectionManager.getAllCollections().stream()
-                    .filter(c -> c.getCollectionDate().getMonth().getDisplayName(TextStyle.SHORT, Locale.ENGLISH).equals(month))
+                    .filter(c -> c.getCollectionDate().getMonth().getDisplayName(TextStyle.SHORT, Locale.ENGLISH)
+                            .equals(month))
                     .filter(c -> c.getCollectionStatus() == Collection.CollectionStatus.CANCELLED)
                     .count();
             long toPay = collectionManager.getAllCollections().stream()
-                    .filter(c -> c.getCollectionDate().getMonth().getDisplayName(TextStyle.SHORT, Locale.ENGLISH).equals(month))
+                    .filter(c -> c.getCollectionDate().getMonth().getDisplayName(TextStyle.SHORT, Locale.ENGLISH)
+                            .equals(month))
                     .filter(c -> c.getCollectionStatus() == Collection.CollectionStatus.ACTIVE)
                     .count();
             long completed = collectionManager.getAllCollections().stream()
-                    .filter(c -> c.getCollectionDate().getMonth().getDisplayName(TextStyle.SHORT, Locale.ENGLISH).equals(month))
+                    .filter(c -> c.getCollectionDate().getMonth().getDisplayName(TextStyle.SHORT, Locale.ENGLISH)
+                            .equals(month))
                     .filter(c -> c.getCollectionStatus() == Collection.CollectionStatus.COMPLETED)
                     .count();
 
