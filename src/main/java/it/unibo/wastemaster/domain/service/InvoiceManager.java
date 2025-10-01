@@ -1,6 +1,6 @@
 package it.unibo.wastemaster.domain.service;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -54,7 +54,7 @@ public class InvoiceManager {
                 totalOnetime,
                 recurringCount,
                 onetimeCount,
-                LocalDate.now());
+                LocalDateTime.now());
 
         invoiceRepository.save(invoice); 
 
@@ -84,6 +84,7 @@ public class InvoiceManager {
                 throw new IllegalStateException("Cannot modify a deleted invoice.");
             }
             invoice.setPaymentStatus(Invoice.PaymentStatus.PAID);
+            invoice.setPaymentDate(LocalDateTime.now());
             invoiceRepository.update(invoice);
             return true;
         }
@@ -134,4 +135,5 @@ public class InvoiceManager {
         }
         return false;
     }
+
 }

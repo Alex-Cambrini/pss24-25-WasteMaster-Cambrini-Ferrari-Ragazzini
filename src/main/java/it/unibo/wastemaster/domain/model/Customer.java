@@ -5,6 +5,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "customer")
@@ -28,7 +29,7 @@ public class Customer extends Person {
      */
     public Customer(final String name, final String surname, final Location location,
                     final String email, final String phone) {
-        super(name, surname, location, email, phone);
+        super(name, surname, location, email, phone, LocalDateTime.now());
     }
 
     /**

@@ -231,6 +231,7 @@ public final class TripManager {
         tripRepository.update(trip);
     }
 
+
     public enum IssueType {
         VEHICLE_PROBLEM,
         OPERATOR_PROBLEM,
