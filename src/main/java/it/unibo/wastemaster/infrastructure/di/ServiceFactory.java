@@ -19,6 +19,7 @@ import it.unibo.wastemaster.domain.service.CustomerManager;
 import it.unibo.wastemaster.domain.service.EmployeeManager;
 import it.unibo.wastemaster.domain.service.InvoiceManager;
 import it.unibo.wastemaster.domain.service.LoginManager;
+import it.unibo.wastemaster.domain.service.NotificationManager;
 import it.unibo.wastemaster.domain.service.OneTimeScheduleManager;
 import it.unibo.wastemaster.domain.service.RecurringScheduleManager;
 import it.unibo.wastemaster.domain.service.ScheduleManager;
@@ -56,6 +57,7 @@ public class ServiceFactory {
     private final InvoiceManager invoiceManager;
     private final ScheduleManager scheduleManager;
     private final LoginManager loginManager;
+    private final NotificationManager notificationManager;
 
     public ServiceFactory(EntityManager em) {
 
@@ -106,6 +108,8 @@ public class ServiceFactory {
         this.invoiceManager = new InvoiceManager(invoiceRepository);
         this.employeeManager = new EmployeeManager(employeeRepository, accountManager);
         this.scheduleManager = new ScheduleManager(scheduleRepository);
+        this.notificationManager = new NotificationManager(tripRepository,
+                invoiceRepository, customerRepository);
     }
 
     public AccountManager getAccountManager() {
@@ -158,5 +162,9 @@ public class ServiceFactory {
 
     public ScheduleManager getScheduleManager() {
         return scheduleManager;
+    }
+
+    public NotificationManager getNotificationManager() {
+        return notificationManager;
     }
 }
