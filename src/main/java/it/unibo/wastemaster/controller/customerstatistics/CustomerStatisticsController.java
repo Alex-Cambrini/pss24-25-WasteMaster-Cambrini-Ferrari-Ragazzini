@@ -46,7 +46,7 @@ public class CustomerStatisticsController {
     }
 
     private void updateStatistics() {
-        if (customer == null || invoiceManager == null || collectionManager == null) {
+        if (customer == null) {
             clearStatistics();
             return;
         }
