@@ -541,6 +541,7 @@ public final class ScheduleController implements AutoRefreshable {
             controller.setScheduleManager(scheduleManager);
             controller.setOneTimeScheduleManager(oneTimeScheduleManager);
             controller.setRecurringScheduleManager(recurringScheduleManager);
+            controller.setCollections(collections);
         } catch (Exception e) {
             DialogUtils.showError("Navigation error",
                     "Could not load Associated Collections view.", AppContext.getOwner());

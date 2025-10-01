@@ -541,6 +541,7 @@ private void handleDeleteTrip() {
             controller.setTripManager(tripManager);
             controller.setVehicleManager(vehicleManager);
             controller.setCollectionManager(collectionManager);
+            controller.setCollections(collections);
 
         } catch (Exception e) {
             DialogUtils.showError("Navigation error",
