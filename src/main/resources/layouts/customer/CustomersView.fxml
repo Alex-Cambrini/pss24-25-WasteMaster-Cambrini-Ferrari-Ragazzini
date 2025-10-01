@@ -29,7 +29,7 @@
                 <TableColumn fx:id="surnameColumn" prefWidth="100.0" text="Surname" />
                 <TableColumn fx:id="emailColumn" prefWidth="150.0" text="Email" />
                 <TableColumn fx:id="locationColumn" maxWidth="400.0" minWidth="180.0" prefWidth="220.0" text="Location" />
-                <TableColumn fx:id="creationDateColumn" prefWidth="160.0" text="Created On" />
+                <TableColumn fx:id="creationDateColumn" prefWidth="150.0" text="Created On" />
             </columns>
         </TableView>
 
