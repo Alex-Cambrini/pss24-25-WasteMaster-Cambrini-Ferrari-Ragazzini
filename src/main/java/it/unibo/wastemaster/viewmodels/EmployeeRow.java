@@ -1,5 +1,7 @@
 package it.unibo.wastemaster.viewmodels;
 
+import java.time.format.DateTimeFormatter;
+
 import it.unibo.wastemaster.domain.model.Employee;
 import it.unibo.wastemaster.domain.model.Employee.Licence;
 import it.unibo.wastemaster.domain.model.Employee.Role;
@@ -17,6 +19,7 @@ public final class EmployeeRow {
     private final Role role;
     private final Licence licence;
     private final Employee employee;
+    private final String creationDate;
 
     /**
      * Constructs an EmployeeRow instance using a given employee entity.
@@ -30,6 +33,8 @@ public final class EmployeeRow {
         this.email = employee.getEmail();
         this.role = employee.getRole();
         this.licence = employee.getLicence();
+        this.creationDate = employee.getCreatedDate()
+                .format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"));
     }
 
     /**
@@ -86,5 +91,14 @@ public final class EmployeeRow {
         Location loc = employee.getLocation();
         return loc.getStreet() + " " + loc.getCivicNumber() + ", "
                 + loc.getCity() + " (" + loc.getPostalCode() + ")";
+    }
+
+    /**
+     * Gets the employee's account creation date as a formatted string.
+     *
+     * @return the creation date
+     */
+    public String getCreationDate() {
+        return creationDate;
     }
 }

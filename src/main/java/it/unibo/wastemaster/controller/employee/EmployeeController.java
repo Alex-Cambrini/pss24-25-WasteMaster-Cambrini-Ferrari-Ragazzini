@@ -42,6 +42,7 @@ public final class EmployeeController implements AutoRefreshable {
     private static final String FILTER_ROLE = "role";
     private static final String FILTER_LICENCE = "licence";
     private static final String FILTER_LOCATION = "location";
+    private static final String FILTER_CREATION_DATE = "creationDate";
     private static final int REFRESH_INTERVAL_SECONDS = 30;
     private static final String ERROR_NAVIGATION = "Navigation error";
     private final ObservableList<EmployeeRow> allEmployees = FXCollections.observableArrayList();
@@ -89,6 +90,9 @@ public final class EmployeeController implements AutoRefreshable {
     @FXML
     private TableColumn<EmployeeRow, String> locationColumn;
 
+    @FXML
+    private TableColumn<EmployeeRow, String> creationDateColumn;
+
     public void setEmployeeManager(EmployeeManager employeeManager) {
         this.employeeManager = employeeManager;
     }
@@ -102,6 +106,8 @@ public final class EmployeeController implements AutoRefreshable {
         emailColumn.setCellValueFactory(new PropertyValueFactory<>(FILTER_EMAIL));
         roleColumn.setCellValueFactory(new PropertyValueFactory<>(FILTER_ROLE));
         licenceColumn.setCellValueFactory(new PropertyValueFactory<>(FILTER_LICENCE));
+        creationDateColumn.setCellValueFactory(new PropertyValueFactory<>(FILTER_CREATION_DATE));
+
 
         roleColumn.setCellFactory(column -> new TableCell<EmployeeRow, Role>() {
             @Override
