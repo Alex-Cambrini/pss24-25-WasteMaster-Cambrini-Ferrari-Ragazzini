@@ -21,4 +21,6 @@ public interface CustomerRepository {
     void delete(Customer customer);
 
     List<Customer> findAll();
+
+    List<Customer> findLast5Inserted();
 }

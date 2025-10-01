@@ -111,4 +111,8 @@ public class CustomerManager {
         return customerRepository.findByEmail(email);
     }
 
+    public List<Customer> getLast5Customers() {
+        return customerRepository.findLast5Inserted();
+    }
+
 }
