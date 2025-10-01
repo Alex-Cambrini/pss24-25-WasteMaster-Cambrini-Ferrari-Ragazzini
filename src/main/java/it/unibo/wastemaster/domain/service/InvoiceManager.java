@@ -84,6 +84,7 @@ public class InvoiceManager {
                 throw new IllegalStateException("Cannot modify a deleted invoice.");
             }
             invoice.setPaymentStatus(Invoice.PaymentStatus.PAID);
+            invoice.setPaymentDate(LocalDate.now());
             invoiceRepository.update(invoice);
             return true;
         }

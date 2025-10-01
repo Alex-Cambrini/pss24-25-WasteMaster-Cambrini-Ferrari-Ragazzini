@@ -27,6 +27,9 @@ public class Invoice {
     @NotNull(message = "The issue date cannot be null")
     private LocalDate issueDate;
 
+    @Column
+    private LocalDate paymentDate;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     @NotNull(message = "The payment status cannot be null")
@@ -122,6 +125,14 @@ public class Invoice {
 
     public double getTotalOnetime() {
         return totalOnetime;
+    }
+
+    public LocalDate getPaymentDate() {
+        return paymentDate;
+    }
+
+    public void setPaymentDate(final LocalDate paymentDate) {
+        this.paymentDate = paymentDate;
     }
 
     public void setTotalOnetime(final double totalOnetime) {
