@@ -38,14 +38,14 @@
         </HBox>
 
         <!-- Collections per Month Chart -->
-        <BarChart fx:id="collectionsChart" title="Collections per Month" prefHeight="250" prefWidth="500">
+        <StackedBarChart fx:id="collectionsChart" title="Collections per Month" prefHeight="250" prefWidth="500">
             <xAxis>
                 <CategoryAxis label="Month"/>
             </xAxis>
             <yAxis>
                 <NumberAxis label="Collections"/>
             </yAxis>
-        </BarChart>
+        </StackedBarChart>
 
         <VBox spacing="8">
             <Label text="Recent activity / Notifications" styleClass="title-4"/>
