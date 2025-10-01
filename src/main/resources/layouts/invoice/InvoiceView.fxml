@@ -70,6 +70,7 @@
                 <TableColumn fx:id="invoiceAmountColumn" minWidth="70" text="Amount" />
                 <TableColumn fx:id="statusColumn" minWidth="70" text="Status" />
                 <TableColumn fx:id="dateColumn" minWidth="90" text="Date" />
+                <TableColumn fx:id="paymentDateColumn" minWidth="120" text="Payment Date" />
                 <TableColumn fx:id="serviceCountsColumn" text="Service Counts" />
                 <TableColumn fx:id="totalAmountsColumn" text="Total Services Amounts" />
                 <TableColumn fx:id="isCancelledColumn" text="Cancelled" />

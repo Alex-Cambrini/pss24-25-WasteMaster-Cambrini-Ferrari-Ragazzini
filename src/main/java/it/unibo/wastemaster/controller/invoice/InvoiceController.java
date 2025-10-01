@@ -22,8 +22,6 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ContextMenu;
@@ -33,7 +31,6 @@ import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
@@ -84,6 +81,9 @@ public final class InvoiceController implements AutoRefreshable {
 
     @FXML
     private TableColumn<InvoiceRow, String> invoiceAmountColumn;
+
+    @FXML
+    private TableColumn<InvoiceRow, String> paymentDateColumn;
 
     @FXML
     private TableColumn<InvoiceRow, String> statusColumn;
@@ -140,6 +140,7 @@ public final class InvoiceController implements AutoRefreshable {
         invoiceAmountColumn.setCellValueFactory(new PropertyValueFactory<>("amount"));
         statusColumn.setCellValueFactory(new PropertyValueFactory<>("status"));
         dateColumn.setCellValueFactory(new PropertyValueFactory<>("issueDate"));
+        paymentDateColumn.setCellValueFactory(new PropertyValueFactory<>("paymentDate"));
         serviceCountsColumn.setCellValueFactory(
                 new PropertyValueFactory<>("serviceCounts"));
         totalAmountsColumn.setCellValueFactory(
@@ -149,11 +150,11 @@ public final class InvoiceController implements AutoRefreshable {
         searchField.textProperty().addListener((obs, oldText, newText) -> handleSearch());
 
         invoiceTable.getSelectionModel().selectedItemProperty()
-        .addListener((obs, oldVal, newVal) -> {
-            updateButtons(newVal);
-            // Dinamicamente abilita/disabilita il bottone "View Customer"
-            viewCustomerButton.setDisable(newVal == null);
-        });
+                .addListener((obs, oldVal, newVal) -> {
+                    updateButtons(newVal);
+                    // Dinamicamente abilita/disabilita il bottone "View Customer"
+                    viewCustomerButton.setDisable(newVal == null);
+                });
 
         if (showDeletedCheckBox != null) {
             showDeletedCheckBox.setSelected(false);
@@ -467,19 +468,17 @@ public final class InvoiceController implements AutoRefreshable {
         Customer customer = selectedRow.getInvoice().getCustomer();
 
         try {
-        Optional<CustomerStatisticsController> controllerOpt = DialogUtils.showModalWithController(
-                "Customer Statistics",
-                "/layouts/customerstatistics/CustomerStatisticsView.fxml",
-                AppContext.getOwner(),
-                ctrl -> {
-                    ctrl.setCustomerManager(customerManager);
-                    ctrl.setInvoiceManager(invoiceManager);
-                    ctrl.setCollectionManager(collectionManager);
-                    ctrl.setCustomer(customer); 
-                });
+            Optional<CustomerStatisticsController> controllerOpt = DialogUtils.showModalWithController(
+                    "Customer Statistics",
+                    "/layouts/customerstatistics/CustomerStatisticsView.fxml",
+                    AppContext.getOwner(),
+                    ctrl -> {
+                        ctrl.setCustomerManager(customerManager);
+                        ctrl.setInvoiceManager(invoiceManager);
+                        ctrl.setCollectionManager(collectionManager);
+                        ctrl.setCustomer(customer);
+                    });
 
-
-            
         } catch (IOException e) {
             e.printStackTrace();
             DialogUtils.showError("Loading Error", "Could not load Customer Statistics dialog.", AppContext.getOwner());

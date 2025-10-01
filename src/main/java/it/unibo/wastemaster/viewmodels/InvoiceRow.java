@@ -1,5 +1,8 @@
 package it.unibo.wastemaster.viewmodels;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+
 import it.unibo.wastemaster.domain.model.Invoice;
 
 /**
@@ -13,6 +16,7 @@ public final class InvoiceRow {
     private final String amount;
     private final String status;
     private final String issueDate;
+    private final String paymentDate;
     private final String serviceCounts;
     private final String totalAmounts;
     private final String isCancelled;
@@ -25,6 +29,9 @@ public final class InvoiceRow {
         this.amount = String.format("%.2f", invoice.getAmount());
         this.status = invoice.getPaymentStatus() != null ? invoice.getPaymentStatus().toString() : "";
         this.issueDate = invoice.getIssueDate() != null ? invoice.getIssueDate().toString() : "";
+        DateTimeFormatter fmt = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        LocalDateTime paid = invoice.getPaymentDate();
+        this.paymentDate = paid != null ? paid.format(fmt) : "";
         this.serviceCounts = "Recurring: " + invoice.getRecurringCount()
                 + ", One-time: " + invoice.getOnetimeCount();
         this.totalAmounts = "Recurring: " + String.format("%.2f", invoice.getTotalRecurring())
@@ -37,6 +44,7 @@ public final class InvoiceRow {
     public String getAmount() { return amount; }
     public String getStatus() { return status; }
     public String getIssueDate() { return issueDate; }
+    public String getPaymentDate() { return paymentDate; }
     public String getServiceCounts() { return serviceCounts; }
     public String getTotalAmounts() { return totalAmounts; }
     public String getIsCancelled() { return isCancelled; }
