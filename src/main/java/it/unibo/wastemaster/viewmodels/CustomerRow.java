@@ -1,5 +1,7 @@
 package it.unibo.wastemaster.viewmodels;
 
+import java.time.format.DateTimeFormatter;
+
 import it.unibo.wastemaster.domain.model.Customer;
 
 /**
@@ -15,6 +17,7 @@ public final class CustomerRow {
     private final String civic;
     private final String city;
     private final String postalCode;
+    private final String creationDate;
 
     /**
      * Constructs a CustomerRow instance using a given customer entity.
@@ -29,6 +32,8 @@ public final class CustomerRow {
         this.civic = customer.getLocation().getCivicNumber();
         this.city = customer.getLocation().getCity();
         this.postalCode = customer.getLocation().getPostalCode();
+        this.creationDate = customer.getCreatedDate()
+        .format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"));
     }
 
     /**
@@ -93,7 +98,6 @@ public final class CustomerRow {
     public String getPostalCode() {
         return postalCode;
     }
-
     /**
      * Gets the full location as a formatted string.
      *
@@ -101,5 +105,14 @@ public final class CustomerRow {
      */
     public String getFullLocation() {
         return street + " " + civic + ", " + city + " (" + postalCode + ")";
+    }
+
+    /**
+     * Gets the customer's creation date as a formatted string.
+     *
+     * @return the creation date
+     */
+    public String getCreationDate() {
+        return creationDate;
     }
 }
