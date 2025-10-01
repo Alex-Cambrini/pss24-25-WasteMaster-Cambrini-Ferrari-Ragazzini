@@ -208,7 +208,8 @@ public final class MainLayoutController {
         dashCtrl.setCollectionManager(AppContext.getServiceFactory().getCollectionManager());
         dashCtrl.setInvoiceManager(AppContext.getServiceFactory().getInvoiceManager());
         dashCtrl.setTripManager(AppContext.getServiceFactory().getTripManager());
-        dashCtrl.updateDashboard();
+        dashCtrl.setNotificationManager(AppContext.getServiceFactory().getNotificationManager());
+        dashCtrl.initData();
     }
     }
 
