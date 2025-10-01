@@ -5,6 +5,7 @@ import it.unibo.wastemaster.domain.model.Invoice;
 import it.unibo.wastemaster.domain.repository.InvoiceRepository;
 import it.unibo.wastemaster.infrastructure.dao.InvoiceDAO;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -60,8 +61,9 @@ public class InvoiceRepositoryImpl implements InvoiceRepository {
         combined.addAll(paid);
 
         combined.sort((i1, i2) -> {
-            LocalDate d1 = i1.getPaymentDate() != null ? i1.getPaymentDate() : i1.getIssueDate();
-            LocalDate d2 = i2.getPaymentDate() != null ? i2.getPaymentDate() : i2.getIssueDate();
+            LocalDateTime d1 = i1.getPaymentDate() != null ? i1.getPaymentDate() :
+                    i1.getIssueDate();
+            LocalDateTime d2 = i2.getPaymentDate() != null ? i2.getPaymentDate() : i2.getIssueDate();
             return d2.compareTo(d1);
         });
 
