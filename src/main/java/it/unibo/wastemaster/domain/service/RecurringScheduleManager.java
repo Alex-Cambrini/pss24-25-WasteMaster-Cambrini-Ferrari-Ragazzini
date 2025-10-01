@@ -280,4 +280,13 @@ public class RecurringScheduleManager {
     public Optional<RecurringSchedule> findRecurringScheduleById(Integer id) {
         return recurringScheduleRepository.findById(id);
     }
+
+    public void rescheduleNextCollection(Collection collection) {
+        if (collection.getSchedule() instanceof RecurringSchedule rs) {
+            LocalDate next = calculateNextDate(rs);
+            rs.setNextCollectionDate(next);
+            recurringScheduleRepository.update(rs);
+            collectionManager.generateCollection(rs);
+        }
+    }
 }
