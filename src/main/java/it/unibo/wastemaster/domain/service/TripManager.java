@@ -28,11 +28,15 @@ public final class TripManager {
 
     private final TripRepository tripRepository;
     private final CollectionRepository collectionRepository;
+    private final RecurringScheduleManager recurringScheduleManager;
     private NotificationService notificationService;
 
-    public TripManager(final TripRepository tripRepository, final CollectionRepository collectionRepository) {
+    public TripManager(final TripRepository tripRepository,
+                       final CollectionRepository collectionRepository,
+                       final RecurringScheduleManager recurringScheduleManager) {
         this.tripRepository = tripRepository;
         this.collectionRepository = collectionRepository;
+        this.recurringScheduleManager = recurringScheduleManager;
     }
 
     public void createTrip(final String postalCode, final Vehicle assignedVehicle,
@@ -88,6 +92,19 @@ public final class TripManager {
         } catch (IllegalArgumentException e) {
             return false;
         }
+    }
+
+    public boolean softDeleteAndRescheduleNextCollection(final Trip trip) {
+        boolean deleted = softDeleteTrip(trip);
+        if (!deleted) {
+            return false;
+        }
+        for (Collection collection : trip.getCollections()) {
+            collection.setCollectionStatus(Collection.CollectionStatus.CANCELLED);
+                collectionRepository.update(collection);
+                recurringScheduleManager.rescheduleNextCollection(collection);
+        }
+        return true;
     }
 
     public List<Employee> getAvailableOperatorsExcludeDriverToEdit(LocalDateTime depDateTime, LocalDateTime retDateTime, Employee selectedDriver,
@@ -155,6 +172,7 @@ public final class TripManager {
                 }
                 c.setCollectionStatus(Collection.CollectionStatus.COMPLETED);
                 collectionRepository.update(c);
+                recurringScheduleManager.rescheduleNextCollection(c);
             }
 
             trip.setStatus(TripStatus.COMPLETED);
