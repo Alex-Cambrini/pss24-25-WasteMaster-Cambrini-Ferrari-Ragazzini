@@ -104,5 +104,10 @@ public class TripRepositoryImpl implements TripRepository {
     public List<String> findAvailablePostalCodes(LocalDate date) {
         return tripDAO.findAvailablePostalCodes(date);
     }
+
+    @Override
+    public List<Trip> findLast5Inserted() {
+        return tripDAO.findLast5Inserted();
+    }
 }
 

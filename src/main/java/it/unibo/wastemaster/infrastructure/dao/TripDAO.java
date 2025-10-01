@@ -118,4 +118,12 @@ public class TripDAO extends GenericDAO<Trip> {
                 .setParameter("toBeScheduled", CollectionStatus.ACTIVE)
                 .getResultList();
     }
+
+    public List<Trip> findLast5Inserted() {
+        return getEntityManager().createQuery(
+                        "SELECT t FROM Trip t ORDER BY t.tripId DESC", Trip.class)
+                .setMaxResults(5)
+                .getResultList();
+    }
+
 }

@@ -42,4 +42,6 @@ public interface TripRepository {
                                                              Trip tripToEdit);
 
     List<String> findAvailablePostalCodes(LocalDate date);
+
+    List<Trip> findLast5Inserted();
 }
