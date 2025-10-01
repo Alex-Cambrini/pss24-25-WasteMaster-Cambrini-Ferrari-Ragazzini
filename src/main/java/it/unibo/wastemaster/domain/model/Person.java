@@ -10,6 +10,7 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
+import java.time.LocalDateTime;
 
 /**
  * Abstract superclass representing a person with common attributes. Provides basic
@@ -70,6 +71,10 @@ public abstract class Person {
     @Column(nullable = false)
     private boolean isDeleted = false;
 
+    @Column(nullable = false, updatable = false)
+    private LocalDateTime createdDate;
+
+
     /**
      * Constructs a new Person with the given parameters.
      *
@@ -80,12 +85,13 @@ public abstract class Person {
      * @param phone the phone number (final)
      */
     protected Person(final String name, final String surname, final Location location,
-                     final String email, final String phone) {
+                     final String email, final String phone, final LocalDateTime createdDate) {
         this.name = name;
         this.surname = surname;
         this.location = location;
         this.email = email;
         this.phone = phone;
+        this.createdDate = LocalDateTime.now();
     }
 
     /**
@@ -193,6 +199,10 @@ public abstract class Person {
      */
     public void restore() {
         isDeleted = false;
+    }
+
+    public LocalDateTime getCreatedDate() {
+        return createdDate;
     }
 
     /**
