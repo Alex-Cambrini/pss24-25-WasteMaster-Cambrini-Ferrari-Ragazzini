@@ -3,14 +3,20 @@ package it.unibo.wastemaster.controller.dashboard;
 import it.unibo.wastemaster.domain.service.*;
 import it.unibo.wastemaster.domain.model.*;
 import javafx.fxml.FXML;
+import javafx.scene.chart.BarChart;
+import javafx.scene.chart.XYChart;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.collections.FXCollections;
 
+import java.time.format.TextStyle;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 import java.util.Optional;
 import java.util.ArrayList;
+import java.util.stream.Collectors;
 
 public class DashboardController {
 
@@ -19,6 +25,7 @@ public class DashboardController {
     @FXML private Label totalTripsLabel;
     @FXML private Label invoicesToPayLabel;
     @FXML private ListView<String> notificationsList;
+    @FXML private BarChart<String, Number> collectionsChart;
 
     private CustomerManager customerManager;
     private CollectionManager collectionManager;
@@ -49,8 +56,6 @@ public class DashboardController {
 
     public void updateDashboard() {
 
-       
-        
         if (customerManager != null)
             totalCustomersLabel.setText(String.valueOf(customerManager.getAllCustomers().size()));
         if (collectionManager != null)
@@ -64,6 +69,30 @@ public class DashboardController {
             invoicesToPayLabel.setText(String.valueOf(toPay));
         }
 
+        
+        if (collectionsChart != null && collectionManager != null) {
+            collectionsChart.getData().clear();
+
+            Map<String, Long> collectionsPerMonth = collectionManager.getAllCollections().stream()
+                .collect(Collectors.groupingBy(
+                    c -> c.getCollectionDate().getMonth().getDisplayName(TextStyle.SHORT, Locale.ENGLISH),
+                    Collectors.counting()
+                ));
+
+            XYChart.Series<String, Number> series = new XYChart.Series<>();
+            series.setName("Collections");
+
+            
+            List<String> monthOrder = List.of("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec");
+            for (String month : monthOrder) {
+                long value = collectionsPerMonth.getOrDefault(month, 0L);
+                series.getData().add(new XYChart.Data<>(month, value));
+            }
+
+            collectionsChart.getData().add(series);
+        }
+
+        
         List<String> notifications = new ArrayList<>();
 
         if (collectionManager != null && !collectionManager.getAllCollections().isEmpty()) {
@@ -106,7 +135,7 @@ public class DashboardController {
                 .filter(inv -> inv.getPaymentStatus() != Invoice.PaymentStatus.PAID)
                 .min(Comparator.comparing(Invoice::getIssueDate));
             nextDueOpt.ifPresent(nextDue -> {
-                notifications.add("Upcoming invoice: #" + nextDue.getInvoiceId());
+                notifications.add("Invoice due soon: #" + nextDue.getInvoiceId());
             });
         }
 
