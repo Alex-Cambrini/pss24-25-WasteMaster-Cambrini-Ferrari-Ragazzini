@@ -44,4 +44,6 @@ public interface TripRepository {
     List<String> findAvailablePostalCodes(LocalDate date);
 
     List<Trip> findLast5Inserted();
+
+    int countCompleted();
 }
