@@ -425,4 +425,31 @@ public abstract class AbstractDatabaseTest {
     protected AccountManager getAccountManager() {
         return accountManager;
     }
+
+    /**
+     * Returns the repository for Customer entities.
+     *
+     * @return the CustomerRepository instance
+     */
+    protected CustomerRepository getCustomerRepository() {
+        return customerRepository;
+    }
+
+    /**
+     * Returns the repository for Invoice entities.
+     *
+     * @return the InvoiceRepository instance
+     */
+    protected InvoiceRepository getInvoiceRepository() {
+        return invoiceRepository;
+    }
+
+    /**
+     * Returns the repository for Trip entities.
+     *
+     * @return the TripRepository instance
+     */
+    protected TripRepository getTripRepository() {
+        return tripRepository;
+    }
 }
