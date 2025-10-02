@@ -9,6 +9,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.collections.FXCollections;
 
+import java.time.format.DateTimeFormatter;
 import java.time.format.TextStyle;
 import java.util.List;
 import java.util.Locale;
@@ -129,9 +130,10 @@ public class DashboardController {
         notificationsList.getItems().clear();
 
         if (notificationManager != null) {
+            DateTimeFormatter TS_FMT = DateTimeFormatter.ofPattern("yyyy-MM-dd 'at' HH:mm");
             List<Notification> lastEvents = notificationManager.getLast5Events();
             List<String> displayNotifications = lastEvents.stream()
-                    .map(n -> n.getMessage() + " - " + n.getTimestamp())
+                    .map(n -> String.format("%s - %s", n.getMessage(), n.getTimestamp().format(TS_FMT)))
                     .toList();
             notificationsList.setItems(FXCollections.observableArrayList(displayNotifications));
         }
