@@ -13,59 +13,100 @@ import java.util.Currency;
 import java.util.List;
 import java.util.Locale;
 
+/**
+ * Service class responsible for managing notifications related to system events
+ * such as customer registrations, invoice issuances, and trip updates.
+ */
 public class NotificationManager {
 
-    private final TripRepository tripRepository;
-    private final InvoiceRepository invoiceRepository;
-    private final CustomerRepository customerRepository;
+        private final TripRepository tripRepository;
+        private final InvoiceRepository invoiceRepository;
+        private final CustomerRepository customerRepository;
 
-    public NotificationManager(TripRepository tripRepository,
-            InvoiceRepository invoiceRepository,
-            CustomerRepository customerRepository) {
-        this.tripRepository = tripRepository;
-        this.invoiceRepository = invoiceRepository;
-        this.customerRepository = customerRepository;
-    }
+        /**
+         * Constructs a NotificationManager with the given repositories.
+         *
+         * @param tripRepository     repository for accessing trip data
+         * @param invoiceRepository  repository for accessing invoice data
+         * @param customerRepository repository for accessing customer data
+         */
+        public NotificationManager(TripRepository tripRepository,
+                        InvoiceRepository invoiceRepository,
+                        CustomerRepository customerRepository) {
+                this.tripRepository = tripRepository;
+                this.invoiceRepository = invoiceRepository;
+                this.customerRepository = customerRepository;
+        }
 
-    private static String formatEur(double amount) {
-        NumberFormat nf = NumberFormat.getCurrencyInstance(Locale.ITALY);
-        nf.setCurrency(Currency.getInstance("EUR"));
-        return nf.format(amount);
-    }
+        /**
+         * Formats a numeric amount as a currency string in EUR using Italian locale.
+         *
+         * @param amount the amount to format
+         * @return the formatted currency string
+         */
+        private static String formatEur(double amount) {
+                NumberFormat nf = NumberFormat.getCurrencyInstance(Locale.ITALY);
+                nf.setCurrency(Currency.getInstance("EUR"));
+                return nf.format(amount);
+        }
 
-    public List<Notification> getLast5Events() {
-        List<Notification> events = new ArrayList<>();
+        /**
+         * Retrieves the 5 most recent notifications aggregated from customers,
+         * invoices, and trips.
+         * <p>
+         * Timestamps used for recency/sorting:
+         * <ul>
+         * <li><b>Customers</b>: {@code createdDate}</li>
+         * <li><b>Invoices</b>: {@code paymentDate} if present, otherwise
+         * {@code issueDate}</li>
+         * <li><b>Trips</b>: {@code departureTime}</li>
+         * </ul>
+         * Events are merged, sorted in descending order by the timestamp above, and
+         * converted into {@link Notification} objects. The first 5 items are returned.
+         *
+         * @return a list of up to 5 latest notifications based on the timestamps listed
+         *         above
+         */
+        public List<Notification> getLast5Events() {
+                List<Notification> events = new ArrayList<>();
 
-        customerRepository.findLast5Inserted()
-                .forEach(c -> events.add(new Notification(
-                        String.format("New customer: %s %s (%s)",
-                                c.getName(), c.getSurname(), c.getEmail()),
-                        c.getCreatedDate())));
+                customerRepository.findLast5Inserted()
+                                .forEach(c -> events.add(new Notification(
+                                                String.format("New customer: %s %s (%s)",
+                                                                c.getName(), c.getSurname(), c.getEmail()),
+                                                c.getCreatedDate())));
 
-        invoiceRepository.findLast5InvoicesEvent()
-                .forEach(i -> {
-                    LocalDateTime date = i.getPaymentDate() != null ? i.getPaymentDate() : i.getIssueDate();
-                    String customerName = (i.getCustomer() != null)
-                            ? (i.getCustomer().getName() + " " + i.getCustomer().getSurname())
-                            : "Unknown customer";
-                    String statusText = (i.getPaymentStatus() == Invoice.PaymentStatus.PAID) ? "Paid" : "Not Paid";
-                    events.add(new Notification(
-                            String.format("Invoice #%d for %s - %s: %s",
-                                    i.getInvoiceId(), customerName, statusText, formatEur(i.getAmount())),
-                            date));
-                });
+                invoiceRepository.findLast5InvoicesEvent()
+                                .forEach(i -> {
+                                        LocalDateTime date = i.getPaymentDate() != null ? i.getPaymentDate()
+                                                        : i.getIssueDate();
+                                        String customerName = (i.getCustomer() != null)
+                                                        ? (i.getCustomer().getName() + " "
+                                                                        + i.getCustomer().getSurname())
+                                                        : "Unknown customer";
+                                        String statusText = (i.getPaymentStatus() == Invoice.PaymentStatus.PAID)
+                                                        ? "Paid"
+                                                        : "Not Paid";
+                                        events.add(new Notification(
+                                                        String.format("Invoice #%d for %s - %s: %s",
+                                                                        i.getInvoiceId(), customerName, statusText,
+                                                                        formatEur(i.getAmount())),
+                                                        date));
+                                });
 
-        tripRepository.findLast5Modified()
-                .forEach(t -> {
-                    String vehicle = t.getAssignedVehicle() != null ? t.getAssignedVehicle().getPlate() : "N/A";
-                    String status = (t.getStatus() != null) ? t.getStatus().name() : "UNKNOWN";
-                    events.add(new Notification(
-                            String.format("Trip #%d - Vehicle: %s - Status: %s",
-                                    t.getTripId(), vehicle, status),
-                            t.getDepartureTime()));
-                });
+                tripRepository.findLast5Modified()
+                                .forEach(t -> {
+                                        String vehicle = t.getAssignedVehicle() != null
+                                                        ? t.getAssignedVehicle().getPlate()
+                                                        : "N/A";
+                                        String status = (t.getStatus() != null) ? t.getStatus().name() : "UNKNOWN";
+                                        events.add(new Notification(
+                                                        String.format("Trip #%d - Vehicle: %s - Status: %s",
+                                                                        t.getTripId(), vehicle, status),
+                                                        t.getDepartureTime()));
+                                });
 
-        events.sort((n1, n2) -> n2.getTimestamp().compareTo(n1.getTimestamp()));
-        return events.stream().limit(5).toList();
-    }
+                events.sort((n1, n2) -> n2.getTimestamp().compareTo(n1.getTimestamp()));
+                return events.stream().limit(5).toList();
+        }
 }

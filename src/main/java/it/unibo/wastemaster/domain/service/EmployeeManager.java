@@ -8,7 +8,8 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Manages operations related to employees such as creation, update, deletion and
+ * Manages operations related to employees such as creation, update, deletion
+ * and
  * permission checks.
  */
 public class EmployeeManager {
@@ -21,10 +22,10 @@ public class EmployeeManager {
      * Constructs an EmployeeManager with the given dependencies.
      *
      * @param employeeRepository the DAO used for employee persistence
-     * @param accountManager the manager responsible for account operations
+     * @param accountManager     the manager responsible for account operations
      */
     public EmployeeManager(final EmployeeRepository employeeRepository,
-                           final AccountManager accountManager) {
+            final AccountManager accountManager) {
         this.employeeRepository = employeeRepository;
         this.accountManager = accountManager;
     }
@@ -36,14 +37,18 @@ public class EmployeeManager {
      * with the provided raw password. If account creation fails, the employee
      * persistence is rolled back by deleting the employee.
      * <p>
-     * Note: This method does not manage transactions atomically; partial persistence
+     * Note: This method does not manage transactions atomically; partial
+     * persistence
      * may occur if account creation fails.
      *
-     * @param employee the employee entity to add (must not be null)
-     * @param rawPassword the plain text password for the new account (must not be null)
+     * @param employee    the employee entity to add (must not be null)
+     * @param rawPassword the plain text password for the new account (must not be
+     *                    null)
      * @return the persisted employee entity
-     * @throws IllegalArgumentException if the email is already registered or input is invalid
-     * @throws RuntimeException if account creation fails, after deleting the persisted employee
+     * @throws IllegalArgumentException if the email is already registered or input
+     *                                  is invalid
+     * @throws RuntimeException         if account creation fails, after deleting
+     *                                  the persisted employee
      */
     public Employee addEmployee(final Employee employee, final String rawPassword) {
         ValidateUtils.requireArgNotNull(employee, EMPLOYEE_NULL_MSG);
@@ -65,7 +70,6 @@ public class EmployeeManager {
         return employee;
     }
 
-
     /**
      * Checks if an email is already registered.
      *
@@ -78,18 +82,21 @@ public class EmployeeManager {
 
     /**
      * Updates an existing employee after validation and email conflict check.
+     * Validates the entity, requires a non-null ID, and ensures that the email
+     * address is not already used by another employee.
      *
-     * @param toUpdateEmployee the employee to update
-     * @throws IllegalArgumentException if the ID is null or email is used by another
-     * employee
+     * @param toUpdateEmployee the employee to update (must not be null; must have a
+     *                         non-null ID)
+     * @throws IllegalArgumentException if the employee is invalid, the ID is null,
+     *                                  or the email is already used by another
+     *                                  employee
      */
     public void updateEmployee(final Employee toUpdateEmployee) {
         ValidateUtils.validateEntity(toUpdateEmployee);
         ValidateUtils.requireArgNotNull(toUpdateEmployee.getEmployeeId(),
                 "Employee ID cannot be null");
 
-        final Optional<Employee> existingOpt =
-                employeeRepository.findByEmail(toUpdateEmployee.getEmail());
+        final Optional<Employee> existingOpt = employeeRepository.findByEmail(toUpdateEmployee.getEmail());
         if (existingOpt.isPresent() && !existingOpt.get().getEmployeeId()
                 .equals(toUpdateEmployee.getEmployeeId())) {
             throw new IllegalArgumentException(
@@ -99,7 +106,8 @@ public class EmployeeManager {
     }
 
     /**
-     * Performs a soft delete by marking the employee as deleted and updating it in the
+     * Performs a soft delete by marking the employee as deleted and updating it in
+     * the
      * database.
      *
      * @param employee the employee to delete
@@ -119,11 +127,17 @@ public class EmployeeManager {
     }
 
     /**
-     * Checks if an employee is allowed to drive a specific vehicle based on license.
+     * Determines whether the given employee can drive the specified vehicle based
+     * on licence classes.
+     * Rules:
+     * - C : can drive vehicles requiring B, C1, or C
+     * - C1 : can drive vehicles requiring B or C1
+     * - B : can drive vehicles requiring B only
      *
-     * @param employee the employee
-     * @param vehicle the vehicle
-     * @return true if the employee can drive the vehicle, false otherwise
+     * @param employee the employee (must not be null)
+     * @param vehicle  the vehicle (must not be null)
+     * @return true if the employee can drive the vehicle; false otherwise
+     * @throws IllegalArgumentException if employee or vehicle is null
      */
     public boolean canDriveVehicle(final Employee employee, final Vehicle vehicle) {
         ValidateUtils.requireArgNotNull(employee, EMPLOYEE_NULL_MSG);
@@ -143,16 +157,27 @@ public class EmployeeManager {
      *
      * @param employeeId the ID of the employee
      * @return an Optional containing the employee if found, or an empty Optional
-     * otherwise
+     *         otherwise
      */
     public Optional<Employee> getEmployeeById(final int employeeId) {
         return employeeRepository.findById(employeeId);
     }
 
+    /**
+     * Finds an employee by their email address.
+     *
+     * @param Email the email of the employee to search for
+     * @return an Optional containing the employee if found, or empty if not found
+     */
     public Optional<Employee> findEmployeeByEmail(final String Email) {
         return employeeRepository.findByEmail(Email);
     }
 
+    /**
+     * Retrieves all employees that are marked as active (not deleted).
+     *
+     * @return a list of active employees
+     */
     public List<Employee> getAllActiveEmployee() {
         return employeeRepository.findAllActive();
     }

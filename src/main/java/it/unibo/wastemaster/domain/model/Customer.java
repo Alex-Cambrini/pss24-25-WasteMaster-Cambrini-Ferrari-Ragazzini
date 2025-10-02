@@ -7,9 +7,13 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import java.time.LocalDateTime;
 
+/**
+ * Represents a customer entity extending Person.
+ * Maps to the "customer" table in the database.
+ */
 @Entity
 @Table(name = "customer")
-public class Customer extends Person {
+public final class Customer extends Person {
 
     /**
      * Unique identifier for the customer, auto-generated.
@@ -47,7 +51,11 @@ public class Customer extends Person {
         return customerId;
     }
 
-
+    /**
+     * Returns a string representation of the customer including name, surname and email.
+     *
+     * @return formatted string describing the customer
+     */
     @Override
     public String toString() {
         return String.format("%s %s (%s)", getName(), getSurname(), getEmail());

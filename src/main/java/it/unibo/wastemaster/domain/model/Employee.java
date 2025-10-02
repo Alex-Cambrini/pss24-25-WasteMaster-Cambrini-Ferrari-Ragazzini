@@ -17,7 +17,7 @@ import java.time.LocalDateTime;
  */
 @Entity
 @Table(name = "employee")
-public class Employee extends Person {
+public final class Employee extends Person {
 
     /**
      * Unique identifier for the employee, auto-generated.
@@ -43,15 +43,15 @@ public class Employee extends Person {
     private Licence licence;
 
     /**
-     * Constructs an Employee with the specified details.
+     * Instantiates a new Employee.
      *
-     * @param name employee's first name.
-     * @param surname employee's last name.
-     * @param address employee's location.
-     * @param email employee's email address.
-     * @param phone employee's phone number.
-     * @param role employee's role.
-     * @param licence employee's licence.
+     * @param name the name
+     * @param surname the surname
+     * @param address the address
+     * @param email the email
+     * @param phone the phone
+     * @param role the role
+     * @param licence the licence
      */
     public Employee(final String name, final String surname, final Location address,
                     final String email, final String phone, final Role role,

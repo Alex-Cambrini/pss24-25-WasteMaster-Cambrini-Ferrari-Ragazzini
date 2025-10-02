@@ -26,8 +26,8 @@ class InvoiceTest extends AbstractDatabaseTest {
     public void setUp() {
         super.setUp();
         Customer customer = new Customer(
-                "Mario", 
-                "Rossi", 
+                "Mario",
+                "Rossi",
                 new Location("Via Roma", "10", "Bologna", "40100"),
                 "mario.rossi@example.com",
                 "1234567890"
@@ -49,7 +49,6 @@ class InvoiceTest extends AbstractDatabaseTest {
         invoice = new Invoice(customer, List.of(collection), 50.0, 150.0, 2, 3, now);
         invoice.setAmount(100.0);
         invoice.setPaymentStatus(Invoice.PaymentStatus.PAID);
-        invoice.setLastModified(LocalDateTime.now()); 
     }
 
     @Test

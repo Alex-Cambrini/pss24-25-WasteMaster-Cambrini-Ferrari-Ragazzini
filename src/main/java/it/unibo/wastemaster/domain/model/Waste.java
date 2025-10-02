@@ -9,6 +9,7 @@ import jakarta.validation.constraints.NotNull;
 
 /**
  * Entity representing a type of waste.
+ * Includes information about recyclability, danger status, and soft delete.
  */
 @Entity
 public class Waste {

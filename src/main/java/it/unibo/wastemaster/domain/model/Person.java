@@ -71,21 +71,26 @@ public abstract class Person {
     @Column(nullable = false)
     private boolean isDeleted = false;
 
+    /**
+     * Timestamp indicating when the entity was created.
+     * Automatically set at instantiation and cannot be modified afterwards.
+     */
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdDate;
 
-
     /**
-     * Constructs a new Person with the given parameters.
+     * Instantiates a new Person.
      *
-     * @param name the first name (final)
-     * @param surname the surname (final)
-     * @param location the location (final)
-     * @param email the email address (final)
-     * @param phone the phone number (final)
+     * @param name the name
+     * @param surname the surname
+     * @param location the location
+     * @param email the email
+     * @param phone the phone
+     * @param createdDate the created date
      */
     protected Person(final String name, final String surname, final Location location,
-                     final String email, final String phone, final LocalDateTime createdDate) {
+                     final String email, final String phone,
+                     final LocalDateTime createdDate) {
         this.name = name;
         this.surname = surname;
         this.location = location;
@@ -201,6 +206,11 @@ public abstract class Person {
         isDeleted = false;
     }
 
+    /**
+     * Gets created date.
+     *
+     * @return the created date
+     */
     public LocalDateTime getCreatedDate() {
         return createdDate;
     }
