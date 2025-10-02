@@ -104,8 +104,8 @@ public class TripRepositoryImpl implements TripRepository {
     }
 
     @Override
-    public List<Trip> findLast5Inserted() {
-        return tripDAO.findLast5Inserted();
+    public List<Trip> findLast5Modified() {
+        return tripDAO.findLast5Modified();
     }
 
     @Override

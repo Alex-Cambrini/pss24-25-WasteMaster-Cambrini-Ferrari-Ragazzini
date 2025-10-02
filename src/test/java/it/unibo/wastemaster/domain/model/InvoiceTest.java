@@ -45,9 +45,9 @@ class InvoiceTest extends AbstractDatabaseTest {
         collection.setCollectionStatus(CollectionStatus.COMPLETED);
         getCollectionDAO().update(collection);
 
-        invoice = new Invoice(customer, List.of(collection), 0, 0, 0, 0, null);
+        LocalDateTime now = LocalDateTime.now();
+        invoice = new Invoice(customer, List.of(collection), 50.0, 150.0, 2, 3, now);
         invoice.setAmount(100.0);
-        invoice.setIssueDate(LocalDateTime.now());
         invoice.setPaymentStatus(Invoice.PaymentStatus.PAID);
     }
 
@@ -55,10 +55,25 @@ class InvoiceTest extends AbstractDatabaseTest {
     void testGetterSetter() {
         invoice.setAmount(TEST_AMOUNT);
         invoice.setPaymentStatus(Invoice.PaymentStatus.UNPAID);
+        invoice.setTotalRecurring(50.0);
+        invoice.setTotalOnetime(150.0);
+        invoice.setRecurringCount(2);
+        invoice.setOnetimeCount(3);
+        LocalDateTime now = LocalDateTime.now();
+        invoice.setLastModified(now);
+        invoice.setPaymentDate(now.plusDays(1));
+
         assertEquals(TEST_AMOUNT, invoice.getAmount());
         assertEquals(Invoice.PaymentStatus.UNPAID, invoice.getPaymentStatus());
+        assertEquals(50.0, invoice.getTotalRecurring());
+        assertEquals(150.0, invoice.getTotalOnetime());
+        assertEquals(2, invoice.getRecurringCount());
+        assertEquals(3, invoice.getOnetimeCount());
+        assertEquals(now, invoice.getLastModified());
+        assertEquals(now.plusDays(1), invoice.getPaymentDate());
         assertTrue(invoice.getCollections().contains(collection));
     }
+
 
     @Test
     void testToString() {
@@ -77,11 +92,17 @@ class InvoiceTest extends AbstractDatabaseTest {
 
         Invoice found = foundOpt.get();
         assertEquals(invoice.getAmount(), found.getAmount());
+        assertEquals(invoice.getTotalRecurring(), found.getTotalRecurring());
+        assertEquals(invoice.getTotalOnetime(), found.getTotalOnetime());
+        assertEquals(invoice.getRecurringCount(), found.getRecurringCount());
+        assertEquals(invoice.getOnetimeCount(), found.getOnetimeCount());
+        assertEquals(invoice.getLastModified(), found.getLastModified());
+        assertEquals(invoice.getPaymentDate(), found.getPaymentDate());
+        assertEquals(invoice.isDeleted(), found.isDeleted());
         assertTrue(found.getCollections().stream()
-        .anyMatch(c -> c.getCollectionId() == collection.getCollectionId()));
+                .anyMatch(c -> c.getCollectionId() == collection.getCollectionId()));
 
         int foundId = found.getInvoiceId();
-
         getInvoiceDAO().delete(found);
         getEntityManager().getTransaction().commit();
 

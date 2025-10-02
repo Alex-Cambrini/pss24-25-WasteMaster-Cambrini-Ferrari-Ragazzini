@@ -118,12 +118,14 @@ public class TripDAO extends GenericDAO<Trip> {
         .getResultList();
   }
 
-  public List<Trip> findLast5Inserted() {
+  public List<Trip> findLast5Modified() {
     return getEntityManager().createQuery(
-        "SELECT t FROM Trip t ORDER BY t.tripId DESC", Trip.class)
-        .setMaxResults(5)
-        .getResultList();
+                    "SELECT t FROM Trip t ORDER BY t.lastModified DESC", Trip.class)
+            .setMaxResults(5)
+            .getResultList();
   }
+
+
 
   public int countCompleted() {
     String jpql = "SELECT COUNT(t) FROM Trip t WHERE t.status = :status";

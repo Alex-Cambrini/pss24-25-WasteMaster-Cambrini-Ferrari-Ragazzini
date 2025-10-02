@@ -55,7 +55,7 @@ public class NotificationManager {
                             date));
                 });
 
-        tripRepository.findLast5Inserted()
+        tripRepository.findLast5Modified()
                 .forEach(t -> {
                     String vehicle = t.getAssignedVehicle() != null ? t.getAssignedVehicle().getPlate() : "N/A";
                     String status = (t.getStatus() != null) ? t.getStatus().name() : "UNKNOWN";
