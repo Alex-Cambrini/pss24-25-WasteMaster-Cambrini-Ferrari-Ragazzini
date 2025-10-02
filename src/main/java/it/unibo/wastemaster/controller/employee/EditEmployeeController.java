@@ -49,6 +49,11 @@ public final class EditEmployeeController {
 
     private EmployeeManager employeeManager;
 
+    /**
+     * Sets the employee manager used for updating employees.
+     *
+     * @param employeeManager the EmployeeManager to use
+     */
     public void setEmployeeManager(EmployeeManager employeeManager) {
         this.employeeManager = employeeManager;
     }
@@ -89,7 +94,7 @@ public final class EditEmployeeController {
         try {
             Optional<Employee> originalOpt =
                     employeeManager.findEmployeeByEmail(employee.getEmail());
-            if (originalOpt.isPresent()) {
+            if (originalOpt.isEmpty()) {
                 DialogUtils.showError("Error", "Employee not found.",
                         AppContext.getOwner());
                 return;

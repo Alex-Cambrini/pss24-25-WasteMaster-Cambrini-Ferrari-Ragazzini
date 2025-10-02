@@ -30,8 +30,7 @@ import javafx.util.Duration;
 
 /**
  * Controller for managing the employee view. Handles loading, filtering,
- * adding, editing,
- * and deleting employees, as well as managing the table and search
+ * adding, editing, and deleting employees, as well as managing the table and search
  * functionalities.
  */
 public final class EmployeeController implements AutoRefreshable {
@@ -47,8 +46,7 @@ public final class EmployeeController implements AutoRefreshable {
     private static final String ERROR_NAVIGATION = "Navigation error";
     private final ObservableList<EmployeeRow> allEmployees = FXCollections.observableArrayList();
     private final ObservableList<String> activeFilters = FXCollections.observableArrayList(FILTER_NAME, FILTER_SURNAME,
-            FILTER_EMAIL,
-            FILTER_ROLE, FILTER_LICENCE, FILTER_LOCATION);
+            FILTER_EMAIL, FILTER_ROLE, FILTER_LICENCE, FILTER_LOCATION);
     private Timeline refreshTimeline;
     private ContextMenu filterMenu;
     private Stage owner;
@@ -93,10 +91,18 @@ public final class EmployeeController implements AutoRefreshable {
     @FXML
     private TableColumn<EmployeeRow, String> creationDateColumn;
 
+    /**
+     * Sets the employee manager used for employee operations.
+     *
+     * @param employeeManager the EmployeeManager to use
+     */
     public void setEmployeeManager(EmployeeManager employeeManager) {
         this.employeeManager = employeeManager;
     }
 
+    /**
+     * Initializes the employee view, table columns, and search/filter logic.
+     */
     @FXML
     public void initialize() {
         owner = (Stage) MainLayoutController.getInstance().getRootPane().getScene().getWindow();
@@ -107,7 +113,6 @@ public final class EmployeeController implements AutoRefreshable {
         roleColumn.setCellValueFactory(new PropertyValueFactory<>(FILTER_ROLE));
         licenceColumn.setCellValueFactory(new PropertyValueFactory<>(FILTER_LICENCE));
         creationDateColumn.setCellValueFactory(new PropertyValueFactory<>(FILTER_CREATION_DATE));
-
 
         roleColumn.setCellFactory(column -> new TableCell<EmployeeRow, Role>() {
             @Override
@@ -151,6 +156,9 @@ public final class EmployeeController implements AutoRefreshable {
         loadEmployee();
     }
 
+    /**
+     * Starts the automatic refresh of the employee table.
+     */
     @Override
     public void startAutoRefresh() {
         if (refreshTimeline != null || employeeManager == null) {
@@ -165,8 +173,7 @@ public final class EmployeeController implements AutoRefreshable {
 
     /**
      * Stops the automatic refresh of the employee table, if it is currently active.
-     * This
-     * is typically used when the view is being closed or refreshed manually.
+     * This is typically used when the view is being closed or refreshed manually.
      */
     @Override
     public void stopAutoRefresh() {
@@ -178,10 +185,8 @@ public final class EmployeeController implements AutoRefreshable {
 
     /**
      * Loads the employee data from the database and populates the employee table.
-     * This
-     * method retrieves all employee details, clears the existing list, and adds new
-     * rows
-     * to the table.
+     * This method retrieves all employee details, clears the existing list, and adds new
+     * rows to the table.
      */
     public void loadEmployee() {
         List<Employee> employees = employeeManager.getAllActiveEmployee();
@@ -198,6 +203,9 @@ public final class EmployeeController implements AutoRefreshable {
         }
     }
 
+    /**
+     * Handles the search action, filtering the employee table based on the query and active filters.
+     */
     @FXML
     private void handleSearch() {
         String query = searchField.getText().toLowerCase().trim();
@@ -232,6 +240,9 @@ public final class EmployeeController implements AutoRefreshable {
         employeeTable.setItems(filtered);
     }
 
+    /**
+     * Handles the deletion of the selected employee.
+     */
     @FXML
     private void handleDeleteEmployee() {
         EmployeeRow selected = employeeTable.getSelectionModel().getSelectedItem();
@@ -268,6 +279,9 @@ public final class EmployeeController implements AutoRefreshable {
         }
     }
 
+    /**
+     * Handles the addition of a new employee.
+     */
     @FXML
     private void handleAddEmployee() {
         try {
@@ -288,6 +302,9 @@ public final class EmployeeController implements AutoRefreshable {
         }
     }
 
+    /**
+     * Handles the editing of the selected employee.
+     */
     @FXML
     private void handleEditEmployee() {
         EmployeeRow selected = employeeTable.getSelectionModel().getSelectedItem();
@@ -323,6 +340,9 @@ public final class EmployeeController implements AutoRefreshable {
         }
     }
 
+    /**
+     * Handles the reset of the search field and filters.
+     */
     @FXML
     private void handleResetSearch() {
         searchField.clear();
@@ -334,6 +354,11 @@ public final class EmployeeController implements AutoRefreshable {
         loadEmployee();
     }
 
+    /**
+     * Shows the filter menu for selecting which fields to search.
+     *
+     * @param event the mouse event triggering the menu
+     */
     @FXML
     private void showFilterMenu(final javafx.scene.input.MouseEvent event) {
         if (filterMenu != null && filterMenu.isShowing()) {
@@ -388,10 +413,8 @@ public final class EmployeeController implements AutoRefreshable {
 
     /**
      * Returns to the employee view by loading the appropriate FXML layout. Restores
-     * the
-     * previous title and loads the employee management screen. Displays an error
-     * dialog
-     * if the view fails to load.
+     * the previous title and loads the employee management screen. Displays an error
+     * dialog if the view fails to load.
      */
     public void returnToEmployeeView() {
         try {

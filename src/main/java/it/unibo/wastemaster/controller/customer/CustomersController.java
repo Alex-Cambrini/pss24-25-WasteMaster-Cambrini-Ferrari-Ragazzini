@@ -26,9 +26,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.util.Duration;
 
 /**
- * Controller for managing the customers view, including search, filters and
- * CRUD
- * operations.
+ * Controller for managing the customers view, including search, filters and CRUD operations.
  */
 public final class CustomersController implements AutoRefreshable {
 
@@ -79,6 +77,11 @@ public final class CustomersController implements AutoRefreshable {
     @FXML
     private TableColumn<CustomerRow, String> creationDateColumn;
 
+    /**
+     * Sets the customer manager used for customer operations.
+     *
+     * @param customerManager the CustomerManager to use
+     */
     public void setCustomerManager(CustomerManager customerManager) {
         this.customerManager = customerManager;
     }
@@ -104,10 +107,16 @@ public final class CustomersController implements AutoRefreshable {
                 });
     }
 
+    /**
+     * Loads initial customer data into the table.
+     */
     public void initData() {
         loadCustomers();
     }
 
+    /**
+     * Starts the automatic refresh of the customer table.
+     */
     @Override
     public void startAutoRefresh() {
         if (refreshTimeline != null)
@@ -146,6 +155,9 @@ public final class CustomersController implements AutoRefreshable {
         }
     }
 
+    /**
+     * Handles the action to add a new customer.
+     */
     @FXML
     private void handleAddCustomer() {
         try {
@@ -164,6 +176,9 @@ public final class CustomersController implements AutoRefreshable {
         }
     }
 
+    /**
+     * Handles the action to delete the selected customer.
+     */
     @FXML
     private void handleDeleteCustomer() {
         CustomerRow selected = customerTable.getSelectionModel().getSelectedItem();
@@ -199,6 +214,9 @@ public final class CustomersController implements AutoRefreshable {
         }
     }
 
+    /**
+     * Handles the action to edit the selected customer.
+     */
     @FXML
     private void handleEditCustomer() {
         CustomerRow selected = customerTable.getSelectionModel().getSelectedItem();
@@ -232,6 +250,9 @@ public final class CustomersController implements AutoRefreshable {
         }
     }
 
+    /**
+     * Handles the search action, filtering the customer table based on the query.
+     */
     @FXML
     private void handleSearch() {
         String query = searchField.getText().toLowerCase().trim();
@@ -261,6 +282,9 @@ public final class CustomersController implements AutoRefreshable {
                         && row.getFullLocation().toLowerCase().contains(query));
     }
 
+    /**
+     * Handles the reset of the search field and filters.
+     */
     @FXML
     private void handleResetSearch() {
         searchField.clear();
@@ -269,6 +293,11 @@ public final class CustomersController implements AutoRefreshable {
         loadCustomers();
     }
 
+    /**
+     * Shows the filter menu for selecting which fields to search.
+     *
+     * @param event the mouse event triggering the menu
+     */
     @FXML
     private void showFilterMenu(final javafx.scene.input.MouseEvent event) {
         if (filterMenu != null && filterMenu.isShowing()) {
@@ -304,16 +333,16 @@ public final class CustomersController implements AutoRefreshable {
     }
 
     /**
-    * Returns to the main customers view from a modal or sub-view.
-    */
+     * Returns to the main customers view from a modal or sub-view.
+     */
     public void returnToCustomerView() {
-    try {
-    MainLayoutController.getInstance().restorePreviousTitle();
-    MainLayoutController.getInstance()
-    .loadCenter("/layouts/customer/CustomersView.fxml");
-    } catch (Exception e) {
-    DialogUtils.showError(NAVIGATION_ERROR, "Failed to load customer view.",
-    AppContext.getOwner());
-    }
+        try {
+            MainLayoutController.getInstance().restorePreviousTitle();
+            MainLayoutController.getInstance()
+                    .loadCenter("/layouts/customer/CustomersView.fxml");
+        } catch (Exception e) {
+            DialogUtils.showError(NAVIGATION_ERROR, "Failed to load customer view.",
+                    AppContext.getOwner());
+        }
     }
 }

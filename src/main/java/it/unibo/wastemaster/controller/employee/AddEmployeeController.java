@@ -57,6 +57,11 @@ public final class AddEmployeeController {
     @FXML
     private ComboBox<Licence> licenceComboBox;
 
+    /**
+     * Sets the employee manager used to persist new employees.
+     *
+     * @param employeeManager the EmployeeManager to use
+     */
     public void setEmployeeManager(EmployeeManager employeeManager) {
         this.employeeManager = employeeManager;
     }
