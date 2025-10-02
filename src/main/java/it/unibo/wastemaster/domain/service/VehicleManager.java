@@ -126,7 +126,13 @@ public final class VehicleManager {
         }
     }
 
-
+    /**
+     * Returns the list of allowed licences for the given vehicle.
+     *
+     * @param vehicle the vehicle to check
+     * @return a list of allowed licences
+     * @throws IllegalArgumentException if vehicle is null
+     */
     public List<Licence> getAllowedLicences(final Vehicle vehicle) {
         ValidateUtils.requireArgNotNull(vehicle, "Vehicle cannot be null");
         return switch (vehicle.getRequiredLicence()) {
@@ -136,7 +142,11 @@ public final class VehicleManager {
         };
     }
 
-
+    /**
+     * Retrieves all vehicles in the system.
+     *
+     * @return a list of all vehicles
+     */
     public List<Vehicle> findAllVehicle() {
         return vehicleRepository.findAll();
     }
