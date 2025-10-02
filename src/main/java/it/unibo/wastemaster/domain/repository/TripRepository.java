@@ -43,7 +43,7 @@ public interface TripRepository {
 
     List<String> findAvailablePostalCodes(LocalDate date);
 
-    List<Trip> findLast5Inserted();
+    List<Trip> findLast5Modified();
 
     int countCompleted();
 }
