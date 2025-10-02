@@ -9,7 +9,7 @@
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox alignment="TOP_CENTER" prefWidth="640.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.unibo.wastemaster.controller.employee.EmployeeController">
+<VBox alignment="TOP_CENTER" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.unibo.wastemaster.controller.employee.EmployeeController">
 
     <children>
 
@@ -29,8 +29,9 @@
                 <TableColumn fx:id="surnameColumn" prefWidth="100.0" text="Surname" />
                 <TableColumn fx:id="emailColumn" prefWidth="150.0" text="Email" />
                 <TableColumn fx:id="roleColumn" prefWidth="100.0" text="Role" />
-                <TableColumn fx:id="licenceColumn" prefWidth="120.0" text="Licence" />
+                <TableColumn fx:id="licenceColumn" prefWidth="50.0" text="Licence" />
                 <TableColumn fx:id="locationColumn" maxWidth="400.0" minWidth="180.0" prefWidth="220.0" text="Location" />
+                <TableColumn fx:id="creationDateColumn" prefWidth="150.0" text="Created On" />
             </columns>
         </TableView>
 

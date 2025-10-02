@@ -1,6 +1,7 @@
 package it.unibo.wastemaster.controller.customer;
 
 import it.unibo.wastemaster.application.context.AppContext;
+import it.unibo.wastemaster.controller.main.MainLayoutController;
 import it.unibo.wastemaster.controller.utils.AutoRefreshable;
 import it.unibo.wastemaster.controller.utils.DialogUtils;
 import it.unibo.wastemaster.domain.model.Customer;
@@ -35,6 +36,7 @@ public final class CustomersController implements AutoRefreshable {
     private static final String FIELD_SURNAME = "surname";
     private static final String FIELD_EMAIL = "email";
     private static final String FILTER_LOCATION = "location";
+    private static final String FIELD_CREATION_DATE = "creationDate";
     private static final String NAVIGATION_ERROR = "Navigation error";
     private static final int REFRESH_SECONDS = 30;
     private final ObservableList<CustomerRow> allCustomers = FXCollections.observableArrayList();
@@ -74,6 +76,9 @@ public final class CustomersController implements AutoRefreshable {
     @FXML
     private TableColumn<CustomerRow, String> locationColumn;
 
+    @FXML
+    private TableColumn<CustomerRow, String> creationDateColumn;
+
     public void setCustomerManager(CustomerManager customerManager) {
         this.customerManager = customerManager;
     }
@@ -89,7 +94,7 @@ public final class CustomersController implements AutoRefreshable {
         locationColumn.setText("Location");
         locationColumn.setCellValueFactory(cellData -> new SimpleStringProperty(
                 cellData.getValue().getFullLocation()));
-
+        creationDateColumn.setCellValueFactory(new PropertyValueFactory<>(FIELD_CREATION_DATE));
         searchField.textProperty().addListener((obs, oldText, newText) -> handleSearch());
         customerTable.getSelectionModel().selectedItemProperty()
                 .addListener((obs, oldVal, newVal) -> {
@@ -298,17 +303,17 @@ public final class CustomersController implements AutoRefreshable {
         filterMenu.show(filterButton, event.getScreenX(), event.getScreenY());
     }
 
-    // /**
-    // * Returns to the main customers view from a modal or sub-view.
-    // */
-    // public void returnToCustomerView() {
-    // try {
-    // MainLayoutController.getInstance().restorePreviousTitle();
-    // MainLayoutController.getInstance()
-    // .loadCenter("/layouts/customer/CustomersView.fxml");
-    // } catch (Exception e) {
-    // DialogUtils.showError(NAVIGATION_ERROR, "Failed to load customer view.",
-    // AppContext.getOwner());
-    // }
-    // }
+    /**
+    * Returns to the main customers view from a modal or sub-view.
+    */
+    public void returnToCustomerView() {
+    try {
+    MainLayoutController.getInstance().restorePreviousTitle();
+    MainLayoutController.getInstance()
+    .loadCenter("/layouts/customer/CustomersView.fxml");
+    } catch (Exception e) {
+    DialogUtils.showError(NAVIGATION_ERROR, "Failed to load customer view.",
+    AppContext.getOwner());
+    }
+    }
 }

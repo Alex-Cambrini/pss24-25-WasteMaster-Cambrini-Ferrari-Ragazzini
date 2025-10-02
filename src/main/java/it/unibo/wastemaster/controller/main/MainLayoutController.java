@@ -47,6 +47,7 @@ public final class MainLayoutController {
     private static MainLayoutController instance;
     private Object currentController;
     private String previousTitle;
+    private boolean firstDashboardLoad = true;
 
     @FXML
     private StackPane rootPane;
@@ -105,22 +106,27 @@ public final class MainLayoutController {
     @FXML
     public void initialize() {
         MainLayoutController.setInstance(this);
-        String accountName = AppContext.getCurrentAccount().getEmployee().getName();
-        setPageTitle(String.format("Welcome back %s", accountName));
+        centerPane.setPrefWidth(800);
+        centerPane.setPrefHeight(600);
         Employee.Role role = AppContext.getCurrentAccount().getEmployee().getRole();
         switch (role) {
             case OFFICE_WORKER -> {
                 employeesLink.setDisable(true);
                 vehiclesLink.setDisable(true);
+                handleDashboard();
             }
             case OPERATOR -> {
                 customersLink.setDisable(true);
                 employeesLink.setDisable(true);
                 vehiclesLink.setDisable(true);
                 schedulesLink.setDisable(true);
+                dashboardLink.setDisable(true);
+                wasteLink.setDisable(true);
+                invoicesLink.setDisable(true);
+                handleTrip();
             }
             default -> {
-                // Do nothing
+                handleDashboard();
             }
         }
     }
@@ -151,26 +157,21 @@ public final class MainLayoutController {
      * @return the controller instance, or null if loading fails
      */
     public <T> T loadCenterWithController(final String fxmlPath) {
-        System.out.println("[DEBUG] Loading FXML from path: " + fxmlPath);
         try {
             stopAutoRefreshIfSupported(currentController);
             final URL resource = getClass().getResource(fxmlPath);
-            System.out.println("[DEBUG] Resolved resource URL: " + resource);
             if (resource == null) {
-                System.out.println("[ERROR] Resource not found: " + fxmlPath);
                 return null;
             }
             final FXMLLoader loader = new FXMLLoader(resource);
             final Pane view = loader.load();
             T controller = loader.getController();
-            System.out.println("[DEBUG] Controller loaded: " + (controller != null));
             currentController = controller;
 
             centerPane.getChildren().setAll(view);
             return controller;
         } catch (final IOException e) {
             e.printStackTrace();
-            System.out.println("[ERROR] IOException loading FXML: " + e.getMessage());
             return null;
         }
     }
@@ -181,15 +182,9 @@ public final class MainLayoutController {
 
         customersLink.setVisited(false);
         setPageTitle(CUSTOMER_MANAGEMENT);
-
-        System.out.println("[DEBUG] Carico CustomersView.fxml...");
         CustomersController controller = loadCenterWithController("/layouts/customer/CustomersView.fxml");
-
-        System.out.println("[DEBUG] Controller caricato: " + (controller != null));
-
         if (controller != null) {
             var cm = AppContext.getServiceFactory().getCustomerManager();
-            System.out.println("[DEBUG] CustomerManager: " + cm);
             controller.setCustomerManager(cm);
             controller.initData();
         startAutoRefreshIfSupported(controller);
@@ -199,16 +194,23 @@ public final class MainLayoutController {
     @FXML
     private void handleDashboard() {
     dashboardLink.setVisited(false);
-    setPageTitle("Dashboard");
+        dashboardLink.setVisited(false);
+        if (firstDashboardLoad) {
+            setPageTitle(String.format("Welcome back %s", AppContext.getCurrentAccount().getEmployee().getName()));
+            firstDashboardLoad = false;
+        } else {
+            setPageTitle("Dashboard");
+        }
 
-    
+
     var controller = loadCenterWithController("/layouts/dashboard/DashboardView.fxml");
     if (controller != null && controller instanceof it.unibo.wastemaster.controller.dashboard.DashboardController dashCtrl) {
         dashCtrl.setCustomerManager(AppContext.getServiceFactory().getCustomerManager());
         dashCtrl.setCollectionManager(AppContext.getServiceFactory().getCollectionManager());
         dashCtrl.setInvoiceManager(AppContext.getServiceFactory().getInvoiceManager());
         dashCtrl.setTripManager(AppContext.getServiceFactory().getTripManager());
-        dashCtrl.updateDashboard();
+        dashCtrl.setNotificationManager(AppContext.getServiceFactory().getNotificationManager());
+        dashCtrl.initData();
     }
     }
 

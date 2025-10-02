@@ -14,6 +14,7 @@ import it.unibo.wastemaster.domain.service.InvoiceManager;
 import it.unibo.wastemaster.viewmodels.CustomerRow;
 import it.unibo.wastemaster.viewmodels.InvoiceRow;
 import java.io.IOException;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 import javafx.animation.KeyFrame;
@@ -22,8 +23,6 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ContextMenu;
@@ -33,7 +32,6 @@ import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
@@ -86,6 +84,9 @@ public final class InvoiceController implements AutoRefreshable {
     private TableColumn<InvoiceRow, String> invoiceAmountColumn;
 
     @FXML
+    private TableColumn<InvoiceRow, String> paymentDateColumn;
+
+    @FXML
     private TableColumn<InvoiceRow, String> statusColumn;
 
     @FXML
@@ -132,28 +133,65 @@ public final class InvoiceController implements AutoRefreshable {
 
     @FXML
     public void initialize() {
-        owner = (Stage) MainLayoutController.getInstance().getRootPane().getScene()
-                .getWindow();
+        owner = (Stage) MainLayoutController.getInstance().getRootPane().getScene().getWindow();
+
+        DateTimeFormatter TS_FMT = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 
         idColumn.setCellValueFactory(new PropertyValueFactory<>("id"));
         customerColumn.setCellValueFactory(new PropertyValueFactory<>("customer"));
         invoiceAmountColumn.setCellValueFactory(new PropertyValueFactory<>("amount"));
         statusColumn.setCellValueFactory(new PropertyValueFactory<>("status"));
         dateColumn.setCellValueFactory(new PropertyValueFactory<>("issueDate"));
-        serviceCountsColumn.setCellValueFactory(
-                new PropertyValueFactory<>("serviceCounts"));
-        totalAmountsColumn.setCellValueFactory(
-                new PropertyValueFactory<>("totalAmounts"));
+        paymentDateColumn.setCellValueFactory(new PropertyValueFactory<>("paymentDate"));
+        serviceCountsColumn.setCellValueFactory(new PropertyValueFactory<>("serviceCounts"));
+        totalAmountsColumn.setCellValueFactory(new PropertyValueFactory<>("totalAmounts"));
         isCancelledColumn.setCellValueFactory(new PropertyValueFactory<>("isCancelled"));
+
+        java.util.function.Function<String, String> fmt = s -> {
+            if (s == null || s.isBlank())
+                return "";
+            try {
+                return java.time.LocalDateTime.parse(s).format(TS_FMT);
+            } catch (Exception e1) {
+                try {
+                    return java.time.OffsetDateTime.parse(s).toLocalDateTime().format(TS_FMT);
+                } catch (Exception e2) {
+                    try {
+                        return java.time.ZonedDateTime.parse(s).toLocalDateTime().format(TS_FMT);
+                    } catch (Exception e3) {
+                        return s;
+                    }
+                }
+            }
+        };
+
+        dateColumn.setCellFactory(col -> new javafx.scene.control.TableCell<InvoiceRow, String>() {
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                setText(empty ? null : fmt.apply(item));
+            }
+        });
+
+        paymentDateColumn.setCellFactory(col -> new javafx.scene.control.TableCell<InvoiceRow, String>() {
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty) {
+                    setText(null);
+                } else {
+                    setText((item == null || item.isBlank()) ? "-" : fmt.apply(item));
+                }
+            }
+        });
 
         searchField.textProperty().addListener((obs, oldText, newText) -> handleSearch());
 
         invoiceTable.getSelectionModel().selectedItemProperty()
-        .addListener((obs, oldVal, newVal) -> {
-            updateButtons(newVal);
-            // Dinamicamente abilita/disabilita il bottone "View Customer"
-            viewCustomerButton.setDisable(newVal == null);
-        });
+                .addListener((obs, oldVal, newVal) -> {
+                    updateButtons(newVal);
+                    viewCustomerButton.setDisable(newVal == null);
+                });
 
         if (showDeletedCheckBox != null) {
             showDeletedCheckBox.setSelected(false);
@@ -467,19 +505,17 @@ public final class InvoiceController implements AutoRefreshable {
         Customer customer = selectedRow.getInvoice().getCustomer();
 
         try {
-        Optional<CustomerStatisticsController> controllerOpt = DialogUtils.showModalWithController(
-                "Customer Statistics",
-                "/layouts/customerstatistics/CustomerStatisticsView.fxml",
-                AppContext.getOwner(),
-                ctrl -> {
-                    ctrl.setCustomerManager(customerManager);
-                    ctrl.setInvoiceManager(invoiceManager);
-                    ctrl.setCollectionManager(collectionManager);
-                    ctrl.setCustomer(customer); 
-                });
+            Optional<CustomerStatisticsController> controllerOpt = DialogUtils.showModalWithController(
+                    "Customer Statistics",
+                    "/layouts/customerstatistics/CustomerStatisticsView.fxml",
+                    AppContext.getOwner(),
+                    ctrl -> {
+                        ctrl.setCustomerManager(customerManager);
+                        ctrl.setInvoiceManager(invoiceManager);
+                        ctrl.setCollectionManager(collectionManager);
+                        ctrl.setCustomer(customer);
+                    });
 
-
-            
         } catch (IOException e) {
             e.printStackTrace();
             DialogUtils.showError("Loading Error", "Could not load Customer Statistics dialog.", AppContext.getOwner());

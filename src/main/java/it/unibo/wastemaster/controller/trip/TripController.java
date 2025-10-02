@@ -9,21 +9,25 @@ import it.unibo.wastemaster.domain.model.Collection;
 import it.unibo.wastemaster.domain.model.Employee;
 import it.unibo.wastemaster.domain.model.Trip;
 import it.unibo.wastemaster.domain.service.CollectionManager;
+import it.unibo.wastemaster.domain.service.NotificationService;
 import it.unibo.wastemaster.domain.service.TripManager;
 import it.unibo.wastemaster.domain.service.VehicleManager;
 import it.unibo.wastemaster.viewmodels.TripRow;
+
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+
+import java.util.Set;
+
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
-import javafx.scene.control.ButtonBar;
-import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.CustomMenuItem;
@@ -38,6 +42,12 @@ import javafx.util.Duration;
  * operations.
  */
 public final class TripController implements AutoRefreshable {
+
+    private NotificationService notificationService;
+
+    public void setNotificationService(NotificationService notificationService) {
+        this.notificationService = notificationService;
+    }
 
     private static final String FIELD_ID = "id";
     private static final String FIELD_POSTAL_CODES = "postalCodes";
@@ -176,7 +186,6 @@ public final class TripController implements AutoRefreshable {
                         deleteTripPermanentlyButton.setDisable(!isActive);
                         completeTripButton.setDisable(!isActive);
 
-
                         boolean isNotCancelled = !"CANCELED".equalsIgnoreCase(status)
                                 && !"CANCELLED".equalsIgnoreCase(status);
                         showRelatedCollections.setDisable(!isNotCancelled);
@@ -194,6 +203,8 @@ public final class TripController implements AutoRefreshable {
         boolean isAllowedToCompleteTrip = currentUser.getRole() == Employee.Role.ADMINISTRATOR
                 || currentUser.getRole() == Employee.Role.OPERATOR;
         completeTripButton.setVisible(isAllowedToCompleteTrip);
+
+        this.notificationService = AppContext.getServiceFactory().getNotificationService();
     }
 
     public void initData() {
@@ -269,10 +280,11 @@ public final class TripController implements AutoRefreshable {
         boolean confirmed = DialogUtils.showConfirmationDialog(
                 "Confirm Permanent Deletion",
                 "Are you sure you want to permanently delete this trip? Recurring "
-                        + "collections will be rescheduled to the next date.",
-
+                        + "collections will be rescheduled to the next available date.",
                 AppContext.getOwner());
-        if (!confirmed) return;
+        if (!confirmed) {
+            return;
+        }
 
         Optional<Trip> tripOpt = tripManager.getTripById(selected.getIdAsInt());
         if (tripOpt.isEmpty()) {
@@ -283,15 +295,49 @@ public final class TripController implements AutoRefreshable {
 
         Trip trip = tripOpt.get();
         boolean success = tripManager.softDeleteAndRescheduleNextCollection(trip);
+
         if (success) {
+            try {
+                List<String> recipients = extractCustomerEmails(trip);
+                if (!recipients.isEmpty() && notificationService != null) {
+                    DateTimeFormatter fmt = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+                    String formattedDeparture = trip.getDepartureTime().format(fmt);
+
+                    String subject = "Trip cancellation #" + trip.getTripId();
+                    String body = "Dear customer,\n\n"
+                            + "We inform you that trip #" + trip.getTripId()
+                            + " (ZIP " + trip.getPostalCode() + ", departure " + formattedDeparture + ") "
+                            + "has been cancelled. Any recurring collections have been rescheduled to the next available date.\n\n"
+                            + "For assistance, please reply to this email.\n"
+                            + "Best regards,\nWasteMaster";
+
+                    notificationService.notifyTripCancellation(recipients, subject, body);
+                }
+            } catch (Exception ex) {
+                DialogUtils.showError("Notification Warning",
+                        "Trip deleted, but customers could not be notified:\n" + ex.getMessage(),
+                        AppContext.getOwner());
+            }
+
             loadTrips();
-            DialogUtils.showSuccess("Trip permanently deleted and recurring collections rescheduled.", AppContext.getOwner());
+            DialogUtils.showSuccess("Trip permanently deleted and recurring collections rescheduled.",
+                    AppContext.getOwner());
         } else {
             DialogUtils.showError("Deletion Failed",
                     "Unable to delete the selected trip.", AppContext.getOwner());
         }
     }
 
+    private List<String> extractCustomerEmails(Trip trip) {
+        if (trip.getCollections() == null)
+            return List.of();
+        Set<String> unique = trip.getCollections().stream()
+                .map(c -> c.getCustomer())
+                .filter(cu -> cu != null && cu.getEmail() != null && !cu.getEmail().isBlank())
+                .map(cu -> cu.getEmail().trim())
+                .collect(Collectors.toSet());
+        return List.copyOf(unique);
+    }
 
     @FXML
     private void handleDeleteTrip() {
@@ -306,7 +352,8 @@ public final class TripController implements AutoRefreshable {
                 "Confirm Deletion",
                 "Are you sure you want to delete this trip?",
                 AppContext.getOwner());
-        if (!confirmed) return;
+        if (!confirmed)
+            return;
 
         Optional<Trip> tripOpt = tripManager.getTripById(selected.getIdAsInt());
         if (tripOpt.isEmpty()) {
@@ -326,7 +373,6 @@ public final class TripController implements AutoRefreshable {
                     "Unable to delete the selected trip.", AppContext.getOwner());
         }
     }
-
 
     @FXML
     private void handleEditTrip() {
