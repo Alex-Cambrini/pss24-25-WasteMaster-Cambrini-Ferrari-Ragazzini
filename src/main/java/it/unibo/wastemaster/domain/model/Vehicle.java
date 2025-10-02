@@ -33,7 +33,8 @@ public final class Vehicle {
      */
     @Column(length = 10, nullable = false, unique = true)
     @NotBlank(message = "Plate must not be blank")
-    @Pattern(regexp = "^[a-zA-Z0-9\\-\\s]{5,10}$", message = "Plate must contain 5 to 10 alphanumeric characters")
+    @Pattern(regexp = "^[a-zA-Z0-9\\-\\s]{5,10}$", message = "Plate must contain 5 to "
+            + "10 alphanumeric characters")
     private String plate;
 
     /**
@@ -104,17 +105,17 @@ public final class Vehicle {
     /**
      * Constructs a vehicle with all required attributes.
      *
-     * @param plate             license plate
-     * @param brand             vehicle brand
-     * @param model             vehicle model
-     * @param registrationYear  year of registration
-     * @param requiredLicence   licence needed to drive
-     * @param vehicleStatus     current vehicle status
+     * @param plate license plate
+     * @param brand vehicle brand
+     * @param model vehicle model
+     * @param registrationYear year of registration
+     * @param requiredLicence licence needed to drive
+     * @param vehicleStatus current vehicle status
      * @param requiredOperators number of operators needed for the vehicle
      */
     public Vehicle(final String plate, final String brand, final String model,
-            final int registrationYear, final RequiredLicence requiredLicence,
-            final VehicleStatus vehicleStatus, final int requiredOperators) {
+                   final int registrationYear, final RequiredLicence requiredLicence,
+                   final VehicleStatus vehicleStatus, final int requiredOperators) {
         if (plate == null) {
             throw new IllegalArgumentException("Plate must not be null");
         }
@@ -281,7 +282,8 @@ public final class Vehicle {
 
     @Override
     public String toString() {
-        return String.format("%s %s %s (%d operators)", plate, brand, model, requiredOperators);
+        return String.format("%s %s %s (%d operators)", plate, brand, model,
+                requiredOperators);
     }
 
     /**

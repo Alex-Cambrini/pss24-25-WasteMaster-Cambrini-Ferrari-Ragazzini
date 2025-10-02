@@ -17,18 +17,14 @@ import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
 
 /**
- * Represents a waste collection linked to a customer and a schedule. Contains
- * information
- * about the waste type, scheduled date, collection status, and other relevant
- * details for
- * managing the collection.
+ * The type Collection.
  */
 @Entity
 @Table(name = "collections")
-public class Collection {
+public final class Collection {
 
     /**
-     * Number of days allowed to cancel a collection.
+     * The constant CANCEL_LIMIT_DAYS.
      */
     public static final int CANCEL_LIMIT_DAYS = 2;
 
@@ -86,10 +82,11 @@ public class Collection {
     @NotNull(message = "Schedule cannot be null")
     private Schedule schedule;
 
-    /** True if the collection has been billed, false otherwise. */
+    /**
+     * True if the collection has been billed, false otherwise.
+     */
     @Column(nullable = false)
     private boolean isBilled = false;
-
 
     /**
      * Trip associated with the collection (optional).
@@ -99,16 +96,15 @@ public class Collection {
     private Trip trip;
 
     /**
-     * Default constructor required by JPA.
+     * Default no-argument constructor required by JPA.
      */
     public Collection() {
     }
 
     /**
-     * Constructs a Collection based on a Schedule. Sets the date, waste type, and
-     * customer based on the schedule.
+     * Instantiates a new Collection.
      *
-     * @param schedule the schedule linked to this collection
+     * @param schedule the schedule
      */
     public Collection(final Schedule schedule) {
         this.schedule = schedule;
@@ -122,143 +118,174 @@ public class Collection {
     }
 
     /**
-     * @return the unique collection identifier
+     * Gets collection id.
+     *
+     * @return the collection id
      */
     public int getCollectionId() {
         return collectionId;
     }
 
     /**
-     * @return the scheduled collection date
+     * Gets collection date.
+     *
+     * @return the collection date
      */
     public LocalDate getCollectionDate() {
         return date;
     }
 
     /**
-     * Sets the collection date.
+     * Sets collection date.
      *
-     * @param date the new collection date
+     * @param date the date
      */
     public void setCollectionDate(final LocalDate date) {
         this.date = date;
     }
 
     /**
-     * @return the customer associated with the collection
+     * Gets customer.
+     *
+     * @return the customer
      */
     public Customer getCustomer() {
         return customer;
     }
 
     /**
-     * @return the waste type
+     * Gets waste.
+     *
+     * @return the waste
      */
     public Waste getWaste() {
         return waste;
     }
 
     /**
-     * Sets the waste type.
+     * Sets waste.
      *
-     * @param waste the new waste type
+     * @param waste the waste
      */
     public void setWaste(final Waste waste) {
         this.waste = waste;
     }
 
     /**
-     * @return the current status of the collection
+     * Gets collection status.
+     *
+     * @return the collection status
      */
     public CollectionStatus getCollectionStatus() {
         return collectionStatus;
     }
 
     /**
-     * Sets the collection status.
+     * Sets collection status.
      *
-     * @param collectionStatus the new status
+     * @param collectionStatus the collection status
      */
     public void setCollectionStatus(final CollectionStatus collectionStatus) {
         this.collectionStatus = collectionStatus;
     }
 
     /**
-     * @return the cancellation limit days
+     * Gets cancel limit days.
+     *
+     * @return the cancel limit days
      */
     public int getCancelLimitDays() {
         return cancelLimitDays;
     }
 
     /**
-     * Sets the cancellation limit days.
+     * Sets cancel limit days.
      *
-     * @param cancelLimitDays the new cancellation limit
+     * @param cancelLimitDays the cancel limit days
      */
     public void setCancelLimitDays(final int cancelLimitDays) {
         this.cancelLimitDays = cancelLimitDays;
     }
 
     /**
-     * Returns whether the collection has been billed.
+     * Gets is billed.
      *
-     * @return true if billed, false otherwise
+     * @return the is billed
      */
     public Boolean getIsBilled() {
         return isBilled;
     }
 
     /**
-     * Sets whether the collection has been billed.
+     * Sets is billed.
      *
-     * @param isBilled true if billed, false otherwise
+     * @param isBilled the is billed
      */
     public void setIsBilled(final Boolean isBilled) {
         this.isBilled = isBilled;
     }
 
     /**
-     * @return the schedule linked to the collection
+     * Gets trip.
+     *
+     * @return the trip
+     */
+    public final Trip getTrip() {
+        return trip;
+    }
+
+    /**
+     * Sets trip.
+     *
+     * @param trip the trip
+     */
+    public void setTrip(final Trip trip) {
+        this.trip = trip;
+    }
+
+    /**
+     * Gets schedule.
+     *
+     * @return the schedule
      */
     public Schedule getSchedule() {
         return schedule;
     }
 
     /**
-     * Returns a string representation of the collection.
-     * <p>
-     * Subclasses overriding this method should call super.toString() and append
-     * their
-     * additional information to maintain consistency.
+     * Returns a string representation of the collection, including key details:
+     * collection ID, customer name, collection date, waste type, collection status,
+     * cancel limit days, schedule ID, and schedule category.
+     * Null values are replaced with "N/A".
      *
-     * @return string representation of the collection
+     * @return formatted string describing the collection
      */
     @Override
     public String toString() {
         return String.format("""
-                Collection {ID: %d, Customer: %s, Date: %s, Waste: %s, Status: %s,
-                Cancel Limit Days: %d, Schedule ID: %s, Schedule Category: %s}""",
+                        Collection {ID: %d, Customer: %s, Date: %s, Waste: %s, Status: %s,
+                        Cancel Limit Days: %d, Schedule ID: %s, Schedule Category: %s}""",
                 collectionId, customer != null ? customer.getName() : "N/A", date,
                 waste != null ? waste.getWasteName() : "N/A", collectionStatus,
                 cancelLimitDays, schedule != null ? schedule.getScheduleId() : "N/A",
                 schedule != null ? schedule.getScheduleCategory() : "N/A");
     }
 
-    public void setTrip(Trip trip) {
-        this.trip = trip;
-    }
-
-    public Trip getTrip() {
-        return trip;
-    }
-
     /**
-     * Possible statuses of the collection.
+     * The enum Collection status.
      */
     public enum CollectionStatus {
-        ACTIVE, // raccolta attiva
-        COMPLETED, // raccolta terminata
-        CANCELLED // raccolta annullata
+        /**
+         * Active collection status.
+         */
+        ACTIVE,
+        /**
+         * Completed collection status.
+         */
+        COMPLETED,
+        /**
+         * Cancelled collection status.
+         */
+        CANCELLED
     }
-
 }
