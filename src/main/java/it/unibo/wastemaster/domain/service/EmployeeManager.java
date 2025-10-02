@@ -82,10 +82,13 @@ public class EmployeeManager {
 
     /**
      * Updates an existing employee after validation and email conflict check.
+     * Validates the entity, requires a non-null ID, and ensures that the email
+     * address is not already used by another employee.
      *
-     * @param toUpdateEmployee the employee to update
-     * @throws IllegalArgumentException if the ID is null or email is used by
-     *                                  another
+     * @param toUpdateEmployee the employee to update (must not be null; must have a
+     *                         non-null ID)
+     * @throws IllegalArgumentException if the employee is invalid, the ID is null,
+     *                                  or the email is already used by another
      *                                  employee
      */
     public void updateEmployee(final Employee toUpdateEmployee) {
@@ -124,12 +127,17 @@ public class EmployeeManager {
     }
 
     /**
-     * Checks if an employee is allowed to drive a specific vehicle based on
-     * license.
+     * Determines whether the given employee can drive the specified vehicle based
+     * on licence classes.
+     * Rules:
+     * - C : can drive vehicles requiring B, C1, or C
+     * - C1 : can drive vehicles requiring B or C1
+     * - B : can drive vehicles requiring B only
      *
-     * @param employee the employee
-     * @param vehicle  the vehicle
-     * @return true if the employee can drive the vehicle, false otherwise
+     * @param employee the employee (must not be null)
+     * @param vehicle  the vehicle (must not be null)
+     * @return true if the employee can drive the vehicle; false otherwise
+     * @throws IllegalArgumentException if employee or vehicle is null
      */
     public boolean canDriveVehicle(final Employee employee, final Vehicle vehicle) {
         ValidateUtils.requireArgNotNull(employee, EMPLOYEE_NULL_MSG);

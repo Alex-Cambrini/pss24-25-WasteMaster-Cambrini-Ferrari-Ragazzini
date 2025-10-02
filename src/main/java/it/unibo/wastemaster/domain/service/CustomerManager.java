@@ -66,10 +66,14 @@ public class CustomerManager {
     }
 
     /**
-     * Performs a soft delete on the customer by marking it deleted and updating it.
+     * Performs a soft delete on the customer by marking it as deleted and updating
+     * it.
+     * If validation fails, the method catches the exception and returns false
+     * instead
+     * of propagating it.
      *
      * @param customer the customer to soft delete
-     * @return true if deletion succeeded, false if any validation fails
+     * @return true if deletion and update succeeded, false if validation fails
      */
     public boolean softDeleteCustomer(final Customer customer) {
         try {

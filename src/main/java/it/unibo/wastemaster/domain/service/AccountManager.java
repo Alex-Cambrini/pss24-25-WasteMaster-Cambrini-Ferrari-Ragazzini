@@ -27,13 +27,21 @@ public class AccountManager {
     }
 
     /**
-     * Creates a new Account for the given Employee with the raw password. The
-     * password is
-     * hashed using BCrypt before storing.
+     * Creates a new Account for the given Employee using the provided raw password.
+     * The password is validated (at least 8 characters, at least one letter and one
+     * number)
+     * and then hashed with BCrypt before being stored.
      *
-     * @param employee    the employee to associate with the new account
-     * @param rawPassword the plain text password to hash and store
+     * @param employee    the employee to associate with the new account (must not
+     *                    be null)
+     * @param rawPassword the plain text password to validate and hash (must not be
+     *                    null/blank)
      * @return the created Account entity
+     * @throws IllegalArgumentException if the password is null/blank or does not
+     *                                  satisfy
+     *                                  the minimum policy (>= 8 chars, >= 1 letter,
+     *                                  >= 1 digit)
+     * @throws AccountCreationException if the account cannot be persisted
      */
     public Account createAccount(final Employee employee, final String rawPassword) {
         if (rawPassword == null || rawPassword.trim().isEmpty()) {

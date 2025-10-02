@@ -65,11 +65,12 @@ public class CollectionManager {
     }
 
     /**
-     * Retrieves the currently active collection associated with a given recurring
-     * schedule.
+     * Retrieves the currently active collection associated with the given recurring
+     * schedule, if present.
      *
-     * @param schedule the recurring schedule
-     * @return the active collection, or null if none exists
+     * @param schedule the recurring schedule (must not be null)
+     * @return an Optional containing the active collection if found, or an empty
+     *         Optional otherwise
      */
     public Optional<Collection> getActiveCollectionByRecurringSchedule(
             final RecurringSchedule schedule) {

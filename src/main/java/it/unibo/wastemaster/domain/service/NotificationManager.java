@@ -51,12 +51,21 @@ public class NotificationManager {
         }
 
         /**
-         * Retrieves the 5 most recent system events across customers, invoices, and
-         * trips.
-         * Events are aggregated, sorted by timestamp (most recent first),
-         * and converted into {@link Notification} objects.
+         * Retrieves the 5 most recent notifications aggregated from customers,
+         * invoices, and trips.
+         * <p>
+         * Timestamps used for recency/sorting:
+         * <ul>
+         * <li><b>Customers</b>: {@code createdDate}</li>
+         * <li><b>Invoices</b>: {@code paymentDate} if present, otherwise
+         * {@code issueDate}</li>
+         * <li><b>Trips</b>: {@code departureTime}</li>
+         * </ul>
+         * Events are merged, sorted in descending order by the timestamp above, and
+         * converted into {@link Notification} objects. The first 5 items are returned.
          *
-         * @return a list of up to 5 latest notifications
+         * @return a list of up to 5 latest notifications based on the timestamps listed
+         *         above
          */
         public List<Notification> getLast5Events() {
                 List<Notification> events = new ArrayList<>();
