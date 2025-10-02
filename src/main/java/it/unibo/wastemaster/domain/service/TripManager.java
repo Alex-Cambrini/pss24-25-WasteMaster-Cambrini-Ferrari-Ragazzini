@@ -83,6 +83,7 @@ public final class TripManager {
                 throw new IllegalArgumentException("Only ACTIVE trips can be canceled");
             }
             trip.setStatus(TripStatus.CANCELED);
+            trip.setLastModified(LocalDateTime.now());
             tripRepository.update(trip);
             for (Collection c : trip.getCollections()) {
                 c.setTrip(null);
@@ -178,6 +179,7 @@ public final class TripManager {
             }
 
             trip.setStatus(TripStatus.COMPLETED);
+            trip.setLastModified(LocalDateTime.now());
             tripRepository.update(trip);
 
             return true;
