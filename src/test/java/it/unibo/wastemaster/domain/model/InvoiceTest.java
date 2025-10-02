@@ -26,8 +26,8 @@ class InvoiceTest extends AbstractDatabaseTest {
     public void setUp() {
         super.setUp();
         Customer customer = new Customer(
-                "Mario", // nome
-                "Rossi", // cognome
+                "Mario", 
+                "Rossi", 
                 new Location("Via Roma", "10", "Bologna", "40100"),
                 "mario.rossi@example.com",
                 "1234567890"
@@ -49,6 +49,7 @@ class InvoiceTest extends AbstractDatabaseTest {
         invoice.setAmount(100.0);
         invoice.setIssueDate(LocalDateTime.now());
         invoice.setPaymentStatus(Invoice.PaymentStatus.PAID);
+        invoice.setLastModified(LocalDateTime.now()); 
     }
 
     @Test
@@ -91,10 +92,10 @@ class InvoiceTest extends AbstractDatabaseTest {
 
     @Test
     void testIsDeletedSetterGetter() {
-    assertFalse(invoice.isDeleted());
-    invoice.setDeleted(true);
-    assertTrue(invoice.isDeleted());
-    invoice.setDeleted(false);
-    assertFalse(invoice.isDeleted());
+        assertFalse(invoice.isDeleted());
+        invoice.setDeleted(true);
+        assertTrue(invoice.isDeleted());
+        invoice.setDeleted(false);
+        assertFalse(invoice.isDeleted());
     }
 }
