@@ -5,6 +5,8 @@ import it.unibo.wastemaster.domain.model.Invoice;
 import it.unibo.wastemaster.domain.repository.InvoiceRepository;
 import it.unibo.wastemaster.infrastructure.dao.InvoiceDAO;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 public class InvoiceRepositoryImpl implements InvoiceRepository {
@@ -47,6 +49,11 @@ public class InvoiceRepositoryImpl implements InvoiceRepository {
     @Override
     public List<Invoice> findByCustomer(Customer customer) {
         return invoiceDAO.findByCustomer(customer);
+    }
+
+    @Override
+    public List<Invoice> findLast5InvoicesEvent() {
+        return invoiceDAO.findLast5InvoicesEvent();
     }
 }
 

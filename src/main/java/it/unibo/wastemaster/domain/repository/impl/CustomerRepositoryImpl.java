@@ -53,4 +53,9 @@ public class CustomerRepositoryImpl implements CustomerRepository {
     public List<Customer> findAll() {
         return customerDAO.findAll();
     }
+
+    @Override
+    public List<Customer> findLast5Inserted() {
+        return customerDAO.findLast5Inserted();
+    }
 }

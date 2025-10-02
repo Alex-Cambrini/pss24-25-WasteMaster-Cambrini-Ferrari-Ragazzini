@@ -20,4 +20,7 @@ public interface InvoiceRepository {
     List<Invoice> findAll();
 
     List<Invoice> findByCustomer(it.unibo.wastemaster.domain.model.Customer customer);
+
+    List<Invoice> findLast5InvoicesEvent();
+
 }

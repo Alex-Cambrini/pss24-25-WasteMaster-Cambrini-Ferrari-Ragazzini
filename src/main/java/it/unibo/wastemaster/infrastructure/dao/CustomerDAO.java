@@ -56,4 +56,12 @@ public final class CustomerDAO extends GenericDAO<Customer> {
                     WHERE c.isDeleted = false
                 """, Customer.class).getResultList();
     }
+
+    public List<Customer> findLast5Inserted() {
+        return getEntityManager().createQuery(
+                        "SELECT c FROM Customer c ORDER BY c.createdDate DESC", Customer.class)
+                .setMaxResults(5)
+                .getResultList();
+    }
+
 }

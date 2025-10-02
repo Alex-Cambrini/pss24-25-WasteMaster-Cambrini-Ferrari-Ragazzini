@@ -9,6 +9,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
+import java.time.LocalDateTime;
 
 /**
  * Represents an employee entity extending the Person class. Maps to the "employee" table
@@ -55,7 +56,7 @@ public class Employee extends Person {
     public Employee(final String name, final String surname, final Location address,
                     final String email, final String phone, final Role role,
                     final Licence licence) {
-        super(name, surname, address, email, phone);
+        super(name, surname, address, email, phone, LocalDateTime.now());
         this.role = role;
         this.licence = licence;
     }

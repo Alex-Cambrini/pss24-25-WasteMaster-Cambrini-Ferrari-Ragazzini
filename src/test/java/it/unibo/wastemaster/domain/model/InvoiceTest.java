@@ -8,6 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import it.unibo.wastemaster.infrastructure.AbstractDatabaseTest;
 import it.unibo.wastemaster.domain.model.Collection.CollectionStatus;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -25,8 +26,8 @@ class InvoiceTest extends AbstractDatabaseTest {
     public void setUp() {
         super.setUp();
         Customer customer = new Customer(
-                "Mario", // nome
-                "Rossi", // cognome
+                "Mario", 
+                "Rossi", 
                 new Location("Via Roma", "10", "Bologna", "40100"),
                 "mario.rossi@example.com",
                 "1234567890"
@@ -44,20 +45,36 @@ class InvoiceTest extends AbstractDatabaseTest {
         collection.setCollectionStatus(CollectionStatus.COMPLETED);
         getCollectionDAO().update(collection);
 
-        invoice = new Invoice(customer, List.of(collection), 0, 0, 0, 0, null);
+        LocalDateTime now = LocalDateTime.now();
+        invoice = new Invoice(customer, List.of(collection), 50.0, 150.0, 2, 3, now);
         invoice.setAmount(100.0);
-        invoice.setIssueDate(LocalDate.now());
         invoice.setPaymentStatus(Invoice.PaymentStatus.PAID);
+        invoice.setLastModified(LocalDateTime.now()); 
     }
 
     @Test
     void testGetterSetter() {
         invoice.setAmount(TEST_AMOUNT);
         invoice.setPaymentStatus(Invoice.PaymentStatus.UNPAID);
+        invoice.setTotalRecurring(50.0);
+        invoice.setTotalOnetime(150.0);
+        invoice.setRecurringCount(2);
+        invoice.setOnetimeCount(3);
+        LocalDateTime now = LocalDateTime.now();
+        invoice.setLastModified(now);
+        invoice.setPaymentDate(now.plusDays(1));
+
         assertEquals(TEST_AMOUNT, invoice.getAmount());
         assertEquals(Invoice.PaymentStatus.UNPAID, invoice.getPaymentStatus());
+        assertEquals(50.0, invoice.getTotalRecurring());
+        assertEquals(150.0, invoice.getTotalOnetime());
+        assertEquals(2, invoice.getRecurringCount());
+        assertEquals(3, invoice.getOnetimeCount());
+        assertEquals(now, invoice.getLastModified());
+        assertEquals(now.plusDays(1), invoice.getPaymentDate());
         assertTrue(invoice.getCollections().contains(collection));
     }
+
 
     @Test
     void testToString() {
@@ -76,11 +93,17 @@ class InvoiceTest extends AbstractDatabaseTest {
 
         Invoice found = foundOpt.get();
         assertEquals(invoice.getAmount(), found.getAmount());
+        assertEquals(invoice.getTotalRecurring(), found.getTotalRecurring());
+        assertEquals(invoice.getTotalOnetime(), found.getTotalOnetime());
+        assertEquals(invoice.getRecurringCount(), found.getRecurringCount());
+        assertEquals(invoice.getOnetimeCount(), found.getOnetimeCount());
+        assertEquals(invoice.getLastModified(), found.getLastModified());
+        assertEquals(invoice.getPaymentDate(), found.getPaymentDate());
+        assertEquals(invoice.isDeleted(), found.isDeleted());
         assertTrue(found.getCollections().stream()
-        .anyMatch(c -> c.getCollectionId() == collection.getCollectionId()));
+                .anyMatch(c -> c.getCollectionId() == collection.getCollectionId()));
 
         int foundId = found.getInvoiceId();
-
         getInvoiceDAO().delete(found);
         getEntityManager().getTransaction().commit();
 
@@ -90,10 +113,10 @@ class InvoiceTest extends AbstractDatabaseTest {
 
     @Test
     void testIsDeletedSetterGetter() {
-    assertFalse(invoice.isDeleted());
-    invoice.setDeleted(true);
-    assertTrue(invoice.isDeleted());
-    invoice.setDeleted(false);
-    assertFalse(invoice.isDeleted());
+        assertFalse(invoice.isDeleted());
+        invoice.setDeleted(true);
+        assertTrue(invoice.isDeleted());
+        invoice.setDeleted(false);
+        assertFalse(invoice.isDeleted());
     }
 }

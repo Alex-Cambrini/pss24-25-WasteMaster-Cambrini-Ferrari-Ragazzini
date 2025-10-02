@@ -32,8 +32,8 @@ public final class TripManager {
     private NotificationService notificationService;
 
     public TripManager(final TripRepository tripRepository,
-                       final CollectionRepository collectionRepository,
-                       final RecurringScheduleManager recurringScheduleManager) {
+            final CollectionRepository collectionRepository,
+            final RecurringScheduleManager recurringScheduleManager) {
         this.tripRepository = tripRepository;
         this.collectionRepository = collectionRepository;
         this.recurringScheduleManager = recurringScheduleManager;
@@ -83,6 +83,7 @@ public final class TripManager {
                 throw new IllegalArgumentException("Only ACTIVE trips can be canceled");
             }
             trip.setStatus(TripStatus.CANCELED);
+            trip.setLastModified(LocalDateTime.now());
             tripRepository.update(trip);
             for (Collection c : trip.getCollections()) {
                 c.setTrip(null);
@@ -101,19 +102,21 @@ public final class TripManager {
         }
         for (Collection collection : trip.getCollections()) {
             collection.setCollectionStatus(Collection.CollectionStatus.CANCELLED);
-                collectionRepository.update(collection);
-                recurringScheduleManager.rescheduleNextCollection(collection);
+            collectionRepository.update(collection);
+            recurringScheduleManager.rescheduleNextCollection(collection);
         }
         return true;
     }
 
-    public List<Employee> getAvailableOperatorsExcludeDriverToEdit(LocalDateTime depDateTime, LocalDateTime retDateTime, Employee selectedDriver,
-                                                                   Trip tripToEdit) {
+    public List<Employee> getAvailableOperatorsExcludeDriverToEdit(LocalDateTime depDateTime, LocalDateTime retDateTime,
+            Employee selectedDriver,
+            Trip tripToEdit) {
         return tripRepository.findAvailableOperatorsExcludeDriverToEdit(depDateTime,
                 retDateTime, selectedDriver, tripToEdit);
     }
 
-    public List<Employee> getQualifiedDriversToEdit(LocalDateTime depDateTime, LocalDateTime retDateTime, List<Licence> allowedLicences, Trip tripToEdit) {
+    public List<Employee> getQualifiedDriversToEdit(LocalDateTime depDateTime, LocalDateTime retDateTime,
+            List<Licence> allowedLicences, Trip tripToEdit) {
         return tripRepository.findQualifiedDriversToEdit(depDateTime, retDateTime, allowedLicences, tripToEdit);
     }
 
@@ -176,6 +179,7 @@ public final class TripManager {
             }
 
             trip.setStatus(TripStatus.COMPLETED);
+            trip.setLastModified(LocalDateTime.now());
             tripRepository.update(trip);
 
             return true;
@@ -229,6 +233,10 @@ public final class TripManager {
 
     public void updateTrip(Trip trip) {
         tripRepository.update(trip);
+    }
+
+    public int countCompletedTrips() {
+        return tripRepository.countCompleted();
     }
 
     public enum IssueType {

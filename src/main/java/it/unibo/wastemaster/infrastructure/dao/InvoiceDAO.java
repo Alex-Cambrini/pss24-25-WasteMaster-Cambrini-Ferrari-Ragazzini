@@ -31,11 +31,18 @@ public class InvoiceDAO extends GenericDAO<Invoice> {
                 .getResultList();
     }
 
-
     public List<Invoice> findByCustomer(Customer customer) {
-    return getEntityManager().createQuery(
-        "SELECT i FROM Invoice i WHERE i.customer = :customer", Invoice.class)
-        .setParameter("customer", customer)
-        .getResultList();
+        return getEntityManager().createQuery(
+                        "SELECT i FROM Invoice i WHERE i.customer = :customer", Invoice.class)
+                .setParameter("customer", customer)
+                .getResultList();
+    }
+
+    public List<Invoice> findLast5InvoicesEvent() {
+        return getEntityManager().createQuery(
+                        "SELECT i FROM Invoice i ORDER BY i.lastModified DESC", Invoice.class)
+                .setMaxResults(5)
+                .getResultList();
+    }
 }
-}
+

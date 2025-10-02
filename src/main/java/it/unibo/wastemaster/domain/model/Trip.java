@@ -53,6 +53,10 @@ public final class Trip {
     @Column(nullable = false)
     private LocalDateTime expectedReturnTime;
 
+    @Column(nullable = false)
+    @NotNull(message = "The last modified date cannot be null")
+    private LocalDateTime lastModified;
+
     @Enumerated(EnumType.STRING)
     @NotNull
     @Column(nullable = false)
@@ -90,6 +94,7 @@ public final class Trip {
         this.expectedReturnTime = expectedReturnTime;
         this.collections = collections;
         this.status = TripStatus.ACTIVE;
+        this.lastModified = LocalDateTime.now();
     }
 
     /**
@@ -225,6 +230,14 @@ public final class Trip {
      */
     public void setCollections(final List<Collection> collections) {
         this.collections = collections;
+    }
+
+    public void setLastModified(final LocalDateTime lastModified) {
+        this.lastModified = lastModified;
+    }
+
+    public LocalDateTime getLastModified() {
+        return lastModified;
     }
 
     /**
