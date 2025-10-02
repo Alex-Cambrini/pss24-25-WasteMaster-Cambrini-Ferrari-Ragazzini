@@ -4,7 +4,10 @@ import it.unibo.wastemaster.domain.model.Notification;
 import it.unibo.wastemaster.domain.repository.CustomerRepository;
 import it.unibo.wastemaster.domain.repository.InvoiceRepository;
 import it.unibo.wastemaster.domain.repository.TripRepository;
+import it.unibo.wastemaster.domain.model.Invoice;
+
 import java.text.NumberFormat;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Currency;
 import java.util.List;
@@ -35,19 +38,32 @@ public class NotificationManager {
 
         customerRepository.findLast5Inserted()
                 .forEach(c -> events.add(new Notification(
-                        "New customer: " + c.getName() + " " + c.getSurname(),
+                        String.format("New customer: %s %s (%s)",
+                                c.getName(), c.getSurname(), c.getEmail()),
                         c.getCreatedDate())));
 
         invoiceRepository.findLast5InvoicesEvent()
-                .forEach(i -> events.add(new Notification(
-                        "Invoice #" + i.getInvoiceId() + " for " + i.getCustomer().getName() + " " + i.getCustomer().getSurname()
-                                + " - " + i.getPaymentStatus() + ": " + formatEur(i.getAmount()),
-                        i.getLastModified())));
+                .forEach(i -> {
+                    LocalDateTime date = i.getPaymentDate() != null ? i.getPaymentDate() : i.getIssueDate();
+                    String customerName = (i.getCustomer() != null)
+                            ? (i.getCustomer().getName() + " " + i.getCustomer().getSurname())
+                            : "Unknown customer";
+                    String statusText = (i.getPaymentStatus() == Invoice.PaymentStatus.PAID) ? "Paid" : "Not Paid";
+                    events.add(new Notification(
+                            String.format("Invoice #%d for %s - %s: %s",
+                                    i.getInvoiceId(), customerName, statusText, formatEur(i.getAmount())),
+                            date));
+                });
 
         tripRepository.findLast5Modified()
-                .forEach(t -> events.add(new Notification(
-                        "Trip #" + t.getTripId() + " - Vehicle: " + t.getAssignedVehicle().getPlate(),
-                        t.getLastModified())));
+                .forEach(t -> {
+                    String vehicle = t.getAssignedVehicle() != null ? t.getAssignedVehicle().getPlate() : "N/A";
+                    String status = (t.getStatus() != null) ? t.getStatus().name() : "UNKNOWN";
+                    events.add(new Notification(
+                            String.format("Trip #%d - Vehicle: %s - Status: %s",
+                                    t.getTripId(), vehicle, status),
+                            t.getDepartureTime()));
+                });
 
         events.sort((n1, n2) -> n2.getTimestamp().compareTo(n1.getTimestamp()));
         return events.stream().limit(5).toList();
