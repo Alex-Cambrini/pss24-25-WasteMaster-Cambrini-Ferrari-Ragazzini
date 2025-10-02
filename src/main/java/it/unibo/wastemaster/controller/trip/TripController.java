@@ -18,7 +18,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-
 import java.util.Set;
 
 import javafx.animation.Animation;
@@ -38,13 +37,19 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.util.Duration;
 
 /**
- * Controller for managing the trips view, including search, filters and CRUD
- * operations.
+ * Controller for managing the trips view, including search, filters, and CRUD operations.
+ * Handles trip creation, editing, deletion, completion, and viewing related collections.
+ * Supports filtering and searching by various trip attributes.
  */
 public final class TripController implements AutoRefreshable {
 
     private NotificationService notificationService;
 
+    /**
+     * Sets the notification service used for sending trip notifications.
+     *
+     * @param notificationService the NotificationService to use
+     */
     public void setNotificationService(NotificationService notificationService) {
         this.notificationService = notificationService;
     }
@@ -130,14 +135,29 @@ public final class TripController implements AutoRefreshable {
     @FXML
     private CheckBox showCompletedCheckBox;
 
+    /**
+     * Sets the trip manager used for trip operations.
+     *
+     * @param tripManager the TripManager to use
+     */
     public void setTripManager(TripManager tripManager) {
         this.tripManager = tripManager;
     }
 
+    /**
+     * Sets the vehicle manager used for vehicle operations.
+     *
+     * @param vehicleManager the VehicleManager to use
+     */
     public void setVehicleManager(VehicleManager vehicleManager) {
         this.vehicleManager = vehicleManager;
     }
 
+    /**
+     * Sets the collection manager used for collection operations.
+     *
+     * @param collectionManager the CollectionManager to use
+     */
     public void setCollectionManager(CollectionManager collectionManager) {
         this.collectionManager = collectionManager;
     }
@@ -207,14 +227,23 @@ public final class TripController implements AutoRefreshable {
         this.notificationService = AppContext.getServiceFactory().getNotificationService();
     }
 
+    /**
+     * Loads trip data and populates the trip table.
+     */
     public void initData() {
         loadTrips();
     }
 
+    /**
+     * Refreshes the trip table by applying the current search and filters.
+     */
     public void refresh() {
         handleSearch();
     }
 
+    /**
+     * Starts the automatic refresh of the trip table.
+     */
     @Override
     public void startAutoRefresh() {
         if (refreshTimeline != null || tripManager == null) {
@@ -227,6 +256,9 @@ public final class TripController implements AutoRefreshable {
         refreshTimeline.play();
     }
 
+    /**
+     * Stops the automatic refresh of the trip table.
+     */
     @Override
     public void stopAutoRefresh() {
         if (refreshTimeline != null) {
@@ -237,8 +269,7 @@ public final class TripController implements AutoRefreshable {
 
     /**
      * Loads trips visible to the current user and updates the trip table.
-     * Operators see only their assigned trips, while admins and office workers see
-     * all trips.
+     * Operators see only their assigned trips, while admins and office workers see all trips.
      */
     public void loadTrips() {
         List<Trip> trips = tripManager.getTripsForCurrentUser(currentUser);
@@ -249,6 +280,9 @@ public final class TripController implements AutoRefreshable {
         handleSearch();
     }
 
+    /**
+     * Handles the action to add a new trip.
+     */
     @FXML
     private void handleAddTrip() {
         try {
@@ -268,6 +302,10 @@ public final class TripController implements AutoRefreshable {
         }
     }
 
+    /**
+     * Handles the action to permanently delete a trip and reschedule recurring collections.
+     * Notifies customers via email if possible.
+     */
     @FXML
     private void handleDeleteTripPermanently() {
         TripRow selected = tripTable.getSelectionModel().getSelectedItem();
@@ -328,6 +366,12 @@ public final class TripController implements AutoRefreshable {
         }
     }
 
+    /**
+     * Extracts unique customer emails from the trip's collections.
+     *
+     * @param trip the Trip object
+     * @return a list of unique customer email addresses
+     */
     private List<String> extractCustomerEmails(Trip trip) {
         if (trip.getCollections() == null)
             return List.of();
@@ -339,6 +383,9 @@ public final class TripController implements AutoRefreshable {
         return List.copyOf(unique);
     }
 
+    /**
+     * Handles the action to soft-delete a trip.
+     */
     @FXML
     private void handleDeleteTrip() {
         TripRow selected = tripTable.getSelectionModel().getSelectedItem();
@@ -374,6 +421,9 @@ public final class TripController implements AutoRefreshable {
         }
     }
 
+    /**
+     * Handles the action to edit the selected trip.
+     */
     @FXML
     private void handleEditTrip() {
         TripRow selected = tripTable.getSelectionModel().getSelectedItem();
@@ -408,6 +458,9 @@ public final class TripController implements AutoRefreshable {
         }
     }
 
+    /**
+     * Handles the search/filtering of trips based on the search field and active filters.
+     */
     @FXML
     private void handleSearch() {
         String query = searchField.getText().toLowerCase().trim();
@@ -463,6 +516,9 @@ public final class TripController implements AutoRefreshable {
                         && row.getStatus().toLowerCase().contains(query));
     }
 
+    /**
+     * Handles the reset of the search field and filter checkboxes.
+     */
     @FXML
     private void handleResetSearch() {
         searchField.clear();
@@ -476,6 +532,11 @@ public final class TripController implements AutoRefreshable {
         loadTrips();
     }
 
+    /**
+     * Shows the filter menu for selecting which fields to search.
+     *
+     * @param event the mouse event triggering the menu
+     */
     @FXML
     private void showFilterMenu(final javafx.scene.input.MouseEvent event) {
         if (filterMenu != null && filterMenu.isShowing()) {
@@ -513,6 +574,9 @@ public final class TripController implements AutoRefreshable {
         filterMenu.show(filterButton, event.getScreenX(), event.getScreenY());
     }
 
+    /**
+     * Handles the action to mark the selected trip as completed.
+     */
     @FXML
     private void handleCompleteTrip() {
         TripRow selected = tripTable.getSelectionModel().getSelectedItem();
@@ -545,9 +609,11 @@ public final class TripController implements AutoRefreshable {
             DialogUtils.showError("Completion Failed",
                     "Unable to complete the selected trip.", AppContext.getOwner());
         }
-
     }
 
+    /**
+     * Handles the action to show collections related to the selected trip.
+     */
     @FXML
     private void handleShowRelatedCollections() {
         TripRow selected = tripTable.getSelectionModel().getSelectedItem();

@@ -11,6 +11,7 @@ import javafx.scene.control.TextField;
 
 /**
  * Controller for adding a new waste type.
+ * Handles input validation, waste creation, and modal dialog management.
  */
 public final class AddWasteController {
 
@@ -25,14 +26,19 @@ public final class AddWasteController {
 
     private WasteManager wasteManager;
 
+    /**
+     * Sets the waste manager used for waste operations.
+     *
+     * @param wasteManager the WasteManager to use
+     */
     public void setWasteManager(WasteManager wasteManager) {
         this.wasteManager = wasteManager;
     }
 
     /**
-     * Saves the waste entry if valid.
+     * Handles saving the waste entry if valid.
      *
-     * @param event the action event
+     * @param event the action event from the save button
      */
     @FXML
     private void handleSaveWaste(final ActionEvent event) {
@@ -63,7 +69,7 @@ public final class AddWasteController {
     /**
      * Cancels the waste creation and closes the modal.
      *
-     * @param event the action event
+     * @param event the action event from the abort button
      */
     @FXML
     private void handleAbortWasteCreation(final ActionEvent event) {

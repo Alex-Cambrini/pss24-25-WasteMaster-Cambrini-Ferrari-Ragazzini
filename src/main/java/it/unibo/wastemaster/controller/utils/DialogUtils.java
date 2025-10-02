@@ -13,7 +13,9 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 /**
- * Utility class for displaying dialog windows in the application.
+ * Utility class for displaying dialog windows and alerts in the application.
+ * Provides methods for showing error/success dialogs, confirmation dialogs,
+ * modal windows with controllers, and closing modals.
  */
 public final class DialogUtils {
 

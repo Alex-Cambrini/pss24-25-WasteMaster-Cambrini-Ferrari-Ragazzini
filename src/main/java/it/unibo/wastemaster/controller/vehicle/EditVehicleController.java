@@ -16,8 +16,8 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
 
 /**
- * Controller for the view to edit an existing vehicle. Manages loading the vehicle data
- * into fields, updating the modified data, and handling UI events.
+ * Controller for the view to edit an existing vehicle.
+ * Manages loading the vehicle data into fields, updating the modified data, and handling UI events.
  */
 public final class EditVehicleController {
 
@@ -46,13 +46,18 @@ public final class EditVehicleController {
 
     private VehicleManager vehicleManager;
 
+    /**
+     * Sets the vehicle manager used for vehicle operations.
+     *
+     * @param vehicleManager the VehicleManager to use
+     */
     public void setVehicleManager(VehicleManager vehicleManager) {
         this.vehicleManager = vehicleManager;
     }
 
     /**
-     * Sets the vehicle to be edited. Subclasses overriding this method must call
-     * super.setVehicleToEdit().
+     * Sets the vehicle to be edited and populates the form fields.
+     * Subclasses overriding this method must call super.setVehicleToEdit().
      *
      * @param vehicle the vehicle to edit
      */
@@ -72,6 +77,11 @@ public final class EditVehicleController {
         statusComboBox.getSelectionModel().select(vehicle.getVehicleStatus());
     }
 
+    /**
+     * Handles the update action, validating input and saving the vehicle changes.
+     *
+     * @param event the action event from the update button
+     */
     @FXML
     private void handleUpdateVehicle(final ActionEvent event) {
         try {
@@ -119,6 +129,11 @@ public final class EditVehicleController {
         }
     }
 
+    /**
+     * Handles aborting the vehicle edit modal.
+     *
+     * @param event the action event from the abort button
+     */
     @FXML
     private void handleAbortVehicleEdit(final ActionEvent event) {
         closeModal(event);

@@ -31,6 +31,8 @@ import javafx.util.Duration;
 
 /**
  * Controller for managing the waste types and their collection schedules.
+ * Handles loading, displaying, searching, filtering, adding, editing, and deleting waste types and programs.
+ * Supports periodic automatic refresh of the waste list and interaction with the JavaFX UI.
  */
 public final class WasteController implements AutoRefreshable {
 
@@ -79,14 +81,25 @@ public final class WasteController implements AutoRefreshable {
 
     @FXML
     private TableColumn<WasteRow, DayOfWeek> dayOfWeekColumn;
+
     private Timeline refreshTimeline;
     private WasteManager wasteManager;
     private WasteScheduleManager wasteScheduleManager;
 
+    /**
+     * Sets the waste manager used for waste operations.
+     *
+     * @param wasteManager the WasteManager to use
+     */
     public void setWasteManager(WasteManager wasteManager) {
         this.wasteManager = wasteManager;
     }
 
+    /**
+     * Sets the waste schedule manager used for program operations.
+     *
+     * @param wasteScheduleManager the WasteScheduleManager to use
+     */
     public void setWasteScheduleManager(WasteScheduleManager wasteScheduleManager) {
         this.wasteScheduleManager = wasteScheduleManager;
     }
@@ -97,19 +110,14 @@ public final class WasteController implements AutoRefreshable {
     @FXML
     public void initialize() {
         nameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
-        recyclableColumn.setCellValueFactory(
-                new PropertyValueFactory<>("recyclable"));
-        dangerousColumn.setCellValueFactory(
-                new PropertyValueFactory<>("dangerous"));
-        dayOfWeekColumn.setCellValueFactory(
-                new PropertyValueFactory<>("dayOfWeek"));
+        recyclableColumn.setCellValueFactory(new PropertyValueFactory<>("recyclable"));
+        dangerousColumn.setCellValueFactory(new PropertyValueFactory<>("dangerous"));
+        dayOfWeekColumn.setCellValueFactory(new PropertyValueFactory<>("dayOfWeek"));
 
         dayOfWeekColumn.setCellFactory(
                 col -> new TableCell<WasteRow, DayOfWeek>() {
                     @Override
-                    protected void updateItem(
-                            final DayOfWeek item,
-                            final boolean empty) {
+                    protected void updateItem(final DayOfWeek item, final boolean empty) {
                         super.updateItem(item, empty);
                         String displayText;
                         if (empty) {
@@ -123,12 +131,9 @@ public final class WasteController implements AutoRefreshable {
                     }
                 });
 
-        searchField.textProperty()
-                .addListener((obs, oldText, newText) -> handleSearch());
-        showRecyclableCheckBox.selectedProperty()
-                .addListener((obs, oldVal, newVal) -> handleSearch());
-        showDangerousCheckBox.selectedProperty()
-                .addListener((obs, oldVal, newVal) -> handleSearch());
+        searchField.textProperty().addListener((obs, oldText, newText) -> handleSearch());
+        showRecyclableCheckBox.selectedProperty().addListener((obs, oldVal, newVal) -> handleSearch());
+        showDangerousCheckBox.selectedProperty().addListener((obs, oldVal, newVal) -> handleSearch());
 
         addProgramButton.setDisable(true);
         changeDayButton.setDisable(true);
@@ -146,14 +151,16 @@ public final class WasteController implements AutoRefreshable {
                     }
 
                     final boolean hasProgram = newRow.getDayOfWeek() != null;
-                    addProgramButton.setDisable(
-                            hasProgram);
+                    addProgramButton.setDisable(hasProgram);
                     changeDayButton.setDisable(!hasProgram);
                     deleteButton.setDisable(false);
                     deleteProgramButton.setDisable(!hasProgram);
                 });
     }
 
+    /**
+     * Initializes data and loads the waste list.
+     */
     public void initData() {
         loadWastes();
     }
@@ -183,6 +190,9 @@ public final class WasteController implements AutoRefreshable {
         }
     }
 
+    /**
+     * Loads all waste types and their schedules, updating the table.
+     */
     private void loadWastes() {
         List<Waste> wastes = wasteManager.getActiveWastes();
         allWastes.clear();
@@ -190,11 +200,9 @@ public final class WasteController implements AutoRefreshable {
         for (Waste waste : wastes) {
             WasteSchedule schedule = null;
             try {
-                schedule = wasteScheduleManager
-                        .getWasteScheduleByWaste(waste);
+                schedule = wasteScheduleManager.getWasteScheduleByWaste(waste);
             } catch (IllegalStateException ignored) {
-                // It's acceptable if no schedule exists
-                // for this waste; skip it.
+                // It's acceptable if no schedule exists for this waste; skip it.
             }
             allWastes.add(new WasteRow(waste, schedule));
         }
@@ -241,8 +249,7 @@ public final class WasteController implements AutoRefreshable {
     @FXML
     private void handleAddProgram() {
         try {
-            final WasteRow selectedRow = wasteTable.getSelectionModel()
-                    .getSelectedItem();
+            final WasteRow selectedRow = wasteTable.getSelectionModel().getSelectedItem();
 
             if (selectedRow == null || selectedRow.getDayOfWeek() != null) {
                 return;
@@ -278,8 +285,7 @@ public final class WasteController implements AutoRefreshable {
      */
     @FXML
     private void handleChangeDay() {
-        final WasteRow selectedRow = wasteTable.getSelectionModel()
-                .getSelectedItem();
+        final WasteRow selectedRow = wasteTable.getSelectionModel().getSelectedItem();
 
         if (selectedRow == null || selectedRow.getDayOfWeek() == null) {
             DialogUtils.showError(
@@ -290,8 +296,7 @@ public final class WasteController implements AutoRefreshable {
         }
 
         try {
-            final WasteSchedule schedule = wasteScheduleManager
-                    .getWasteScheduleByWaste(selectedRow.getWaste());
+            final WasteSchedule schedule = wasteScheduleManager.getWasteScheduleByWaste(selectedRow.getWaste());
 
             final Stage stage = (Stage) MainLayoutController.getInstance()
                     .getRootPane()
@@ -304,18 +309,13 @@ public final class WasteController implements AutoRefreshable {
                     stage,
                     ctrl -> {
                         ctrl.setSchedule(schedule);
-                        ctrl.setCurrentDay(schedule
-                                .getDayOfWeek());
+                        ctrl.setCurrentDay(schedule.getDayOfWeek());
                     });
 
             if (controllerOpt.isPresent()) {
-                final DayOfWeek newDay = controllerOpt.get()
-                        .getSelectedDay();
-                if (newDay != null
-                        && !newDay.equals(schedule
-                                .getDayOfWeek())) {
-                    wasteScheduleManager
-                            .changeCollectionDay(schedule, newDay);
+                final DayOfWeek newDay = controllerOpt.get().getSelectedDay();
+                if (newDay != null && !newDay.equals(schedule.getDayOfWeek())) {
+                    wasteScheduleManager.changeCollectionDay(schedule, newDay);
                     loadWastes();
                 }
             }
@@ -328,6 +328,9 @@ public final class WasteController implements AutoRefreshable {
         }
     }
 
+    /**
+     * Handles the action to delete the selected waste and its program if present.
+     */
     @FXML
     private void handleDeleteWaste() {
         WasteRow selected = wasteTable.getSelectionModel().getSelectedItem();
@@ -349,8 +352,7 @@ public final class WasteController implements AutoRefreshable {
 
         try {
             if (selected.getDayOfWeek() != null) {
-                WasteSchedule schedule = wasteScheduleManager
-                        .getWasteScheduleByWaste(selected.getWaste());
+                WasteSchedule schedule = wasteScheduleManager.getWasteScheduleByWaste(selected.getWaste());
                 wasteScheduleManager.deleteSchedule(schedule);
             }
             wasteManager.softDeleteWaste(selected.getWaste());
@@ -363,6 +365,9 @@ public final class WasteController implements AutoRefreshable {
         }
     }
 
+    /**
+     * Handles the action to delete only the collection program for the selected waste.
+     */
     @FXML
     private void handleDeleteProgramWaste() {
         WasteRow selected = wasteTable.getSelectionModel().getSelectedItem();
@@ -383,8 +388,7 @@ public final class WasteController implements AutoRefreshable {
         }
 
         try {
-            WasteSchedule schedule = wasteScheduleManager
-                    .getWasteScheduleByWaste(selected.getWaste());
+            WasteSchedule schedule = wasteScheduleManager.getWasteScheduleByWaste(selected.getWaste());
             wasteScheduleManager.deleteSchedule(schedule);
             loadWastes();
         } catch (Exception e) {
@@ -395,6 +399,9 @@ public final class WasteController implements AutoRefreshable {
         }
     }
 
+    /**
+     * Handles the reset of the search field and filter checkboxes.
+     */
     @FXML
     private void handleResetSearch() {
         searchField.clear();
@@ -403,6 +410,9 @@ public final class WasteController implements AutoRefreshable {
         wasteTable.setItems(FXCollections.observableArrayList(allWastes));
     }
 
+    /**
+     * Handles the search/filtering of wastes based on the search field and active filters.
+     */
     private void handleSearch() {
         String query = searchField.getText().toLowerCase().trim();
 
@@ -411,9 +421,7 @@ public final class WasteController implements AutoRefreshable {
         for (WasteRow row : allWastes) {
             boolean matchesName = row.getName().toLowerCase().contains(query);
             boolean matchesDayOfWeek = row.getDayOfWeek() != null
-                    && formatEnum(row.getDayOfWeek())
-                            .toLowerCase()
-                            .contains(query);
+                    && formatEnum(row.getDayOfWeek()).toLowerCase().contains(query);
 
             boolean matchesCheckRecyclable = !showRecyclableCheckBox.isSelected()
                     || row.isRecyclable();
@@ -430,6 +438,12 @@ public final class WasteController implements AutoRefreshable {
         wasteTable.setItems(filtered);
     }
 
+    /**
+     * Formats enum values for display in the table.
+     *
+     * @param value the enum value
+     * @return the formatted string
+     */
     private String formatEnum(final Enum<?> value) {
         if (value == null) {
             return "";

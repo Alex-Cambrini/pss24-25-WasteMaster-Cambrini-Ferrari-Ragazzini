@@ -28,6 +28,7 @@ import javafx.stage.Stage;
 
 /**
  * Controller for the main layout of the application.
+ * Handles navigation, page title management, and loading of main views.
  */
 public final class MainLayoutController {
 
@@ -100,8 +101,8 @@ public final class MainLayoutController {
     }
 
     /**
-     * Initializes the controller after its root element has been completely
-     * processed.
+     * Initializes the controller after its root element has been completely processed.
+     * Sets up role-based navigation and default view.
      */
     @FXML
     public void initialize() {
@@ -149,8 +150,7 @@ public final class MainLayoutController {
     }
 
     /**
-     * Loads the specified FXML file into the center pane and returns its
-     * controller.
+     * Loads the specified FXML file into the center pane and returns its controller.
      *
      * @param <T>      the type of the controller
      * @param fxmlPath the path to the FXML file
@@ -176,10 +176,11 @@ public final class MainLayoutController {
         }
     }
 
-
+    /**
+     * Handles navigation to the customers view.
+     */
     @FXML
     private void handleCustomers() {
-
         customersLink.setVisited(false);
         setPageTitle(CUSTOMER_MANAGEMENT);
         CustomersController controller = loadCenterWithController("/layouts/customer/CustomersView.fxml");
@@ -187,13 +188,15 @@ public final class MainLayoutController {
             var cm = AppContext.getServiceFactory().getCustomerManager();
             controller.setCustomerManager(cm);
             controller.initData();
-        startAutoRefreshIfSupported(controller);
+            startAutoRefreshIfSupported(controller);
         }
     }
 
+    /**
+     * Handles navigation to the dashboard view.
+     */
     @FXML
     private void handleDashboard() {
-    dashboardLink.setVisited(false);
         dashboardLink.setVisited(false);
         if (firstDashboardLoad) {
             setPageTitle(String.format("Welcome back %s", AppContext.getCurrentAccount().getEmployee().getName()));
@@ -202,97 +205,101 @@ public final class MainLayoutController {
             setPageTitle("Dashboard");
         }
 
-
-    var controller = loadCenterWithController("/layouts/dashboard/DashboardView.fxml");
-    if (controller != null && controller instanceof it.unibo.wastemaster.controller.dashboard.DashboardController dashCtrl) {
-        dashCtrl.setCustomerManager(AppContext.getServiceFactory().getCustomerManager());
-        dashCtrl.setCollectionManager(AppContext.getServiceFactory().getCollectionManager());
-        dashCtrl.setInvoiceManager(AppContext.getServiceFactory().getInvoiceManager());
-        dashCtrl.setTripManager(AppContext.getServiceFactory().getTripManager());
-        dashCtrl.setNotificationManager(AppContext.getServiceFactory().getNotificationManager());
-        dashCtrl.initData();
+        var controller = loadCenterWithController("/layouts/dashboard/DashboardView.fxml");
+        if (controller != null && controller instanceof it.unibo.wastemaster.controller.dashboard.DashboardController dashCtrl) {
+            dashCtrl.setCustomerManager(AppContext.getServiceFactory().getCustomerManager());
+            dashCtrl.setCollectionManager(AppContext.getServiceFactory().getCollectionManager());
+            dashCtrl.setInvoiceManager(AppContext.getServiceFactory().getInvoiceManager());
+            dashCtrl.setTripManager(AppContext.getServiceFactory().getTripManager());
+            dashCtrl.setNotificationManager(AppContext.getServiceFactory().getNotificationManager());
+            dashCtrl.initData();
+        }
     }
-    }
 
+    /**
+     * Handles navigation to the waste management view.
+     */
     @FXML
     private void handleWaste() {
         wasteLink.setVisited(false);
         setPageTitle(WASTE_MANAGEMENT);
-        WasteController controller = loadCenterWithController("/layouts/waste"
-                + "/WasteView.fxml");
+        WasteController controller = loadCenterWithController("/layouts/waste/WasteView.fxml");
         if (controller != null) {
-            controller.setWasteManager(AppContext.getServiceFactory()
-                    .getWasteManager());
-            controller.setWasteScheduleManager(AppContext.getServiceFactory()
-                    .getWasteScheduleManager());
+            controller.setWasteManager(AppContext.getServiceFactory().getWasteManager());
+            controller.setWasteScheduleManager(AppContext.getServiceFactory().getWasteScheduleManager());
+            controller.initData();
+            startAutoRefreshIfSupported(controller);
         }
-        controller.initData();
-        startAutoRefreshIfSupported(controller);
     }
 
+    /**
+     * Handles navigation to the vehicle management view.
+     */
     @FXML
     private void handleVehicle() {
         vehiclesLink.setVisited(false);
         setPageTitle(VEHICLE_MANAGEMENT);
         VehicleController controller = loadCenterWithController("/layouts/vehicle/VehicleView.fxml");
         if (controller != null) {
-            controller.setVehicleManager(AppContext.getServiceFactory()
-                    .getVehicleManager());
+            controller.setVehicleManager(AppContext.getServiceFactory().getVehicleManager());
             controller.initData();
             startAutoRefreshIfSupported(controller);
         }
     }
 
+    /**
+     * Handles navigation to the employee management view.
+     */
     @FXML
     private void handleEmployee() {
         employeesLink.setVisited(false);
         setPageTitle(EMPLOYEE_MANAGEMENT);
         EmployeeController controller = loadCenterWithController("/layouts/employee/EmployeeView.fxml");
         if (controller != null) {
-            controller.setEmployeeManager(
-                    AppContext.getServiceFactory().getEmployeeManager());
+            controller.setEmployeeManager(AppContext.getServiceFactory().getEmployeeManager());
             controller.initData();
             startAutoRefreshIfSupported(controller);
         }
     }
 
+    /**
+     * Handles navigation to the schedule management view.
+     */
     @FXML
     private void handleSchedule() {
         schedulesLink.setVisited(false);
         setPageTitle(SCHEDULE_MANAGEMENT);
         ScheduleController controller = loadCenterWithController("/layouts/schedule/ScheduleView.fxml");
         if (controller != null) {
-            controller.setScheduleManager(
-                    AppContext.getServiceFactory().getScheduleManager());
-            controller.setRecurringScheduleManager(AppContext.getServiceFactory()
-                    .getRecurringScheduleManager());
-            controller.setOneTimeScheduleManager(AppContext.getServiceFactory()
-                    .getOneTimeScheduleManager());
-            controller.setCollectionManager(AppContext.getServiceFactory()
-                    .getCollectionManager());
+            controller.setScheduleManager(AppContext.getServiceFactory().getScheduleManager());
+            controller.setRecurringScheduleManager(AppContext.getServiceFactory().getRecurringScheduleManager());
+            controller.setOneTimeScheduleManager(AppContext.getServiceFactory().getOneTimeScheduleManager());
+            controller.setCollectionManager(AppContext.getServiceFactory().getCollectionManager());
+            controller.initData();
+            startAutoRefreshIfSupported(controller);
         }
-        controller.initData();
-        startAutoRefreshIfSupported(controller);
     }
 
+    /**
+     * Handles navigation to the trip management view.
+     */
     @FXML
     private void handleTrip() {
         tripsLink.setVisited(false);
         setPageTitle(TRIP_MANAGEMENT);
-
         TripController controller = loadCenterWithController("/layouts/trip/TripView.fxml");
         if (controller != null) {
-            controller.setTripManager(
-                    AppContext.getServiceFactory().getTripManager());
-            controller.setVehicleManager(AppContext.getServiceFactory()
-                    .getVehicleManager());
-            controller.setCollectionManager(AppContext.getServiceFactory()
-                    .getCollectionManager());
+            controller.setTripManager(AppContext.getServiceFactory().getTripManager());
+            controller.setVehicleManager(AppContext.getServiceFactory().getVehicleManager());
+            controller.setCollectionManager(AppContext.getServiceFactory().getCollectionManager());
+            controller.initData();
+            startAutoRefreshIfSupported(controller);
         }
-        controller.initData();
-        startAutoRefreshIfSupported(controller);
     }
 
+    /**
+     * Handles navigation to the invoice management view.
+     */
     @FXML
     private void handleInvoice() {
         invoicesLink.setVisited(false);
@@ -300,13 +307,11 @@ public final class MainLayoutController {
         InvoiceController controller = loadCenterWithController("/layouts/invoice/InvoiceView.fxml");
         if (controller != null) {
             controller.setInvoiceManager(AppContext.getServiceFactory().getInvoiceManager());
-            controller.setCustomerManager(AppContext.getServiceFactory()
-                    .getCustomerManager());
-            controller.setCollectionManager(AppContext.getServiceFactory()
-                    .getCollectionManager());
+            controller.setCustomerManager(AppContext.getServiceFactory().getCustomerManager());
+            controller.setCollectionManager(AppContext.getServiceFactory().getCollectionManager());
+            controller.initData();
+            startAutoRefreshIfSupported(controller);
         }
-        controller.initData();
-        startAutoRefreshIfSupported(controller);
     }
 
     /**
@@ -339,6 +344,9 @@ public final class MainLayoutController {
         return rootPane;
     }
 
+    /**
+     * Handles the logout action, showing a confirmation dialog and returning to the login view.
+     */
     @FXML
     private void handleLogout() {
         if (DialogUtils.showConfirmationDialog(
@@ -374,12 +382,22 @@ public final class MainLayoutController {
         }
     }
 
+    /**
+     * Starts auto-refresh if the controller supports it.
+     *
+     * @param controller the controller to check
+     */
     private void startAutoRefreshIfSupported(Object controller) {
         if (controller instanceof AutoRefreshable ar) {
             ar.startAutoRefresh();
         }
     }
 
+    /**
+     * Stops auto-refresh if the controller supports it.
+     *
+     * @param controller the controller to check
+     */
     private void stopAutoRefreshIfSupported(Object controller) {
         if (controller instanceof AutoRefreshable ar) {
             ar.stopAutoRefresh();

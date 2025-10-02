@@ -11,6 +11,7 @@ import javafx.scene.control.ComboBox;
 
 /**
  * Controller for creating a weekly waste collection program.
+ * Handles input validation, waste selection, and saving the collection routine.
  */
 public final class AddProgramController {
 
@@ -21,6 +22,11 @@ public final class AddProgramController {
 
     private WasteScheduleManager wasteScheduleManager;
 
+    /**
+     * Sets the waste schedule manager used for program operations.
+     *
+     * @param wasteScheduleManager the WasteScheduleManager to use
+     */
     public void setWasteScheduleManager(WasteScheduleManager wasteScheduleManager) {
         this.wasteScheduleManager = wasteScheduleManager;
     }
@@ -57,17 +63,14 @@ public final class AddProgramController {
                 throw new IllegalArgumentException("Invalid input.");
             }
 
-            wasteScheduleManager.setupCollectionRoutine(selectedWaste,
-                    selectedDay);
+            wasteScheduleManager.setupCollectionRoutine(selectedWaste, selectedDay);
 
             DialogUtils.showSuccess("Program saved successfully.", AppContext.getOwner());
             DialogUtils.closeModal(event);
         } catch (IllegalArgumentException e) {
-            DialogUtils.showError("Validation error", e.getMessage(),
-                    AppContext.getOwner());
+            DialogUtils.showError("Validation error", e.getMessage(), AppContext.getOwner());
         } catch (Exception e) {
-            DialogUtils.showError("Unexpected error", e.getMessage(),
-                    AppContext.getOwner());
+            DialogUtils.showError("Unexpected error", e.getMessage(), AppContext.getOwner());
         }
     }
 

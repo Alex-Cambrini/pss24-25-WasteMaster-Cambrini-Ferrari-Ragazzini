@@ -39,9 +39,9 @@ import javafx.stage.Stage;
 import javafx.util.Duration;
 
 /**
- * Controller for managing schedules in the WasteMaster application. Handles
- * schedule
- * creation, editing, deletion, filtering, and display logic.
+ * Controller for managing schedules in the WasteMaster application.
+ * Handles schedule creation, editing, deletion, filtering, and display logic.
+ * Supports both one-time and recurring schedules, and provides search/filter UI.
  */
 public final class ScheduleController implements AutoRefreshable {
 
@@ -120,27 +120,46 @@ public final class ScheduleController implements AutoRefreshable {
     @FXML
     private TextField searchField;
 
+    /**
+     * Sets the schedule manager used for schedule operations.
+     *
+     * @param scheduleManager the ScheduleManager to use
+     */
     public void setScheduleManager(ScheduleManager scheduleManager) {
         this.scheduleManager = scheduleManager;
     }
 
+    /**
+     * Sets the recurring schedule manager used for recurring schedule operations.
+     *
+     * @param recurringScheduleManager the RecurringScheduleManager to use
+     */
     public void setRecurringScheduleManager(
             RecurringScheduleManager recurringScheduleManager) {
         this.recurringScheduleManager = recurringScheduleManager;
     }
 
+    /**
+     * Sets the one-time schedule manager used for one-time schedule operations.
+     *
+     * @param oneTimeScheduleManager the OneTimeScheduleManager to use
+     */
     public void setOneTimeScheduleManager(OneTimeScheduleManager oneTimeScheduleManager) {
         this.oneTimeScheduleManager = oneTimeScheduleManager;
     }
 
+    /**
+     * Sets the collection manager used for retrieving collections.
+     *
+     * @param collectionManager the CollectionManager to use
+     */
     public void setCollectionManager(CollectionManager collectionManager) {
         this.collectionManager = collectionManager;
     }
 
     /**
-     * Initializes the controller after its root element has been completely
-     * processed.
-     * This method is not intended to be overridden.
+     * Initializes the controller after its root element has been completely processed.
+     * Sets up table columns, checkboxes, and listeners.
      */
     @FXML
     public void initialize() {
@@ -173,8 +192,7 @@ public final class ScheduleController implements AutoRefreshable {
     }
 
     /**
-     * Refreshes the schedule table by reloading schedules and applying the current
-     * search filter.
+     * Refreshes the schedule table by reloading schedules and applying the current search filter.
      */
     public void refresh() {
         loadSchedules();
@@ -218,7 +236,6 @@ public final class ScheduleController implements AutoRefreshable {
                     deleteButton.setDisable(true);
                 }
                 default -> {
-                    // Optionally handle unexpected status values
                     toggleStatusButton.setDisable(true);
                     changeFrequencyButton.setDisable(true);
                     deleteButton.setDisable(true);
@@ -232,6 +249,9 @@ public final class ScheduleController implements AutoRefreshable {
         }
     }
 
+    /**
+     * Handles toggling the status (pause/resume) of a recurring schedule.
+     */
     @FXML
     private void handleStatusToggle() {
         ScheduleRow selected = scheduleTable.getSelectionModel().getSelectedItem();
@@ -265,6 +285,9 @@ public final class ScheduleController implements AutoRefreshable {
         loadSchedules();
     }
 
+    /**
+     * Starts the automatic refresh of the schedule table.
+     */
     @Override
     public void startAutoRefresh() {
         if (refreshTimeline != null || scheduleManager == null) {
@@ -278,9 +301,7 @@ public final class ScheduleController implements AutoRefreshable {
     }
 
     /**
-     * Stops the auto-refresh timeline if it is running. This method is not intended
-     * to be
-     * overridden.
+     * Stops the auto-refresh timeline if it is running.
      */
     @Override
     public void stopAutoRefresh() {
@@ -332,6 +353,9 @@ public final class ScheduleController implements AutoRefreshable {
         return matchesType && matchesStatus;
     }
 
+    /**
+     * Handles the action to add a new schedule.
+     */
     @FXML
     private void handleAddSchedule() {
         try {
@@ -358,6 +382,9 @@ public final class ScheduleController implements AutoRefreshable {
         }
     }
 
+    /**
+     * Handles the action to change the frequency of a recurring schedule.
+     */
     @FXML
     private void handleChangeFrequency() {
         ScheduleRow selected = scheduleTable.getSelectionModel().getSelectedItem();
@@ -410,6 +437,9 @@ public final class ScheduleController implements AutoRefreshable {
         }
     }
 
+    /**
+     * Handles the action to delete (cancel) the selected schedule.
+     */
     @FXML
     private void handleDeleteSchedule() {
         ScheduleRow selected = scheduleTable.getSelectionModel().getSelectedItem();
@@ -470,6 +500,9 @@ public final class ScheduleController implements AutoRefreshable {
         }
     }
 
+    /**
+     * Handles the search/filtering of schedules based on the search field and active filters.
+     */
     @FXML
     private void handleSearch() {
         String query = searchField.getText().toLowerCase().trim();
@@ -496,6 +529,9 @@ public final class ScheduleController implements AutoRefreshable {
         scheduleTable.setItems(filtered);
     }
 
+    /**
+     * Handles the reset of the search field and filter checkboxes.
+     */
     @FXML
     private void handleResetSearch() {
         searchField.clear();
@@ -507,6 +543,9 @@ public final class ScheduleController implements AutoRefreshable {
         loadSchedules();
     }
 
+    /**
+     * Handles the action to show collections related to the selected schedule.
+     */
     @FXML
     private void handleShowRelatedCollections() {
         ScheduleRow selected = scheduleTable.getSelectionModel().getSelectedItem();
@@ -549,6 +588,11 @@ public final class ScheduleController implements AutoRefreshable {
         }
     }
 
+    /**
+     * Shows the filter menu for selecting which fields to search.
+     *
+     * @param event the mouse event triggering the menu
+     */
     @FXML
     private void showFilterMenu(final javafx.scene.input.MouseEvent event) {
         if (filterMenu != null && filterMenu.isShowing()) {

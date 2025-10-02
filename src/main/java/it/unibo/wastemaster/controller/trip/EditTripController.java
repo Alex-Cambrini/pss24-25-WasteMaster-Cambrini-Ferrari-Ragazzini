@@ -31,6 +31,10 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.CheckBoxTableCell;
 
+/**
+ * Controller for editing an existing trip.
+ * Handles form population, crew selection, validation, and saving of updated trip data.
+ */
 public final class EditTripController {
 
     private Trip tripToEdit;
@@ -65,18 +69,36 @@ public final class EditTripController {
     private final Map<Integer, BooleanProperty> selectedById = new HashMap<>();
     private final IntegerProperty seatCapacity = new SimpleIntegerProperty(0);
 
+    /**
+     * Sets the trip manager used for updating trips.
+     *
+     * @param tripManager the TripManager to use
+     */
     public void setTripManager(TripManager tripManager) {
         this.tripManager = tripManager;
     }
 
+    /**
+     * Sets the vehicle manager used for vehicle and licence checks.
+     *
+     * @param vehicleManager the VehicleManager to use
+     */
     public void setVehicleManager(VehicleManager vehicleManager) {
         this.vehicleManager = vehicleManager;
     }
 
+    /**
+     * Sets the trip to be edited.
+     *
+     * @param trip the Trip to edit
+     */
     public void setTripToEdit(final Trip trip) {
         this.tripToEdit = trip;
     }
 
+    /**
+     * Initializes UI components, listeners, and table columns.
+     */
     @FXML
     public void initialize() {
         driverCombo.valueProperty().addListener((obs, oldVal, newVal) -> {
@@ -109,6 +131,9 @@ public final class EditTripController {
         refreshHint();
     }
 
+    /**
+     * Populates the form fields with the trip's current data.
+     */
     public void initData() {
         populateFields();
     }
@@ -293,6 +318,11 @@ public final class EditTripController {
         return v.getRequiredOperators();
     }
 
+    /**
+     * Handles the update action, validating input and saving the trip changes.
+     *
+     * @param event the action event from the update button
+     */
     @FXML
     private void handleUpdateTrip(final ActionEvent event) {
         try {
@@ -358,6 +388,11 @@ public final class EditTripController {
         }
     }
 
+    /**
+     * Handles aborting the trip edit modal.
+     *
+     * @param event the action event from the abort button
+     */
     @FXML
     private void handleAbortTripEdit(final ActionEvent event) {
         DialogUtils.closeModal(event);
