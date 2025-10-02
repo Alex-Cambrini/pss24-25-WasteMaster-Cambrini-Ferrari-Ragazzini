@@ -47,6 +47,10 @@ public class Invoice {
     private PaymentStatus paymentStatus;
 
     @Column(nullable = false)
+    @NotNull(message = "The last modified date cannot be null")
+    private LocalDateTime lastModified;
+
+    @Column(nullable = false)
     private double amount;
 
     @Column(nullable = false)
@@ -80,6 +84,7 @@ public class Invoice {
         this.issueDate = issueDate;
         this.paymentStatus = PaymentStatus.UNPAID;
         this.amount = totalRecurring + totalOnetime;
+        this.lastModified = issueDate;
     }
 
     public Integer getInvoiceId() {
@@ -174,10 +179,18 @@ public class Invoice {
         this.isDeleted = deleted;
     }
 
+    public void setLastModified(LocalDateTime lastModified) {
+        this.lastModified = lastModified;
+    }
+
+    public LocalDateTime getLastModified() {
+        return lastModified;
+    }
     public enum PaymentStatus {
         PAID,
         UNPAID
     }
+
 
     @Override
     public String toString() {
