@@ -56,12 +56,14 @@ public class NotificationManager {
                 });
 
         tripRepository.findLast5Inserted()
-                .forEach(t -> events.add(new Notification(
-                        String.format("Trip #%d - Vehicle: %s",
-                                t.getTripId(),
-                                t.getAssignedVehicle() != null ? t.getAssignedVehicle().getPlate() : "N/A"),
-                        t.getDepartureTime()
-                )));
+                .forEach(t -> {
+                    String vehicle = t.getAssignedVehicle() != null ? t.getAssignedVehicle().getPlate() : "N/A";
+                    String status = (t.getStatus() != null) ? t.getStatus().name() : "UNKNOWN";
+                    events.add(new Notification(
+                            String.format("Trip #%d - Vehicle: %s - Status: %s",
+                                    t.getTripId(), vehicle, status),
+                            t.getDepartureTime()));
+                });
 
         events.sort((n1, n2) -> n2.getTimestamp().compareTo(n1.getTimestamp()));
         return events.stream().limit(5).toList();
