@@ -8,7 +8,8 @@ import java.util.Optional;
 import org.mindrot.jbcrypt.BCrypt;
 
 /**
- * Service class responsible for managing Account entities, including account creation and
+ * Service class responsible for managing Account entities, including account
+ * creation and
  * password hashing.
  */
 public class AccountManager {
@@ -18,17 +19,19 @@ public class AccountManager {
     /**
      * Constructs an AccountManager with the given AccountRepository.
      *
-     * @param accountRepository the repository used for account persistence operations
+     * @param accountRepository the repository used for account persistence
+     *                          operations
      */
     public AccountManager(final AccountRepository accountRepository) {
         this.accountRepository = accountRepository;
     }
 
     /**
-     * Creates a new Account for the given Employee with the raw password. The password is
+     * Creates a new Account for the given Employee with the raw password. The
+     * password is
      * hashed using BCrypt before storing.
      *
-     * @param employee the employee to associate with the new account
+     * @param employee    the employee to associate with the new account
      * @param rawPassword the plain text password to hash and store
      * @return the created Account entity
      */
@@ -64,6 +67,14 @@ public class AccountManager {
         return BCrypt.hashpw(rawPassword, BCrypt.gensalt());
     }
 
+    /**
+     * Retrieves an Account associated with the Employee identified by the given
+     * email.
+     *
+     * @param email the email of the employee whose account is to be retrieved
+     * @return an Optional containing the associated Account if found, or an empty
+     *         Optional otherwise
+     */
     public Optional<Account> findAccountByEmployeeEmail(final String email) {
         return accountRepository.findAccountByEmployeeEmail(email);
     }

@@ -141,14 +141,25 @@ public class CollectionManager {
         return collectionRepository.findCompletedNotBilledByCustomer(customer);
     }
 
+    /**
+     * Retrieves all collections for a specific postal code on a given date.
+     *
+     * @param postalCode the postal code to filter collections by
+     * @param date       the date for which to retrieve collections
+     * @return a list of collections matching the postal code and date
+     * @throws IllegalArgumentException if the postal code is null
+     */
     public List<Collection> getCollectionsByPostalCode(final String postalCode, final LocalDate date) {
         ValidateUtils.requireArgNotNull(postalCode, "Postal code cannot be null");
         return collectionRepository.findCollectionsByPostalCodeAndDate(postalCode, date);
     }
 
+    /**
+     * Retrieves all collections present in the system.
+     *
+     * @return a list of all collections
+     */
     public List<Collection> getAllCollections() {
         return collectionRepository.findAll();
     }
-
-   
 }

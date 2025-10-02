@@ -48,15 +48,15 @@ public class CustomerManager {
      * Updates the given customer.
      *
      * @param toUpdateCustomer the customer with updated data
-     * @throws IllegalArgumentException if the customer is invalid or the email is used by
-     * another customer
+     * @throws IllegalArgumentException if the customer is invalid or the email is
+     *                                  used by
+     *                                  another customer
      */
     public void updateCustomer(final Customer toUpdateCustomer) {
         ValidateUtils.validateEntity(toUpdateCustomer);
         ValidateUtils.requireArgNotNull(toUpdateCustomer.getCustomerId(),
                 "Customer ID cannot be null");
-        Optional<Customer> existingOpt =
-                customerRepository.findByEmail(toUpdateCustomer.getEmail());
+        Optional<Customer> existingOpt = customerRepository.findByEmail(toUpdateCustomer.getEmail());
         if (existingOpt.isPresent() && !existingOpt.get().getCustomerId()
                 .equals(toUpdateCustomer.getCustomerId())) {
             throw new IllegalArgumentException(
@@ -103,12 +103,22 @@ public class CustomerManager {
         return customerRepository.findAll();
     }
 
+    /**
+     * Retrieves all customers that are marked as active (not deleted).
+     *
+     * @return a list of active customers
+     */
     public List<Customer> getAllActiveCustomers() {
         return customerRepository.findActive();
     }
 
+    /**
+     * Finds a customer by their email address.
+     *
+     * @param email the email of the customer to search for
+     * @return an Optional containing the customer if found, or empty if not found
+     */
     public Optional<Customer> findCustomerByEmail(String email) {
         return customerRepository.findByEmail(email);
     }
-
 }
