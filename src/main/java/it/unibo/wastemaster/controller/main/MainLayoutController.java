@@ -105,6 +105,8 @@ public final class MainLayoutController {
     @FXML
     public void initialize() {
         MainLayoutController.setInstance(this);
+        centerPane.setPrefWidth(800);
+        centerPane.setPrefHeight(600);
         String accountName = AppContext.getCurrentAccount().getEmployee().getName();
         setPageTitle(String.format("Welcome back %s", accountName));
         Employee.Role role = AppContext.getCurrentAccount().getEmployee().getRole();
@@ -112,15 +114,20 @@ public final class MainLayoutController {
             case OFFICE_WORKER -> {
                 employeesLink.setDisable(true);
                 vehiclesLink.setDisable(true);
+                handleDashboard();
             }
             case OPERATOR -> {
                 customersLink.setDisable(true);
                 employeesLink.setDisable(true);
                 vehiclesLink.setDisable(true);
                 schedulesLink.setDisable(true);
+                dashboardLink.setDisable(true);
+                wasteLink.setDisable(true);
+                invoicesLink.setDisable(true);
+                handleTrip();
             }
             default -> {
-                // Do nothing
+                handleDashboard();
             }
         }
     }
