@@ -32,6 +32,7 @@ class TripManagerTest extends AbstractDatabaseTest {
     private static final int VEHICLE_TEST_YEAR = 2020;
     private static final int TRIP_EXPECTED_DURATION_HOURS = 5;
     private static final int NEXT_COLLECTION_DAYS = 7;
+    private static final int NON_EXISTENT_TRIP_ID = 999_999;
 
     private Vehicle vehicle1;
     private Employee operator1, operator2;
@@ -147,12 +148,12 @@ class TripManagerTest extends AbstractDatabaseTest {
         assertEquals(trip.getTripId(), found.getTripId());
         assertEquals("40100", found.getPostalCode());
 
-        Optional<Trip> none = getTripManager().getTripById(999_999);
+        Optional<Trip> none = getTripManager().getTripById(NON_EXISTENT_TRIP_ID);
         assertTrue(none.isEmpty());
     }
 
     @Test
-    void testUpdateTrip_and_SoftDeleteTrip() {
+    void testUpdateTripAndSoftDeleteTrip() {
         List<Collection> collections = createCollections();
         getTripManager().createTrip(
                 "40100",
@@ -195,7 +196,7 @@ class TripManagerTest extends AbstractDatabaseTest {
     }
 
     @Test
-    void testUpdateVehicle_and_UpdateOperators() {
+    void testUpdateVehicleAndUpdateOperators() {
         List<Collection> collections = createCollections();
         getTripManager().createTrip(
                 "40100",
@@ -205,8 +206,7 @@ class TripManagerTest extends AbstractDatabaseTest {
                 expectedReturnTime,
                 new ArrayList<>(collections));
         Trip trip = getTripDAO().findAll().get(0);
-
-        Vehicle vehicle2 = new Vehicle("ZZ999YY", "Fiat", "Ducato", 2021,
+        Vehicle vehicle2 = new Vehicle("ZZ999YY", "Fiat", "Ducato", VEHICLE_TEST_YEAR,
                 Vehicle.RequiredLicence.C1, Vehicle.VehicleStatus.IN_SERVICE, 3);
         getVehicleDAO().insert(vehicle2);
 
@@ -221,11 +221,11 @@ class TripManagerTest extends AbstractDatabaseTest {
         assertEquals(operator2.getEmail(), updated.getOperators().get(0).getEmail());
 
         assertThrows(IllegalArgumentException.class,
-                () -> getTripManager().updateVehicle(999_999, vehicle2));
+                () -> getTripManager().updateVehicle(NON_EXISTENT_TRIP_ID, vehicle2));
         assertThrows(IllegalArgumentException.class,
                 () -> getTripManager().updateVehicle(trip.getTripId(), null));
         assertThrows(IllegalArgumentException.class,
-                () -> getTripManager().updateOperators(999_999,
+                () -> getTripManager().updateOperators(NON_EXISTENT_TRIP_ID,
                         new ArrayList<>(List.of(operator1))));
         assertThrows(IllegalArgumentException.class,
                 () -> getTripManager().updateOperators(trip.getTripId(), null));
@@ -236,7 +236,7 @@ class TripManagerTest extends AbstractDatabaseTest {
 
     @Test
     void testGetTripByIdNotFound() {
-        Optional<Trip> none = getTripManager().getTripById(999_999);
+        Optional<Trip> none = getTripManager().getTripById(NON_EXISTENT_TRIP_ID);
         assertTrue(none.isEmpty());
     }
 
@@ -343,7 +343,7 @@ class TripManagerTest extends AbstractDatabaseTest {
     }
 
     @Test
-    void testSetTripAsCompleted_allCases() {
+    void testSetTripAsCompleted() {
         // Create an ACTIVE trip with ACTIVE collections
         List<Collection> collections = createCollections();
         collections.forEach(
