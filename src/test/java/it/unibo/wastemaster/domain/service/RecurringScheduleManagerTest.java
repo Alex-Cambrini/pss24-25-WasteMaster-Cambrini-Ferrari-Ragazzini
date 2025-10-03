@@ -27,6 +27,8 @@ import org.junit.jupiter.api.Test;
 
 class RecurringScheduleManagerTest extends AbstractDatabaseTest {
 
+    private static final int DEFAULT_PLUS_DAYS = 7;
+
     private Location location;
     private Customer customer;
     private Waste waste;
@@ -102,7 +104,7 @@ class RecurringScheduleManagerTest extends AbstractDatabaseTest {
 
     @Test
     void testUpdateStatusRecurringSchedule() {
-        LocalDate validDate = LocalDate.now().plusDays(3);
+        LocalDate validDate = LocalDate.now().plusDays(DEFAULT_PLUS_DAYS);
 
         // Null arguments throw exception
         assertThrows(IllegalArgumentException.class, () -> getRecurringScheduleManager()
@@ -198,7 +200,7 @@ class RecurringScheduleManagerTest extends AbstractDatabaseTest {
 
     @Test
     void testUpdateFrequency() {
-        LocalDate validDate = LocalDate.now().plusDays(3);
+        LocalDate validDate = LocalDate.now().plusDays(DEFAULT_PLUS_DAYS);
 
         // Null arguments throw exception
         assertThrows(IllegalArgumentException.class, () -> getRecurringScheduleManager()
@@ -264,7 +266,7 @@ class RecurringScheduleManagerTest extends AbstractDatabaseTest {
                         LocalDate.now(), Frequency.WEEKLY);
         assertNotNull(schedule.getNextCollectionDate());
         WasteSchedule ws = getWasteScheduleDAO().findSchedulebyWaste(waste);
-        LocalDate expectedDate = LocalDate.now().plusDays(2);
+        LocalDate expectedDate = LocalDate.now().plusDays(1);
         while (expectedDate.getDayOfWeek() != ws.getDayOfWeek()) {
             expectedDate = expectedDate.plusDays(1);
         }
@@ -294,7 +296,7 @@ class RecurringScheduleManagerTest extends AbstractDatabaseTest {
 
     @Test
     void testUpdateNextDatesDoesNotChangeFutureNextCollectionDate() {
-        LocalDate futureDate = LocalDate.now().plusDays(10);
+        LocalDate futureDate = LocalDate.now().plusDays(DEFAULT_PLUS_DAYS);
 
         RecurringSchedule schedule =
                 new RecurringSchedule(customer, waste, LocalDate.now(), Frequency.WEEKLY);
@@ -326,7 +328,7 @@ class RecurringScheduleManagerTest extends AbstractDatabaseTest {
 
         RecurringSchedule rs = new RecurringSchedule(
                 customer, paper, LocalDate.now(), RecurringSchedule.Frequency.WEEKLY);
-        LocalDate oldNext = LocalDate.now().plusDays(7);
+        LocalDate oldNext = LocalDate.now().plusDays(DEFAULT_PLUS_DAYS);
         rs.setNextCollectionDate(oldNext);
         getRecurringScheduleDAO().insert(rs);
 
