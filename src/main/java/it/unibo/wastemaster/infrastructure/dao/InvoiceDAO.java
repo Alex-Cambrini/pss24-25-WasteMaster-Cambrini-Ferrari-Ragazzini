@@ -15,7 +15,9 @@ import java.util.List;
  */
 public final class InvoiceDAO extends GenericDAO<Invoice> {
 
-    /** Limit used for fetching the most recently modified invoices. */
+    /**
+     * Limit used for fetching the most recently modified invoices.
+     */
     private static final int LAST_INVOICES_LIMIT = 5;
 
     /**
@@ -31,13 +33,14 @@ public final class InvoiceDAO extends GenericDAO<Invoice> {
      * Finds invoices issued between the given start and end dates (inclusive).
      *
      * @param start the start date of the range
-     * @param end   the end date of the range
+     * @param end the end date of the range
      * @return list of invoices issued in the given date range
      */
     public List<Invoice> findByDateRange(final LocalDate start, final LocalDate end) {
         return getEntityManager().createQuery(
-                "SELECT i FROM Invoice i WHERE i.issueDate BETWEEN :start AND :end",
-                Invoice.class)
+                        "SELECT i FROM Invoice i WHERE i.issueDate BETWEEN :start AND "
+                                + ":end",
+                        Invoice.class)
                 .setParameter("start", start)
                 .setParameter("end", end)
                 .getResultList();
@@ -51,8 +54,8 @@ public final class InvoiceDAO extends GenericDAO<Invoice> {
      */
     public List<Invoice> findByCustomer(final Customer customer) {
         return getEntityManager().createQuery(
-                "SELECT i FROM Invoice i WHERE i.customer = :customer",
-                Invoice.class)
+                        "SELECT i FROM Invoice i WHERE i.customer = :customer",
+                        Invoice.class)
                 .setParameter("customer", customer)
                 .getResultList();
     }
@@ -62,12 +65,12 @@ public final class InvoiceDAO extends GenericDAO<Invoice> {
      * date descending.
      *
      * @return up to {@link #LAST_INVOICES_LIMIT} invoices sorted by last modified
-     *         date
+     * date
      */
     public List<Invoice> findLast5InvoicesEvent() {
         return getEntityManager().createQuery(
-                "SELECT i FROM Invoice i ORDER BY i.lastModified DESC",
-                Invoice.class)
+                        "SELECT i FROM Invoice i ORDER BY i.lastModified DESC",
+                        Invoice.class)
                 .setMaxResults(LAST_INVOICES_LIMIT)
                 .getResultList();
     }

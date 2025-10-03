@@ -263,8 +263,8 @@ public final class Collection {
     @Override
     public String toString() {
         return String.format("""
-                Collection {ID: %d, Customer: %s, Date: %s, Waste: %s, Status: %s,
-                Cancel Limit Days: %d, Schedule ID: %s, Schedule Category: %s}""",
+                        Collection {ID: %d, Customer: %s, Date: %s, Waste: %s, Status: %s,
+                        Cancel Limit Days: %d, Schedule ID: %s, Schedule Category: %s}""",
                 collectionId, customer != null ? customer.getName() : "N/A", date,
                 waste != null ? waste.getWasteName() : "N/A", collectionStatus,
                 cancelLimitDays, schedule != null ? schedule.getScheduleId() : "N/A",

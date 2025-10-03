@@ -17,8 +17,8 @@ public final class FakeNotificationService implements NotificationService {
      * the details to the console.
      *
      * @param recipients the list of email addresses of the recipients
-     * @param subject    the subject of the notification
-     * @param body       the body content of the notification
+     * @param subject the subject of the notification
+     * @param body the body content of the notification
      */
     @Override
     public void notifyTripCancellation(

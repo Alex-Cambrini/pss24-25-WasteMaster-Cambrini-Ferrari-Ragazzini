@@ -19,7 +19,7 @@ import java.util.List;
  * Abstract base class for waste collection schedules, associated with a specific
  * customer and type of waste. Provides common attributes like status, creation date,
  * category (one-time or recurring), and linked collections.
- *
+ * <p>
  * Subclasses must implement {@link #getCollectionDate()} to define when the waste
  * collection occurs. This class uses single table inheritance with a discriminator
  * column "schedule_type".

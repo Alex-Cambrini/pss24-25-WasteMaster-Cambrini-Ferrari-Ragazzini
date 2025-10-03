@@ -8,10 +8,14 @@ import java.time.LocalDateTime;
  */
 public class Notification {
 
-    /** The content of the notification. */
+    /**
+     * The content of the notification.
+     */
     private final String message;
 
-    /** The timestamp when the notification was created. */
+    /**
+     * The timestamp when the notification was created.
+     */
     private final LocalDateTime timestamp;
 
     /**

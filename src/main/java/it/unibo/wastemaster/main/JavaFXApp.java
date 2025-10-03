@@ -16,10 +16,14 @@ import javafx.stage.Stage;
  */
 public final class JavaFXApp extends Application {
 
-    /** Default window width. */
+    /**
+     * Default window width.
+     */
     private static final int DEFAULT_WIDTH = 400;
 
-    /** Default window height. */
+    /**
+     * Default window height.
+     */
     private static final int DEFAULT_HEIGHT = 300;
 
     private Parent root;

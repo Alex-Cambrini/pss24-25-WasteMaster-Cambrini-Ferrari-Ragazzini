@@ -13,7 +13,6 @@ import javafx.stage.Stage;
  * Application context class that manages global state and resources
  * such as the {@link EntityManager}, {@link ServiceFactory}, and
  * the current {@link Account}.
- * <p>
  * This class is {@code final} and provides only static utility methods.
  * It cannot be instantiated.
  */

@@ -18,7 +18,7 @@ public class AccountCreationException extends RuntimeException {
      * Creates a new exception with the specified detail message and cause.
      *
      * @param message the detail message describing the cause of the exception
-     * @param cause   the underlying cause of the exception (can be {@code null})
+     * @param cause the underlying cause of the exception (can be {@code null})
      */
     public AccountCreationException(final String message, final Throwable cause) {
         super(message, cause);
