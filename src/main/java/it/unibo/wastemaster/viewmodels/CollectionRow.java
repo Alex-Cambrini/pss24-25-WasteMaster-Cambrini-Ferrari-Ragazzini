@@ -37,10 +37,28 @@ public final class CollectionRow {
                 + collection.getCustomer().getSurname();
     }
 
+    /**
+     * @return the JavaFX boolean property backing the selection state
+     */
+    public BooleanProperty selectedProperty() {
+        return selected;
+    }
 
-    public BooleanProperty selectedProperty() { return selected; }
-    public boolean isSelected() { return selected.get(); }
-    public void setSelected(boolean value) { selected.set(value); }
+    /**
+     * @return whether the row is selected
+     */
+    public boolean isSelected() {
+        return selected.get();
+    }
+
+    /**
+     * Sets the selection state.
+     *
+     * @param value the new selection value
+     */
+    public void setSelected(final boolean value) {
+        selected.set(value);
+    }
 
     /**
      * Returns the ID of the collection.
@@ -96,6 +114,11 @@ public final class CollectionRow {
         return customerName;
     }
 
+    /**
+     * Returns the underlying collection domain entity.
+     *
+     * @return the {@link Collection} entity
+     */
     public Collection getCollection() {
         return collection;
     }

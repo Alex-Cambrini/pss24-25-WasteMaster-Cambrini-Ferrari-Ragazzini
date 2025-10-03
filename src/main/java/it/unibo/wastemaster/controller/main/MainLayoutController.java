@@ -215,7 +215,7 @@ public final class MainLayoutController {
         if (controller != null
                 && controller
                 instanceof it.unibo.wastemaster.controller.dashboard
-                        .DashboardController dashCtrl) {
+                .DashboardController dashCtrl) {
             dashCtrl.setCustomerManager(
                     AppContext.getServiceFactory().getCustomerManager());
             dashCtrl.setCollectionManager(
