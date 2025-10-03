@@ -1,8 +1,9 @@
 package it.unibo.wastemaster.viewmodels;
 
-import it.unibo.wastemaster.domain.model.Invoice;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+
+import it.unibo.wastemaster.domain.model.Invoice;
 
 /**
  * ViewModel class that represents an invoice for the table view.
@@ -24,62 +25,29 @@ public final class InvoiceRow {
         this.invoice = invoice;
         this.id = String.valueOf(invoice.getInvoiceId());
         this.customer = invoice.getCustomer() != null ?
-                invoice.getCustomer().getName() + " " + invoice.getCustomer()
-                        .getSurname() : "";
+                invoice.getCustomer().getName() + " " + invoice.getCustomer().getSurname() : "";
         this.amount = String.format("%.2f", invoice.getAmount());
-        this.status = invoice.getPaymentStatus() != null ?
-                invoice.getPaymentStatus().toString() : "";
-        this.issueDate =
-                invoice.getIssueDate() != null ? invoice.getIssueDate().toString() : "";
+        this.status = invoice.getPaymentStatus() != null ? invoice.getPaymentStatus().toString() : "";
+        this.issueDate = invoice.getIssueDate() != null ? invoice.getIssueDate().toString() : "";
         DateTimeFormatter fmt = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         LocalDateTime paid = invoice.getPaymentDate();
         this.paymentDate = paid != null ? paid.format(fmt) : "";
         this.serviceCounts = "Recurring: " + invoice.getRecurringCount()
                 + ", One-time: " + invoice.getOnetimeCount();
-        this.totalAmounts =
-                "Recurring: " + String.format("%.2f", invoice.getTotalRecurring())
-                        + ", One-time: " + String.format("%.2f",
-                        invoice.getTotalOnetime());
+        this.totalAmounts = "Recurring: " + String.format("%.2f", invoice.getTotalRecurring())
+                + ", One-time: " + String.format("%.2f", invoice.getTotalOnetime());
         this.isCancelled = invoice.isDeleted() ? "Yes" : "No";
     }
 
-    public String getId() {
-        return id;
-    }
+    public String getId() { return id; }
+    public String getCustomer() { return customer; }
+    public String getAmount() { return amount; }
+    public String getStatus() { return status; }
+    public String getIssueDate() { return issueDate; }
+    public String getPaymentDate() { return paymentDate; }
+    public String getServiceCounts() { return serviceCounts; }
+    public String getTotalAmounts() { return totalAmounts; }
+    public String getIsCancelled() { return isCancelled; }
 
-    public String getCustomer() {
-        return customer;
-    }
-
-    public String getAmount() {
-        return amount;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public String getIssueDate() {
-        return issueDate;
-    }
-
-    public String getPaymentDate() {
-        return paymentDate;
-    }
-
-    public String getServiceCounts() {
-        return serviceCounts;
-    }
-
-    public String getTotalAmounts() {
-        return totalAmounts;
-    }
-
-    public String getIsCancelled() {
-        return isCancelled;
-    }
-
-    public Invoice getInvoice() {
-        return invoice;
-    }
+    public Invoice getInvoice() { return invoice; }
 }

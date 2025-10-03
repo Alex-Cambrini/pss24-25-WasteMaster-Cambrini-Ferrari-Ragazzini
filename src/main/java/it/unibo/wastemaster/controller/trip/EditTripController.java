@@ -83,7 +83,7 @@ public final class EditTripController {
      *
      * @param tripManager the TripManager to use
      */
-    public void setTripManager(TripManager tripManager) {
+    public void setTripManager(final TripManager tripManager) {
         this.tripManager = tripManager;
     }
 
@@ -92,7 +92,7 @@ public final class EditTripController {
      *
      * @param vehicleManager the VehicleManager to use
      */
-    public void setVehicleManager(VehicleManager vehicleManager) {
+    public void setVehicleManager(final VehicleManager vehicleManager) {
         this.vehicleManager = vehicleManager;
     }
 
@@ -203,8 +203,9 @@ public final class EditTripController {
         operatorsTable.refresh();
     }
 
-    private void updateAvailableVehicles(LocalDate dep, LocalDate ret, int depHour,
-                                         int retHour) {
+    private void updateAvailableVehicles(final LocalDate dep, final LocalDate ret,
+                                         final int depHour,
+                                         final int retHour) {
         if (tripManager == null) {
             return;
         }
@@ -295,7 +296,7 @@ public final class EditTripController {
         refreshHint();
     }
 
-    private BooleanProperty selectedPropertyFor(Employee e) {
+    private BooleanProperty selectedPropertyFor(final Employee e) {
         BooleanProperty p = selectedById.computeIfAbsent(
                 e.getEmployeeId(), k -> new SimpleBooleanProperty(false));
         p.addListener((obs, was, is) -> {
@@ -340,7 +341,7 @@ public final class EditTripController {
         operatorsHint.setText(total + " / " + seatCapacity.get() + " selected");
     }
 
-    private int getSeatCount(Vehicle v) {
+    private int getSeatCount(final Vehicle v) {
         if (v == null) {
             return 0;
         }

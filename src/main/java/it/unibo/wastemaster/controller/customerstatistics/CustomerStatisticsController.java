@@ -44,7 +44,7 @@ public class CustomerStatisticsController {
      *
      * @param customerManager the CustomerManager to use
      */
-    public void setCustomerManager(CustomerManager customerManager) {
+    public void setCustomerManager(final CustomerManager customerManager) {
         this.customerManager = customerManager;
     }
 
@@ -53,7 +53,7 @@ public class CustomerStatisticsController {
      *
      * @param invoiceManager the InvoiceManager to use
      */
-    public void setInvoiceManager(InvoiceManager invoiceManager) {
+    public void setInvoiceManager(final InvoiceManager invoiceManager) {
         this.invoiceManager = invoiceManager;
     }
 
@@ -62,7 +62,7 @@ public class CustomerStatisticsController {
      *
      * @param collectionManager the CollectionManager to use
      */
-    public void setCollectionManager(CollectionManager collectionManager) {
+    public void setCollectionManager(final CollectionManager collectionManager) {
         this.collectionManager = collectionManager;
     }
 
@@ -72,7 +72,7 @@ public class CustomerStatisticsController {
      *
      * @param customer the customer to display statistics for
      */
-    public void setCustomer(Customer customer) {
+    public void setCustomer(final Customer customer) {
         this.customer = customer;
         updateStatistics();
     }

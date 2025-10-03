@@ -127,7 +127,7 @@ public final class TripController implements AutoRefreshable {
      *
      * @param notificationService the NotificationService to use
      */
-    public void setNotificationService(NotificationService notificationService) {
+    public void setNotificationService(final NotificationService notificationService) {
         this.notificationService = notificationService;
     }
 
@@ -136,7 +136,7 @@ public final class TripController implements AutoRefreshable {
      *
      * @param tripManager the TripManager to use
      */
-    public void setTripManager(TripManager tripManager) {
+    public void setTripManager(final TripManager tripManager) {
         this.tripManager = tripManager;
     }
 
@@ -145,7 +145,7 @@ public final class TripController implements AutoRefreshable {
      *
      * @param vehicleManager the VehicleManager to use
      */
-    public void setVehicleManager(VehicleManager vehicleManager) {
+    public void setVehicleManager(final VehicleManager vehicleManager) {
         this.vehicleManager = vehicleManager;
     }
 
@@ -154,7 +154,7 @@ public final class TripController implements AutoRefreshable {
      *
      * @param collectionManager the CollectionManager to use
      */
-    public void setCollectionManager(CollectionManager collectionManager) {
+    public void setCollectionManager(final CollectionManager collectionManager) {
         this.collectionManager = collectionManager;
     }
 
@@ -378,7 +378,7 @@ public final class TripController implements AutoRefreshable {
      * @param trip the Trip object
      * @return a list of unique customer email addresses
      */
-    private List<String> extractCustomerEmails(Trip trip) {
+    private List<String> extractCustomerEmails(final Trip trip) {
         if (trip.getCollections() == null) {
             return List.of();
         }
@@ -496,7 +496,7 @@ public final class TripController implements AutoRefreshable {
         tripTable.setItems(filtered);
     }
 
-    private boolean shouldShowByStatus(String status) {
+    private boolean shouldShowByStatus(final String status) {
         if (status == null) {
             return false;
         }

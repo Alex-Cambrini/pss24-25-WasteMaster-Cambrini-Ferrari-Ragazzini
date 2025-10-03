@@ -90,7 +90,7 @@ public class AddInvoiceController {
      *
      * @param collectionManager the CollectionManager to use
      */
-    public void setCollectionManager(CollectionManager collectionManager) {
+    public void setCollectionManager(final CollectionManager collectionManager) {
         this.collectionManager = collectionManager;
     }
 
@@ -99,7 +99,7 @@ public class AddInvoiceController {
      *
      * @param customerManager the CustomerManager to use
      */
-    public void setCustomerManager(CustomerManager customerManager) {
+    public void setCustomerManager(final CustomerManager customerManager) {
         this.customerManager = customerManager;
     }
 
@@ -108,7 +108,7 @@ public class AddInvoiceController {
      *
      * @param invoiceManager the InvoiceManager to use
      */
-    public void setInvoiceManager(InvoiceManager invoiceManager) {
+    public void setInvoiceManager(final InvoiceManager invoiceManager) {
         this.invoiceManager = invoiceManager;
     }
 
@@ -121,7 +121,7 @@ public class AddInvoiceController {
                 });
     }
 
-    private void loadCollectionsForCustomer(Customer customer) {
+    private void loadCollectionsForCustomer(final Customer customer) {
         availableCollections.clear();
 
         if (customer != null) {
@@ -249,7 +249,7 @@ public class AddInvoiceController {
         saveButton.getScene().getWindow().hide();
     }
 
-    private void showAlert(String message) {
+    private void showAlert(final String message) {
         Alert alert = new Alert(Alert.AlertType.WARNING, message, ButtonType.OK);
         alert.showAndWait();
     }

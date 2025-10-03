@@ -54,7 +54,7 @@ public class DashboardController {
      *
      * @param customerManager the CustomerManager to use
      */
-    public void setCustomerManager(CustomerManager customerManager) {
+    public void setCustomerManager(final CustomerManager customerManager) {
         this.customerManager = customerManager;
     }
 
@@ -63,7 +63,7 @@ public class DashboardController {
      *
      * @param collectionManager the CollectionManager to use
      */
-    public void setCollectionManager(CollectionManager collectionManager) {
+    public void setCollectionManager(final CollectionManager collectionManager) {
         this.collectionManager = collectionManager;
     }
 
@@ -72,7 +72,7 @@ public class DashboardController {
      *
      * @param invoiceManager the InvoiceManager to use
      */
-    public void setInvoiceManager(InvoiceManager invoiceManager) {
+    public void setInvoiceManager(final InvoiceManager invoiceManager) {
         this.invoiceManager = invoiceManager;
     }
 
@@ -81,7 +81,7 @@ public class DashboardController {
      *
      * @param tripManager the TripManager to use
      */
-    public void setTripManager(TripManager tripManager) {
+    public void setTripManager(final TripManager tripManager) {
         this.tripManager = tripManager;
     }
 
@@ -90,7 +90,7 @@ public class DashboardController {
      *
      * @param notificationManager the NotificationManager to use
      */
-    public void setNotificationManager(NotificationManager notificationManager) {
+    public void setNotificationManager(final NotificationManager notificationManager) {
         this.notificationManager = notificationManager;
     }
 
@@ -194,12 +194,12 @@ public class DashboardController {
         notificationsList.getItems().clear();
 
         if (notificationManager != null) {
-            DateTimeFormatter TS_FMT =
+            DateTimeFormatter tsFmt =
                     DateTimeFormatter.ofPattern("yyyy-MM-dd 'at' HH:mm");
             List<Notification> lastEvents = notificationManager.getLast5Events();
             List<String> displayNotifications = lastEvents.stream()
                     .map(n -> String.format("%s - %s", n.getMessage(),
-                            n.getTimestamp().format(TS_FMT)))
+                            n.getTimestamp().format(tsFmt)))
                     .toList();
             notificationsList.setItems(
                     FXCollections.observableArrayList(displayNotifications));

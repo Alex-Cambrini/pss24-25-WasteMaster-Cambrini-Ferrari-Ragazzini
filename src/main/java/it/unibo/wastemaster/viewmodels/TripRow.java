@@ -22,20 +22,15 @@ public final class TripRow {
         this.trip = trip;
         this.id = String.valueOf(trip.getTripId());
         this.postalCodes = trip.getPostalCode() != null ? trip.getPostalCode() : "";
-        this.vehicle =
-                trip.getAssignedVehicle() != null ? trip.getAssignedVehicle().getPlate() :
-                        "";
+        this.vehicle = trip.getAssignedVehicle() != null ? trip.getAssignedVehicle().getPlate() : "";
         this.operators = trip.getOperators() != null
                 ? trip.getOperators().stream()
-                .map(op -> op.getName() + " " + op.getSurname())
-                .collect(Collectors.joining(", "))
+                        .map(op -> op.getName() + " " + op.getSurname())
+                        .collect(Collectors.joining(", "))
                 : "";
         DateTimeFormatter fmt = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
-        this.departure =
-                trip.getDepartureTime() != null ? trip.getDepartureTime().format(fmt) :
-                        "";
-        this.returnTime = trip.getExpectedReturnTime() != null ?
-                trip.getExpectedReturnTime().format(fmt) : "";
+        this.departure = trip.getDepartureTime() != null ? trip.getDepartureTime().format(fmt) : "";
+        this.returnTime = trip.getExpectedReturnTime() != null ? trip.getExpectedReturnTime().format(fmt) : "";
         this.status = trip.getStatus() != null ? trip.getStatus().toString() : "";
     }
 
@@ -61,18 +56,17 @@ public final class TripRow {
 
     public String getVehicleModel() {
         var v = trip.getAssignedVehicle();
-        if (v == null) {
+        if (v == null)
             return "";
-        }
         String brand = v.getBrand() != null ? v.getBrand() : "";
         String model = v.getModel() != null ? v.getModel() : "";
         return (brand + " " + model).trim();
     }
 
     public int getVehicleCapacity() {
-        var v = trip.getAssignedVehicle();
-        return v != null ? v.getRequiredOperators() : 0;
-    }
+    var v = trip.getAssignedVehicle();
+    return v != null ? v.getRequiredOperators() : 0;
+}
 
     public String getOperators() {
         return operators;

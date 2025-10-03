@@ -81,7 +81,7 @@ public final class CollectionController {
      *
      * @param previousPage the previous page identifier
      */
-    public void setPreviousPage(String previousPage) {
+    public void setPreviousPage(final String previousPage) {
         this.previousPage = previousPage;
     }
 
@@ -90,7 +90,7 @@ public final class CollectionController {
      *
      * @param scheduleManager the schedule manager to set
      */
-    public void setScheduleManager(ScheduleManager scheduleManager) {
+    public void setScheduleManager(final ScheduleManager scheduleManager) {
         this.scheduleManager = scheduleManager;
     }
 
@@ -100,7 +100,7 @@ public final class CollectionController {
      * @param recurringScheduleManager the recurring schedule manager to set
      */
     public void setRecurringScheduleManager(
-            RecurringScheduleManager recurringScheduleManager) {
+            final RecurringScheduleManager recurringScheduleManager) {
         this.recurringScheduleManager = recurringScheduleManager;
     }
 
@@ -109,7 +109,8 @@ public final class CollectionController {
      *
      * @param oneTimeScheduleManager the one-time schedule manager to set
      */
-    public void setOneTimeScheduleManager(OneTimeScheduleManager oneTimeScheduleManager) {
+    public void setOneTimeScheduleManager(
+            final OneTimeScheduleManager oneTimeScheduleManager) {
         this.oneTimeScheduleManager = oneTimeScheduleManager;
     }
 
@@ -118,7 +119,7 @@ public final class CollectionController {
      *
      * @param tripManager the trip manager to set
      */
-    public void setTripManager(TripManager tripManager) {
+    public void setTripManager(final TripManager tripManager) {
         this.tripManager = tripManager;
     }
 
@@ -127,7 +128,7 @@ public final class CollectionController {
      *
      * @param vehicleManager the vehicle manager to set
      */
-    public void setVehicleManager(VehicleManager vehicleManager) {
+    public void setVehicleManager(final VehicleManager vehicleManager) {
         this.vehicleManager = vehicleManager;
     }
 
@@ -136,7 +137,7 @@ public final class CollectionController {
      *
      * @param collectionManager the collection manager to set
      */
-    public void setCollectionManager(CollectionManager collectionManager) {
+    public void setCollectionManager(final CollectionManager collectionManager) {
         this.collectionManager = collectionManager;
     }
 

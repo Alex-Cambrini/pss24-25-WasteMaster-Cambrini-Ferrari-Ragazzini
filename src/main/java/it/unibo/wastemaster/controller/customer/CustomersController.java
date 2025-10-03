@@ -85,7 +85,7 @@ public final class CustomersController implements AutoRefreshable {
      *
      * @param customerManager the CustomerManager to use
      */
-    public void setCustomerManager(CustomerManager customerManager) {
+    public void setCustomerManager(final CustomerManager customerManager) {
         this.customerManager = customerManager;
     }
 

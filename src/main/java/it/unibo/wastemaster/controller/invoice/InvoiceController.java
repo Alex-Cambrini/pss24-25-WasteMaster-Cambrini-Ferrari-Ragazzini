@@ -130,7 +130,7 @@ public final class InvoiceController implements AutoRefreshable {
      *
      * @param invoiceManager the InvoiceManager to use
      */
-    public void setInvoiceManager(InvoiceManager invoiceManager) {
+    public void setInvoiceManager(final InvoiceManager invoiceManager) {
         this.invoiceManager = invoiceManager;
     }
 
@@ -139,7 +139,7 @@ public final class InvoiceController implements AutoRefreshable {
      *
      * @param collectionManager the CollectionManager to use
      */
-    public void setCollectionManager(CollectionManager collectionManager) {
+    public void setCollectionManager(final CollectionManager collectionManager) {
         this.collectionManager = collectionManager;
     }
 
@@ -148,7 +148,7 @@ public final class InvoiceController implements AutoRefreshable {
      *
      * @param customerManager the CustomerManager to use
      */
-    public void setCustomerManager(CustomerManager customerManager) {
+    public void setCustomerManager(final CustomerManager customerManager) {
         this.customerManager = customerManager;
     }
 
@@ -160,7 +160,7 @@ public final class InvoiceController implements AutoRefreshable {
         owner = (Stage) MainLayoutController.getInstance().getRootPane().getScene()
                 .getWindow();
 
-        DateTimeFormatter TS_FMT = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+        DateTimeFormatter tsFtm = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 
         idColumn.setCellValueFactory(new PropertyValueFactory<>("id"));
         customerColumn.setCellValueFactory(new PropertyValueFactory<>("customer"));
@@ -179,15 +179,15 @@ public final class InvoiceController implements AutoRefreshable {
                 return "";
             }
             try {
-                return java.time.LocalDateTime.parse(s).format(TS_FMT);
+                return java.time.LocalDateTime.parse(s).format(tsFtm);
             } catch (Exception e1) {
                 try {
                     return java.time.OffsetDateTime.parse(s).toLocalDateTime()
-                            .format(TS_FMT);
+                            .format(tsFtm);
                 } catch (Exception e2) {
                     try {
                         return java.time.ZonedDateTime.parse(s).toLocalDateTime()
-                                .format(TS_FMT);
+                                .format(tsFtm);
                     } catch (Exception e3) {
                         return s;
                     }
@@ -198,7 +198,7 @@ public final class InvoiceController implements AutoRefreshable {
         dateColumn.setCellFactory(
                 col -> new javafx.scene.control.TableCell<InvoiceRow, String>() {
                     @Override
-                    protected void updateItem(String item, boolean empty) {
+                    protected void updateItem(final String item, final boolean empty) {
                         super.updateItem(item, empty);
                         setText(empty ? null : fmt.apply(item));
                     }
@@ -207,13 +207,13 @@ public final class InvoiceController implements AutoRefreshable {
         paymentDateColumn.setCellFactory(
                 col -> new javafx.scene.control.TableCell<InvoiceRow, String>() {
                     @Override
-                    protected void updateItem(String item, boolean empty) {
+                    protected void updateItem(final String item, final boolean empty) {
                         super.updateItem(item, empty);
                         if (empty) {
                             setText(null);
                         } else {
-                            setText((item == null || item.isBlank()) ? "-" :
-                                    fmt.apply(item));
+                            setText((item == null || item.isBlank()) ? "-"
+                                    : fmt.apply(item));
                         }
                     }
                 });
@@ -244,7 +244,7 @@ public final class InvoiceController implements AutoRefreshable {
 
         invoiceTable.setRowFactory(tv -> new TableRow<InvoiceRow>() {
             @Override
-            protected void updateItem(InvoiceRow item, boolean empty) {
+            protected void updateItem(final InvoiceRow item, final boolean empty) {
                 super.updateItem(item, empty);
                 if (item == null || empty) {
                     setStyle("");
@@ -553,14 +553,16 @@ public final class InvoiceController implements AutoRefreshable {
 
         if (file.exists() && !file.renameTo(file)) {
             DialogUtils.showError("File in use",
-                    "The PDF is already open in another program. Close it and try again.",
+                    "The PDF is already open in another program."
+                            + " Close it and try again.",
                     AppContext.getOwner());
             return;
         }
 
         try (java.io.FileOutputStream fos = new java.io.FileOutputStream(file)) {
-            new it.unibo.wastemaster.infrastructure.pdf.InvoicePdfService().generateInvoicePdf(
-                    invoice, fos);
+            new it.unibo.wastemaster.infrastructure.pdf.InvoicePdfService()
+                    .generateInvoicePdf(
+                            invoice, fos);
             DialogUtils.showSuccess("PDF generated: " + outputPath.toAbsolutePath(),
                     AppContext.getOwner());
         } catch (Exception e) {
@@ -606,7 +608,7 @@ public final class InvoiceController implements AutoRefreshable {
      * @param event the action event
      */
     @FXML
-    private void handleViewCustomer(ActionEvent event) {
+    private void handleViewCustomer(final ActionEvent event) {
         InvoiceRow selectedRow = invoiceTable.getSelectionModel().getSelectedItem();
         if (selectedRow == null) {
             DialogUtils.showError("No Selection", "Please select an invoice.",

@@ -70,7 +70,7 @@ public final class AddScheduleController {
      *
      * @param customerManager the CustomerManager to use
      */
-    public void setCustomerManager(CustomerManager customerManager) {
+    public void setCustomerManager(final CustomerManager customerManager) {
         this.customerManager = customerManager;
     }
 
@@ -79,7 +79,8 @@ public final class AddScheduleController {
      *
      * @param oneTimeScheduleManager the OneTimeScheduleManager to use
      */
-    public void setOneTimeScheduleManager(OneTimeScheduleManager oneTimeScheduleManager) {
+    public void setOneTimeScheduleManager(
+            final OneTimeScheduleManager oneTimeScheduleManager) {
         this.oneTimeScheduleManager = oneTimeScheduleManager;
     }
 
@@ -89,7 +90,7 @@ public final class AddScheduleController {
      * @param recurringScheduleManager the RecurringScheduleManager to use
      */
     public void setRecurringScheduleManager(
-            RecurringScheduleManager recurringScheduleManager) {
+            final RecurringScheduleManager recurringScheduleManager) {
         this.recurringScheduleManager = recurringScheduleManager;
     }
 
@@ -98,7 +99,7 @@ public final class AddScheduleController {
      *
      * @param wasteManager the WasteManager to use
      */
-    public void setWasteManager(WasteManager wasteManager) {
+    public void setWasteManager(final WasteManager wasteManager) {
         this.wasteManager = wasteManager;
     }
 
@@ -215,12 +216,12 @@ public final class AddScheduleController {
         frequencyComboBox.setItems(FXCollections.observableArrayList(Frequency.values()));
         frequencyComboBox.setConverter(new StringConverter<Frequency>() {
             @Override
-            public String toString(Frequency freq) {
+            public String toString(final Frequency freq) {
                 return freq != null ? freq.name() : "";
             }
 
             @Override
-            public Frequency fromString(String string) {
+            public Frequency fromString(final String string) {
                 return null;
             }
         });

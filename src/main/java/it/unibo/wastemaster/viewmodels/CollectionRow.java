@@ -37,17 +37,10 @@ public final class CollectionRow {
                 + collection.getCustomer().getSurname();
     }
 
-    public BooleanProperty selectedProperty() {
-        return selected;
-    }
 
-    public boolean isSelected() {
-        return selected.get();
-    }
-
-    public void setSelected(boolean value) {
-        selected.set(value);
-    }
+    public BooleanProperty selectedProperty() { return selected; }
+    public boolean isSelected() { return selected.get(); }
+    public void setSelected(boolean value) { selected.set(value); }
 
     /**
      * Returns the ID of the collection.

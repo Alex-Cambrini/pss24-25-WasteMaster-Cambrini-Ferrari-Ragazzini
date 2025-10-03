@@ -125,7 +125,7 @@ public final class ScheduleController implements AutoRefreshable {
      *
      * @param scheduleManager the ScheduleManager to use
      */
-    public void setScheduleManager(ScheduleManager scheduleManager) {
+    public void setScheduleManager(final ScheduleManager scheduleManager) {
         this.scheduleManager = scheduleManager;
     }
 
@@ -135,7 +135,7 @@ public final class ScheduleController implements AutoRefreshable {
      * @param recurringScheduleManager the RecurringScheduleManager to use
      */
     public void setRecurringScheduleManager(
-            RecurringScheduleManager recurringScheduleManager) {
+            final RecurringScheduleManager recurringScheduleManager) {
         this.recurringScheduleManager = recurringScheduleManager;
     }
 
@@ -144,7 +144,8 @@ public final class ScheduleController implements AutoRefreshable {
      *
      * @param oneTimeScheduleManager the OneTimeScheduleManager to use
      */
-    public void setOneTimeScheduleManager(OneTimeScheduleManager oneTimeScheduleManager) {
+    public void setOneTimeScheduleManager(
+            final OneTimeScheduleManager oneTimeScheduleManager) {
         this.oneTimeScheduleManager = oneTimeScheduleManager;
     }
 
@@ -153,7 +154,7 @@ public final class ScheduleController implements AutoRefreshable {
      *
      * @param collectionManager the CollectionManager to use
      */
-    public void setCollectionManager(CollectionManager collectionManager) {
+    public void setCollectionManager(final CollectionManager collectionManager) {
         this.collectionManager = collectionManager;
     }
 

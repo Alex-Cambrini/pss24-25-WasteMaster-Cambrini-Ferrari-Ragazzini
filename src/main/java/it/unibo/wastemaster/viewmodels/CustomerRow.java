@@ -1,7 +1,8 @@
 package it.unibo.wastemaster.viewmodels;
 
-import it.unibo.wastemaster.domain.model.Customer;
 import java.time.format.DateTimeFormatter;
+
+import it.unibo.wastemaster.domain.model.Customer;
 
 /**
  * ViewModel class representing a customer row to be shown in UI tables. It wraps relevant
@@ -32,7 +33,7 @@ public final class CustomerRow {
         this.city = customer.getLocation().getCity();
         this.postalCode = customer.getLocation().getPostalCode();
         this.creationDate = customer.getCreatedDate()
-                .format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"));
+        .format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"));
     }
 
     /**
@@ -97,7 +98,6 @@ public final class CustomerRow {
     public String getPostalCode() {
         return postalCode;
     }
-
     /**
      * Gets the full location as a formatted string.
      *

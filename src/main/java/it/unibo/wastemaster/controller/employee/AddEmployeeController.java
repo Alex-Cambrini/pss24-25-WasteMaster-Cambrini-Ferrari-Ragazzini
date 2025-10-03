@@ -62,7 +62,7 @@ public final class AddEmployeeController {
      *
      * @param employeeManager the EmployeeManager to use
      */
-    public void setEmployeeManager(EmployeeManager employeeManager) {
+    public void setEmployeeManager(final EmployeeManager employeeManager) {
         this.employeeManager = employeeManager;
     }
 

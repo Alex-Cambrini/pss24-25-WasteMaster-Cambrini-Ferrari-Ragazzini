@@ -40,6 +40,9 @@ import javafx.scene.control.cell.CheckBoxTableCell;
  */
 public class AddTripController {
 
+    private static final int MAX_HOUR = 23;
+    private static final int DEFAULT_DEPARTURE_HOUR = 8;
+    private static final int DEFAULT_RETURN_HOUR = 12;
     private final ObservableList<Employee> operatorItems =
             FXCollections.observableArrayList();
     private final Map<Integer, BooleanProperty> selectedById = new HashMap<>();
@@ -95,7 +98,7 @@ public class AddTripController {
      *
      * @param tripManager the TripManager to use
      */
-    public void setTripManager(TripManager tripManager) {
+    public void setTripManager(final TripManager tripManager) {
         this.tripManager = tripManager;
     }
 
@@ -104,7 +107,7 @@ public class AddTripController {
      *
      * @param vehicleManager the VehicleManager to use
      */
-    public void setVehicleManager(VehicleManager vehicleManager) {
+    public void setVehicleManager(final VehicleManager vehicleManager) {
         this.vehicleManager = vehicleManager;
     }
 
@@ -113,7 +116,7 @@ public class AddTripController {
      *
      * @param collectionManager the CollectionManager to use
      */
-    public void setCollectionManager(CollectionManager collectionManager) {
+    public void setCollectionManager(final CollectionManager collectionManager) {
         this.collectionManager = collectionManager;
     }
 
@@ -128,9 +131,11 @@ public class AddTripController {
         driverCombo.setDisable(true);
 
         departureTime.setValueFactory(
-                new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 23, 8));
+                new SpinnerValueFactory.IntegerSpinnerValueFactory(0, MAX_HOUR,
+                        DEFAULT_DEPARTURE_HOUR));
         returnTime.setValueFactory(
-                new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 23, 12));
+                new SpinnerValueFactory.IntegerSpinnerValueFactory(0, MAX_HOUR,
+                        DEFAULT_RETURN_HOUR));
 
         opSelectCol.setCellValueFactory(cd -> selectedPropertyFor(cd.getValue()));
         opSelectCol.setCellFactory(CheckBoxTableCell.forTableColumn(opSelectCol));
@@ -212,8 +217,9 @@ public class AddTripController {
         refreshHint();
     }
 
-    private void updateAvailableVehicles(LocalDate dep, LocalDate ret, int depHour,
-                                         int retHour) {
+    private void updateAvailableVehicles(final LocalDate dep, final LocalDate ret,
+                                         final int depHour,
+                                         final int retHour) {
         if (tripManager == null) {
             return;
         }
@@ -222,7 +228,7 @@ public class AddTripController {
                         ret.atTime(retHour, 0))));
     }
 
-    private void updateAvailablePostalCodes(LocalDate dep) {
+    private void updateAvailablePostalCodes(final LocalDate dep) {
         if (tripManager == null) {
             return;
         }
@@ -230,7 +236,7 @@ public class AddTripController {
                 tripManager.getAvailablePostalCodes(dep)));
     }
 
-    private void updateDriverInfo(Vehicle vehicle) {
+    private void updateDriverInfo(final Vehicle vehicle) {
         LocalDate depDate = departureDate.getValue();
         LocalDate retDate = returnDate.getValue();
         Integer depHour = departureTime.getValue();
@@ -282,7 +288,7 @@ public class AddTripController {
         }
     }
 
-    private BooleanProperty selectedPropertyFor(Employee e) {
+    private BooleanProperty selectedPropertyFor(final Employee e) {
         BooleanProperty p = selectedById.computeIfAbsent(
                 e.getEmployeeId(), k -> new SimpleBooleanProperty(false));
         p.addListener((obs, was, is) -> {
@@ -327,7 +333,7 @@ public class AddTripController {
         operatorsHint.setText(total + " / " + seatCapacity.get() + " selected");
     }
 
-    private int getSeatCount(Vehicle v) {
+    private int getSeatCount(final Vehicle v) {
         if (v == null) {
             return 0;
         }
@@ -351,9 +357,10 @@ public class AddTripController {
         LocalDateTime retDateTime =
                 retDate != null ? retDate.atTime(returnTime.getValue(), 0) : null;
 
-        if (postalCode == null || postalCode.isEmpty() ||
-                vehicle == null || depDate == null || retDate == null ||
-                depDateTime == null || retDateTime == null) {
+        if (postalCode == null
+                || postalCode.isEmpty() || vehicle == null
+                || depDate == null || retDate == null
+                || depDateTime == null || retDateTime == null) {
             showAlert("All fields are required.");
             return;
         }
@@ -430,7 +437,7 @@ public class AddTripController {
         closeModal(event);
     }
 
-    private void showAlert(String msg) {
+    private void showAlert(final String msg) {
         Alert alert = new Alert(Alert.AlertType.ERROR, msg, ButtonType.OK);
         alert.showAndWait();
     }
