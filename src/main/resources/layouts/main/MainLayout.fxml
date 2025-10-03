@@ -11,25 +11,25 @@
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
-
-<StackPane fx:id="rootPane" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.unibo.wastemaster.controller.main.MainLayoutController">
+<StackPane xmlns:fx="http://javafx.com/fxml/1" fx:id="rootPane" xmlns="http://javafx.com/javafx/21"
+           fx:controller="it.unibo.wastemaster.controller.main.MainLayoutController">
     <children>
         <VBox fx:id="rootVBox" spacing="0">
             <MenuBar>
                 <menus>
                     <Menu mnemonicParsing="false" text="File">
                         <items>
-                            <MenuItem mnemonicParsing="false" text="Close" />
+                            <MenuItem mnemonicParsing="false" text="Close"/>
                         </items>
                     </Menu>
                     <Menu mnemonicParsing="false" text="Edit">
                         <items>
-                            <MenuItem mnemonicParsing="false" text="Delete" />
+                            <MenuItem mnemonicParsing="false" text="Delete"/>
                         </items>
                     </Menu>
                     <Menu mnemonicParsing="false" text="Help">
                         <items>
-                            <MenuItem mnemonicParsing="false" text="About" />
+                            <MenuItem mnemonicParsing="false" text="About"/>
                         </items>
                     </Menu>
                 </menus>
@@ -38,33 +38,34 @@
             <HBox fx:id="mainHBox" spacing="0" VBox.vgrow="always">
                 <VBox fx:id="sideMenu" prefWidth="180" spacing="20.0" styleClass="side-menu">
                     <padding>
-                        <Insets bottom="20" left="20" right="20" top="20" />
+                        <Insets bottom="20" left="20" right="20" top="20"/>
                     </padding>
                     <children>
-                        <Hyperlink fx:id="dashboardLink" onAction="#handleDashboard" text="Dashboard" />
-                        <Hyperlink fx:id="customersLink" onAction="#handleCustomers" text="Customers" />
-                        <Hyperlink fx:id="wasteLink" onAction="#handleWaste" text="Waste" />
-                        <Hyperlink fx:id="schedulesLink" onAction="#handleSchedule" text="Schedule" />
-                        <Hyperlink fx:id="vehiclesLink" onAction="#handleVehicle" text="Vehicle" />
-                        <Hyperlink fx:id="employeesLink" onAction="#handleEmployee" text="Employee" />
-                        <Hyperlink fx:id="tripsLink" onAction="#handleTrip" text="Trip" />
-                        <Hyperlink fx:id="invoicesLink" onAction="#handleInvoice" text="Invoice" />
+                        <Hyperlink fx:id="dashboardLink" onAction="#handleDashboard" text="Dashboard"/>
+                        <Hyperlink fx:id="customersLink" onAction="#handleCustomers" text="Customers"/>
+                        <Hyperlink fx:id="wasteLink" onAction="#handleWaste" text="Waste"/>
+                        <Hyperlink fx:id="schedulesLink" onAction="#handleSchedule" text="Schedule"/>
+                        <Hyperlink fx:id="vehiclesLink" onAction="#handleVehicle" text="Vehicle"/>
+                        <Hyperlink fx:id="employeesLink" onAction="#handleEmployee" text="Employee"/>
+                        <Hyperlink fx:id="tripsLink" onAction="#handleTrip" text="Trip"/>
+                        <Hyperlink fx:id="invoicesLink" onAction="#handleInvoice" text="Invoice"/>
                     </children>
                 </VBox>
 
                 <VBox fx:id="contentVBox" spacing="10" styleClass="central-box" HBox.hgrow="always">
                     <padding>
-                        <Insets bottom="20" left="20" right="20" top="20" />
+                        <Insets bottom="20" left="20" right="20" top="20"/>
                     </padding>
                     <children>
-                  <HBox prefHeight="100.0" prefWidth="200.0">
-                     <children>
-                              <Label fx:id="pageTitleLabel" styleClass="title-1" text="MAIN_TITLE" />
-                        <Region prefHeight="100.0" prefWidth="56.0" HBox.hgrow="ALWAYS" />
-                        <Button mnemonicParsing="false" text="Logout" onAction="#handleLogout" styleClass="accent, button-outlined" />
-                     </children>
-                  </HBox>
-                        <StackPane fx:id="centerPane" styleClass="center-pane" VBox.vgrow="always" />
+                        <HBox prefHeight="100.0" prefWidth="200.0">
+                            <children>
+                                <Label fx:id="pageTitleLabel" styleClass="title-1" text="MAIN_TITLE"/>
+                                <Region prefHeight="100.0" prefWidth="56.0" HBox.hgrow="ALWAYS"/>
+                                <Button mnemonicParsing="false" text="Logout" onAction="#handleLogout"
+                                        styleClass="accent, button-outlined"/>
+                            </children>
+                        </HBox>
+                        <StackPane fx:id="centerPane" styleClass="center-pane" VBox.vgrow="always"/>
                     </children>
                 </VBox>
             </HBox>

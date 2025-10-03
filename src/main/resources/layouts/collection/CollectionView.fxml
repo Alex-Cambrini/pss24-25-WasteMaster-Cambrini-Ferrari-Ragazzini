@@ -10,56 +10,58 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
-
-<VBox alignment="TOP_CENTER" prefWidth="640.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.unibo.wastemaster.controller.collection.CollectionController">
+<VBox xmlns:fx="http://javafx.com/fxml/1" alignment="TOP_CENTER" prefWidth="640.0"
+      xmlns="http://javafx.com/javafx/23.0.1"
+      fx:controller="it.unibo.wastemaster.controller.collection.CollectionController">
     <children>
         <HBox alignment="TOP_CENTER" minHeight="40.0" prefHeight="40.0" prefWidth="600.0" spacing="10.0">
             <VBox.margin>
-                <Insets bottom="10.0" />
+                <Insets bottom="10.0"/>
             </VBox.margin>
             <children>
-                <Label fx:id="totalLabel" styleClass="title-4, text-bold" text="Total: 0" />
-                <Label fx:id="completedLabel" styleClass="title-4, text-bold, text, success" text="Completed: 0" />
-                <Label fx:id="cancelledLabel" styleClass="title-4, text-bold, danger" text="Cancelled: 0" />
-                <Label fx:id="activeLabel" styleClass="title-4, text-bold, text, accent" text="Active: 0" />
-            <Region prefHeight="200.0" prefWidth="200.0" HBox.hgrow="ALWAYS" />
-            <Button mnemonicParsing="false" text="Back" styleClass="accent" onAction="#handleBack"/>
+                <Label fx:id="totalLabel" styleClass="title-4, text-bold" text="Total: 0"/>
+                <Label fx:id="completedLabel" styleClass="title-4, text-bold, text, success" text="Completed: 0"/>
+                <Label fx:id="cancelledLabel" styleClass="title-4, text-bold, danger" text="Cancelled: 0"/>
+                <Label fx:id="activeLabel" styleClass="title-4, text-bold, text, accent" text="Active: 0"/>
+                <Region prefHeight="200.0" prefWidth="200.0" HBox.hgrow="ALWAYS"/>
+                <Button mnemonicParsing="false" text="Back" styleClass="accent" onAction="#handleBack"/>
             </children>
         </HBox>
         <HBox alignment="CENTER_RIGHT" prefHeight="30.0" prefWidth="30.0" spacing="10.0">
             <children>
                 <CheckBox fx:id="showCompletedCheckBox" mnemonicParsing="false" text="Show Completed">
                     <tooltip>
-                        <Tooltip text="Show Completed" />
+                        <Tooltip text="Show Completed"/>
                     </tooltip>
                 </CheckBox>
                 <CheckBox fx:id="showCancelledCheckBox" mnemonicParsing="false" text="Show Cancelled">
                     <tooltip>
-                        <Tooltip text="Show Cancelled" />
+                        <Tooltip text="Show Cancelled"/>
                     </tooltip>
                 </CheckBox>
                 <CheckBox fx:id="showActiveCheckBox" mnemonicParsing="false" text="Show Active">
                     <tooltip>
-                        <Tooltip text="Show Active" />
+                        <Tooltip text="Show Active"/>
                     </tooltip>
                 </CheckBox>
             </children>
             <VBox.margin>
-                <Insets bottom="5.0" />
+                <Insets bottom="5.0"/>
             </VBox.margin>
         </HBox>
-        <TableView fx:id="collectionTable" prefHeight="300.0" prefWidth="600.0" styleClass="table-view" VBox.vgrow="ALWAYS">
+        <TableView fx:id="collectionTable" prefHeight="300.0" prefWidth="600.0" styleClass="table-view"
+                   VBox.vgrow="ALWAYS">
             <columns>
-                <TableColumn fx:id="wasteNameColumn" prefWidth="100" text="Waste Name" />
-                <TableColumn fx:id="dateColumn" prefWidth="120" text="Date" />
-                <TableColumn fx:id="zoneColumn" prefWidth="120" text="Zone" />
-                <TableColumn fx:id="statusColumn" prefWidth="100" text="Status" />
-                <TableColumn fx:id="customerColumn" prefWidth="120" text="Customer" />
+                <TableColumn fx:id="wasteNameColumn" prefWidth="100" text="Waste Name"/>
+                <TableColumn fx:id="dateColumn" prefWidth="120" text="Date"/>
+                <TableColumn fx:id="zoneColumn" prefWidth="120" text="Zone"/>
+                <TableColumn fx:id="statusColumn" prefWidth="100" text="Status"/>
+                <TableColumn fx:id="customerColumn" prefWidth="120" text="Customer"/>
             </columns>
         </TableView>
         <HBox minHeight="50.0" prefHeight="100.0" prefWidth="600.0" spacing="10.0">
             <padding>
-                <Insets top="10.0" />
+                <Insets top="10.0"/>
             </padding>
         </HBox>
     </children>
