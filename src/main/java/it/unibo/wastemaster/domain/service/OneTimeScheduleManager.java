@@ -69,25 +69,19 @@ public class OneTimeScheduleManager {
     }
 
     /**
-     * Attempts to cancel a one-time schedule and its associated collection, if
-     * allowed by the pickup date.
-     * <p>
+     * Attempts to cancel a one-time schedule and its associated collection, if allowed by the pickup date.
+     *
      * Preconditions:
-     * <ul>
-     * <li>{@code schedule} and its {@code scheduleId} must not be null</li>
-     * <li>An associated collection for the given schedule must exist</li>
-     * </ul>
-     * Cancellation rule: allowed only if {@code pickupDate} is at least
-     * {@code collection.cancelLimitDays} days from today.
+     * - {@code schedule} and its {@code scheduleId} must not be null
+     * - At least one associated collection for the given schedule must exist
+     *
+     * Cancellation rule: allowed only if {@code pickupDate} is at least {@code collection.cancelLimitDays} days from today.
      *
      * @param schedule the schedule to cancel
      * @return {@code true} if the schedule and its collection were cancelled;
-     * {@code false} if
-     * cancellation is not allowed by date rules or the schedule is already
-     * cancelled
-     * @throws IllegalArgumentException if {@code schedule} or {@code scheduleId} is
-     * null,
-     * or if no associated collection is found
+     *         {@code false} if cancellation is not allowed by date rules or the schedule is already cancelled
+     * @throws IllegalArgumentException if {@code schedule} or {@code scheduleId} is null,
+     *                                  or if no associated collection is found
      */
     public boolean softDeleteOneTimeSchedule(final OneTimeSchedule schedule) {
         ValidateUtils.requireArgNotNull(schedule, "Schedule cannot be null");
