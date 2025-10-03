@@ -189,7 +189,7 @@ public final class EmployeeController implements AutoRefreshable {
      * rows to the table.
      */
     public void loadEmployee() {
-        List<Employee> employees = employeeManager.getAllActiveEmployee();
+        List<Employee> employees = employeeManager.getAllActiveEmployees();
         allEmployees.clear();
 
         for (Employee employee : employees) {
