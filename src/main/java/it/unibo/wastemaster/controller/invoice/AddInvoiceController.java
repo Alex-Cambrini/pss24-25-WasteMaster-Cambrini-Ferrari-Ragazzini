@@ -28,6 +28,9 @@ import javafx.scene.control.cell.CheckBoxTableCell;
  */
 public class AddInvoiceController {
 
+    private final ObservableList<CollectionRow> availableCollections =
+            FXCollections.observableArrayList();
+
     @FXML
     private ComboBox<Customer> customerCombo;
 
@@ -57,15 +60,11 @@ public class AddInvoiceController {
 
     @FXML
     private Button saveButton;
-
     private CollectionManager collectionManager;
     private CustomerManager customerManager;
     private InvoiceManager invoiceManager;
     private boolean updatingFromSelectAll = false;
     private boolean updatingFromRows = false;
-
-    private final ObservableList<CollectionRow> availableCollections =
-            FXCollections.observableArrayList();
 
     /**
      * Initializes the controller, setting up table, buttons, and listeners.
