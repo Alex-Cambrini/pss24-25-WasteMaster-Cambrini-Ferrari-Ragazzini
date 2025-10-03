@@ -9,33 +9,49 @@ import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
 
-public class JavaFXApp extends Application {
+/**
+ * Main JavaFX application entry point for WasteMaster.
+ * <p>
+ * This class initializes the application context and loads the login view.
+ */
+public final class JavaFXApp extends Application {
+
+    /** Default window width. */
+    private static final int DEFAULT_WIDTH = 400;
+
+    /** Default window height. */
+    private static final int DEFAULT_HEIGHT = 300;
 
     private Parent root;
 
+    /**
+     * Starts the JavaFX application by initializing the context,
+     * loading the login view, and configuring the primary stage.
+     *
+     * @param primaryStage the primary stage provided by the JavaFX runtime
+     */
     @Override
-    public void start(Stage primaryStage) {
+    public void start(final Stage primaryStage) {
         try {
             AppContext.init();
             AppContext.setOwner(primaryStage);
 
-            FXMLLoader loader =
-                    new FXMLLoader(
-                            getClass().getResource("/layouts/login/LoginView.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass()
+                    .getResource("/layouts/login/LoginView.fxml"));
             Parent root = loader.load();
 
             Scene scene = new Scene(root);
-            scene.getStylesheets().add(getClass().getResource("/css/primer-light.css")
-                    .toExternalForm());
+            scene.getStylesheets().add(
+                    getClass().getResource("/css/primer-light.css").toExternalForm());
 
             primaryStage.setScene(scene);
             primaryStage.setTitle("WasteMaster - Login");
             primaryStage.getIcons()
                     .add(new Image(getClass().getResourceAsStream("/images/icon.png")));
-            primaryStage.setWidth(400);
-            primaryStage.setHeight(300);
-            primaryStage.setMinWidth(400);
-            primaryStage.setMinHeight(300);
+            primaryStage.setWidth(DEFAULT_WIDTH);
+            primaryStage.setHeight(DEFAULT_HEIGHT);
+            primaryStage.setMinWidth(DEFAULT_WIDTH);
+            primaryStage.setMinHeight(DEFAULT_HEIGHT);
             primaryStage.show();
 
         } catch (Exception e) {
