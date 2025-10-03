@@ -21,6 +21,10 @@ import org.junit.jupiter.api.Test;
 
 class InvoiceManagerTest extends AbstractDatabaseTest {
 
+    private static final double INVOICE_AMOUNT_1 = 50.0;
+    private static final double INVOICE_AMOUNT_TOTAL = 150.0;
+    private static final double DELTA = 0.001;
+
     private Customer customer;
     private Waste waste;
 
@@ -60,7 +64,7 @@ class InvoiceManagerTest extends AbstractDatabaseTest {
 
         Invoice invoice1 =
                 getInvoiceManager().createInvoice(customer, new ArrayList<>(List.of(c1)));
-        invoice1.setAmount(50.0);
+        invoice1.setAmount(INVOICE_AMOUNT_1);
         invoice1.setPaymentStatus(PaymentStatus.UNPAID);
         getInvoiceDAO().update(invoice1);
 
@@ -71,7 +75,7 @@ class InvoiceManagerTest extends AbstractDatabaseTest {
         getInvoiceDAO().update(invoice2);
 
         double total = getInvoiceManager().getTotalBilledAmountForCustomer(customer);
-        assertEquals(150.0, total, 0.001);
+        assertEquals(INVOICE_AMOUNT_TOTAL, total, DELTA);
     }
 
     @Test
@@ -81,7 +85,7 @@ class InvoiceManagerTest extends AbstractDatabaseTest {
 
         Invoice invoice1 =
                 getInvoiceManager().createInvoice(customer, new ArrayList<>(List.of(c1)));
-        invoice1.setAmount(50.0);
+        invoice1.setAmount(INVOICE_AMOUNT_1);
         invoice1.setPaymentStatus(PaymentStatus.UNPAID);
         getInvoiceDAO().update(invoice1);
 
@@ -92,7 +96,7 @@ class InvoiceManagerTest extends AbstractDatabaseTest {
         getInvoiceDAO().update(invoice2);
 
         double totalPaid = getInvoiceManager().getTotalPaidAmountForCustomer(customer);
-        assertEquals(100.0, totalPaid, 0.001);
+        assertEquals(100.0, totalPaid, DELTA);
     }
 
     @Test
