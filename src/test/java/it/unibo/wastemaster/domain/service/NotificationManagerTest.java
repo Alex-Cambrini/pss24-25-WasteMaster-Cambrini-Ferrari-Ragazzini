@@ -1,16 +1,25 @@
 package it.unibo.wastemaster.domain.service;
 
-import it.unibo.wastemaster.domain.model.*;
-import it.unibo.wastemaster.infrastructure.AbstractDatabaseTest;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import it.unibo.wastemaster.domain.model.Collection;
+import it.unibo.wastemaster.domain.model.Customer;
+import it.unibo.wastemaster.domain.model.Employee;
+import it.unibo.wastemaster.domain.model.Invoice;
+import it.unibo.wastemaster.domain.model.Location;
+import it.unibo.wastemaster.domain.model.OneTimeSchedule;
+import it.unibo.wastemaster.domain.model.Trip;
+import it.unibo.wastemaster.domain.model.Vehicle;
+import it.unibo.wastemaster.domain.model.Waste;
+import it.unibo.wastemaster.infrastructure.AbstractDatabaseTest;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 class NotificationManagerTest extends AbstractDatabaseTest {
 
@@ -39,33 +48,35 @@ class NotificationManagerTest extends AbstractDatabaseTest {
         getWasteDAO().insert(waste);
     }
 
-   @Test
+    @Test
     void testFindLast5InsertedCustomers() {
         for (int i = 1; i <= 6; i++) {
-            Customer c = new Customer("Nome" + i, "Cognome" + i, location, "mail" + i + "@mail.com", "3912345678" + i);
+            Customer c = new Customer("Nome" + i, "Cognome" + i, location,
+                    "mail" + i + "@mail.com", "3912345678" + i);
             getCustomerDAO().insert(c);
         }
 
         List<Customer> last5 = getCustomerRepository().findLast5Inserted();
         assertEquals(5, last5.size());
 
-        
-        List<String> expected = List.of("Cognome6", "Cognome5", "Cognome4", "Cognome3", "Cognome2");
+        List<String> expected =
+                List.of("Cognome6", "Cognome5", "Cognome4", "Cognome3", "Cognome2");
         List<String> actual = last5.stream().map(Customer::getSurname).toList();
 
-        
         assertEquals("Cognome6", actual.get(0));
-        
+
         assertTrue(actual.containsAll(expected));
     }
 
     @Test
     void testFindLast5InsertedTrips() {
         for (int i = 1; i <= 6; i++) {
-            Customer customer = new Customer("Nome" + i, "Cognome" + i, location, "mail" + i + "@mail.com", "3912345678" + i);
+            Customer customer = new Customer("Nome" + i, "Cognome" + i, location,
+                    "mail" + i + "@mail.com", "3912345678" + i);
             getCustomerDAO().insert(customer);
 
-            OneTimeSchedule schedule = new OneTimeSchedule(customer, waste, LocalDate.now().plusDays(i));
+            OneTimeSchedule schedule =
+                    new OneTimeSchedule(customer, waste, LocalDate.now().plusDays(i));
             getOneTimeScheduleDAO().insert(schedule);
 
             Collection collection = new Collection(schedule);
@@ -91,14 +102,17 @@ class NotificationManagerTest extends AbstractDatabaseTest {
 
     @Test
     void testFindLast5InvoicesEvent() {
-        Customer customer = new Customer("Mario", "Rossi", location, "mario.rossi@example.com", "39123456789");
+        Customer customer =
+                new Customer("Mario", "Rossi", location, "mario.rossi@example.com",
+                        "39123456789");
         getCustomerDAO().insert(customer);
 
         for (int i = 1; i <= 6; i++) {
             Waste waste = new Waste("Tipo" + i, true, false);
             getWasteDAO().insert(waste);
 
-            OneTimeSchedule schedule = new OneTimeSchedule(customer, waste, LocalDate.now().plusDays(i));
+            OneTimeSchedule schedule =
+                    new OneTimeSchedule(customer, waste, LocalDate.now().plusDays(i));
             getOneTimeScheduleDAO().insert(schedule);
 
             Collection collection = new Collection(schedule);
@@ -113,7 +127,7 @@ class NotificationManagerTest extends AbstractDatabaseTest {
             invoice.setPaymentStatus(Invoice.PaymentStatus.PAID);
             invoice.setIssueDate(LocalDate.now().plusDays(i).atStartOfDay());
             invoice.setPaymentDate(LocalDateTime.now().plusDays(i));
-            invoice.setLastModified(LocalDateTime.now().plusDays(i)); 
+            invoice.setLastModified(LocalDateTime.now().plusDays(i));
             getInvoiceDAO().insert(invoice);
         }
 

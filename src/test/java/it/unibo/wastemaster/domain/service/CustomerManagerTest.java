@@ -7,9 +7,9 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import it.unibo.wastemaster.infrastructure.AbstractDatabaseTest;
 import it.unibo.wastemaster.domain.model.Customer;
 import it.unibo.wastemaster.domain.model.Location;
+import it.unibo.wastemaster.infrastructure.AbstractDatabaseTest;
 import jakarta.validation.ConstraintViolationException;
 import java.util.List;
 import java.util.Optional;

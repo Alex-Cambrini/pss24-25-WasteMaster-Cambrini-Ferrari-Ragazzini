@@ -5,12 +5,12 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import it.unibo.wastemaster.infrastructure.AbstractDatabaseTest;
 import it.unibo.wastemaster.domain.model.Collection.CollectionStatus;
+import it.unibo.wastemaster.infrastructure.AbstractDatabaseTest;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Optional;
 import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -73,7 +73,6 @@ class InvoiceTest extends AbstractDatabaseTest {
         assertEquals(now.plusDays(1), invoice.getPaymentDate());
         assertTrue(invoice.getCollections().contains(collection));
     }
-
 
     @Test
     void testToString() {
