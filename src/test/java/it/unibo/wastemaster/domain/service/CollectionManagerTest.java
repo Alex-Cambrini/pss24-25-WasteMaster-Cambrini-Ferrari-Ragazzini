@@ -22,6 +22,8 @@ import org.junit.jupiter.api.Test;
 
 class CollectionManagerTest extends AbstractDatabaseTest {
 
+    private static final int FUTURE_DAYS_FOR_POSTAL_CODE = 5;
+
     private Customer customer;
     private Waste plastic;
     private Collection collection;
@@ -191,7 +193,7 @@ class CollectionManagerTest extends AbstractDatabaseTest {
                 "0987654321");
         getCustomerDAO().insert(otherCustomer);
 
-        LocalDate targetDate = LocalDate.now().plusDays(5);
+        LocalDate targetDate = LocalDate.now().plusDays(FUTURE_DAYS_FOR_POSTAL_CODE);
 
         OneTimeSchedule s1 = new OneTimeSchedule(customer, plastic, targetDate);
         s1.setScheduleStatus(Schedule.ScheduleStatus.ACTIVE);
