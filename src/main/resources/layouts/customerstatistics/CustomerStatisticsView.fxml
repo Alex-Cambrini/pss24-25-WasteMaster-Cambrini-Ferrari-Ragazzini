@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
-
-<VBox xmlns="http://javafx.com/javafx/21"
-      xmlns:fx="http://javafx.com/fxml/1"
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<VBox xmlns:fx="http://javafx.com/fxml/1"
+      xmlns="http://javafx.com/javafx/21"
       fx:controller="it.unibo.wastemaster.controller.customerstatistics.CustomerStatisticsController"
       spacing="18" styleClass="center-pane">
     <padding>
@@ -15,7 +17,7 @@
         <Label text="Customer Statistics" styleClass="title-3"/>
         <HBox spacing="6">
             <Label text="Customer:" styleClass="title-4"/>
-            <Label fx:id="customerNameLabel" text="-" />
+            <Label fx:id="customerNameLabel" text="-"/>
         </HBox>
         <GridPane hgap="20" vgap="10">
             <columnConstraints>
@@ -28,11 +30,14 @@
                 <Label text="Total Collections:" GridPane.columnIndex="0" GridPane.rowIndex="1" styleClass="title-4"/>
                 <Label fx:id="totalCollectionsLabel" text="-" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
                 <Label text="Total Amount:" GridPane.columnIndex="0" GridPane.rowIndex="2" styleClass="title-4"/>
-                <Label fx:id="totalAmountLabel" text="-" GridPane.columnIndex="1" GridPane.rowIndex="2" styleClass="accent"/>
+                <Label fx:id="totalAmountLabel" text="-" GridPane.columnIndex="1" GridPane.rowIndex="2"
+                       styleClass="accent"/>
                 <Label text="Unpaid Amount:" GridPane.columnIndex="0" GridPane.rowIndex="3" styleClass="title-4"/>
-                <Label fx:id="unpaidAmountLabel" text="-" GridPane.columnIndex="1" GridPane.rowIndex="3" styleClass="danger"/>
+                <Label fx:id="unpaidAmountLabel" text="-" GridPane.columnIndex="1" GridPane.rowIndex="3"
+                       styleClass="danger"/>
                 <Label text="Paid Amount:" GridPane.columnIndex="0" GridPane.rowIndex="4" styleClass="title-4"/>
-                <Label fx:id="paidAmountLabel" text="-" GridPane.columnIndex="1" GridPane.rowIndex="4" styleClass="success"/>
+                <Label fx:id="paidAmountLabel" text="-" GridPane.columnIndex="1" GridPane.rowIndex="4"
+                       styleClass="success"/>
             </children>
         </GridPane>
     </children>

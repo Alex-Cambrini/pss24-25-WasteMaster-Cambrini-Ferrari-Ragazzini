@@ -9,55 +9,60 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
-
-<VBox alignment="TOP_CENTER" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.unibo.wastemaster.controller.trip.TripController">
+<VBox xmlns:fx="http://javafx.com/fxml/1" alignment="TOP_CENTER" xmlns="http://javafx.com/javafx/21"
+      fx:controller="it.unibo.wastemaster.controller.trip.TripController">
 
     <children>
 
         <HBox alignment="TOP_CENTER" minHeight="40.0" prefHeight="60.0" prefWidth="600.0" spacing="10.0">
             <children>
-                <Button fx:id="addTripButton" onAction="#handleAddTrip" styleClass="success" text="Create Trip" />
-                <Region prefHeight="20.0" prefWidth="0.0" HBox.hgrow="ALWAYS" />
-                <Button fx:id="filterButton" onMouseClicked="#showFilterMenu" styleClass="accent" text="Filter ▼" />
-                <TextField fx:id="searchField" promptText="Search..." />
-                <Button onAction="#handleResetSearch" styleClass="accent, button-outlined" text="Reset" />
+                <Button fx:id="addTripButton" onAction="#handleAddTrip" styleClass="success" text="Create Trip"/>
+                <Region prefHeight="20.0" prefWidth="0.0" HBox.hgrow="ALWAYS"/>
+                <Button fx:id="filterButton" onMouseClicked="#showFilterMenu" styleClass="accent" text="Filter ▼"/>
+                <TextField fx:id="searchField" promptText="Search..."/>
+                <Button onAction="#handleResetSearch" styleClass="accent, button-outlined" text="Reset"/>
             </children>
         </HBox>
 
         <HBox alignment="CENTER_RIGHT" prefHeight="30.0" spacing="10.0">
             <children>
-                <CheckBox fx:id="showActiveCheckBox" text="Show Active" />
-                <CheckBox fx:id="showCancelledCheckBox" text="Show Cancelled" />
-                <CheckBox fx:id="showCompletedCheckBox" text="Show Completed" />
+                <CheckBox fx:id="showActiveCheckBox" text="Show Active"/>
+                <CheckBox fx:id="showCancelledCheckBox" text="Show Cancelled"/>
+                <CheckBox fx:id="showCompletedCheckBox" text="Show Completed"/>
             </children>
             <VBox.margin>
-                <Insets bottom="5.0" />
+                <Insets bottom="5.0"/>
             </VBox.margin>
         </HBox>
 
         <TableView fx:id="tripTable" prefHeight="300.0" prefWidth="600.0" styleClass="table-view" VBox.vgrow="ALWAYS">
             <columns>
-                <TableColumn fx:id="postalCodeColumn" prefWidth="100.0" text="Postal Code" />
-                <TableColumn fx:id="vehicleColumn" prefWidth="160.0" text="Vehicle" />
-                <TableColumn fx:id="vehicleCapacityColumn" prefWidth="120.0" text="Seats" />
-                <TableColumn fx:id="operatorsColumn" prefWidth="150.0" text="Operators" />
-                <TableColumn fx:id="departureColumn" prefWidth="150.0" text="Departure" />
-                <TableColumn fx:id="returnColumn" prefWidth="150.0" text="Return" />
-                <TableColumn fx:id="statusColumn" prefWidth="100.0" text="Status" />
+                <TableColumn fx:id="postalCodeColumn" prefWidth="100.0" text="Postal Code"/>
+                <TableColumn fx:id="vehicleColumn" prefWidth="160.0" text="Vehicle"/>
+                <TableColumn fx:id="vehicleCapacityColumn" prefWidth="120.0" text="Seats"/>
+                <TableColumn fx:id="operatorsColumn" prefWidth="150.0" text="Operators"/>
+                <TableColumn fx:id="departureColumn" prefWidth="150.0" text="Departure"/>
+                <TableColumn fx:id="returnColumn" prefWidth="150.0" text="Return"/>
+                <TableColumn fx:id="statusColumn" prefWidth="100.0" text="Status"/>
             </columns>
         </TableView>
 
         <HBox alignment="TOP_RIGHT" minHeight="50.0" prefHeight="100.0" prefWidth="600.0" spacing="10.0">
             <children>
-            <Button fx:id="completeTripButton" disable="true" minWidth="95.0" mnemonicParsing="false" onAction="#handleCompleteTrip" styleClass="success" text="Complete Trip" visible="false" />
-            <Button fx:id="showRelatedCollections" disable="true" minWidth="105.0" mnemonicParsing="false" onAction="#handleShowRelatedCollections" styleClass="accent" text="Show collections" />
-            <Region prefHeight="90.0" prefWidth="95.0" HBox.hgrow="ALWAYS" />
-                <Button fx:id="editTripButton" disable="true" onAction="#handleEditTrip" styleClass="accent" text="Edit" />
-                <Button fx:id="deleteTripButton" disable="true" onAction="#handleDeleteTrip" styleClass="danger" text="Delete" />
-                <Button fx:id="deleteTripPermanentlyButton" disable="true" onAction="#handleDeleteTripPermanently" styleClass="danger" text="Delete Permanently" />
+                <Button fx:id="completeTripButton" disable="true" minWidth="95.0" mnemonicParsing="false"
+                        onAction="#handleCompleteTrip" styleClass="success" text="Complete Trip" visible="false"/>
+                <Button fx:id="showRelatedCollections" disable="true" minWidth="105.0" mnemonicParsing="false"
+                        onAction="#handleShowRelatedCollections" styleClass="accent" text="Show collections"/>
+                <Region prefHeight="90.0" prefWidth="95.0" HBox.hgrow="ALWAYS"/>
+                <Button fx:id="editTripButton" disable="true" onAction="#handleEditTrip" styleClass="accent"
+                        text="Edit"/>
+                <Button fx:id="deleteTripButton" disable="true" onAction="#handleDeleteTrip" styleClass="danger"
+                        text="Delete"/>
+                <Button fx:id="deleteTripPermanentlyButton" disable="true" onAction="#handleDeleteTripPermanently"
+                        styleClass="danger" text="Delete Permanently"/>
             </children>
             <padding>
-                <Insets top="10.0" />
+                <Insets top="10.0"/>
             </padding>
         </HBox>
 

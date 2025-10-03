@@ -10,80 +10,87 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
-
-<VBox alignment="TOP_CENTER" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.unibo.wastemaster.controller.schedule.ScheduleController">
+<VBox xmlns:fx="http://javafx.com/fxml/1" alignment="TOP_CENTER" xmlns="http://javafx.com/javafx/21"
+      fx:controller="it.unibo.wastemaster.controller.schedule.ScheduleController">
     <children>
         <HBox alignment="TOP_CENTER" minHeight="40.0" prefHeight="40.0" prefWidth="600.0" spacing="10.0">
             <children>
-                <Button fx:id="addScheduleButton" mnemonicParsing="false" onAction="#handleAddSchedule" styleClass="success" text="Add Schedule" />
-                <Region prefHeight="20" prefWidth="0.0" HBox.hgrow="ALWAYS" />
-                <Button fx:id="filterButton" onMouseClicked="#showFilterMenu" styleClass="accent" text="Filter ▼" />
-                <TextField fx:id="searchField" promptText="Search..." />
-                <Button mnemonicParsing="false" onAction="#handleResetSearch" styleClass="accent, button-outlined" text="Reset" />
+                <Button fx:id="addScheduleButton" mnemonicParsing="false" onAction="#handleAddSchedule"
+                        styleClass="success" text="Add Schedule"/>
+                <Region prefHeight="20" prefWidth="0.0" HBox.hgrow="ALWAYS"/>
+                <Button fx:id="filterButton" onMouseClicked="#showFilterMenu" styleClass="accent" text="Filter ▼"/>
+                <TextField fx:id="searchField" promptText="Search..."/>
+                <Button mnemonicParsing="false" onAction="#handleResetSearch" styleClass="accent, button-outlined"
+                        text="Reset"/>
             </children>
             <VBox.margin>
-                <Insets bottom="10.0" />
+                <Insets bottom="10.0"/>
             </VBox.margin>
         </HBox>
         <HBox alignment="CENTER_RIGHT" prefHeight="30.0" prefWidth="30.0" spacing="10.0">
-<children>
-        <CheckBox fx:id="showActiveCheckBox" mnemonicParsing="false" text="Show Active">
-            <tooltip>
-                <Tooltip text="Show Active" />
-            </tooltip>
-        </CheckBox>
-        <CheckBox fx:id="showPausedCheckBox" mnemonicParsing="false" text="Show Paused">
-            <tooltip>
-                <Tooltip text="Show Paused" />
-            </tooltip>
-        </CheckBox>
-        <CheckBox fx:id="showCompletedCheckBox" mnemonicParsing="false" text="Show Completed">
-            <tooltip>
-                <Tooltip text="Show Completed" />
-            </tooltip>
-        </CheckBox>
-        <CheckBox fx:id="showDeletedCheckBox" text="Show Deleted">
-            <tooltip>
-                <Tooltip text="Show Deleted" />
-            </tooltip>
-        </CheckBox>
-        <CheckBox fx:id="oneTimeCheckBox" text="OneTime">
-            <tooltip>
-                <Tooltip text="OneTime" />
-            </tooltip>
-        </CheckBox>
-        <CheckBox fx:id="recurringCheckBox" text="Recurring">
-            <tooltip>
-                <Tooltip text="Recurring" />
-            </tooltip>
-        </CheckBox>
-    </children>
-         <VBox.margin>
-            <Insets bottom="5.0" />
-         </VBox.margin>
+            <children>
+                <CheckBox fx:id="showActiveCheckBox" mnemonicParsing="false" text="Show Active">
+                    <tooltip>
+                        <Tooltip text="Show Active"/>
+                    </tooltip>
+                </CheckBox>
+                <CheckBox fx:id="showPausedCheckBox" mnemonicParsing="false" text="Show Paused">
+                    <tooltip>
+                        <Tooltip text="Show Paused"/>
+                    </tooltip>
+                </CheckBox>
+                <CheckBox fx:id="showCompletedCheckBox" mnemonicParsing="false" text="Show Completed">
+                    <tooltip>
+                        <Tooltip text="Show Completed"/>
+                    </tooltip>
+                </CheckBox>
+                <CheckBox fx:id="showDeletedCheckBox" text="Show Deleted">
+                    <tooltip>
+                        <Tooltip text="Show Deleted"/>
+                    </tooltip>
+                </CheckBox>
+                <CheckBox fx:id="oneTimeCheckBox" text="OneTime">
+                    <tooltip>
+                        <Tooltip text="OneTime"/>
+                    </tooltip>
+                </CheckBox>
+                <CheckBox fx:id="recurringCheckBox" text="Recurring">
+                    <tooltip>
+                        <Tooltip text="Recurring"/>
+                    </tooltip>
+                </CheckBox>
+            </children>
+            <VBox.margin>
+                <Insets bottom="5.0"/>
+            </VBox.margin>
         </HBox>
-        <TableView fx:id="scheduleTable" prefHeight="300.0" prefWidth="600.0" styleClass="table-view" VBox.vgrow="ALWAYS">
+        <TableView fx:id="scheduleTable" prefHeight="300.0" prefWidth="600.0" styleClass="table-view"
+                   VBox.vgrow="ALWAYS">
             <columns>
-                <TableColumn fx:id="wasteNameColumn" prefWidth="100" text="Waste Name" />
-                <TableColumn fx:id="scheduleCategoryColumn" prefWidth="120" text="Schedule Type" />
-                <TableColumn fx:id="frequencyColumn" prefWidth="100" text="Frequency" />
-                <TableColumn fx:id="executionDateColumn" prefWidth="120" text="Execution Date" />
-                <TableColumn fx:id="startDateColumn" prefWidth="120" text="Start Date" />
-                <TableColumn fx:id="statusColumn" prefWidth="100" text="Status" />
-                <TableColumn fx:id="customerColumn" prefWidth="120" text="Customer" />
+                <TableColumn fx:id="wasteNameColumn" prefWidth="100" text="Waste Name"/>
+                <TableColumn fx:id="scheduleCategoryColumn" prefWidth="120" text="Schedule Type"/>
+                <TableColumn fx:id="frequencyColumn" prefWidth="100" text="Frequency"/>
+                <TableColumn fx:id="executionDateColumn" prefWidth="120" text="Execution Date"/>
+                <TableColumn fx:id="startDateColumn" prefWidth="120" text="Start Date"/>
+                <TableColumn fx:id="statusColumn" prefWidth="100" text="Status"/>
+                <TableColumn fx:id="customerColumn" prefWidth="120" text="Customer"/>
             </columns>
 
         </TableView>
         <HBox alignment="TOP_RIGHT" minHeight="50.0" prefHeight="100.0" prefWidth="600.0" spacing="10.0">
             <children>
-                <Button fx:id="changeFrequencyButton" disable="true" mnemonicParsing="false" onAction="#handleChangeFrequency" styleClass="accent" text="Change Frequency" />
-                <Button fx:id="toggleStatusButton" disable="true" mnemonicParsing="false" onAction="#handleStatusToggle" styleClass="accent" text="Pause" />
-                <Button fx:id="showRelatedCollectionsButton" disable="true" onAction="#handleShowRelatedCollections" mnemonicParsing="false" text="Show collections" styleClass="accent" />
-                <Region prefHeight="200.0" prefWidth="200.0" HBox.hgrow="ALWAYS" />
-                <Button fx:id="deleteButton" disable="true" mnemonicParsing="false" onAction="#handleDeleteSchedule" styleClass="danger" text="Delete" />
+                <Button fx:id="changeFrequencyButton" disable="true" mnemonicParsing="false"
+                        onAction="#handleChangeFrequency" styleClass="accent" text="Change Frequency"/>
+                <Button fx:id="toggleStatusButton" disable="true" mnemonicParsing="false" onAction="#handleStatusToggle"
+                        styleClass="accent" text="Pause"/>
+                <Button fx:id="showRelatedCollectionsButton" disable="true" onAction="#handleShowRelatedCollections"
+                        mnemonicParsing="false" text="Show collections" styleClass="accent"/>
+                <Region prefHeight="200.0" prefWidth="200.0" HBox.hgrow="ALWAYS"/>
+                <Button fx:id="deleteButton" disable="true" mnemonicParsing="false" onAction="#handleDeleteSchedule"
+                        styleClass="danger" text="Delete"/>
             </children>
             <padding>
-                <Insets top="10.0" />
+                <Insets top="10.0"/>
             </padding>
         </HBox>
     </children>
