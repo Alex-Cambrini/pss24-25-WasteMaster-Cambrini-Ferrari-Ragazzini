@@ -43,18 +43,17 @@ public final class TripDAO extends GenericDAO<Trip> {
      */
     public List<Vehicle> findAvailableVehicles(
             final LocalDateTime start, final LocalDateTime end) {
-        final String jpql = """
-                SELECT v FROM Vehicle v
-                WHERE v.vehicleStatus = :inService
-                  AND (v.nextMaintenanceDate IS NULL OR v.nextMaintenanceDate > :tripEndDate)
-                  AND NOT EXISTS (
-                      SELECT 1 FROM Trip t
-                      WHERE t.assignedVehicle = v
-                        AND t.status = :active
-                        AND t.departureTime < :tripEnd
-                        AND t.expectedReturnTime > :tripStart
-                  )
-                """;
+        final String jpql = "SELECT v FROM Vehicle v "
+                + "WHERE v.vehicleStatus = :inService "
+                + "AND (v.nextMaintenanceDate IS NULL OR v.nextMaintenanceDate > "
+                + ":tripEndDate) "
+                + "AND NOT EXISTS ( "
+                + "    SELECT 1 FROM Trip t "
+                + "    WHERE t.assignedVehicle = v "
+                + "      AND t.status = :active "
+                + "      AND t.departureTime < :tripEnd "
+                + "      AND t.expectedReturnTime > :tripStart "
+                + ")";
 
         return getEntityManager().createQuery(jpql, Vehicle.class)
                 .setParameter("inService", Vehicle.VehicleStatus.IN_SERVICE)
