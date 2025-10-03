@@ -13,7 +13,6 @@ import it.unibo.wastemaster.domain.model.Vehicle;
 import it.unibo.wastemaster.domain.repository.CollectionRepository;
 import it.unibo.wastemaster.domain.repository.TripRepository;
 import it.unibo.wastemaster.infrastructure.utils.ValidateUtils;
-
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -39,8 +38,8 @@ public final class TripManager {
      * @param recurringScheduleManager the manager for recurring schedules
      */
     public TripManager(final TripRepository tripRepository,
-            final CollectionRepository collectionRepository,
-            final RecurringScheduleManager recurringScheduleManager) {
+                       final CollectionRepository collectionRepository,
+                       final RecurringScheduleManager recurringScheduleManager) {
         this.tripRepository = tripRepository;
         this.collectionRepository = collectionRepository;
         this.recurringScheduleManager = recurringScheduleManager;
@@ -57,10 +56,13 @@ public final class TripManager {
      * @param collections the collections to associate with the trip
      */
     public void createTrip(final String postalCode, final Vehicle assignedVehicle,
-            final List<Employee> operators, final LocalDateTime departureTime,
-            final LocalDateTime expectedReturnTime, final List<Collection> collections) {
+                           final List<Employee> operators,
+                           final LocalDateTime departureTime,
+                           final LocalDateTime expectedReturnTime,
+                           final List<Collection> collections) {
 
-        Trip trip = new Trip(postalCode, assignedVehicle, operators, departureTime, expectedReturnTime,
+        Trip trip = new Trip(postalCode, assignedVehicle, operators, departureTime,
+                expectedReturnTime,
                 new ArrayList<>());
         tripRepository.save(trip);
 
@@ -78,31 +80,38 @@ public final class TripManager {
      * @param end the end time
      * @return a list of available vehicles
      */
-    public List<Vehicle> getAvailableVehicles(final LocalDateTime start, final LocalDateTime end) {
+    public List<Vehicle> getAvailableVehicles(final LocalDateTime start,
+                                              final LocalDateTime end) {
         return tripRepository.findAvailableVehicles(start, end);
     }
 
     /**
-     * Retrieves the list of available operators, excluding the specified driver, for the given time range.
+     * Retrieves the list of available operators, excluding the specified driver, for
+     * the given time range.
      *
      * @param start the start time
      * @param end the end time
      * @param driver the driver to exclude
      * @return a list of available operators excluding the driver
      */
-    public List<Employee> getAvailableOperatorsExcludeDriver(LocalDateTime start, LocalDateTime end, Employee driver) {
+    public List<Employee> getAvailableOperatorsExcludeDriver(final LocalDateTime start,
+                                                             final LocalDateTime end,
+                                                             final Employee driver) {
         return tripRepository.findAvailableOperatorsExcludeDriver(start, end, driver);
     }
 
     /**
-     * Retrieves the list of qualified drivers available in the given time range and with allowed licences.
+     * Retrieves the list of qualified drivers available in the given time range and
+     * with allowed licences.
      *
      * @param start the start time
      * @param end the end time
      * @param allowedLicences the list of allowed licences
      * @return a list of qualified drivers
      */
-    public List<Employee> getQualifiedDrivers(LocalDateTime start, LocalDateTime end, List<Licence> allowedLicences) {
+    public List<Employee> getQualifiedDrivers(final LocalDateTime start,
+                                              final LocalDateTime end,
+                                              final List<Licence> allowedLicences) {
         return tripRepository.findQualifiedDrivers(start, end, allowedLicences);
     }
 
@@ -154,7 +163,8 @@ public final class TripManager {
     }
 
     /**
-     * Soft deletes the trip and reschedules the next collection for each associated collection.
+     * Soft deletes the trip and reschedules the next collection for each associated
+     * collection.
      *
      * @param trip the trip to cancel and reschedule
      * @return true if the trip was canceled and rescheduling succeeded, false otherwise
@@ -173,7 +183,8 @@ public final class TripManager {
     }
 
     /**
-     * Retrieves the list of available operators (excluding the selected driver) for editing a trip.
+     * Retrieves the list of available operators (excluding the selected driver) for
+     * editing a trip.
      *
      * @param depDateTime the new departure time
      * @param retDateTime the new return time
@@ -181,9 +192,10 @@ public final class TripManager {
      * @param tripToEdit the trip being edited
      * @return a list of available operators for editing
      */
-    public List<Employee> getAvailableOperatorsExcludeDriverToEdit(LocalDateTime depDateTime, LocalDateTime retDateTime,
-            Employee selectedDriver,
-            Trip tripToEdit) {
+    public List<Employee> getAvailableOperatorsExcludeDriverToEdit(
+            final LocalDateTime depDateTime, final LocalDateTime retDateTime,
+            final Employee selectedDriver,
+            final Trip tripToEdit) {
         return tripRepository.findAvailableOperatorsExcludeDriverToEdit(depDateTime,
                 retDateTime, selectedDriver, tripToEdit);
     }
@@ -197,37 +209,37 @@ public final class TripManager {
      * @param tripToEdit the trip being edited
      * @return a list of qualified drivers for editing
      */
-    public List<Employee> getQualifiedDriversToEdit(LocalDateTime depDateTime, LocalDateTime retDateTime,
-            List<Licence> allowedLicences, Trip tripToEdit) {
-        return tripRepository.findQualifiedDriversToEdit(depDateTime, retDateTime, allowedLicences, tripToEdit);
+    public List<Employee> getQualifiedDriversToEdit(final LocalDateTime depDateTime,
+                                                    final LocalDateTime retDateTime,
+                                                    final List<Licence> allowedLicences,
+                                                    final Trip tripToEdit) {
+        return tripRepository.findQualifiedDriversToEdit(depDateTime, retDateTime,
+                allowedLicences, tripToEdit);
     }
 
     /**
-     * Represents the possible results of a trip cancellation and notification attempt.
-     */
-    public enum CancellationResult {
-        CANCELLED_AND_NOTIFIED,
-        CANCELLED_NOTIFICATION_FAILED,
-        CANCEL_FAILED
-    }
-
-    /**
-     * Cancels the specified trip and notifies the associated customers with a default message.
+     * Cancels the specified trip and notifies the associated customers with a default
+     * message.
      *
      * @param trip the trip to cancel and notify about
      * @return the result of the cancellation and notification attempt
      */
     public CancellationResult cancelTripAndNotify(final Trip trip) {
         final String subject = "Trip cancellation due to technical issues";
-        final String body = "Dear customer,\n\n" +
-                "We regret to inform you that your trip has been cancelled due to technical issues. " +
-                "We apologize for the inconvenience and remain available to reschedule.\n\n" +
+        final String body = "Dear customer,\n\n"
+                + "We regret to inform you that your trip has been cancelled due to "
+                + "technical issues. "
+                +
+                "We apologize for the inconvenience and remain available to reschedule"
+                + ".\n\n"
+                +
                 "Best regards,\nWasteMaster";
         return cancelTripAndNotify(trip, subject, body);
     }
 
     /**
-     * Cancels the specified trip and notifies the associated customers with a custom message.
+     * Cancels the specified trip and notifies the associated customers with a custom
+     * message.
      *
      * @param trip the trip to cancel and notify about
      * @param subject the subject of the notification
@@ -235,8 +247,8 @@ public final class TripManager {
      * @return the result of the cancellation and notification attempt
      */
     public CancellationResult cancelTripAndNotify(final Trip trip,
-            final String subject,
-            final String body) {
+                                                  final String subject,
+                                                  final String body) {
         final boolean cancelled = softDeleteTrip(trip);
         if (!cancelled) {
             return CancellationResult.CANCEL_FAILED;
@@ -272,12 +284,14 @@ public final class TripManager {
             ValidateUtils.requireArgNotNull(trip.getTripId(), "Trip ID cannot be null");
 
             if (trip.getStatus() != TripStatus.ACTIVE) {
-                throw new IllegalArgumentException("Only ACTIVE trips can be set as COMPLETED");
+                throw new IllegalArgumentException(
+                        "Only ACTIVE trips can be set as COMPLETED");
             }
 
             for (Collection c : trip.getCollections()) {
                 if (c.getCollectionStatus() != Collection.CollectionStatus.ACTIVE) {
-                    throw new IllegalArgumentException("All collections must be ACTIVE to complete the trip");
+                    throw new IllegalArgumentException(
+                            "All collections must be ACTIVE to complete the trip");
                 }
                 c.setCollectionStatus(Collection.CollectionStatus.COMPLETED);
                 collectionRepository.update(c);
@@ -301,7 +315,7 @@ public final class TripManager {
      * @param newVehicle the new vehicle to assign
      * @throws IllegalArgumentException if the trip is not found or the vehicle is null
      */
-    public void updateVehicle(int tripId, Vehicle newVehicle) {
+    public void updateVehicle(final int tripId, final Vehicle newVehicle) {
         Optional<Trip> tripOpt = getTripById(tripId);
         if (tripOpt.isEmpty()) {
             throw new IllegalArgumentException("Trip not found");
@@ -319,16 +333,18 @@ public final class TripManager {
      *
      * @param tripId the ID of the trip to update
      * @param newOperators the new list of operators to assign
-     * @throws IllegalArgumentException if the trip is not found or the operators list is invalid
+     * @throws IllegalArgumentException if the trip is not found or the operators list
+     * is invalid
      */
-    public void updateOperators(int tripId, List<Employee> newOperators) {
+    public void updateOperators(final int tripId, final List<Employee> newOperators) {
         Optional<Trip> tripOpt = getTripById(tripId);
         if (tripOpt.isEmpty()) {
             throw new IllegalArgumentException("Trip not found");
         }
 
         ValidateUtils.requireArgNotNull(newOperators, "new operators cannot be null");
-        ValidateUtils.requireListNotEmpty(newOperators, "The operators list cannot be null or empty");
+        ValidateUtils.requireListNotEmpty(newOperators,
+                "The operators list cannot be null or empty");
 
         Trip trip = tripOpt.get();
         trip.setOperators(newOperators);
@@ -342,8 +358,9 @@ public final class TripManager {
      * @param currentUser the current user
      * @return a list of trips visible to the user
      */
-    public List<Trip> getTripsForCurrentUser(Employee currentUser) {
-        if (currentUser.getRole() == ADMINISTRATOR || currentUser.getRole() == OFFICE_WORKER) {
+    public List<Trip> getTripsForCurrentUser(final Employee currentUser) {
+        if (currentUser.getRole() == ADMINISTRATOR
+                || currentUser.getRole() == OFFICE_WORKER) {
             return tripRepository.findAll();
         } else {
             return tripRepository.findByOperator(currentUser);
@@ -356,7 +373,7 @@ public final class TripManager {
      * @param date the date to check for available postal codes
      * @return a list of available postal codes
      */
-    public List<String> getAvailablePostalCodes(LocalDate date) {
+    public List<String> getAvailablePostalCodes(final LocalDate date) {
         return tripRepository.findAvailablePostalCodes(date);
     }
 
@@ -366,7 +383,7 @@ public final class TripManager {
      * @param trip the trip whose collections are to be retrieved
      * @return a list of collections for the trip
      */
-    public List<Collection> getCollectionsByTrip(Trip trip) {
+    public List<Collection> getCollectionsByTrip(final Trip trip) {
         return trip.getCollections();
     }
 
@@ -375,7 +392,7 @@ public final class TripManager {
      *
      * @param trip the trip to update
      */
-    public void updateTrip(Trip trip) {
+    public void updateTrip(final Trip trip) {
         tripRepository.update(trip);
     }
 
@@ -386,6 +403,15 @@ public final class TripManager {
      */
     public int countCompletedTrips() {
         return tripRepository.countCompleted();
+    }
+
+    /**
+     * Represents the possible results of a trip cancellation and notification attempt.
+     */
+    public enum CancellationResult {
+        CANCELLED_AND_NOTIFIED,
+        CANCELLED_NOTIFICATION_FAILED,
+        CANCEL_FAILED
     }
 
     /**

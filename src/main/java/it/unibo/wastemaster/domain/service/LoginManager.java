@@ -23,6 +23,7 @@ public final class LoginManager {
 
     /**
      * Authenticates a user by verifying the provided email and raw password.
+     * Password verification is done using BCrypt hashing.
      *
      * @param email the email address of the user
      * @param rawPassword the plain-text password to verify

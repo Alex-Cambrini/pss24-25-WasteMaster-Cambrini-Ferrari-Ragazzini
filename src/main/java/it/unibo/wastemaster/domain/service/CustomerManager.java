@@ -7,12 +7,18 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Manages operations related to Customer entities.
+ * Manages creation, update, retrieval, and soft deletion operations for Customer
+ * entities.
  */
 public class CustomerManager {
 
     private final CustomerRepository customerRepository;
 
+    /**
+     * Instantiates a new Customer manager.
+     *
+     * @param customerRepository the customer repository
+     */
     public CustomerManager(final CustomerRepository customerRepository) {
         this.customerRepository = customerRepository;
     }
@@ -49,14 +55,15 @@ public class CustomerManager {
      *
      * @param toUpdateCustomer the customer with updated data
      * @throws IllegalArgumentException if the customer is invalid or the email is
-     *                                  used by
-     *                                  another customer
+     * used by
+     * another customer
      */
     public void updateCustomer(final Customer toUpdateCustomer) {
         ValidateUtils.validateEntity(toUpdateCustomer);
         ValidateUtils.requireArgNotNull(toUpdateCustomer.getCustomerId(),
                 "Customer ID cannot be null");
-        Optional<Customer> existingOpt = customerRepository.findByEmail(toUpdateCustomer.getEmail());
+        Optional<Customer> existingOpt =
+                customerRepository.findByEmail(toUpdateCustomer.getEmail());
         if (existingOpt.isPresent() && !existingOpt.get().getCustomerId()
                 .equals(toUpdateCustomer.getCustomerId())) {
             throw new IllegalArgumentException(
@@ -122,7 +129,7 @@ public class CustomerManager {
      * @param email the email of the customer to search for
      * @return an Optional containing the customer if found, or empty if not found
      */
-    public Optional<Customer> findCustomerByEmail(String email) {
+    public Optional<Customer> findCustomerByEmail(final String email) {
         return customerRepository.findByEmail(email);
     }
 }

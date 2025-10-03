@@ -9,26 +9,89 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Repository interface for managing Collection entities.
+ * Provides CRUD operations and various retrieval methods based on schedule, status,
+ * date, postal code, and customer.
+ */
 public interface CollectionRepository {
 
+    /**
+     * Retrieves all collections associated with the given schedule.
+     *
+     * @param schedule the Schedule entity to filter collections
+     * @return a list of Collection entities matching the schedule
+     */
     List<Collection> findAllBySchedule(Schedule schedule);
 
+    /**
+     * Retrieves all collections with the specified status.
+     *
+     * @param status the CollectionStatus to filter collections
+     * @return a list of Collection entities with the given status
+     */
     List<Collection> findByStatus(CollectionStatus status);
 
+    /**
+     * Retrieves the currently active collection for the given recurring schedule, if any.
+     *
+     * @param schedule the RecurringSchedule to find the active collection for
+     * @return an Optional containing the active Collection if present, empty otherwise
+     */
     Optional<Collection> findActiveByRecurringSchedule(RecurringSchedule schedule);
 
+    /**
+     * Retrieves all collections within the specified date range.
+     *
+     * @param start the start date of the range (inclusive)
+     * @param end the end date of the range (inclusive)
+     * @return a list of Collection entities within the date range
+     */
     List<Collection> findByDateRange(LocalDate start, LocalDate end);
 
-    List<Collection> findCollectionsByPostalCodeAndDate(String postalCode, LocalDate date);
+    /**
+     * Retrieves all collections for a specific postal code on a given date.
+     *
+     * @param postalCode the postal code to filter collections
+     * @param date the date to filter collections
+     * @return a list of Collection entities matching the postal code and date
+     */
+    List<Collection> findCollectionsByPostalCodeAndDate(String postalCode,
+                                                        LocalDate date);
 
-    List<Collection> findCompletedNotBilledByCustomer(final Customer customer);
+    /**
+     * Retrieves all completed collections for a customer that have not yet been billed.
+     *
+     * @param customer the Customer entity to filter collections
+     * @return a list of completed and not billed Collection entities for the customer
+     */
+    List<Collection> findCompletedNotBilledByCustomer(Customer customer);
 
+    /**
+     * Updates an existing collection.
+     *
+     * @param collection the Collection entity to update
+     */
     void update(Collection collection);
 
+    /**
+     * Persists a new collection.
+     *
+     * @param collection the Collection entity to save
+     */
     void save(Collection collection);
 
+    /**
+     * Deletes a collection.
+     *
+     * @param collection the Collection entity to delete
+     */
     void delete(Collection collection);
 
+    /**
+     * Retrieves all collections in the system.
+     *
+     * @return a list of all Collection entities
+     */
     List<Collection> findAll();
-
 }

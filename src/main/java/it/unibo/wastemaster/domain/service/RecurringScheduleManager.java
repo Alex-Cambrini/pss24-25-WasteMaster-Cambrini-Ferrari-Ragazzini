@@ -281,19 +281,21 @@ public class RecurringScheduleManager {
      * Finds a recurring schedule by its unique identifier.
      *
      * @param id the unique identifier of the recurring schedule
-     * @return an Optional containing the recurring schedule if found, or empty if not found
+     * @return an Optional containing the recurring schedule if found, or empty if not
+     * found
      */
-    public Optional<RecurringSchedule> findRecurringScheduleById(Integer id) {
+    public Optional<RecurringSchedule> findRecurringScheduleById(final Integer id) {
         return recurringScheduleRepository.findById(id);
     }
 
     /**
-     * Reschedules the next collection for the given collection if it is associated with a recurring schedule.
+     * Reschedules the next collection for the given collection if it is associated
+     * with a recurring schedule.
      * Updates the next collection date and generates a new collection.
      *
      * @param collection the collection whose recurring schedule should be rescheduled
      */
-    public void rescheduleNextCollection(Collection collection) {
+    public void rescheduleNextCollection(final Collection collection) {
         if (collection.getSchedule() instanceof RecurringSchedule rs) {
             LocalDate next = calculateNextDate(rs);
             rs.setNextCollectionDate(next);

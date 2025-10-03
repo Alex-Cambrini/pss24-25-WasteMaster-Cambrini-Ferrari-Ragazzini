@@ -1,9 +1,5 @@
 package it.unibo.wastemaster.domain.service;
 
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
-
 import it.unibo.wastemaster.domain.model.Collection;
 import it.unibo.wastemaster.domain.model.Customer;
 import it.unibo.wastemaster.domain.model.Invoice;
@@ -11,6 +7,9 @@ import it.unibo.wastemaster.domain.model.Invoice.PaymentStatus;
 import it.unibo.wastemaster.domain.model.OneTimeSchedule;
 import it.unibo.wastemaster.domain.model.RecurringSchedule;
 import it.unibo.wastemaster.domain.repository.InvoiceRepository;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
 
 /**
  * Service class responsible for managing Invoice entities, including creation,
@@ -27,7 +26,7 @@ public class InvoiceManager {
      *
      * @param invoiceRepository the repository used for invoice persistence
      */
-    public InvoiceManager(InvoiceRepository invoiceRepository) {
+    public InvoiceManager(final InvoiceRepository invoiceRepository) {
         this.invoiceRepository = invoiceRepository;
     }
 
@@ -38,15 +37,17 @@ public class InvoiceManager {
      * collection
      * adds a one-time fee. All included collections are marked as billed.
      *
-     * @param customer          the customer for whom the invoice is created
+     * @param customer the customer for whom the invoice is created
      * @param collectionsToBill the list of collections to include in the invoice
      * @return the newly created invoice
      * @throws IllegalArgumentException if the list is null or empty
-     * @throws IllegalStateException    if a collection has an unknown schedule type
+     * @throws IllegalStateException if a collection has an unknown schedule type
      */
-    public Invoice createInvoice(Customer customer, List<Collection> collectionsToBill) {
+    public Invoice createInvoice(final Customer customer,
+                                 final List<Collection> collectionsToBill) {
         if (collectionsToBill == null || collectionsToBill.isEmpty()) {
-            throw new IllegalArgumentException("No collections to bill for this customer.");
+            throw new IllegalArgumentException(
+                    "No collections to bill for this customer.");
         }
 
         double totalRecurring = 0.0;
@@ -63,7 +64,8 @@ public class InvoiceManager {
                 onetimeCount++;
             } else {
                 throw new IllegalStateException(
-                        "Unknown schedule type for collection ID " + collection.getCollectionId());
+                        "Unknown schedule type for collection ID "
+                                + collection.getCollectionId());
             }
 
             collection.setIsBilled(true);
@@ -89,7 +91,7 @@ public class InvoiceManager {
      * @param id the ID of the invoice
      * @return an Optional containing the invoice if found, or empty if not found
      */
-    public Optional<Invoice> findInvoiceById(int id) {
+    public Optional<Invoice> findInvoiceById(final int id) {
         return invoiceRepository.findById(id);
     }
 
@@ -108,7 +110,7 @@ public class InvoiceManager {
      * @param invoiceId the ID of the invoice to mark as paid
      * @return true if the invoice was found and updated, false otherwise
      */
-    public boolean markInvoiceAsPaid(int invoiceId) {
+    public boolean markInvoiceAsPaid(final int invoiceId) {
         Optional<Invoice> invoiceOpt = invoiceRepository.findById(invoiceId);
         if (invoiceOpt.isPresent()) {
             Invoice invoice = invoiceOpt.get();
@@ -131,7 +133,7 @@ public class InvoiceManager {
      * @param customer the customer whose billed amount is to be calculated
      * @return the total billed amount
      */
-    public double getTotalBilledAmountForCustomer(Customer customer) {
+    public double getTotalBilledAmountForCustomer(final Customer customer) {
         double total = 0.0;
         for (Invoice invoice : invoiceRepository.findByCustomer(customer)) {
             total += invoice.getAmount();
@@ -145,7 +147,7 @@ public class InvoiceManager {
      * @param customer the customer whose paid amount is to be calculated
      * @return the total paid amount
      */
-    public double getTotalPaidAmountForCustomer(Customer customer) {
+    public double getTotalPaidAmountForCustomer(final Customer customer) {
         double total = 0.0;
         for (Invoice invoice : invoiceRepository.findByCustomer(customer)) {
             if (invoice.getPaymentStatus() == Invoice.PaymentStatus.PAID) {
@@ -162,9 +164,9 @@ public class InvoiceManager {
      *
      * @param invoiceId the ID of the invoice to delete
      * @return true if the invoice was found and deleted, false if the invoice
-     *         was not found or is already marked as PAID
+     * was not found or is already marked as PAID
      */
-    public boolean deleteInvoice(int invoiceId) {
+    public boolean deleteInvoice(final int invoiceId) {
         Optional<Invoice> invoiceOpt = invoiceRepository.findById(invoiceId);
         if (invoiceOpt.isPresent()) {
             Invoice invoice = invoiceOpt.get();
