@@ -150,8 +150,9 @@ class VehicleManagerTest extends AbstractDatabaseTest {
 
     @Test
     void testDeleteVehicle() {
-        Vehicle toDelete = new Vehicle("HH777HH", "Iveco", "Daily", 2022,
-                Vehicle.RequiredLicence.C1, Vehicle.VehicleStatus.IN_SERVICE, 2);
+        Vehicle toDelete =
+                new Vehicle("HH777HH", "Iveco", "Daily", VEHICLE_REGISTRATION_YEAR,
+                        Vehicle.RequiredLicence.C1, Vehicle.VehicleStatus.IN_SERVICE, 2);
         getVehicleDAO().insert(toDelete);
 
         assertTrue(getVehicleManager().deleteVehicle(toDelete));
@@ -162,11 +163,11 @@ class VehicleManagerTest extends AbstractDatabaseTest {
 
     @Test
     void testGetAllowedLicences() {
-        Vehicle vb = new Vehicle("AA100AA", "Brand", "Model", 2020,
+        Vehicle vb = new Vehicle("AA100AA", "Brand", "Model", VEHICLE_REGISTRATION_YEAR,
                 Vehicle.RequiredLicence.B, Vehicle.VehicleStatus.IN_SERVICE, 1);
-        Vehicle vc1 = new Vehicle("AA101AA", "Brand", "Model", 2020,
+        Vehicle vc1 = new Vehicle("AA101AA", "Brand", "Model", VEHICLE_REGISTRATION_YEAR,
                 Vehicle.RequiredLicence.C1, Vehicle.VehicleStatus.IN_SERVICE, 1);
-        Vehicle vc = new Vehicle("AA102AA", "Brand", "Model", 2020,
+        Vehicle vc = new Vehicle("AA102AA", "Brand", "Model", VEHICLE_REGISTRATION_YEAR,
                 Vehicle.RequiredLicence.C, Vehicle.VehicleStatus.IN_SERVICE, 1);
 
         assertEquals(List.of(Licence.B, Licence.C1, Licence.C),
