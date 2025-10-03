@@ -1,31 +1,17 @@
 .root {
   -color-dark: #1b1f24;
   -color-light: #ffffff;
-  /* -color-base-0: #f6f8fa;
-  -color-base-1: #eaeef2;
-  -color-base-2: #d0d7de;
-  -color-base-3: #afb8c1;
-  -color-base-4: #8c959f;
-  -color-base-5: #6e7781;
-  -color-base-6: #57606a;
-  -color-base-7: #424a53;
-  -color-base-8: #32383f;
-  -color-base-9: #24292f; */
--color-base-0:  #fbfbfb; /* zinc-50 */
--color-base-1:  #f6f6f8; /* zinc-100 */
--color-base-2:  #e4e4ea; /* zinc-200 */
--color-base-3:  #d4d4da; /* zinc-300 */
--color-base-4:  #a4a4ae; /* zinc-400 */
--color-base-5:  #888891; /* zinc-500 */
--color-base-6:  #71717b; /* zinc-600 */
--color-base-7:  #5e5e66; /* zinc-700 */
--color-base-8:  #47474c; /* zinc-800 */
--color-base-9:  #36363b; /* zinc-900 */
--color-base-10: #232328; /* zinc-950 */
-
-
-
-
+  -color-base-0:  #fbfbfb;
+  -color-base-1:  #f6f6f8;
+  -color-base-2:  #e4e4ea;
+  -color-base-3:  #d4d4da;
+  -color-base-4:  #a4a4ae;
+  -color-base-5:  #888891;
+  -color-base-6:  #71717b;
+  -color-base-7:  #5e5e66;
+  -color-base-8:  #47474c;
+  -color-base-9:  #36363b;
+  -color-base-10: #232328;
   -color-accent-0: #ddf4ff;
   -color-accent-1: #b6e3ff;
   -color-accent-2: #80ccff;
