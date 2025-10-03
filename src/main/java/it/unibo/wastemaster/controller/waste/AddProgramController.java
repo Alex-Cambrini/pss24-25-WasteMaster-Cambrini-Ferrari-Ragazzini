@@ -27,7 +27,7 @@ public final class AddProgramController {
      *
      * @param wasteScheduleManager the WasteScheduleManager to use
      */
-    public void setWasteScheduleManager(WasteScheduleManager wasteScheduleManager) {
+    public void setWasteScheduleManager(final WasteScheduleManager wasteScheduleManager) {
         this.wasteScheduleManager = wasteScheduleManager;
     }
 

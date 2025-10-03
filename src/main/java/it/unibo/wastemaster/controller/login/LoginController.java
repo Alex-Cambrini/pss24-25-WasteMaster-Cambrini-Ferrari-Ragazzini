@@ -225,7 +225,7 @@ public class LoginController {
         }
     }
 
-    private void handleFieldAction(javafx.event.ActionEvent e) {
+    private void handleFieldAction(final javafx.event.ActionEvent e) {
         tryLoginIfFieldsFilled();
     }
 }

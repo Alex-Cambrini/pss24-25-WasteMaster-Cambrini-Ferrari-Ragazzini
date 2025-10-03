@@ -34,6 +34,8 @@ public final class MainLayoutController {
 
     private static final int LOGIN_WINDOW_WIDTH = 400;
     private static final int LOGIN_WINDOW_HEIGHT = 300;
+    private static final double CENTER_PANE_PREF_WIDTH = 800.0;
+    private static final double CENTER_PANE_PREF_HEIGHT = 600.0;
     private static final Logger LOGGER =
             Logger.getLogger(MainLayoutController.class.getName());
 
@@ -108,8 +110,8 @@ public final class MainLayoutController {
     @FXML
     public void initialize() {
         MainLayoutController.setInstance(this);
-        centerPane.setPrefWidth(800);
-        centerPane.setPrefHeight(600);
+        centerPane.setPrefWidth(CENTER_PANE_PREF_WIDTH);
+        centerPane.setPrefHeight(CENTER_PANE_PREF_HEIGHT);
         Employee.Role role = AppContext.getCurrentAccount().getEmployee().getRole();
         switch (role) {
             case OFFICE_WORKER -> {
@@ -211,7 +213,9 @@ public final class MainLayoutController {
         var controller =
                 loadCenterWithController("/layouts/dashboard/DashboardView.fxml");
         if (controller != null
-                && controller instanceof it.unibo.wastemaster.controller.dashboard.DashboardController dashCtrl) {
+                && controller
+                instanceof it.unibo.wastemaster.controller.dashboard
+                        .DashboardController dashCtrl) {
             dashCtrl.setCustomerManager(
                     AppContext.getServiceFactory().getCustomerManager());
             dashCtrl.setCollectionManager(
@@ -377,10 +381,8 @@ public final class MainLayoutController {
      */
     @FXML
     private void handleLogout() {
-        if (DialogUtils.showConfirmationDialog(
-                "Logout Confirmation",
-                "Are you sure you want to logout?",
-                AppContext.getOwner())) {
+        if (DialogUtils.showConfirmationDialog("Logout Confirmation",
+                "Are you sure you want to logout?", AppContext.getOwner())) {
             try {
                 stopAutoRefreshIfSupported(currentController);
                 currentController = null;
@@ -392,10 +394,9 @@ public final class MainLayoutController {
                 Parent loginRoot = loader.load();
 
                 Scene loginScene = new Scene(loginRoot);
-                loginScene.getStylesheets().add(
-                        Objects.requireNonNull(
-                                        getClass().getResource("/css/primer-light.css"))
-                                .toExternalForm());
+                loginScene.getStylesheets().add(Objects.requireNonNull(
+                                getClass().getResource("/css/primer-light.css"))
+                        .toExternalForm());
 
                 Stage stage = AppContext.getOwner();
                 stage.setScene(loginScene);
@@ -418,7 +419,7 @@ public final class MainLayoutController {
      *
      * @param controller the controller to check
      */
-    private void startAutoRefreshIfSupported(Object controller) {
+    private void startAutoRefreshIfSupported(final Object controller) {
         if (controller instanceof AutoRefreshable ar) {
             ar.startAutoRefresh();
         }
@@ -429,7 +430,7 @@ public final class MainLayoutController {
      *
      * @param controller the controller to check
      */
-    private void stopAutoRefreshIfSupported(Object controller) {
+    private void stopAutoRefreshIfSupported(final Object controller) {
         if (controller instanceof AutoRefreshable ar) {
             ar.stopAutoRefresh();
         }

@@ -94,7 +94,7 @@ public final class WasteController implements AutoRefreshable {
      *
      * @param wasteManager the WasteManager to use
      */
-    public void setWasteManager(WasteManager wasteManager) {
+    public void setWasteManager(final WasteManager wasteManager) {
         this.wasteManager = wasteManager;
     }
 
@@ -103,7 +103,7 @@ public final class WasteController implements AutoRefreshable {
      *
      * @param wasteScheduleManager the WasteScheduleManager to use
      */
-    public void setWasteScheduleManager(WasteScheduleManager wasteScheduleManager) {
+    public void setWasteScheduleManager(final WasteScheduleManager wasteScheduleManager) {
         this.wasteScheduleManager = wasteScheduleManager;
     }
 

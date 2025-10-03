@@ -31,7 +31,7 @@ public final class AddWasteController {
      *
      * @param wasteManager the WasteManager to use
      */
-    public void setWasteManager(WasteManager wasteManager) {
+    public void setWasteManager(final WasteManager wasteManager) {
         this.wasteManager = wasteManager;
     }
 

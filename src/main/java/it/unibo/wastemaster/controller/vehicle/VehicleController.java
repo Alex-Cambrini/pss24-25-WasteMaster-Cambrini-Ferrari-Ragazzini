@@ -106,7 +106,7 @@ public final class VehicleController implements AutoRefreshable {
      *
      * @param vehicleManager the VehicleManager to use
      */
-    public void setVehicleManager(VehicleManager vehicleManager) {
+    public void setVehicleManager(final VehicleManager vehicleManager) {
         this.vehicleManager = vehicleManager;
     }
 
