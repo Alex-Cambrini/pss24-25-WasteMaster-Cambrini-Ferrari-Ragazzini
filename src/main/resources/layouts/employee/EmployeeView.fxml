@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+<VBox xmlns:fx="http://javafx.com/fxml/1" alignment="TOP_CENTER" xmlns="http://javafx.com/javafx/21"
+      fx:controller="it.unibo.wastemaster.controller.employee.EmployeeController">
+
+    <children>
+
+        <HBox alignment="TOP_CENTER" minHeight="40.0" prefHeight="60.0" prefWidth="600.0" spacing="10.0">
+            <children>
+                <Button fx:id="addEmployeeButton" onAction="#handleAddEmployee" styleClass="success"
+                        text="Add Employee"/>
+                <Region prefHeight="20.0" prefWidth="0.0" HBox.hgrow="ALWAYS"/>
+                <Button fx:id="filterButton" onMouseClicked="#showFilterMenu" styleClass="accent" text="Filter ▼"/>
+                <TextField fx:id="searchField" promptText="Search..."/>
+                <Button onAction="#handleResetSearch" styleClass="accent, button-outlined" text="Reset"/>
+            </children>
+        </HBox>
+
+        <TableView fx:id="employeeTable" prefHeight="300.0" prefWidth="600.0" styleClass="table-view"
+                   VBox.vgrow="ALWAYS">
+            <columns>
+                <TableColumn fx:id="nameColumn" prefWidth="100.0" text="Name"/>
+                <TableColumn fx:id="surnameColumn" prefWidth="100.0" text="Surname"/>
+                <TableColumn fx:id="emailColumn" prefWidth="150.0" text="Email"/>
+                <TableColumn fx:id="roleColumn" prefWidth="100.0" text="Role"/>
+                <TableColumn fx:id="licenceColumn" prefWidth="50.0" text="Licence"/>
+                <TableColumn fx:id="locationColumn" maxWidth="400.0" minWidth="180.0" prefWidth="220.0"
+                             text="Location"/>
+                <TableColumn fx:id="creationDateColumn" prefWidth="150.0" text="Created On"/>
+            </columns>
+        </TableView>
+
+        <HBox alignment="TOP_RIGHT" minHeight="50.0" prefHeight="100.0" prefWidth="600.0" spacing="10.0">
+            <children>
+                <Button fx:id="editEmployeeButton" disable="true" onAction="#handleEditEmployee" styleClass="accent"
+                        text="Edit"/>
+                <Button fx:id="deleteEmployeeButton" disable="true" onAction="#handleDeleteEmployee" styleClass="danger"
+                        text="Delete"/>
+            </children>
+            <padding>
+                <Insets top="10.0"/>
+            </padding>
+        </HBox>
+
+    </children>
+</VBox>
