@@ -34,7 +34,6 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
@@ -52,7 +51,8 @@ public final class ScheduleController implements AutoRefreshable {
     private static final String TITLE_NO_SELECTION = "No Selection";
     private final ObservableList<String> activeFilters = FXCollections
             .observableArrayList(FILTER_WASTE_TYPE, FILTER_FREQUENCY, FILTER_CUSTOMER);
-    private final ObservableList<ScheduleRow> allSchedules = FXCollections.observableArrayList();
+    private final ObservableList<ScheduleRow> allSchedules =
+            FXCollections.observableArrayList();
 
     private CollectionManager collectionManager;
     private OneTimeScheduleManager oneTimeScheduleManager;
@@ -164,9 +164,11 @@ public final class ScheduleController implements AutoRefreshable {
     @FXML
     public void initialize() {
         wasteNameColumn.setCellValueFactory(new PropertyValueFactory<>("wasteName"));
-        scheduleCategoryColumn.setCellValueFactory(new PropertyValueFactory<>("scheduleCategory"));
+        scheduleCategoryColumn.setCellValueFactory(
+                new PropertyValueFactory<>("scheduleCategory"));
         frequencyColumn.setCellValueFactory(new PropertyValueFactory<>(FILTER_FREQUENCY));
-        executionDateColumn.setCellValueFactory(new PropertyValueFactory<>("executionDate"));
+        executionDateColumn.setCellValueFactory(
+                new PropertyValueFactory<>("executionDate"));
         startDateColumn.setCellValueFactory(new PropertyValueFactory<>("startDate"));
         statusColumn.setCellValueFactory(new PropertyValueFactory<>("status"));
         customerColumn.setCellValueFactory(new PropertyValueFactory<>(FILTER_CUSTOMER));
@@ -180,19 +182,26 @@ public final class ScheduleController implements AutoRefreshable {
 
         searchField.textProperty().addListener((obs, oldText, newText) -> handleSearch());
 
-        oneTimeCheckBox.selectedProperty().addListener((obs, oldVal, newVal) -> refresh());
-        recurringCheckBox.selectedProperty().addListener((obs, oldVal, newVal) -> refresh());
-        showDeletedCheckBox.selectedProperty().addListener((obs, oldVal, newVal) -> refresh());
-        showActiveCheckBox.selectedProperty().addListener((obs, oldVal, newVal) -> refresh());
-        showPausedCheckBox.selectedProperty().addListener((obs, oldVal, newVal) -> refresh());
-        showCompletedCheckBox.selectedProperty().addListener((obs, oldVal, newVal) -> refresh());
+        oneTimeCheckBox.selectedProperty()
+                .addListener((obs, oldVal, newVal) -> refresh());
+        recurringCheckBox.selectedProperty()
+                .addListener((obs, oldVal, newVal) -> refresh());
+        showDeletedCheckBox.selectedProperty()
+                .addListener((obs, oldVal, newVal) -> refresh());
+        showActiveCheckBox.selectedProperty()
+                .addListener((obs, oldVal, newVal) -> refresh());
+        showPausedCheckBox.selectedProperty()
+                .addListener((obs, oldVal, newVal) -> refresh());
+        showCompletedCheckBox.selectedProperty()
+                .addListener((obs, oldVal, newVal) -> refresh());
 
         scheduleTable.getSelectionModel().selectedItemProperty()
                 .addListener((obs, oldVal, newVal) -> updateButtons(newVal));
     }
 
     /**
-     * Refreshes the schedule table by reloading schedules and applying the current search filter.
+     * Refreshes the schedule table by reloading schedules and applying the current
+     * search filter.
      */
     public void refresh() {
         loadSchedules();
@@ -209,7 +218,8 @@ public final class ScheduleController implements AutoRefreshable {
 
     private void updateButtons(final ScheduleRow selected) {
         if (selected != null) {
-            boolean isRecurring = selected.getScheduleCategory() == ScheduleCategory.RECURRING;
+            boolean isRecurring =
+                    selected.getScheduleCategory() == ScheduleCategory.RECURRING;
 
             changeFrequencyButton.setDisable(!isRecurring);
             toggleStatusButton.setDisable(!isRecurring && selected == null);
@@ -258,7 +268,8 @@ public final class ScheduleController implements AutoRefreshable {
         if (selected == null) {
             return;
         }
-        Optional<RecurringSchedule> recurringOpt = recurringScheduleManager.findRecurringScheduleById(selected.getId());
+        Optional<RecurringSchedule> recurringOpt =
+                recurringScheduleManager.findRecurringScheduleById(selected.getId());
         if (recurringOpt.isEmpty()) {
             DialogUtils.showError("Error",
                     "Unable to find the selected recurring schedule.",
@@ -338,7 +349,8 @@ public final class ScheduleController implements AutoRefreshable {
         ScheduleCategory scheduleType = s.getScheduleCategory();
         ScheduleStatus status = s.getScheduleStatus();
 
-        boolean isOneTime = oneTimeCheckBox.isSelected() && scheduleType == ScheduleCategory.ONE_TIME;
+        boolean isOneTime =
+                oneTimeCheckBox.isSelected() && scheduleType == ScheduleCategory.ONE_TIME;
         boolean isRecurring = recurringCheckBox.isSelected()
                 && scheduleType == ScheduleCategory.RECURRING;
         boolean matchesType = isOneTime || isRecurring;
@@ -348,7 +360,7 @@ public final class ScheduleController implements AutoRefreshable {
                 || (status == ScheduleStatus.ACTIVE && showActiveCheckBox.isSelected())
                 || (status == ScheduleStatus.PAUSED && showPausedCheckBox.isSelected())
                 || (status == ScheduleStatus.COMPLETED
-                        && showCompletedCheckBox.isSelected());
+                && showCompletedCheckBox.isSelected());
 
         return matchesType && matchesStatus;
     }
@@ -362,14 +374,18 @@ public final class ScheduleController implements AutoRefreshable {
             Stage mainStage = (Stage) MainLayoutController.getInstance().getRootPane()
                     .getScene().getWindow();
 
-            Optional<AddScheduleController> controllerOpt = DialogUtils.showModalWithController("Add Schedule",
-                    "/layouts/schedule/AddScheduleView.fxml", mainStage, ctrl -> {
-                        ctrl.setCustomerManager(AppContext.getServiceFactory().getCustomerManager());
-                        ctrl.setWasteManager(AppContext.getServiceFactory().getWasteManager());
-                        ctrl.setOneTimeScheduleManager(oneTimeScheduleManager);
-                        ctrl.setRecurringScheduleManager(recurringScheduleManager);
-                        ctrl.initData();
-                    });
+            Optional<AddScheduleController> controllerOpt =
+                    DialogUtils.showModalWithController("Add Schedule",
+                            "/layouts/schedule/AddScheduleView.fxml", mainStage, ctrl -> {
+                                ctrl.setCustomerManager(AppContext.getServiceFactory()
+                                        .getCustomerManager());
+                                ctrl.setWasteManager(
+                                        AppContext.getServiceFactory().getWasteManager());
+                                ctrl.setOneTimeScheduleManager(oneTimeScheduleManager);
+                                ctrl.setRecurringScheduleManager(
+                                        recurringScheduleManager);
+                                ctrl.initData();
+                            });
 
             if (controllerOpt.isPresent()) {
                 AddScheduleController ctrl = controllerOpt.get();
@@ -469,8 +485,9 @@ public final class ScheduleController implements AutoRefreshable {
                     success = oneTimeScheduleManager.softDeleteOneTimeSchedule(schedule);
                 }
             } else if (selected.getScheduleCategory() == ScheduleCategory.RECURRING) {
-                Optional<RecurringSchedule> scheduleOpt = recurringScheduleManager.findRecurringScheduleById(
-                        selected.getId());
+                Optional<RecurringSchedule> scheduleOpt =
+                        recurringScheduleManager.findRecurringScheduleById(
+                                selected.getId());
 
                 if (scheduleOpt.isPresent()) {
                     RecurringSchedule schedule = scheduleOpt.get();
@@ -501,7 +518,8 @@ public final class ScheduleController implements AutoRefreshable {
     }
 
     /**
-     * Handles the search/filtering of schedules based on the search field and active filters.
+     * Handles the search/filtering of schedules based on the search field and active
+     * filters.
      */
     @FXML
     private void handleSearch() {
@@ -518,10 +536,10 @@ public final class ScheduleController implements AutoRefreshable {
             if ((activeFilters.contains(FILTER_WASTE_TYPE)
                     && row.getWasteName().toLowerCase().contains(query))
                     || (activeFilters.contains(FILTER_FREQUENCY)
-                            && row.getFrequency() != null
-                            && row.getFrequency().name().toLowerCase().contains(query))
+                    && row.getFrequency() != null
+                    && row.getFrequency().name().toLowerCase().contains(query))
                     || (activeFilters.contains(FILTER_CUSTOMER)
-                            && row.getCustomer().toLowerCase().contains(query))) {
+                    && row.getCustomer().toLowerCase().contains(query))) {
                 filtered.add(row);
             }
         }
@@ -558,9 +576,11 @@ public final class ScheduleController implements AutoRefreshable {
 
         Optional<? extends Schedule> scheduleOpt;
         if (selected.getScheduleCategory() == ScheduleCategory.ONE_TIME) {
-            scheduleOpt = oneTimeScheduleManager.findOneTimeScheduleById(selected.getId());
+            scheduleOpt =
+                    oneTimeScheduleManager.findOneTimeScheduleById(selected.getId());
         } else {
-            scheduleOpt = recurringScheduleManager.findRecurringScheduleById(selected.getId());
+            scheduleOpt =
+                    recurringScheduleManager.findRecurringScheduleById(selected.getId());
         }
 
         if (scheduleOpt.isEmpty()) {
@@ -569,7 +589,8 @@ public final class ScheduleController implements AutoRefreshable {
         }
 
         Schedule schedule = scheduleOpt.get();
-        List<Collection> collections = collectionManager.getAllCollectionBySchedule(schedule);
+        List<Collection> collections =
+                collectionManager.getAllCollectionBySchedule(schedule);
 
         try {
             MainLayoutController.getInstance().setPageTitle("Associated Collections");
@@ -602,8 +623,8 @@ public final class ScheduleController implements AutoRefreshable {
 
         filterMenu = new ContextMenu();
 
-        String[] fields = { FILTER_WASTE_TYPE, FILTER_FREQUENCY, FILTER_CUSTOMER };
-        String[] labels = { "Waste", "Frequency", "Customer" };
+        String[] fields = {FILTER_WASTE_TYPE, FILTER_FREQUENCY, FILTER_CUSTOMER};
+        String[] labels = {"Waste", "Frequency", "Customer"};
 
         for (int i = 0; i < fields.length; i++) {
             String key = fields[i];

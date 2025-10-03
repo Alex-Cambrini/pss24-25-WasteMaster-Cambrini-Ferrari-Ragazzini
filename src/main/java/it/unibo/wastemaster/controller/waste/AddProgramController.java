@@ -68,9 +68,11 @@ public final class AddProgramController {
             DialogUtils.showSuccess("Program saved successfully.", AppContext.getOwner());
             DialogUtils.closeModal(event);
         } catch (IllegalArgumentException e) {
-            DialogUtils.showError("Validation error", e.getMessage(), AppContext.getOwner());
+            DialogUtils.showError("Validation error", e.getMessage(),
+                    AppContext.getOwner());
         } catch (Exception e) {
-            DialogUtils.showError("Unexpected error", e.getMessage(), AppContext.getOwner());
+            DialogUtils.showError("Unexpected error", e.getMessage(),
+                    AppContext.getOwner());
         }
     }
 

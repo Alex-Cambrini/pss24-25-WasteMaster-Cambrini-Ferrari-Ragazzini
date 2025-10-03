@@ -13,13 +13,11 @@ import it.unibo.wastemaster.domain.service.NotificationService;
 import it.unibo.wastemaster.domain.service.TripManager;
 import it.unibo.wastemaster.domain.service.VehicleManager;
 import it.unibo.wastemaster.viewmodels.TripRow;
-
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import java.util.Set;
-
+import java.util.stream.Collectors;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -43,17 +41,6 @@ import javafx.util.Duration;
  */
 public final class TripController implements AutoRefreshable {
 
-    private NotificationService notificationService;
-
-    /**
-     * Sets the notification service used for sending trip notifications.
-     *
-     * @param notificationService the NotificationService to use
-     */
-    public void setNotificationService(NotificationService notificationService) {
-        this.notificationService = notificationService;
-    }
-
     private static final String FIELD_ID = "id";
     private static final String FIELD_POSTAL_CODES = "postalCodes";
     private static final String FIELD_VEHICLE_MODEL = "vehicleModel";
@@ -64,13 +51,13 @@ public final class TripController implements AutoRefreshable {
     private static final String FIELD_STATUS = "status";
     private static final String NAVIGATION_ERROR = "Navigation error";
     private static final int REFRESH_SECONDS = 30;
-
     private final ObservableList<TripRow> allTrips = FXCollections.observableArrayList();
-    private final ObservableList<String> activeFilters = FXCollections.observableArrayList(
-            FIELD_ID, FIELD_POSTAL_CODES, FIELD_VEHICLE_MODEL,
-            FIELD_VEHICLE_CAPACITY, FIELD_OPERATORS,
-            FIELD_STATUS);
-
+    private final ObservableList<String> activeFilters =
+            FXCollections.observableArrayList(
+                    FIELD_ID, FIELD_POSTAL_CODES, FIELD_VEHICLE_MODEL,
+                    FIELD_VEHICLE_CAPACITY, FIELD_OPERATORS,
+                    FIELD_STATUS);
+    private NotificationService notificationService;
     private TripManager tripManager;
     private VehicleManager vehicleManager;
     private CollectionManager collectionManager;
@@ -134,6 +121,15 @@ public final class TripController implements AutoRefreshable {
 
     @FXML
     private CheckBox showCompletedCheckBox;
+
+    /**
+     * Sets the notification service used for sending trip notifications.
+     *
+     * @param notificationService the NotificationService to use
+     */
+    public void setNotificationService(NotificationService notificationService) {
+        this.notificationService = notificationService;
+    }
 
     /**
      * Sets the trip manager used for trip operations.
@@ -220,11 +216,13 @@ public final class TripController implements AutoRefreshable {
                 });
 
         currentUser = AppContext.getCurrentAccount().getEmployee();
-        boolean isAllowedToCompleteTrip = currentUser.getRole() == Employee.Role.ADMINISTRATOR
-                || currentUser.getRole() == Employee.Role.OPERATOR;
+        boolean isAllowedToCompleteTrip =
+                currentUser.getRole() == Employee.Role.ADMINISTRATOR
+                        || currentUser.getRole() == Employee.Role.OPERATOR;
         completeTripButton.setVisible(isAllowedToCompleteTrip);
 
-        this.notificationService = AppContext.getServiceFactory().getNotificationService();
+        this.notificationService =
+                AppContext.getServiceFactory().getNotificationService();
     }
 
     /**
@@ -269,7 +267,8 @@ public final class TripController implements AutoRefreshable {
 
     /**
      * Loads trips visible to the current user and updates the trip table.
-     * Operators see only their assigned trips, while admins and office workers see all trips.
+     * Operators see only their assigned trips, while admins and office workers see all
+     * trips.
      */
     public void loadTrips() {
         List<Trip> trips = tripManager.getTripsForCurrentUser(currentUser);
@@ -286,13 +285,14 @@ public final class TripController implements AutoRefreshable {
     @FXML
     private void handleAddTrip() {
         try {
-            Optional<AddTripController> controllerOpt = DialogUtils.showModalWithController("Add Trip",
-                    "/layouts/trip/AddTripView.fxml",
-                    AppContext.getOwner(), ctrl -> {
-                        ctrl.setTripManager(tripManager);
-                        ctrl.setVehicleManager(vehicleManager);
-                        ctrl.setCollectionManager(collectionManager);
-                    });
+            Optional<AddTripController> controllerOpt =
+                    DialogUtils.showModalWithController("Add Trip",
+                            "/layouts/trip/AddTripView.fxml",
+                            AppContext.getOwner(), ctrl -> {
+                                ctrl.setTripManager(tripManager);
+                                ctrl.setVehicleManager(vehicleManager);
+                                ctrl.setCollectionManager(collectionManager);
+                            });
             if (controllerOpt.isPresent()) {
                 loadTrips();
             }
@@ -303,7 +303,8 @@ public final class TripController implements AutoRefreshable {
     }
 
     /**
-     * Handles the action to permanently delete a trip and reschedule recurring collections.
+     * Handles the action to permanently delete a trip and reschedule recurring
+     * collections.
      * Notifies customers via email if possible.
      */
     @FXML
@@ -338,14 +339,17 @@ public final class TripController implements AutoRefreshable {
             try {
                 List<String> recipients = extractCustomerEmails(trip);
                 if (!recipients.isEmpty() && notificationService != null) {
-                    DateTimeFormatter fmt = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+                    DateTimeFormatter fmt =
+                            DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
                     String formattedDeparture = trip.getDepartureTime().format(fmt);
 
                     String subject = "Trip cancellation #" + trip.getTripId();
                     String body = "Dear customer,\n\n"
                             + "We inform you that trip #" + trip.getTripId()
-                            + " (ZIP " + trip.getPostalCode() + ", departure " + formattedDeparture + ") "
-                            + "has been cancelled. Any recurring collections have been rescheduled to the next available date.\n\n"
+                            + " (ZIP " + trip.getPostalCode() + ", departure "
+                            + formattedDeparture + ") "
+                            + "has been cancelled. Any recurring collections have been "
+                            + "rescheduled to the next available date.\n\n"
                             + "For assistance, please reply to this email.\n"
                             + "Best regards,\nWasteMaster";
 
@@ -353,12 +357,14 @@ public final class TripController implements AutoRefreshable {
                 }
             } catch (Exception ex) {
                 DialogUtils.showError("Notification Warning",
-                        "Trip deleted, but customers could not be notified:\n" + ex.getMessage(),
+                        "Trip deleted, but customers could not be notified:\n"
+                                + ex.getMessage(),
                         AppContext.getOwner());
             }
 
             loadTrips();
-            DialogUtils.showSuccess("Trip permanently deleted and recurring collections rescheduled.",
+            DialogUtils.showSuccess(
+                    "Trip permanently deleted and recurring collections rescheduled.",
                     AppContext.getOwner());
         } else {
             DialogUtils.showError("Deletion Failed",
@@ -373,11 +379,13 @@ public final class TripController implements AutoRefreshable {
      * @return a list of unique customer email addresses
      */
     private List<String> extractCustomerEmails(Trip trip) {
-        if (trip.getCollections() == null)
+        if (trip.getCollections() == null) {
             return List.of();
+        }
         Set<String> unique = trip.getCollections().stream()
                 .map(c -> c.getCustomer())
-                .filter(cu -> cu != null && cu.getEmail() != null && !cu.getEmail().isBlank())
+                .filter(cu -> cu != null && cu.getEmail() != null && !cu.getEmail()
+                        .isBlank())
                 .map(cu -> cu.getEmail().trim())
                 .collect(Collectors.toSet());
         return List.copyOf(unique);
@@ -399,8 +407,9 @@ public final class TripController implements AutoRefreshable {
                 "Confirm Deletion",
                 "Are you sure you want to delete this trip?",
                 AppContext.getOwner());
-        if (!confirmed)
+        if (!confirmed) {
             return;
+        }
 
         Optional<Trip> tripOpt = tripManager.getTripById(selected.getIdAsInt());
         if (tripOpt.isEmpty()) {
@@ -442,14 +451,15 @@ public final class TripController implements AutoRefreshable {
         }
 
         try {
-            Optional<EditTripController> controllerOpt = DialogUtils.showModalWithController("Edit Trip",
-                    "/layouts/trip/EditTripView.fxml",
-                    AppContext.getOwner(), ctrl -> {
-                        ctrl.setTripToEdit(tripOpt.get());
-                        ctrl.setTripManager(tripManager);
-                        ctrl.setVehicleManager(vehicleManager);
-                        ctrl.initData();
-                    });
+            Optional<EditTripController> controllerOpt =
+                    DialogUtils.showModalWithController("Edit Trip",
+                            "/layouts/trip/EditTripView.fxml",
+                            AppContext.getOwner(), ctrl -> {
+                                ctrl.setTripToEdit(tripOpt.get());
+                                ctrl.setTripManager(tripManager);
+                                ctrl.setVehicleManager(vehicleManager);
+                                ctrl.initData();
+                            });
 
             controllerOpt.ifPresent(ctrl -> loadTrips());
         } catch (Exception e) {
@@ -505,15 +515,15 @@ public final class TripController implements AutoRefreshable {
         return (activeFilters.contains(FIELD_ID)
                 && row.getId().toLowerCase().contains(query))
                 || (activeFilters.contains(FIELD_POSTAL_CODES)
-                        && row.getPostalCodes().toLowerCase().contains(query))
+                && row.getPostalCodes().toLowerCase().contains(query))
                 || (activeFilters.contains(FIELD_VEHICLE_MODEL)
-                        && row.getVehicleModel().toLowerCase().contains(query))
+                && row.getVehicleModel().toLowerCase().contains(query))
                 || (activeFilters.contains(FIELD_VEHICLE_CAPACITY)
-                        && String.valueOf(row.getVehicleCapacity()).contains(query))
+                && String.valueOf(row.getVehicleCapacity()).contains(query))
                 || (activeFilters.contains(FIELD_OPERATORS)
-                        && row.getOperators().toLowerCase().contains(query))
+                && row.getOperators().toLowerCase().contains(query))
                 || (activeFilters.contains(FIELD_STATUS)
-                        && row.getStatus().toLowerCase().contains(query));
+                && row.getStatus().toLowerCase().contains(query));
     }
 
     /**
@@ -545,11 +555,12 @@ public final class TripController implements AutoRefreshable {
         }
 
         filterMenu = new ContextMenu();
-        String[] fields = { FIELD_ID, FIELD_POSTAL_CODES, FIELD_VEHICLE_MODEL,
+        String[] fields = {FIELD_ID, FIELD_POSTAL_CODES, FIELD_VEHICLE_MODEL,
                 FIELD_VEHICLE_CAPACITY,
-                FIELD_OPERATORS, FIELD_STATUS };
-        String[] labels = { "ID", "Postal Codes", "Vehicle", "Vehicle Capacity", "Operators",
-                "Status" };
+                FIELD_OPERATORS, FIELD_STATUS};
+        String[] labels =
+                {"ID", "Postal Codes", "Vehicle", "Vehicle Capacity", "Operators",
+                        "Status"};
 
         for (int i = 0; i < fields.length; i++) {
             String key = fields[i];
@@ -619,7 +630,8 @@ public final class TripController implements AutoRefreshable {
         TripRow selected = tripTable.getSelectionModel().getSelectedItem();
         if (selected == null) {
             DialogUtils.showError("No Selection",
-                    "Please select a trip to view its collections.", AppContext.getOwner());
+                    "Please select a trip to view its collections.",
+                    AppContext.getOwner());
             return;
         }
 

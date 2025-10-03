@@ -17,7 +17,8 @@ import javafx.scene.control.TextField;
 
 /**
  * Controller for the view to edit an existing vehicle.
- * Manages loading the vehicle data into fields, updating the modified data, and handling UI events.
+ * Manages loading the vehicle data into fields, updating the modified data, and
+ * handling UI events.
  */
 public final class EditVehicleController {
 
@@ -116,7 +117,8 @@ public final class EditVehicleController {
             vehicle.setRegistrationYear(Integer.parseInt(yearField.getText()));
             vehicle.setRequiredLicence(licenceComboBox.getValue());
             vehicle.setVehicleStatus(statusComboBox.getValue());
-            vehicle.setRequiredOperators(Integer.parseInt(requiredOperatorsField.getText()));
+            vehicle.setRequiredOperators(
+                    Integer.parseInt(requiredOperatorsField.getText()));
 
             vehicleManager.updateVehicle(vehicle);
             showSuccess("Vehicle updated successfully.", AppContext.getOwner());

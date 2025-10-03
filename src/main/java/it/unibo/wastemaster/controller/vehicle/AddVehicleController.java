@@ -100,7 +100,8 @@ public final class AddVehicleController {
         VehicleStatus status = statusComboBox.getValue();
 
         Vehicle vehicle =
-                new Vehicle(plate, brand, model, year, licence, status, requiredOperators);
+                new Vehicle(plate, brand, model, year, licence, status,
+                        requiredOperators);
         return vehicle;
     }
 

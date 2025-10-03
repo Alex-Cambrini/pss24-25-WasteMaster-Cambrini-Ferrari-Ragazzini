@@ -32,8 +32,10 @@ import javafx.util.Duration;
 
 /**
  * Controller for managing the vehicle view.
- * Handles loading, displaying, searching, filtering, adding, editing, and deleting vehicles.
- * Supports periodic automatic refresh of the vehicle list and interaction with the JavaFX UI.
+ * Handles loading, displaying, searching, filtering, adding, editing, and deleting
+ * vehicles.
+ * Supports periodic automatic refresh of the vehicle list and interaction with the
+ * JavaFX UI.
  */
 public final class VehicleController implements AutoRefreshable {
 
@@ -48,7 +50,8 @@ public final class VehicleController implements AutoRefreshable {
     private static final String NEXT_MAINTENANCE_DATE = "nextMaintenanceDate";
     private static final String REGISTRATION_YEAR = "registrationYear";
     private static final String REQUIRED_OPERATORS = "requiredOperators";
-    private final ObservableList<VehicleRow> allVehicles = FXCollections.observableArrayList();
+    private final ObservableList<VehicleRow> allVehicles =
+            FXCollections.observableArrayList();
     private final ObservableList<String> activeFilters =
             FXCollections.observableArrayList(PLATE, BRAND, MODEL, YEAR, LICENCE_TYPE,
                     VEHICLE_STATUS, LAST_MAINTENANCE_DATE, NEXT_MAINTENANCE_DATE);
@@ -108,7 +111,8 @@ public final class VehicleController implements AutoRefreshable {
     }
 
     /**
-     * Initializes the controller and sets up table columns, cell factories, and listeners.
+     * Initializes the controller and sets up table columns, cell factories, and
+     * listeners.
      */
     @FXML
     public void initialize() {
@@ -116,11 +120,15 @@ public final class VehicleController implements AutoRefreshable {
         brandColumn.setCellValueFactory(new PropertyValueFactory<>(BRAND));
         modelColumn.setCellValueFactory(new PropertyValueFactory<>(MODEL));
         yearColumn.setCellValueFactory(new PropertyValueFactory<>(REGISTRATION_YEAR));
-        requiredOperatorColumn.setCellValueFactory(new PropertyValueFactory<>(REQUIRED_OPERATORS));
+        requiredOperatorColumn.setCellValueFactory(
+                new PropertyValueFactory<>(REQUIRED_OPERATORS));
         licenceTypeColumn.setCellValueFactory(new PropertyValueFactory<>(LICENCE_TYPE));
-        vehicleStatusColumn.setCellValueFactory(new PropertyValueFactory<>(VEHICLE_STATUS));
-        lastMaintenanceDateColumn.setCellValueFactory(new PropertyValueFactory<>(LAST_MAINTENANCE_DATE));
-        nextMaintenanceDateColumn.setCellValueFactory(new PropertyValueFactory<>(NEXT_MAINTENANCE_DATE));
+        vehicleStatusColumn.setCellValueFactory(
+                new PropertyValueFactory<>(VEHICLE_STATUS));
+        lastMaintenanceDateColumn.setCellValueFactory(
+                new PropertyValueFactory<>(LAST_MAINTENANCE_DATE));
+        nextMaintenanceDateColumn.setCellValueFactory(
+                new PropertyValueFactory<>(NEXT_MAINTENANCE_DATE));
 
         setLicenceTypeCellFactory();
         setVehicleStatusCellFactory();
@@ -152,7 +160,8 @@ public final class VehicleController implements AutoRefreshable {
         licenceTypeColumn.setCellFactory(
                 column -> new TableCell<VehicleRow, Vehicle.RequiredLicence>() {
                     @Override
-                    protected void updateItem(final Vehicle.RequiredLicence item, final boolean empty) {
+                    protected void updateItem(final Vehicle.RequiredLicence item,
+                                              final boolean empty) {
                         super.updateItem(item, empty);
                         setText(empty || item == null ? "" : formatEnum(item));
                     }
@@ -163,7 +172,8 @@ public final class VehicleController implements AutoRefreshable {
         vehicleStatusColumn.setCellFactory(
                 column -> new TableCell<VehicleRow, Vehicle.VehicleStatus>() {
                     @Override
-                    protected void updateItem(final Vehicle.VehicleStatus item, final boolean empty) {
+                    protected void updateItem(final Vehicle.VehicleStatus item,
+                                              final boolean empty) {
                         super.updateItem(item, empty);
                         setText(empty || item == null ? "" : formatEnum(item));
                     }
@@ -171,23 +181,25 @@ public final class VehicleController implements AutoRefreshable {
     }
 
     private void setLastMaintenanceDateCellFactory() {
-        lastMaintenanceDateColumn.setCellFactory(column -> new TableCell<VehicleRow, LocalDate>() {
-            @Override
-            protected void updateItem(final LocalDate item, final boolean empty) {
-                super.updateItem(item, empty);
-                setText(empty || item == null ? "" : item.toString());
-            }
-        });
+        lastMaintenanceDateColumn.setCellFactory(
+                column -> new TableCell<VehicleRow, LocalDate>() {
+                    @Override
+                    protected void updateItem(final LocalDate item, final boolean empty) {
+                        super.updateItem(item, empty);
+                        setText(empty || item == null ? "" : item.toString());
+                    }
+                });
     }
 
     private void setNextMaintenanceDateCellFactory() {
-        nextMaintenanceDateColumn.setCellFactory(column -> new TableCell<VehicleRow, LocalDate>() {
-            @Override
-            protected void updateItem(final LocalDate item, final boolean empty) {
-                super.updateItem(item, empty);
-                setText(empty || item == null ? "" : item.toString());
-            }
-        });
+        nextMaintenanceDateColumn.setCellFactory(
+                column -> new TableCell<VehicleRow, LocalDate>() {
+                    @Override
+                    protected void updateItem(final LocalDate item, final boolean empty) {
+                        super.updateItem(item, empty);
+                        setText(empty || item == null ? "" : item.toString());
+                    }
+                });
     }
 
     /**
@@ -348,7 +360,8 @@ public final class VehicleController implements AutoRefreshable {
     }
 
     /**
-     * Handles the search/filtering of vehicles based on the search field and active filters.
+     * Handles the search/filtering of vehicles based on the search field and active
+     * filters.
      */
     @FXML
     private void handleSearch() {

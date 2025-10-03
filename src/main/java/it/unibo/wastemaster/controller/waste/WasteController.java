@@ -31,14 +31,17 @@ import javafx.util.Duration;
 
 /**
  * Controller for managing the waste types and their collection schedules.
- * Handles loading, displaying, searching, filtering, adding, editing, and deleting waste types and programs.
- * Supports periodic automatic refresh of the waste list and interaction with the JavaFX UI.
+ * Handles loading, displaying, searching, filtering, adding, editing, and deleting
+ * waste types and programs.
+ * Supports periodic automatic refresh of the waste list and interaction with the
+ * JavaFX UI.
  */
 public final class WasteController implements AutoRefreshable {
 
     private static final int REFRESH_INTERVAL_SECONDS = 30;
     private static final String ERROR_TITLE = "Error";
-    private final ObservableList<WasteRow> allWastes = FXCollections.observableArrayList();
+    private final ObservableList<WasteRow> allWastes =
+            FXCollections.observableArrayList();
 
     @FXML
     private Button addWasteButton;
@@ -132,8 +135,10 @@ public final class WasteController implements AutoRefreshable {
                 });
 
         searchField.textProperty().addListener((obs, oldText, newText) -> handleSearch());
-        showRecyclableCheckBox.selectedProperty().addListener((obs, oldVal, newVal) -> handleSearch());
-        showDangerousCheckBox.selectedProperty().addListener((obs, oldVal, newVal) -> handleSearch());
+        showRecyclableCheckBox.selectedProperty()
+                .addListener((obs, oldVal, newVal) -> handleSearch());
+        showDangerousCheckBox.selectedProperty()
+                .addListener((obs, oldVal, newVal) -> handleSearch());
 
         addProgramButton.setDisable(true);
         changeDayButton.setDisable(true);
@@ -170,11 +175,13 @@ public final class WasteController implements AutoRefreshable {
      */
     @Override
     public void startAutoRefresh() {
-        if (refreshTimeline != null || wasteManager == null || wasteScheduleManager == null) {
+        if (refreshTimeline != null || wasteManager == null
+                || wasteScheduleManager == null) {
             return;
         }
         refreshTimeline = new Timeline(
-                new KeyFrame(Duration.seconds(REFRESH_INTERVAL_SECONDS), event -> loadWastes()));
+                new KeyFrame(Duration.seconds(REFRESH_INTERVAL_SECONDS),
+                        event -> loadWastes()));
         refreshTimeline.setCycleCount(Animation.INDEFINITE);
         refreshTimeline.play();
     }
@@ -223,13 +230,14 @@ public final class WasteController implements AutoRefreshable {
             final Stage mainStage = (Stage) MainLayoutController.getInstance()
                     .getRootPane().getScene().getWindow();
 
-            final Optional<AddWasteController> controllerOpt = DialogUtils.showModalWithController(
-                    "Add Waste",
-                    "/layouts/waste/AddWasteView.fxml",
-                    mainStage,
-                    ctrl -> {
-                        ctrl.setWasteManager(wasteManager);
-                    });
+            final Optional<AddWasteController> controllerOpt =
+                    DialogUtils.showModalWithController(
+                            "Add Waste",
+                            "/layouts/waste/AddWasteView.fxml",
+                            mainStage,
+                            ctrl -> {
+                                ctrl.setWasteManager(wasteManager);
+                            });
 
             if (controllerOpt.isPresent()) {
                 loadWastes();
@@ -259,14 +267,15 @@ public final class WasteController implements AutoRefreshable {
             final Stage mainStage = (Stage) MainLayoutController.getInstance()
                     .getRootPane().getScene().getWindow();
 
-            final Optional<AddProgramController> controllerOpt = DialogUtils.showModalWithController(
-                    "Add Program",
-                    "/layouts/waste/AddProgramView.fxml",
-                    mainStage,
-                    ctrl -> {
-                        ctrl.setWaste(selectedWaste);
-                        ctrl.setWasteScheduleManager(wasteScheduleManager);
-                    });
+            final Optional<AddProgramController> controllerOpt =
+                    DialogUtils.showModalWithController(
+                            "Add Program",
+                            "/layouts/waste/AddProgramView.fxml",
+                            mainStage,
+                            ctrl -> {
+                                ctrl.setWaste(selectedWaste);
+                                ctrl.setWasteScheduleManager(wasteScheduleManager);
+                            });
 
             if (controllerOpt.isPresent()) {
                 loadWastes();
@@ -296,21 +305,23 @@ public final class WasteController implements AutoRefreshable {
         }
 
         try {
-            final WasteSchedule schedule = wasteScheduleManager.getWasteScheduleByWaste(selectedRow.getWaste());
+            final WasteSchedule schedule =
+                    wasteScheduleManager.getWasteScheduleByWaste(selectedRow.getWaste());
 
             final Stage stage = (Stage) MainLayoutController.getInstance()
                     .getRootPane()
                     .getScene()
                     .getWindow();
 
-            final Optional<ChangeDayDialogController> controllerOpt = DialogUtils.showModalWithController(
-                    "Change Collection Day",
-                    "/layouts/waste/ChangeDayDialog.fxml",
-                    stage,
-                    ctrl -> {
-                        ctrl.setSchedule(schedule);
-                        ctrl.setCurrentDay(schedule.getDayOfWeek());
-                    });
+            final Optional<ChangeDayDialogController> controllerOpt =
+                    DialogUtils.showModalWithController(
+                            "Change Collection Day",
+                            "/layouts/waste/ChangeDayDialog.fxml",
+                            stage,
+                            ctrl -> {
+                                ctrl.setSchedule(schedule);
+                                ctrl.setCurrentDay(schedule.getDayOfWeek());
+                            });
 
             if (controllerOpt.isPresent()) {
                 final DayOfWeek newDay = controllerOpt.get().getSelectedDay();
@@ -352,7 +363,8 @@ public final class WasteController implements AutoRefreshable {
 
         try {
             if (selected.getDayOfWeek() != null) {
-                WasteSchedule schedule = wasteScheduleManager.getWasteScheduleByWaste(selected.getWaste());
+                WasteSchedule schedule =
+                        wasteScheduleManager.getWasteScheduleByWaste(selected.getWaste());
                 wasteScheduleManager.deleteSchedule(schedule);
             }
             wasteManager.softDeleteWaste(selected.getWaste());
@@ -388,7 +400,8 @@ public final class WasteController implements AutoRefreshable {
         }
 
         try {
-            WasteSchedule schedule = wasteScheduleManager.getWasteScheduleByWaste(selected.getWaste());
+            WasteSchedule schedule =
+                    wasteScheduleManager.getWasteScheduleByWaste(selected.getWaste());
             wasteScheduleManager.deleteSchedule(schedule);
             loadWastes();
         } catch (Exception e) {
@@ -411,7 +424,8 @@ public final class WasteController implements AutoRefreshable {
     }
 
     /**
-     * Handles the search/filtering of wastes based on the search field and active filters.
+     * Handles the search/filtering of wastes based on the search field and active
+     * filters.
      */
     private void handleSearch() {
         String query = searchField.getText().toLowerCase().trim();

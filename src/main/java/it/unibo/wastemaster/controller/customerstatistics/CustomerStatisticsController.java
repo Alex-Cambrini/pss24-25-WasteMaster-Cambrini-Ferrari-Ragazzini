@@ -1,15 +1,14 @@
 package it.unibo.wastemaster.controller.customerstatistics;
 
+import it.unibo.wastemaster.domain.model.Collection;
 import it.unibo.wastemaster.domain.model.Customer;
 import it.unibo.wastemaster.domain.model.Invoice;
-import it.unibo.wastemaster.domain.model.Collection;
+import it.unibo.wastemaster.domain.service.CollectionManager;
 import it.unibo.wastemaster.domain.service.CustomerManager;
 import it.unibo.wastemaster.domain.service.InvoiceManager;
-import it.unibo.wastemaster.domain.service.CollectionManager;
+import java.util.List;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
-
-import java.util.List;
 
 /**
  * Controller for displaying statistics related to a specific customer,
@@ -17,12 +16,23 @@ import java.util.List;
  */
 public class CustomerStatisticsController {
 
-    @FXML private Label customerNameLabel;
-    @FXML private Label totalInvoicesLabel;
-    @FXML private Label totalCollectionsLabel;
-    @FXML private Label totalAmountLabel;
-    @FXML private Label unpaidAmountLabel;
-    @FXML private Label paidAmountLabel;
+    @FXML
+    private Label customerNameLabel;
+
+    @FXML
+    private Label totalInvoicesLabel;
+
+    @FXML
+    private Label totalCollectionsLabel;
+
+    @FXML
+    private Label totalAmountLabel;
+
+    @FXML
+    private Label unpaidAmountLabel;
+
+    @FXML
+    private Label paidAmountLabel;
 
     private CustomerManager customerManager;
     private InvoiceManager invoiceManager;
@@ -57,7 +67,8 @@ public class CustomerStatisticsController {
     }
 
     /**
-     * Sets the customer for which statistics are displayed and updates the statistics view.
+     * Sets the customer for which statistics are displayed and updates the statistics
+     * view.
      *
      * @param customer the customer to display statistics for
      */
@@ -85,12 +96,12 @@ public class CustomerStatisticsController {
         customerNameLabel.setText(customer.getName() + " " + customer.getSurname());
 
         List<Invoice> invoices = invoiceManager.getAllInvoices().stream()
-            .filter(inv -> inv.getCustomer().equals(customer))
-            .toList();
+                .filter(inv -> inv.getCustomer().equals(customer))
+                .toList();
 
         List<Collection> collections = collectionManager.getAllCollections().stream()
-            .filter(c -> c.getSchedule().getCustomer().equals(customer))
-            .toList();
+                .filter(c -> c.getSchedule().getCustomer().equals(customer))
+                .toList();
 
         totalInvoicesLabel.setText(String.valueOf(invoices.size()));
         totalCollectionsLabel.setText(String.valueOf(collections.size()));
@@ -98,13 +109,14 @@ public class CustomerStatisticsController {
         totalAmountLabel.setText(String.format("%.2f €", totalAmount));
 
         double unpaidAmount = invoices.stream()
-            .filter(inv -> !inv.getPaymentStatus().toString().equalsIgnoreCase("PAID"))
-            .mapToDouble(Invoice::getAmount)
-            .sum();
+                .filter(inv -> !inv.getPaymentStatus().toString()
+                        .equalsIgnoreCase("PAID"))
+                .mapToDouble(Invoice::getAmount)
+                .sum();
         double paidAmount = invoices.stream()
-            .filter(inv -> inv.getPaymentStatus().toString().equalsIgnoreCase("PAID"))
-            .mapToDouble(Invoice::getAmount)
-            .sum();
+                .filter(inv -> inv.getPaymentStatus().toString().equalsIgnoreCase("PAID"))
+                .mapToDouble(Invoice::getAmount)
+                .sum();
 
         unpaidAmountLabel.setText(String.format("%.2f €", unpaidAmount));
         paidAmountLabel.setText(String.format("%.2f €", paidAmount));

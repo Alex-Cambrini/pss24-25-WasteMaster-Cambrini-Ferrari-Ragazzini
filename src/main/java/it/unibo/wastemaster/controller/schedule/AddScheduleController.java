@@ -218,6 +218,7 @@ public final class AddScheduleController {
             public String toString(Frequency freq) {
                 return freq != null ? freq.name() : "";
             }
+
             @Override
             public Frequency fromString(String string) {
                 return null;

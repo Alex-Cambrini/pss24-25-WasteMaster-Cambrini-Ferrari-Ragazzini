@@ -50,9 +50,11 @@ public final class InvoiceController implements AutoRefreshable {
 
     private static final String TITLE_NO_SELECTION = "No Selection";
 
-    private final ObservableList<String> activeFilters = FXCollections.observableArrayList(
-            FILTER_ID, FILTER_CUSTOMER, FILTER_STATUS);
-    private final ObservableList<InvoiceRow> allInvoices = FXCollections.observableArrayList();
+    private final ObservableList<String> activeFilters =
+            FXCollections.observableArrayList(
+                    FILTER_ID, FILTER_CUSTOMER, FILTER_STATUS);
+    private final ObservableList<InvoiceRow> allInvoices =
+            FXCollections.observableArrayList();
     private Stage owner;
     private InvoiceManager invoiceManager;
     private CollectionManager collectionManager;
@@ -155,7 +157,8 @@ public final class InvoiceController implements AutoRefreshable {
      */
     @FXML
     public void initialize() {
-        owner = (Stage) MainLayoutController.getInstance().getRootPane().getScene().getWindow();
+        owner = (Stage) MainLayoutController.getInstance().getRootPane().getScene()
+                .getWindow();
 
         DateTimeFormatter TS_FMT = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 
@@ -165,21 +168,26 @@ public final class InvoiceController implements AutoRefreshable {
         statusColumn.setCellValueFactory(new PropertyValueFactory<>("status"));
         dateColumn.setCellValueFactory(new PropertyValueFactory<>("issueDate"));
         paymentDateColumn.setCellValueFactory(new PropertyValueFactory<>("paymentDate"));
-        serviceCountsColumn.setCellValueFactory(new PropertyValueFactory<>("serviceCounts"));
-        totalAmountsColumn.setCellValueFactory(new PropertyValueFactory<>("totalAmounts"));
+        serviceCountsColumn.setCellValueFactory(
+                new PropertyValueFactory<>("serviceCounts"));
+        totalAmountsColumn.setCellValueFactory(
+                new PropertyValueFactory<>("totalAmounts"));
         isCancelledColumn.setCellValueFactory(new PropertyValueFactory<>("isCancelled"));
 
         java.util.function.Function<String, String> fmt = s -> {
-            if (s == null || s.isBlank())
+            if (s == null || s.isBlank()) {
                 return "";
+            }
             try {
                 return java.time.LocalDateTime.parse(s).format(TS_FMT);
             } catch (Exception e1) {
                 try {
-                    return java.time.OffsetDateTime.parse(s).toLocalDateTime().format(TS_FMT);
+                    return java.time.OffsetDateTime.parse(s).toLocalDateTime()
+                            .format(TS_FMT);
                 } catch (Exception e2) {
                     try {
-                        return java.time.ZonedDateTime.parse(s).toLocalDateTime().format(TS_FMT);
+                        return java.time.ZonedDateTime.parse(s).toLocalDateTime()
+                                .format(TS_FMT);
                     } catch (Exception e3) {
                         return s;
                     }
@@ -187,25 +195,28 @@ public final class InvoiceController implements AutoRefreshable {
             }
         };
 
-        dateColumn.setCellFactory(col -> new javafx.scene.control.TableCell<InvoiceRow, String>() {
-            @Override
-            protected void updateItem(String item, boolean empty) {
-                super.updateItem(item, empty);
-                setText(empty ? null : fmt.apply(item));
-            }
-        });
+        dateColumn.setCellFactory(
+                col -> new javafx.scene.control.TableCell<InvoiceRow, String>() {
+                    @Override
+                    protected void updateItem(String item, boolean empty) {
+                        super.updateItem(item, empty);
+                        setText(empty ? null : fmt.apply(item));
+                    }
+                });
 
-        paymentDateColumn.setCellFactory(col -> new javafx.scene.control.TableCell<InvoiceRow, String>() {
-            @Override
-            protected void updateItem(String item, boolean empty) {
-                super.updateItem(item, empty);
-                if (empty) {
-                    setText(null);
-                } else {
-                    setText((item == null || item.isBlank()) ? "-" : fmt.apply(item));
-                }
-            }
-        });
+        paymentDateColumn.setCellFactory(
+                col -> new javafx.scene.control.TableCell<InvoiceRow, String>() {
+                    @Override
+                    protected void updateItem(String item, boolean empty) {
+                        super.updateItem(item, empty);
+                        if (empty) {
+                            setText(null);
+                        } else {
+                            setText((item == null || item.isBlank()) ? "-" :
+                                    fmt.apply(item));
+                        }
+                    }
+                });
 
         searchField.textProperty().addListener((obs, oldText, newText) -> handleSearch());
 
@@ -217,15 +228,18 @@ public final class InvoiceController implements AutoRefreshable {
 
         if (showDeletedCheckBox != null) {
             showDeletedCheckBox.setSelected(false);
-            showDeletedCheckBox.selectedProperty().addListener((obs, o, n) -> handleSearch());
+            showDeletedCheckBox.selectedProperty()
+                    .addListener((obs, o, n) -> handleSearch());
         }
         if (showPaidCheckBox != null) {
             showPaidCheckBox.setSelected(true);
-            showPaidCheckBox.selectedProperty().addListener((obs, o, n) -> handleSearch());
+            showPaidCheckBox.selectedProperty()
+                    .addListener((obs, o, n) -> handleSearch());
         }
         if (showNotPaidCheckBox != null) {
             showNotPaidCheckBox.setSelected(true);
-            showNotPaidCheckBox.selectedProperty().addListener((obs, o, n) -> handleSearch());
+            showNotPaidCheckBox.selectedProperty()
+                    .addListener((obs, o, n) -> handleSearch());
         }
 
         invoiceTable.setRowFactory(tv -> new TableRow<InvoiceRow>() {
@@ -264,10 +278,12 @@ public final class InvoiceController implements AutoRefreshable {
      */
     @Override
     public void startAutoRefresh() {
-        if (refreshTimeline != null)
+        if (refreshTimeline != null) {
             return;
+        }
         refreshTimeline = new Timeline(
-                new KeyFrame(Duration.seconds(REFRESH_INTERVAL_SECONDS), e -> loadInvoices()));
+                new KeyFrame(Duration.seconds(REFRESH_INTERVAL_SECONDS),
+                        e -> loadInvoices()));
         refreshTimeline.setCycleCount(Timeline.INDEFINITE);
         refreshTimeline.play();
     }
@@ -287,8 +303,9 @@ public final class InvoiceController implements AutoRefreshable {
      * Loads all invoices from the database and updates the invoice table.
      */
     private void loadInvoices() {
-        if (AppContext.getCurrentAccount() == null)
+        if (AppContext.getCurrentAccount() == null) {
             return;
+        }
         allInvoices.clear();
         List<Invoice> invoices = invoiceManager.getAllInvoices();
         for (Invoice invoice : invoices) {
@@ -324,13 +341,14 @@ public final class InvoiceController implements AutoRefreshable {
     @FXML
     private void handleAddInvoice() {
         try {
-            Optional<AddInvoiceController> controllerOpt = DialogUtils.showModalWithController("Add Invoice",
-                    "/layouts/invoice/AddInvoiceView.fxml", owner, ctrl -> {
-                        ctrl.setCustomerManager(customerManager);
-                        ctrl.setCollectionManager(collectionManager);
-                        ctrl.setInvoiceManager(invoiceManager);
-                        ctrl.initData();
-                    });
+            Optional<AddInvoiceController> controllerOpt =
+                    DialogUtils.showModalWithController("Add Invoice",
+                            "/layouts/invoice/AddInvoiceView.fxml", owner, ctrl -> {
+                                ctrl.setCustomerManager(customerManager);
+                                ctrl.setCollectionManager(collectionManager);
+                                ctrl.setInvoiceManager(invoiceManager);
+                                ctrl.initData();
+                            });
 
             if (controllerOpt.isPresent()) {
                 loadInvoices();
@@ -343,15 +361,18 @@ public final class InvoiceController implements AutoRefreshable {
     }
 
     /**
-     * Handles the search/filtering of invoices based on the search field and filter checkboxes.
+     * Handles the search/filtering of invoices based on the search field and filter
+     * checkboxes.
      */
     @FXML
     private void handleSearch() {
         String query = searchField.getText().toLowerCase().trim();
 
-        boolean showDeleted = showDeletedCheckBox != null && showDeletedCheckBox.isSelected();
+        boolean showDeleted =
+                showDeletedCheckBox != null && showDeletedCheckBox.isSelected();
         boolean showPaid = showPaidCheckBox == null || showPaidCheckBox.isSelected();
-        boolean showUnpaid = showNotPaidCheckBox == null || showNotPaidCheckBox.isSelected();
+        boolean showUnpaid =
+                showNotPaidCheckBox == null || showNotPaidCheckBox.isSelected();
 
         boolean anyStatusSelected = showPaid || showUnpaid;
 
@@ -359,15 +380,19 @@ public final class InvoiceController implements AutoRefreshable {
 
         for (InvoiceRow row : allInvoices) {
             boolean matchesQuery = query.isEmpty()
-                    || (activeFilters.contains(FILTER_ID) && row.getId().toLowerCase().contains(query))
-                    || (activeFilters.contains(FILTER_CUSTOMER) && row.getCustomer().toLowerCase().contains(query))
-                    || (activeFilters.contains(FILTER_STATUS) && row.getStatus().toLowerCase().contains(query))
-                    || (activeFilters.contains(FILTER_AMOUNT) && row.getAmount().toLowerCase().contains(query));
+                    || (activeFilters.contains(FILTER_ID) && row.getId().toLowerCase()
+                    .contains(query))
+                    || (activeFilters.contains(FILTER_CUSTOMER) && row.getCustomer()
+                    .toLowerCase().contains(query))
+                    || (activeFilters.contains(FILTER_STATUS) && row.getStatus()
+                    .toLowerCase().contains(query))
+                    || (activeFilters.contains(FILTER_AMOUNT) && row.getAmount()
+                    .toLowerCase().contains(query));
 
             boolean isCancelled = "Yes".equalsIgnoreCase(row.getIsCancelled());
             String status = row.getStatus();
 
-            boolean matchesCancelled = showDeleted ? isCancelled : !isCancelled;
+            boolean matchesCancelled = showDeleted == isCancelled;
 
             boolean matchesStatus = !anyStatusSelected
                     || ("PAID".equalsIgnoreCase(status) && showPaid)
@@ -390,12 +415,15 @@ public final class InvoiceController implements AutoRefreshable {
         activeFilters.clear();
         activeFilters.addAll(FILTER_ID, FILTER_CUSTOMER, FILTER_STATUS);
 
-        if (showDeletedCheckBox != null)
+        if (showDeletedCheckBox != null) {
             showDeletedCheckBox.setSelected(false);
-        if (showPaidCheckBox != null)
+        }
+        if (showPaidCheckBox != null) {
             showPaidCheckBox.setSelected(true);
-        if (showNotPaidCheckBox != null)
+        }
+        if (showNotPaidCheckBox != null) {
             showNotPaidCheckBox.setSelected(true);
+        }
 
         loadInvoices();
     }
@@ -412,8 +440,8 @@ public final class InvoiceController implements AutoRefreshable {
             return;
         }
         filterMenu = new ContextMenu();
-        String[] fields = { FILTER_ID, FILTER_CUSTOMER, FILTER_STATUS };
-        String[] labels = { "ID", "Customer", "Status" };
+        String[] fields = {FILTER_ID, FILTER_CUSTOMER, FILTER_STATUS};
+        String[] labels = {"ID", "Customer", "Status"};
         for (int i = 0; i < fields.length; i++) {
             String key = fields[i];
             String label = labels[i];
@@ -447,8 +475,9 @@ public final class InvoiceController implements AutoRefreshable {
                     AppContext.getOwner());
             return;
         }
-        Optional<Invoice> invoiceOpt = invoiceManager.findInvoiceById(selected.getInvoice()
-                .getInvoiceId());
+        Optional<Invoice> invoiceOpt =
+                invoiceManager.findInvoiceById(selected.getInvoice()
+                        .getInvoiceId());
         if (invoiceOpt.isEmpty()) {
             DialogUtils.showError("Not Found", "Invoice not found.",
                     AppContext.getOwner());
@@ -463,9 +492,10 @@ public final class InvoiceController implements AutoRefreshable {
         }
         try {
             MainLayoutController.getInstance().setPageTitle("Associated Collections");
-            it.unibo.wastemaster.controller.collection.CollectionController controller = MainLayoutController
-                    .getInstance().loadCenterWithController(
-                            "/layouts/collection/CollectionView.fxml");
+            it.unibo.wastemaster.controller.collection.CollectionController controller =
+                    MainLayoutController
+                            .getInstance().loadCenterWithController(
+                                    "/layouts/collection/CollectionView.fxml");
             controller.setCollections(collections);
         } catch (Exception e) {
             DialogUtils.showError("Navigation error", "Could not load Collection view.",
@@ -503,32 +533,40 @@ public final class InvoiceController implements AutoRefreshable {
     private void handleExportPdf() {
         InvoiceRow selected = invoiceTable.getSelectionModel().getSelectedItem();
         if (selected == null) {
-            DialogUtils.showError("No Selection", "Please select an invoice to export.", AppContext.getOwner());
+            DialogUtils.showError("No Selection", "Please select an invoice to export.",
+                    AppContext.getOwner());
             return;
         }
 
-        Optional<Invoice> invoiceOpt = invoiceManager.findInvoiceById(selected.getInvoice().getInvoiceId());
+        Optional<Invoice> invoiceOpt =
+                invoiceManager.findInvoiceById(selected.getInvoice().getInvoiceId());
         if (invoiceOpt.isEmpty()) {
-            DialogUtils.showError("Not Found", "Invoice not found.", AppContext.getOwner());
+            DialogUtils.showError("Not Found", "Invoice not found.",
+                    AppContext.getOwner());
             return;
         }
 
         Invoice invoice = invoiceOpt.get();
-        java.nio.file.Path outputPath = java.nio.file.Paths.get("invoice-" + invoice.getInvoiceId() + ".pdf");
+        java.nio.file.Path outputPath =
+                java.nio.file.Paths.get("invoice-" + invoice.getInvoiceId() + ".pdf");
         java.io.File file = outputPath.toFile();
 
         if (file.exists() && !file.renameTo(file)) {
-            DialogUtils.showError("File in use", "The PDF is already open in another program. Close it and try again.",
+            DialogUtils.showError("File in use",
+                    "The PDF is already open in another program. Close it and try again.",
                     AppContext.getOwner());
             return;
         }
 
         try (java.io.FileOutputStream fos = new java.io.FileOutputStream(file)) {
-            new it.unibo.wastemaster.infrastructure.pdf.InvoicePdfService().generateInvoicePdf(invoice, fos);
-            DialogUtils.showSuccess("PDF generated: " + outputPath.toAbsolutePath(), AppContext.getOwner());
+            new it.unibo.wastemaster.infrastructure.pdf.InvoicePdfService().generateInvoicePdf(
+                    invoice, fos);
+            DialogUtils.showSuccess("PDF generated: " + outputPath.toAbsolutePath(),
+                    AppContext.getOwner());
         } catch (Exception e) {
             e.printStackTrace();
-            DialogUtils.showError("Export Error", "Could not generate PDF.", AppContext.getOwner());
+            DialogUtils.showError("Export Error", "Could not generate PDF.",
+                    AppContext.getOwner());
         }
     }
 
@@ -562,7 +600,8 @@ public final class InvoiceController implements AutoRefreshable {
     }
 
     /**
-     * Handles the action to view statistics for the customer associated with the selected invoice.
+     * Handles the action to view statistics for the customer associated with the
+     * selected invoice.
      *
      * @param event the action event
      */
@@ -570,26 +609,29 @@ public final class InvoiceController implements AutoRefreshable {
     private void handleViewCustomer(ActionEvent event) {
         InvoiceRow selectedRow = invoiceTable.getSelectionModel().getSelectedItem();
         if (selectedRow == null) {
-            DialogUtils.showError("No Selection", "Please select an invoice.", AppContext.getOwner());
+            DialogUtils.showError("No Selection", "Please select an invoice.",
+                    AppContext.getOwner());
             return;
         }
         Customer customer = selectedRow.getInvoice().getCustomer();
 
         try {
-            Optional<CustomerStatisticsController> controllerOpt = DialogUtils.showModalWithController(
-                    "Customer Statistics",
-                    "/layouts/customerstatistics/CustomerStatisticsView.fxml",
-                    AppContext.getOwner(),
-                    ctrl -> {
-                        ctrl.setCustomerManager(customerManager);
-                        ctrl.setInvoiceManager(invoiceManager);
-                        ctrl.setCollectionManager(collectionManager);
-                        ctrl.setCustomer(customer);
-                    });
+            Optional<CustomerStatisticsController> controllerOpt =
+                    DialogUtils.showModalWithController(
+                            "Customer Statistics",
+                            "/layouts/customerstatistics/CustomerStatisticsView.fxml",
+                            AppContext.getOwner(),
+                            ctrl -> {
+                                ctrl.setCustomerManager(customerManager);
+                                ctrl.setInvoiceManager(invoiceManager);
+                                ctrl.setCollectionManager(collectionManager);
+                                ctrl.setCustomer(customer);
+                            });
 
         } catch (IOException e) {
             e.printStackTrace();
-            DialogUtils.showError("Loading Error", "Could not load Customer Statistics dialog.", AppContext.getOwner());
+            DialogUtils.showError("Loading Error",
+                    "Could not load Customer Statistics dialog.", AppContext.getOwner());
         }
     }
 }

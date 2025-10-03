@@ -1,44 +1,60 @@
 package it.unibo.wastemaster.controller.invoice;
 
-import it.unibo.wastemaster.domain.model.Customer;
 import it.unibo.wastemaster.domain.model.Collection;
+import it.unibo.wastemaster.domain.model.Customer;
 import it.unibo.wastemaster.domain.service.CollectionManager;
 import it.unibo.wastemaster.domain.service.CustomerManager;
 import it.unibo.wastemaster.domain.service.InvoiceManager;
 import it.unibo.wastemaster.viewmodels.CollectionRow;
+import java.util.List;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
 import javafx.scene.control.cell.CheckBoxTableCell;
-import javafx.scene.control.*;
-
-import java.util.List;
 
 /**
- * Controller for the Add Invoice modal view. Handles selection of customer and collections,
+ * Controller for the Add Invoice modal view. Handles selection of customer and
+ * collections,
  * and creation of a new invoice.
  */
 public class AddInvoiceController {
 
     @FXML
     private ComboBox<Customer> customerCombo;
+
     @FXML
     private CheckBox selectAllCheck;
+
     @FXML
     private TableView<CollectionRow> collectionsTable;
+
     @FXML
     private TableColumn<CollectionRow, Boolean> selectCol;
+
     @FXML
     private TableColumn<CollectionRow, Integer> idCol;
+
     @FXML
     private TableColumn<CollectionRow, String> dateCol;
+
     @FXML
     private TableColumn<CollectionRow, String> scheduleCol;
+
     @FXML
     private Label selectedCountField;
+
     @FXML
     private Button cancelButton;
+
     @FXML
     private Button saveButton;
 
@@ -48,7 +64,8 @@ public class AddInvoiceController {
     private boolean updatingFromSelectAll = false;
     private boolean updatingFromRows = false;
 
-    private ObservableList<CollectionRow> availableCollections = FXCollections.observableArrayList();
+    private final ObservableList<CollectionRow> availableCollections =
+            FXCollections.observableArrayList();
 
     /**
      * Initializes the controller, setting up table, buttons, and listeners.
@@ -98,16 +115,18 @@ public class AddInvoiceController {
     private void setupCustomerCombo() {
         List<Customer> activeCustomers = customerManager.getAllActiveCustomers();
         customerCombo.setItems(FXCollections.observableArrayList(activeCustomers));
-        customerCombo.getSelectionModel().selectedItemProperty().addListener((obs, old, newCustomer) -> {
-            loadCollectionsForCustomer(newCustomer);
-        });
+        customerCombo.getSelectionModel().selectedItemProperty()
+                .addListener((obs, old, newCustomer) -> {
+                    loadCollectionsForCustomer(newCustomer);
+                });
     }
 
     private void loadCollectionsForCustomer(Customer customer) {
         availableCollections.clear();
 
         if (customer != null) {
-            List<Collection> collections = collectionManager.getCompletedNotBilledCollections(customer);
+            List<Collection> collections =
+                    collectionManager.getCompletedNotBilledCollections(customer);
             for (Collection c : collections) {
                 CollectionRow row = new CollectionRow(c);
                 row.selectedProperty().addListener((obs, old, newVal) -> {
@@ -130,8 +149,10 @@ public class AddInvoiceController {
             return;
         }
 
-        boolean allSelected = availableCollections.stream().allMatch(CollectionRow::isSelected);
-        boolean noneSelected = availableCollections.stream().noneMatch(CollectionRow::isSelected);
+        boolean allSelected =
+                availableCollections.stream().allMatch(CollectionRow::isSelected);
+        boolean noneSelected =
+                availableCollections.stream().noneMatch(CollectionRow::isSelected);
 
         updatingFromRows = true;
         if (allSelected) {
@@ -151,10 +172,13 @@ public class AddInvoiceController {
         collectionsTable.setItems(availableCollections);
 
         selectCol.setCellValueFactory(cell -> cell.getValue().selectedProperty());
-        idCol.setCellValueFactory(cell -> new ReadOnlyObjectWrapper<>(cell.getValue().getId()));
+        idCol.setCellValueFactory(
+                cell -> new ReadOnlyObjectWrapper<>(cell.getValue().getId()));
         dateCol.setCellValueFactory(
-                cell -> new ReadOnlyObjectWrapper<>(cell.getValue().getCollectionDate().toString()));
-        scheduleCol.setCellValueFactory(cell -> new ReadOnlyObjectWrapper<>(cell.getValue().getZone()));
+                cell -> new ReadOnlyObjectWrapper<>(
+                        cell.getValue().getCollectionDate().toString()));
+        scheduleCol.setCellValueFactory(
+                cell -> new ReadOnlyObjectWrapper<>(cell.getValue().getZone()));
 
         collectionsTable.setEditable(true);
         selectCol.setEditable(true);
@@ -200,7 +224,8 @@ public class AddInvoiceController {
     }
 
     /**
-     * Handles the save action, creating a new invoice for the selected customer and collections.
+     * Handles the save action, creating a new invoice for the selected customer and
+     * collections.
      */
     @FXML
     private void handleSaveInvoice() {

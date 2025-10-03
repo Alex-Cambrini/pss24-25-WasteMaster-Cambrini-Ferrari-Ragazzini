@@ -44,9 +44,11 @@ public final class EmployeeController implements AutoRefreshable {
     private static final String FILTER_CREATION_DATE = "creationDate";
     private static final int REFRESH_INTERVAL_SECONDS = 30;
     private static final String ERROR_NAVIGATION = "Navigation error";
-    private final ObservableList<EmployeeRow> allEmployees = FXCollections.observableArrayList();
-    private final ObservableList<String> activeFilters = FXCollections.observableArrayList(FILTER_NAME, FILTER_SURNAME,
-            FILTER_EMAIL, FILTER_ROLE, FILTER_LICENCE, FILTER_LOCATION);
+    private final ObservableList<EmployeeRow> allEmployees =
+            FXCollections.observableArrayList();
+    private final ObservableList<String> activeFilters =
+            FXCollections.observableArrayList(FILTER_NAME, FILTER_SURNAME,
+                    FILTER_EMAIL, FILTER_ROLE, FILTER_LICENCE, FILTER_LOCATION);
     private Timeline refreshTimeline;
     private ContextMenu filterMenu;
     private Stage owner;
@@ -105,14 +107,16 @@ public final class EmployeeController implements AutoRefreshable {
      */
     @FXML
     public void initialize() {
-        owner = (Stage) MainLayoutController.getInstance().getRootPane().getScene().getWindow();
+        owner = (Stage) MainLayoutController.getInstance().getRootPane().getScene()
+                .getWindow();
 
         nameColumn.setCellValueFactory(new PropertyValueFactory<>(FILTER_NAME));
         surnameColumn.setCellValueFactory(new PropertyValueFactory<>(FILTER_SURNAME));
         emailColumn.setCellValueFactory(new PropertyValueFactory<>(FILTER_EMAIL));
         roleColumn.setCellValueFactory(new PropertyValueFactory<>(FILTER_ROLE));
         licenceColumn.setCellValueFactory(new PropertyValueFactory<>(FILTER_LICENCE));
-        creationDateColumn.setCellValueFactory(new PropertyValueFactory<>(FILTER_CREATION_DATE));
+        creationDateColumn.setCellValueFactory(
+                new PropertyValueFactory<>(FILTER_CREATION_DATE));
 
         roleColumn.setCellFactory(column -> new TableCell<EmployeeRow, Role>() {
             @Override
@@ -204,7 +208,8 @@ public final class EmployeeController implements AutoRefreshable {
     }
 
     /**
-     * Handles the search action, filtering the employee table based on the query and active filters.
+     * Handles the search action, filtering the employee table based on the query and
+     * active filters.
      */
     @FXML
     private void handleSearch() {
@@ -221,17 +226,17 @@ public final class EmployeeController implements AutoRefreshable {
             if ((activeFilters.contains(FILTER_NAME)
                     && row.getName().toLowerCase().contains(query))
                     || (activeFilters.contains(FILTER_SURNAME)
-                            && row.getSurname().toLowerCase().contains(query))
+                    && row.getSurname().toLowerCase().contains(query))
                     || (activeFilters.contains(FILTER_EMAIL)
-                            && row.getEmail().toLowerCase().contains(query))
+                    && row.getEmail().toLowerCase().contains(query))
                     || (activeFilters.contains(FILTER_ROLE)
-                            && formatEnumOrNone(row.getRole()).toLowerCase()
-                                    .contains(query))
+                    && formatEnumOrNone(row.getRole()).toLowerCase()
+                    .contains(query))
                     || (activeFilters.contains(FILTER_LICENCE)
-                            && formatEnumOrNone(row.getLicence()).toLowerCase()
-                                    .contains(query))
+                    && formatEnumOrNone(row.getLicence()).toLowerCase()
+                    .contains(query))
                     || (activeFilters.contains(FILTER_LOCATION)
-                            && row.getFullLocation().toLowerCase().contains(query))) {
+                    && row.getFullLocation().toLowerCase().contains(query))) {
 
                 filtered.add(row);
             }
@@ -261,7 +266,8 @@ public final class EmployeeController implements AutoRefreshable {
             return;
         }
 
-        Optional<Employee> employeeOpt = employeeManager.findEmployeeByEmail(selected.getEmail());
+        Optional<Employee> employeeOpt =
+                employeeManager.findEmployeeByEmail(selected.getEmail());
         if (employeeOpt.isEmpty()) {
             DialogUtils.showError("Not Found",
                     "The selected employee could not be found.", owner);
@@ -285,11 +291,12 @@ public final class EmployeeController implements AutoRefreshable {
     @FXML
     private void handleAddEmployee() {
         try {
-            Optional<AddEmployeeController> controllerOpt = DialogUtils.showModalWithController("Add Employee",
-                    "/layouts/employee/AddEmployeeView.fxml", owner,
-                    ctrl -> {
-                        ctrl.setEmployeeManager(employeeManager);
-                    });
+            Optional<AddEmployeeController> controllerOpt =
+                    DialogUtils.showModalWithController("Add Employee",
+                            "/layouts/employee/AddEmployeeView.fxml", owner,
+                            ctrl -> {
+                                ctrl.setEmployeeManager(employeeManager);
+                            });
 
             if (controllerOpt.isPresent()) {
                 loadEmployee();
@@ -315,7 +322,8 @@ public final class EmployeeController implements AutoRefreshable {
             return;
         }
 
-        Optional<Employee> employeeOpt = employeeManager.findEmployeeByEmail(selected.getEmail());
+        Optional<Employee> employeeOpt =
+                employeeManager.findEmployeeByEmail(selected.getEmail());
         if (employeeOpt.isEmpty()) {
             DialogUtils.showError("Not Found",
                     "Employee not found.", owner);
@@ -324,12 +332,13 @@ public final class EmployeeController implements AutoRefreshable {
 
         Employee employee = employeeOpt.get();
         try {
-            Optional<EditEmployeeController> controllerOpt = DialogUtils.showModalWithController("Edit Employee",
-                    "/layouts/employee/EditEmployeeView.fxml", owner,
-                    ctrl -> {
-                        ctrl.setEmployeeToEdit(employee);
-                        ctrl.setEmployeeManager(employeeManager);
-                    });
+            Optional<EditEmployeeController> controllerOpt =
+                    DialogUtils.showModalWithController("Edit Employee",
+                            "/layouts/employee/EditEmployeeView.fxml", owner,
+                            ctrl -> {
+                                ctrl.setEmployeeToEdit(employee);
+                                ctrl.setEmployeeManager(employeeManager);
+                            });
 
             if (controllerOpt.isPresent()) {
                 loadEmployee();
@@ -368,9 +377,9 @@ public final class EmployeeController implements AutoRefreshable {
 
         filterMenu = new ContextMenu();
 
-        String[] fields = { FILTER_NAME, FILTER_SURNAME, FILTER_EMAIL, FILTER_ROLE,
-                FILTER_LICENCE, FILTER_LOCATION };
-        String[] labels = { "Name", "Surname", "Email", "Role", "Licence", "Location" };
+        String[] fields = {FILTER_NAME, FILTER_SURNAME, FILTER_EMAIL, FILTER_ROLE,
+                FILTER_LICENCE, FILTER_LOCATION};
+        String[] labels = {"Name", "Surname", "Email", "Role", "Licence", "Location"};
 
         for (int i = 0; i < fields.length; i++) {
             String key = fields[i];
@@ -380,8 +389,8 @@ public final class EmployeeController implements AutoRefreshable {
             checkBox.setSelected(activeFilters.contains(key));
 
             checkBox.selectedProperty().addListener((obs,
-                    wasSelected,
-                    isSelected) -> {
+                                                     wasSelected,
+                                                     isSelected) -> {
                 if (isSelected != null && isSelected) {
                     if (!activeFilters.contains(key)) {
                         activeFilters.add(key);

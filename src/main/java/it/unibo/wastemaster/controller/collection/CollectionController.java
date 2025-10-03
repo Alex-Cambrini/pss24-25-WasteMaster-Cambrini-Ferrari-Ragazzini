@@ -26,6 +26,9 @@ import javafx.scene.control.cell.PropertyValueFactory;
  */
 public final class CollectionController {
 
+    private final ObservableList<CollectionRow> allSchedules =
+            FXCollections.observableArrayList();
+
     @FXML
     private Label totalLabel;
 
@@ -64,10 +67,6 @@ public final class CollectionController {
 
     @FXML
     private CheckBox showActiveCheckBox;
-
-    private final ObservableList<CollectionRow> allSchedules =
-            FXCollections.observableArrayList();
-
     private CollectionManager collectionManager;
     private OneTimeScheduleManager oneTimeScheduleManager;
     private RecurringScheduleManager recurringScheduleManager;
@@ -209,8 +208,6 @@ public final class CollectionController {
         }
     }
 
-    
-
     private void loadCollections() {
         if (collections == null) {
             return;
@@ -234,7 +231,7 @@ public final class CollectionController {
                 case CANCELLED -> cancelled++;
                 case ACTIVE -> active++;
                 default -> {
-                    
+
                 }
             }
         }

@@ -26,7 +26,8 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.util.Duration;
 
 /**
- * Controller for managing the customers view, including search, filters and CRUD operations.
+ * Controller for managing the customers view, including search, filters and CRUD
+ * operations.
  */
 public final class CustomersController implements AutoRefreshable {
 
@@ -37,9 +38,11 @@ public final class CustomersController implements AutoRefreshable {
     private static final String FIELD_CREATION_DATE = "creationDate";
     private static final String NAVIGATION_ERROR = "Navigation error";
     private static final int REFRESH_SECONDS = 30;
-    private final ObservableList<CustomerRow> allCustomers = FXCollections.observableArrayList();
-    private final ObservableList<String> activeFilters = FXCollections.observableArrayList(FIELD_NAME, FIELD_SURNAME,
-            FIELD_EMAIL, FILTER_LOCATION);
+    private final ObservableList<CustomerRow> allCustomers =
+            FXCollections.observableArrayList();
+    private final ObservableList<String> activeFilters =
+            FXCollections.observableArrayList(FIELD_NAME, FIELD_SURNAME,
+                    FIELD_EMAIL, FILTER_LOCATION);
     private CustomerManager customerManager;
     private Timeline refreshTimeline;
     private ContextMenu filterMenu;
@@ -97,7 +100,8 @@ public final class CustomersController implements AutoRefreshable {
         locationColumn.setText("Location");
         locationColumn.setCellValueFactory(cellData -> new SimpleStringProperty(
                 cellData.getValue().getFullLocation()));
-        creationDateColumn.setCellValueFactory(new PropertyValueFactory<>(FIELD_CREATION_DATE));
+        creationDateColumn.setCellValueFactory(
+                new PropertyValueFactory<>(FIELD_CREATION_DATE));
         searchField.textProperty().addListener((obs, oldText, newText) -> handleSearch());
         customerTable.getSelectionModel().selectedItemProperty()
                 .addListener((obs, oldVal, newVal) -> {
@@ -119,8 +123,9 @@ public final class CustomersController implements AutoRefreshable {
      */
     @Override
     public void startAutoRefresh() {
-        if (refreshTimeline != null)
+        if (refreshTimeline != null) {
             return;
+        }
         refreshTimeline = new Timeline(new KeyFrame(
                 Duration.seconds(REFRESH_SECONDS),
                 event -> loadCustomers()));
@@ -161,11 +166,12 @@ public final class CustomersController implements AutoRefreshable {
     @FXML
     private void handleAddCustomer() {
         try {
-            Optional<AddCustomerController> controllerOpt = DialogUtils.showModalWithController("Add Customer",
-                    "/layouts/customer/AddCustomerView.fxml",
-                    AppContext.getOwner(), ctrl -> {
-                        ctrl.setCustomerManager(customerManager);
-                    });
+            Optional<AddCustomerController> controllerOpt =
+                    DialogUtils.showModalWithController("Add Customer",
+                            "/layouts/customer/AddCustomerView.fxml",
+                            AppContext.getOwner(), ctrl -> {
+                                ctrl.setCustomerManager(customerManager);
+                            });
             if (controllerOpt.isPresent()) {
                 loadCustomers();
             }
@@ -197,7 +203,8 @@ public final class CustomersController implements AutoRefreshable {
             return;
         }
 
-        Optional<Customer> customerOpt = customerManager.findCustomerByEmail(selected.getEmail());
+        Optional<Customer> customerOpt =
+                customerManager.findCustomerByEmail(selected.getEmail());
         if (customerOpt.isEmpty()) {
             DialogUtils.showError("Not Found",
                     "The selected customer could not be found.", AppContext.getOwner());
@@ -227,7 +234,8 @@ public final class CustomersController implements AutoRefreshable {
             return;
         }
 
-        Optional<Customer> customer = customerManager.findCustomerByEmail(selected.getEmail());
+        Optional<Customer> customer =
+                customerManager.findCustomerByEmail(selected.getEmail());
         if (customer.isEmpty()) {
             DialogUtils.showError("Not Found", "Customer not found.",
                     AppContext.getOwner());
@@ -235,13 +243,14 @@ public final class CustomersController implements AutoRefreshable {
         }
 
         try {
-            Optional<EditCustomerController> controllerOpt = DialogUtils.showModalWithController("Edit Customer",
-                    "/layouts/customer/EditCustomerView.fxml",
-                    AppContext.getOwner(), ctrl -> {
-                        ctrl.setCustomerToEdit(customer.get());
-                        ctrl.setCustomerController(this);
-                        ctrl.setCustomerManager(customerManager);
-                    });
+            Optional<EditCustomerController> controllerOpt =
+                    DialogUtils.showModalWithController("Edit Customer",
+                            "/layouts/customer/EditCustomerView.fxml",
+                            AppContext.getOwner(), ctrl -> {
+                                ctrl.setCustomerToEdit(customer.get());
+                                ctrl.setCustomerController(this);
+                                ctrl.setCustomerManager(customerManager);
+                            });
 
             controllerOpt.ifPresent(ctrl -> loadCustomers());
         } catch (Exception e) {
@@ -275,11 +284,11 @@ public final class CustomersController implements AutoRefreshable {
         return (activeFilters.contains(FIELD_NAME)
                 && row.getName().toLowerCase().contains(query))
                 || (activeFilters.contains(FIELD_SURNAME)
-                        && row.getSurname().toLowerCase().contains(query))
+                && row.getSurname().toLowerCase().contains(query))
                 || (activeFilters.contains(FIELD_EMAIL)
-                        && row.getEmail().toLowerCase().contains(query))
+                && row.getEmail().toLowerCase().contains(query))
                 || (activeFilters.contains(FILTER_LOCATION)
-                        && row.getFullLocation().toLowerCase().contains(query));
+                && row.getFullLocation().toLowerCase().contains(query));
     }
 
     /**
@@ -306,8 +315,8 @@ public final class CustomersController implements AutoRefreshable {
         }
 
         filterMenu = new ContextMenu();
-        String[] fields = { FIELD_NAME, FIELD_SURNAME, FIELD_EMAIL, FILTER_LOCATION };
-        String[] labels = { "Name", "Surname", "Email", "Location" };
+        String[] fields = {FIELD_NAME, FIELD_SURNAME, FIELD_EMAIL, FILTER_LOCATION};
+        String[] labels = {"Name", "Surname", "Email", "Location"};
 
         for (int i = 0; i < fields.length; i++) {
             String key = fields[i];

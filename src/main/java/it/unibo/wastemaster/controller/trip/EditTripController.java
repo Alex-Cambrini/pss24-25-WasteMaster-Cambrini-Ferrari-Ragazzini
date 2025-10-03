@@ -15,7 +15,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ReadOnlyStringWrapper;
@@ -37,6 +36,10 @@ import javafx.scene.control.cell.CheckBoxTableCell;
  */
 public final class EditTripController {
 
+    private final ObservableList<Employee> operatorItems =
+            FXCollections.observableArrayList();
+    private final Map<Integer, BooleanProperty> selectedById = new HashMap<>();
+    private final IntegerProperty seatCapacity = new SimpleIntegerProperty(0);
     private Trip tripToEdit;
     private TripController tripController;
     private TripManager tripManager;
@@ -44,30 +47,36 @@ public final class EditTripController {
 
     @FXML
     private Label departureDateTime;
+
     @FXML
     private Label returnDateTime;
+
     @FXML
     private Label postalCodeLabel;
+
     @FXML
     private ComboBox<Vehicle> vehicleCombo;
+
     @FXML
     private ComboBox<Employee> driverCombo;
+
     @FXML
     private TableView<Employee> operatorsTable;
+
     @FXML
     private TableColumn<Employee, Boolean> opSelectCol;
+
     @FXML
     private TableColumn<Employee, String> opNameCol;
+
     @FXML
     private TableColumn<Employee, String> opRoleCol;
+
     @FXML
     private TableColumn<Employee, String> opLicCol;
+
     @FXML
     private Label operatorsHint;
-
-    private final ObservableList<Employee> operatorItems = FXCollections.observableArrayList();
-    private final Map<Integer, BooleanProperty> selectedById = new HashMap<>();
-    private final IntegerProperty seatCapacity = new SimpleIntegerProperty(0);
 
     /**
      * Sets the trip manager used for updating trips.
@@ -119,11 +128,13 @@ public final class EditTripController {
         opSelectCol.setEditable(true);
 
         opNameCol.setCellValueFactory(
-                cd -> new ReadOnlyStringWrapper(cd.getValue().getName() + " " + cd.getValue().getSurname()));
+                cd -> new ReadOnlyStringWrapper(
+                        cd.getValue().getName() + " " + cd.getValue().getSurname()));
         opRoleCol.setCellValueFactory(
                 cd -> new ReadOnlyStringWrapper(String.valueOf(cd.getValue().getRole())));
         opLicCol.setCellValueFactory(
-                cd -> new ReadOnlyStringWrapper(String.valueOf(cd.getValue().getLicence())));
+                cd -> new ReadOnlyStringWrapper(
+                        String.valueOf(cd.getValue().getLicence())));
 
         operatorsTable.setItems(operatorItems);
         operatorsTable.setEditable(true);
@@ -139,8 +150,9 @@ public final class EditTripController {
     }
 
     private void populateFields() {
-        if (tripToEdit == null)
+        if (tripToEdit == null) {
             return;
+        }
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
         departureDateTime.setText(tripToEdit.getDepartureTime().format(formatter));
@@ -177,11 +189,13 @@ public final class EditTripController {
 
         selectedById.values().forEach(p -> p.set(false));
         if (tripToEdit.getOperators().size() > 1) {
-            List<Employee> previousOperators = tripToEdit.getOperators().subList(1, tripToEdit.getOperators().size());
+            List<Employee> previousOperators = tripToEdit.getOperators()
+                    .subList(1, tripToEdit.getOperators().size());
             for (Employee op : previousOperators) {
                 BooleanProperty prop = selectedById.get(op.getEmployeeId());
-                if (prop != null)
+                if (prop != null) {
                     prop.set(true);
+                }
             }
         }
         enforceSeatLimit();
@@ -189,16 +203,21 @@ public final class EditTripController {
         operatorsTable.refresh();
     }
 
-    private void updateAvailableVehicles(LocalDate dep, LocalDate ret, int depHour, int retHour) {
-        if (tripManager == null)
+    private void updateAvailableVehicles(LocalDate dep, LocalDate ret, int depHour,
+                                         int retHour) {
+        if (tripManager == null) {
             return;
+        }
 
         Vehicle currentVehicle = tripToEdit.getAssignedVehicle();
-        List<Vehicle> allVehicles = tripManager.getAvailableVehicles(dep.atTime(depHour, 0), ret.atTime(retHour, 0));
+        List<Vehicle> allVehicles =
+                tripManager.getAvailableVehicles(dep.atTime(depHour, 0),
+                        ret.atTime(retHour, 0));
         List<Vehicle> filteredVehicles = new ArrayList<>();
         for (Vehicle v : allVehicles) {
             if (v.getRequiredLicence().equals(currentVehicle.getRequiredLicence())
-                    && v.getRequiredOperators() == currentVehicle.getRequiredOperators()) {
+                    && v.getRequiredOperators()
+                    == currentVehicle.getRequiredOperators()) {
                 filteredVehicles.add(v);
             }
         }
@@ -211,18 +230,21 @@ public final class EditTripController {
     }
 
     private void updateAvailableOperators() {
-        if (tripToEdit == null || tripManager == null)
+        if (tripToEdit == null || tripManager == null) {
             return;
+        }
 
         LocalDateTime depDateTime = tripToEdit.getDepartureTime();
         LocalDateTime retDateTime = tripToEdit.getExpectedReturnTime();
         Employee selectedDriver = driverCombo.getValue();
 
-        if (depDateTime == null || retDateTime == null)
+        if (depDateTime == null || retDateTime == null) {
             return;
+        }
 
         List<Employee> availableOperators = tripManager
-                .getAvailableOperatorsExcludeDriverToEdit(depDateTime, retDateTime, selectedDriver, tripToEdit);
+                .getAvailableOperatorsExcludeDriverToEdit(depDateTime, retDateTime,
+                        selectedDriver, tripToEdit);
 
         operatorItems.setAll(availableOperators);
         Map<Integer, Boolean> oldSelections = new HashMap<>();
@@ -240,19 +262,23 @@ public final class EditTripController {
     }
 
     private void updateAvailableDrivers() {
-        if (tripToEdit == null || tripManager == null)
+        if (tripToEdit == null || tripManager == null) {
             return;
+        }
 
         LocalDateTime depDateTime = tripToEdit.getDepartureTime();
         LocalDateTime retDateTime = tripToEdit.getExpectedReturnTime();
         Vehicle currentVehicle = vehicleCombo.getValue();
 
-        if (depDateTime == null || retDateTime == null || currentVehicle == null)
+        if (depDateTime == null || retDateTime == null || currentVehicle == null) {
             return;
+        }
 
-        List<Employee.Licence> allowedLicences = vehicleManager.getAllowedLicences(currentVehicle);
+        List<Employee.Licence> allowedLicences =
+                vehicleManager.getAllowedLicences(currentVehicle);
         List<Employee> availableDrivers = tripManager
-                .getQualifiedDriversToEdit(depDateTime, retDateTime, allowedLicences, tripToEdit);
+                .getQualifiedDriversToEdit(depDateTime, retDateTime, allowedLicences,
+                        tripToEdit);
 
         Employee currentDriver = driverCombo.getValue();
 
@@ -274,7 +300,8 @@ public final class EditTripController {
                 e.getEmployeeId(), k -> new SimpleBooleanProperty(false));
         p.addListener((obs, was, is) -> {
             if (is) {
-                long ops = selectedById.values().stream().filter(BooleanProperty::get).count();
+                long ops = selectedById.values().stream().filter(BooleanProperty::get)
+                        .count();
                 long total = ops + (driverCombo.getValue() != null ? 1 : 0);
                 if (seatCapacity.get() > 0 && total > seatCapacity.get()) {
                     p.set(false);
@@ -296,7 +323,8 @@ public final class EditTripController {
         int allowedOps = Math.max(0, cap - driverCount);
 
         var selected = operatorItems.stream()
-                .filter(e -> selectedById.getOrDefault(e.getEmployeeId(), new SimpleBooleanProperty(false)).get())
+                .filter(e -> selectedById.getOrDefault(e.getEmployeeId(),
+                        new SimpleBooleanProperty(false)).get())
                 .toList();
 
         if (selected.size() > allowedOps) {
@@ -313,8 +341,9 @@ public final class EditTripController {
     }
 
     private int getSeatCount(Vehicle v) {
-        if (v == null)
+        if (v == null) {
             return 0;
+        }
         return v.getRequiredOperators();
     }
 
@@ -338,12 +367,14 @@ public final class EditTripController {
             Employee selectedDriver = driverCombo.getValue();
 
             List<Employee> selectedOperators = operatorItems.stream()
-                    .filter(e -> selectedById.getOrDefault(e.getEmployeeId(), new SimpleBooleanProperty(false)).get())
+                    .filter(e -> selectedById.getOrDefault(e.getEmployeeId(),
+                            new SimpleBooleanProperty(false)).get())
                     .toList();
 
             List<Employee> newOperatorsList = new ArrayList<>();
-            if (selectedDriver != null)
+            if (selectedDriver != null) {
                 newOperatorsList.add(selectedDriver);
+            }
             newOperatorsList.addAll(selectedOperators);
 
             int totalPeople = newOperatorsList.size();
@@ -351,13 +382,15 @@ public final class EditTripController {
             if (required > 0) {
                 if (totalPeople < required) {
                     DialogUtils.showError("Validation error",
-                            "Not enough crew members selected (" + totalPeople + " / " + required + ").",
+                            "Not enough crew members selected (" + totalPeople + " / "
+                                    + required + ").",
                             AppContext.getOwner());
                     return;
                 }
                 if (totalPeople > required) {
                     DialogUtils.showError("Validation error",
-                            "Too many people for this vehicle (" + totalPeople + " / " + required + ").",
+                            "Too many people for this vehicle (" + totalPeople + " / "
+                                    + required + ").",
                             AppContext.getOwner());
                     return;
                 }
@@ -367,7 +400,8 @@ public final class EditTripController {
                     || !original.getOperators().equals(newOperatorsList);
 
             if (!changed) {
-                DialogUtils.showError("No changes", "No fields were modified.", AppContext.getOwner());
+                DialogUtils.showError("No changes", "No fields were modified.",
+                        AppContext.getOwner());
                 return;
             }
 
@@ -384,7 +418,8 @@ public final class EditTripController {
             DialogUtils.closeModal(event);
 
         } catch (IllegalArgumentException e) {
-            DialogUtils.showError("Validation error", e.getMessage(), AppContext.getOwner());
+            DialogUtils.showError("Validation error", e.getMessage(),
+                    AppContext.getOwner());
         }
     }
 

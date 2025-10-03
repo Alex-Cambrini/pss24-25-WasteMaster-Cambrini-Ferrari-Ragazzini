@@ -29,6 +29,11 @@ public class LoginController {
     private static final int WINDOW_HEIGHT = 700;
     private static final int MIN_WINDOW_WIDTH = 1000;
     private static final int MIN_WINDOW_HEIGHT = 700;
+    private final LoginManager loginManager =
+            AppContext.getServiceFactory().getLoginManager();
+    private final SVGPath eyeIcon = new SVGPath();
+    private final SVGPath eyeOffIcon = new SVGPath();
+    private final Rectangle clickArea = new Rectangle(24, 24);
 
     @FXML
     private TextField emailField;
@@ -44,15 +49,7 @@ public class LoginController {
 
     @FXML
     private StackPane togglePasswordIcon;
-
     private boolean passwordVisible = false;
-
-    private final LoginManager loginManager =
-            AppContext.getServiceFactory().getLoginManager();
-
-    private final SVGPath eyeIcon = new SVGPath();
-    private final SVGPath eyeOffIcon = new SVGPath();
-    private final Rectangle clickArea = new Rectangle(24, 24);
 
     /**
      * Initializes the controller class.
@@ -128,7 +125,6 @@ public class LoginController {
         clickArea.setFill(Color.TRANSPARENT);
         togglePasswordIcon.getChildren().addAll(clickArea, eyeIcon);
 
-
         passwordField.textProperty().addListener((newVal) -> {
             if (!passwordVisible) {
                 passwordTextField.setText(newVal.toString());
@@ -184,7 +180,8 @@ public class LoginController {
             } catch (Exception e) {
                 errorLabel.setText("Internal error occurred.");
                 errorLabel.setVisible(true);
-                Logger.getLogger(LoginController.class.getName()).log(Level.SEVERE, null, e);
+                Logger.getLogger(LoginController.class.getName())
+                        .log(Level.SEVERE, null, e);
             }
         } else {
             errorLabel.setText("Invalid email or password.");
