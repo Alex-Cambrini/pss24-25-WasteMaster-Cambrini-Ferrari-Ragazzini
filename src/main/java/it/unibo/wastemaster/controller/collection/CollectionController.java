@@ -26,7 +26,6 @@ import javafx.scene.control.cell.PropertyValueFactory;
  */
 public final class CollectionController {
 
-
     @FXML
     private Label totalLabel;
 
@@ -76,39 +75,71 @@ public final class CollectionController {
     private TripManager tripManager;
     private VehicleManager vehicleManager;
     private String previousPage;
+    private List<Collection> collections;
 
+    /**
+     * Sets the previous page identifier for navigation.
+     *
+     * @param previousPage the previous page identifier
+     */
     public void setPreviousPage(String previousPage) {
         this.previousPage = previousPage;
     }
 
+    /**
+     * Sets the schedule manager.
+     *
+     * @param scheduleManager the schedule manager to set
+     */
     public void setScheduleManager(ScheduleManager scheduleManager) {
         this.scheduleManager = scheduleManager;
     }
 
+    /**
+     * Sets the recurring schedule manager.
+     *
+     * @param recurringScheduleManager the recurring schedule manager to set
+     */
     public void setRecurringScheduleManager(
             RecurringScheduleManager recurringScheduleManager) {
         this.recurringScheduleManager = recurringScheduleManager;
     }
 
+    /**
+     * Sets the one-time schedule manager.
+     *
+     * @param oneTimeScheduleManager the one-time schedule manager to set
+     */
     public void setOneTimeScheduleManager(OneTimeScheduleManager oneTimeScheduleManager) {
         this.oneTimeScheduleManager = oneTimeScheduleManager;
     }
 
+    /**
+     * Sets the trip manager.
+     *
+     * @param tripManager the trip manager to set
+     */
     public void setTripManager(TripManager tripManager) {
         this.tripManager = tripManager;
     }
 
+    /**
+     * Sets the vehicle manager.
+     *
+     * @param vehicleManager the vehicle manager to set
+     */
     public void setVehicleManager(VehicleManager vehicleManager) {
         this.vehicleManager = vehicleManager;
     }
 
+    /**
+     * Sets the collection manager.
+     *
+     * @param collectionManager the collection manager to set
+     */
     public void setCollectionManager(CollectionManager collectionManager) {
         this.collectionManager = collectionManager;
     }
-
-
-
-        private List<Collection> collections;
 
     /**
      * Sets the list of collections and refreshes the table and statistics.
@@ -153,6 +184,33 @@ public final class CollectionController {
                 .addListener((obs, oldVal, newVal) -> refresh());
     }
 
+    /**
+     * Handles the back navigation based on the previous page.
+     */
+    @FXML
+    private void handleBack() {
+        if ("SCHEDULE".equals(previousPage)) {
+            MainLayoutController.getInstance().setPageTitle("Schedule Management");
+            ScheduleController controller = MainLayoutController.getInstance()
+                    .loadCenterWithController("/layouts/schedule/ScheduleView.fxml");
+            controller.setCollectionManager(collectionManager);
+            controller.setScheduleManager(scheduleManager);
+            controller.setOneTimeScheduleManager(oneTimeScheduleManager);
+            controller.setRecurringScheduleManager(recurringScheduleManager);
+            controller.initData();
+        } else if ("TRIP".equals(previousPage)) {
+            MainLayoutController.getInstance().setPageTitle("Trip Management");
+            TripController controller = MainLayoutController.getInstance()
+                    .loadCenterWithController("/layouts/trip/TripView.fxml");
+            controller.setTripManager(tripManager);
+            controller.setVehicleManager(vehicleManager);
+            controller.setCollectionManager(collectionManager);
+            controller.initData();
+        }
+    }
+
+    
+
     private void loadCollections() {
         if (collections == null) {
             return;
@@ -176,7 +234,7 @@ public final class CollectionController {
                 case CANCELLED -> cancelled++;
                 case ACTIVE -> active++;
                 default -> {
-                    // Do nothing for unknown statuses
+                    
                 }
             }
         }
@@ -204,27 +262,5 @@ public final class CollectionController {
             case ACTIVE -> showActiveCheckBox.isSelected();
             default -> false;
         };
-    }
-
-    @FXML
-    private void handleBack() {
-        if ("SCHEDULE".equals(previousPage)) {
-            MainLayoutController.getInstance().setPageTitle("Schedule Management");
-            ScheduleController controller = MainLayoutController.getInstance()
-                    .loadCenterWithController("/layouts/schedule/ScheduleView.fxml");
-            controller.setCollectionManager(collectionManager);
-            controller.setScheduleManager(scheduleManager);
-            controller.setOneTimeScheduleManager(oneTimeScheduleManager);
-            controller.setRecurringScheduleManager(recurringScheduleManager);
-            controller.initData();
-        } else if ("TRIP".equals(previousPage)) {
-            MainLayoutController.getInstance().setPageTitle("Trip Management");
-            TripController controller = MainLayoutController.getInstance()
-                    .loadCenterWithController("/layouts/trip/TripView.fxml");
-            controller.setTripManager(tripManager);
-            controller.setVehicleManager(vehicleManager);
-            controller.setCollectionManager(collectionManager);
-            controller.initData();
-        }
     }
 }

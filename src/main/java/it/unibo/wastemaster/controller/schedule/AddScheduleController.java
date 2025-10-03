@@ -65,19 +65,39 @@ public final class AddScheduleController {
     private WasteManager wasteManager;
     private List<Customer> allCustomers;
 
+    /**
+     * Sets the customer manager used to retrieve customers.
+     *
+     * @param customerManager the CustomerManager to use
+     */
     public void setCustomerManager(CustomerManager customerManager) {
         this.customerManager = customerManager;
     }
 
+    /**
+     * Sets the one-time schedule manager used to create one-time schedules.
+     *
+     * @param oneTimeScheduleManager the OneTimeScheduleManager to use
+     */
     public void setOneTimeScheduleManager(OneTimeScheduleManager oneTimeScheduleManager) {
         this.oneTimeScheduleManager = oneTimeScheduleManager;
     }
 
+    /**
+     * Sets the recurring schedule manager used to create recurring schedules.
+     *
+     * @param recurringScheduleManager the RecurringScheduleManager to use
+     */
     public void setRecurringScheduleManager(
             RecurringScheduleManager recurringScheduleManager) {
         this.recurringScheduleManager = recurringScheduleManager;
     }
 
+    /**
+     * Sets the waste manager used to retrieve waste types.
+     *
+     * @param wasteManager the WasteManager to use
+     */
     public void setWasteManager(WasteManager wasteManager) {
         this.wasteManager = wasteManager;
     }

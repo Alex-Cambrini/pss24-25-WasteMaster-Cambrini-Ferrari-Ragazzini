@@ -35,6 +35,10 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
+/**
+ * Controller for managing the invoices view, including filtering, searching,
+ * marking as paid, exporting, and viewing associated customers and collections.
+ */
 public final class InvoiceController implements AutoRefreshable {
 
     private static final int REFRESH_INTERVAL_SECONDS = 30;
@@ -119,18 +123,36 @@ public final class InvoiceController implements AutoRefreshable {
     @FXML
     private Button viewCustomerButton;
 
+    /**
+     * Sets the invoice manager used for invoice operations.
+     *
+     * @param invoiceManager the InvoiceManager to use
+     */
     public void setInvoiceManager(InvoiceManager invoiceManager) {
         this.invoiceManager = invoiceManager;
     }
 
+    /**
+     * Sets the collection manager used for collection operations.
+     *
+     * @param collectionManager the CollectionManager to use
+     */
     public void setCollectionManager(CollectionManager collectionManager) {
         this.collectionManager = collectionManager;
     }
 
+    /**
+     * Sets the customer manager used for customer operations.
+     *
+     * @param customerManager the CustomerManager to use
+     */
     public void setCustomerManager(CustomerManager customerManager) {
         this.customerManager = customerManager;
     }
 
+    /**
+     * Initializes the invoice view, table columns, filters, and listeners.
+     */
     @FXML
     public void initialize() {
         owner = (Stage) MainLayoutController.getInstance().getRootPane().getScene().getWindow();
@@ -224,6 +246,10 @@ public final class InvoiceController implements AutoRefreshable {
         });
     }
 
+    /**
+     * Loads initial invoice data into the table.
+     * Must be called after all managers are set.
+     */
     public void initData() {
         if (invoiceManager == null || collectionManager == null
                 || customerManager == null) {
@@ -233,6 +259,9 @@ public final class InvoiceController implements AutoRefreshable {
         loadInvoices();
     }
 
+    /**
+     * Starts the automatic refresh of the invoice table.
+     */
     @Override
     public void startAutoRefresh() {
         if (refreshTimeline != null)
@@ -243,6 +272,9 @@ public final class InvoiceController implements AutoRefreshable {
         refreshTimeline.play();
     }
 
+    /**
+     * Stops the automatic refresh of the invoice table.
+     */
     @Override
     public void stopAutoRefresh() {
         if (refreshTimeline != null) {
@@ -251,6 +283,9 @@ public final class InvoiceController implements AutoRefreshable {
         }
     }
 
+    /**
+     * Loads all invoices from the database and updates the invoice table.
+     */
     private void loadInvoices() {
         if (AppContext.getCurrentAccount() == null)
             return;
@@ -262,6 +297,11 @@ public final class InvoiceController implements AutoRefreshable {
         handleSearch();
     }
 
+    /**
+     * Updates the state of action buttons based on the selected invoice.
+     *
+     * @param selected the selected InvoiceRow
+     */
     private void updateButtons(final InvoiceRow selected) {
         if (selected == null) {
             markAsPaidButton.setDisable(true);
@@ -278,6 +318,9 @@ public final class InvoiceController implements AutoRefreshable {
         exportPdfButton.setDisable(isCancelled);
     }
 
+    /**
+     * Handles the action to add a new invoice.
+     */
     @FXML
     private void handleAddInvoice() {
         try {
@@ -299,6 +342,9 @@ public final class InvoiceController implements AutoRefreshable {
         }
     }
 
+    /**
+     * Handles the search/filtering of invoices based on the search field and filter checkboxes.
+     */
     @FXML
     private void handleSearch() {
         String query = searchField.getText().toLowerCase().trim();
@@ -335,6 +381,9 @@ public final class InvoiceController implements AutoRefreshable {
         invoiceTable.setItems(filtered);
     }
 
+    /**
+     * Handles the reset of the search field and filter checkboxes.
+     */
     @FXML
     private void handleResetSearch() {
         searchField.clear();
@@ -351,6 +400,11 @@ public final class InvoiceController implements AutoRefreshable {
         loadInvoices();
     }
 
+    /**
+     * Shows the filter menu for selecting which fields to search.
+     *
+     * @param event the mouse event triggering the menu
+     */
     @FXML
     private void showFilterMenu(final javafx.scene.input.MouseEvent event) {
         if (filterMenu != null && filterMenu.isShowing()) {
@@ -382,6 +436,9 @@ public final class InvoiceController implements AutoRefreshable {
         filterMenu.show(invoiceTable, event.getScreenX(), event.getScreenY());
     }
 
+    /**
+     * Handles the action to view the collections associated with the selected invoice.
+     */
     @FXML
     private void handleViewCollection() {
         InvoiceRow selected = invoiceTable.getSelectionModel().getSelectedItem();
@@ -417,6 +474,9 @@ public final class InvoiceController implements AutoRefreshable {
         }
     }
 
+    /**
+     * Handles the action to mark the selected invoice as paid.
+     */
     @FXML
     private void handleMarkAsPaid() {
         InvoiceRow selected = invoiceTable.getSelectionModel().getSelectedItem();
@@ -436,6 +496,9 @@ public final class InvoiceController implements AutoRefreshable {
         }
     }
 
+    /**
+     * Handles the action to export the selected invoice as a PDF file.
+     */
     @FXML
     private void handleExportPdf() {
         InvoiceRow selected = invoiceTable.getSelectionModel().getSelectedItem();
@@ -469,6 +532,9 @@ public final class InvoiceController implements AutoRefreshable {
         }
     }
 
+    /**
+     * Handles the action to delete the selected invoice.
+     */
     @FXML
     private void handleDeleteInvoice() {
         InvoiceRow selected = invoiceTable.getSelectionModel().getSelectedItem();
@@ -495,6 +561,11 @@ public final class InvoiceController implements AutoRefreshable {
         }
     }
 
+    /**
+     * Handles the action to view statistics for the customer associated with the selected invoice.
+     *
+     * @param event the action event
+     */
     @FXML
     private void handleViewCustomer(ActionEvent event) {
         InvoiceRow selectedRow = invoiceTable.getSelectionModel().getSelectedItem();

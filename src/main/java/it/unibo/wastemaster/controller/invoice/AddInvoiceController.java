@@ -15,6 +15,10 @@ import javafx.scene.control.*;
 
 import java.util.List;
 
+/**
+ * Controller for the Add Invoice modal view. Handles selection of customer and collections,
+ * and creation of a new invoice.
+ */
 public class AddInvoiceController {
 
     @FXML
@@ -46,6 +50,9 @@ public class AddInvoiceController {
 
     private ObservableList<CollectionRow> availableCollections = FXCollections.observableArrayList();
 
+    /**
+     * Initializes the controller, setting up table, buttons, and listeners.
+     */
     @FXML
     public void initialize() {
         setupCollectionsTable();
@@ -54,18 +61,36 @@ public class AddInvoiceController {
         setupSelectAllCheck();
     }
 
+    /**
+     * Loads customer data into the combo box.
+     */
     public void initData() {
         setupCustomerCombo();
     }
 
+    /**
+     * Sets the collection manager used to retrieve collections.
+     *
+     * @param collectionManager the CollectionManager to use
+     */
     public void setCollectionManager(CollectionManager collectionManager) {
         this.collectionManager = collectionManager;
     }
 
+    /**
+     * Sets the customer manager used to retrieve customers.
+     *
+     * @param customerManager the CustomerManager to use
+     */
     public void setCustomerManager(CustomerManager customerManager) {
         this.customerManager = customerManager;
     }
 
+    /**
+     * Sets the invoice manager used to create invoices.
+     *
+     * @param invoiceManager the InvoiceManager to use
+     */
     public void setInvoiceManager(InvoiceManager invoiceManager) {
         this.invoiceManager = invoiceManager;
     }
@@ -166,11 +191,17 @@ public class AddInvoiceController {
         saveButton.setOnAction(e -> handleSaveInvoice());
     }
 
+    /**
+     * Handles the abort action, closing the modal dialog.
+     */
     @FXML
     private void handleAbortInvoiceCreation() {
         cancelButton.getScene().getWindow().hide();
     }
 
+    /**
+     * Handles the save action, creating a new invoice for the selected customer and collections.
+     */
     @FXML
     private void handleSaveInvoice() {
         Customer selectedCustomer = customerCombo.getSelectionModel().getSelectedItem();

@@ -14,6 +14,10 @@ import java.time.format.TextStyle;
 import java.util.List;
 import java.util.Locale;
 
+/**
+ * Controller for the main dashboard view, displaying overall statistics,
+ * recent notifications, and monthly collection charts.
+ */
 public class DashboardController {
 
     @FXML
@@ -35,39 +39,70 @@ public class DashboardController {
     private TripManager tripManager;
     private NotificationManager notificationManager;
 
-    // --- Setters ---
+    /**
+     * Sets the customer manager used for statistics.
+     *
+     * @param customerManager the CustomerManager to use
+     */
     public void setCustomerManager(CustomerManager customerManager) {
         this.customerManager = customerManager;
     }
 
+    /**
+     * Sets the collection manager used for statistics and charts.
+     *
+     * @param collectionManager the CollectionManager to use
+     */
     public void setCollectionManager(CollectionManager collectionManager) {
         this.collectionManager = collectionManager;
     }
 
+    /**
+     * Sets the invoice manager used for statistics.
+     *
+     * @param invoiceManager the InvoiceManager to use
+     */
     public void setInvoiceManager(InvoiceManager invoiceManager) {
         this.invoiceManager = invoiceManager;
     }
 
+    /**
+     * Sets the trip manager used for statistics.
+     *
+     * @param tripManager the TripManager to use
+     */
     public void setTripManager(TripManager tripManager) {
         this.tripManager = tripManager;
     }
 
+    /**
+     * Sets the notification manager used for displaying recent notifications.
+     *
+     * @param notificationManager the NotificationManager to use
+     */
     public void setNotificationManager(NotificationManager notificationManager) {
         this.notificationManager = notificationManager;
     }
 
+    /**
+     * Initializes the dashboard view.
+     */
     @FXML
     public void initialize() {
     }
 
-    // --- Main dashboard update ---
+    /**
+     * Loads and updates all dashboard statistics, charts, and notifications.
+     */
     public void initData() {
         updateTotals();
         updateCollectionsChart();
         updateNotifications();
     }
 
-    // --- Totals ---
+    /**
+     * Updates the total statistics labels for customers, collections, trips, and invoices to pay.
+     */
     private void updateTotals() {
         if (customerManager != null)
             totalCustomersLabel.setText(String.valueOf(customerManager.getAllCustomers().size()));
@@ -83,7 +118,9 @@ public class DashboardController {
         }
     }
 
-    // --- Collections chart ---
+    /**
+     * Updates the monthly collections chart with cancelled, to pay, and completed series.
+     */
     private void updateCollectionsChart() {
         if (collectionsChart == null || collectionManager == null)
             return;
@@ -125,7 +162,9 @@ public class DashboardController {
         collectionsChart.getData().addAll(cancelledSeries, toPaySeries, completedSeries);
     }
 
-    // --- Notifications ---
+    /**
+     * Updates the notifications list with the most recent events.
+     */
     private void updateNotifications() {
         notificationsList.getItems().clear();
 

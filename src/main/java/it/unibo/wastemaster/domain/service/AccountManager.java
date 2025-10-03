@@ -8,7 +8,8 @@ import java.util.Optional;
 import org.mindrot.jbcrypt.BCrypt;
 
 /**
- * Service class responsible for managing Account entities, including account creation and
+ * Service class responsible for managing Account entities, including account
+ * creation and
  * password hashing.
  */
 public class AccountManager {
@@ -18,19 +19,29 @@ public class AccountManager {
     /**
      * Constructs an AccountManager with the given AccountRepository.
      *
-     * @param accountRepository the repository used for account persistence operations
+     * @param accountRepository the repository used for account persistence
+     *                          operations
      */
     public AccountManager(final AccountRepository accountRepository) {
         this.accountRepository = accountRepository;
     }
 
     /**
-     * Creates a new Account for the given Employee with the raw password. The password is
-     * hashed using BCrypt before storing.
+     * Creates a new Account for the given Employee using the provided raw password.
+     * The password is validated (at least 8 characters, at least one letter and one
+     * number)
+     * and then hashed with BCrypt before being stored.
      *
-     * @param employee the employee to associate with the new account
-     * @param rawPassword the plain text password to hash and store
+     * @param employee    the employee to associate with the new account (must not
+     *                    be null)
+     * @param rawPassword the plain text password to validate and hash (must not be
+     *                    null/blank)
      * @return the created Account entity
+     * @throws IllegalArgumentException if the password is null/blank or does not
+     *                                  satisfy
+     *                                  the minimum policy (>= 8 chars, >= 1 letter,
+     *                                  >= 1 digit)
+     * @throws AccountCreationException if the account cannot be persisted
      */
     public Account createAccount(final Employee employee, final String rawPassword) {
         if (rawPassword == null || rawPassword.trim().isEmpty()) {
@@ -64,6 +75,14 @@ public class AccountManager {
         return BCrypt.hashpw(rawPassword, BCrypt.gensalt());
     }
 
+    /**
+     * Retrieves an Account associated with the Employee identified by the given
+     * email.
+     *
+     * @param email the email of the employee whose account is to be retrieved
+     * @return an Optional containing the associated Account if found, or an empty
+     *         Optional otherwise
+     */
     public Optional<Account> findAccountByEmployeeEmail(final String email) {
         return accountRepository.findAccountByEmployeeEmail(email);
     }

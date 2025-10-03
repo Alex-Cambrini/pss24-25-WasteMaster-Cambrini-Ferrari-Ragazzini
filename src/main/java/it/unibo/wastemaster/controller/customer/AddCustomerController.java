@@ -44,10 +44,21 @@ public final class AddCustomerController {
     @FXML
     private TextField postalCodeField;
 
+    /**
+     * Sets the customer manager used to persist new customers.
+     *
+     * @param customerManager the CustomerManager to use
+     */
     public void setCustomerManager(CustomerManager customerManager) {
         this.customerManager = customerManager;
     }
 
+    /**
+     * Handles the save action for a new customer.
+     * Validates input, creates the customer, and shows feedback dialogs.
+     *
+     * @param event the action event triggered by the save button
+     */
     @FXML
     private void handleSaveCustomer(final ActionEvent event) {
         try {
@@ -74,6 +85,11 @@ public final class AddCustomerController {
         }
     }
 
+    /**
+     * Handles the abort action for customer creation, closing the modal dialog.
+     *
+     * @param event the action event triggered by the abort button
+     */
     @FXML
     private void handleAbortCustomerCreation(final ActionEvent event) {
         DialogUtils.closeModal(event);

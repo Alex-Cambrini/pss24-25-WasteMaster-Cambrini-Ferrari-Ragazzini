@@ -20,6 +20,7 @@ import it.unibo.wastemaster.domain.service.EmployeeManager;
 import it.unibo.wastemaster.domain.service.InvoiceManager;
 import it.unibo.wastemaster.domain.service.LoginManager;
 import it.unibo.wastemaster.domain.service.NotificationManager;
+import it.unibo.wastemaster.domain.service.NotificationService;
 import it.unibo.wastemaster.domain.service.OneTimeScheduleManager;
 import it.unibo.wastemaster.domain.service.RecurringScheduleManager;
 import it.unibo.wastemaster.domain.service.ScheduleManager;
@@ -40,6 +41,7 @@ import it.unibo.wastemaster.infrastructure.dao.TripDAO;
 import it.unibo.wastemaster.infrastructure.dao.VehicleDAO;
 import it.unibo.wastemaster.infrastructure.dao.WasteDAO;
 import it.unibo.wastemaster.infrastructure.dao.WasteScheduleDAO;
+import it.unibo.wastemaster.infrastructure.notification.FakeNotificationService;
 import jakarta.persistence.EntityManager;
 
 public class ServiceFactory {
@@ -58,6 +60,7 @@ public class ServiceFactory {
     private final ScheduleManager scheduleManager;
     private final LoginManager loginManager;
     private final NotificationManager notificationManager;
+    private final NotificationService notificationService;
 
     public ServiceFactory(EntityManager em) {
 
@@ -80,11 +83,9 @@ public class ServiceFactory {
         var wasteRepository = new WasteRepositoryImpl(wasteDao);
         var customerRepository = new CustomerRepositoryImpl(customerDao);
         var wasteScheduleRepository = new WasteScheduleRepositoryImpl(wasteScheduleDao);
-        var recurringScheduleRepository =
-                new RecurringScheduleRepositoryImpl(recurringScheduleDao);
+        var recurringScheduleRepository = new RecurringScheduleRepositoryImpl(recurringScheduleDao);
         var collectionRepository = new CollectionRepositoryImpl(collectionDao);
-        var oneTimeScheduleRepository =
-                new OneTimeScheduleRepositoryImpl(oneTimeScheduleDao);
+        var oneTimeScheduleRepository = new OneTimeScheduleRepositoryImpl(oneTimeScheduleDao);
         var vehicleRepository = new VehicleRepositoryImpl(vehicleDao);
         var tripRepository = new TripRepositoryImpl(tripDao);
         var invoiceRepository = new InvoiceRepositoryImpl(invoiceDao);
@@ -95,14 +96,11 @@ public class ServiceFactory {
         this.wasteManager = new WasteManager(wasteRepository);
         this.customerManager = new CustomerManager(customerRepository);
         this.wasteScheduleManager = new WasteScheduleManager(wasteScheduleRepository);
-        this.recurringScheduleManager =
-                new RecurringScheduleManager(recurringScheduleRepository,
-                        wasteScheduleManager);
-        this.collectionManager =
-                new CollectionManager(collectionRepository, recurringScheduleManager);
+        this.recurringScheduleManager = new RecurringScheduleManager(recurringScheduleRepository,
+                wasteScheduleManager);
+        this.collectionManager = new CollectionManager(collectionRepository, recurringScheduleManager);
         this.recurringScheduleManager.setCollectionManager(collectionManager);
-        this.oneTimeScheduleManager =
-                new OneTimeScheduleManager(oneTimeScheduleRepository, collectionManager);
+        this.oneTimeScheduleManager = new OneTimeScheduleManager(oneTimeScheduleRepository, collectionManager);
         this.vehicleManager = new VehicleManager(vehicleRepository);
         this.tripManager = new TripManager(tripRepository, collectionRepository, recurringScheduleManager);
         this.invoiceManager = new InvoiceManager(invoiceRepository);
@@ -110,6 +108,7 @@ public class ServiceFactory {
         this.scheduleManager = new ScheduleManager(scheduleRepository);
         this.notificationManager = new NotificationManager(tripRepository,
                 invoiceRepository, customerRepository);
+        this.notificationService = new FakeNotificationService();
     }
 
     public AccountManager getAccountManager() {
@@ -167,4 +166,9 @@ public class ServiceFactory {
     public NotificationManager getNotificationManager() {
         return notificationManager;
     }
+
+    public NotificationService getNotificationService() {
+        return notificationService;
+    }
+
 }

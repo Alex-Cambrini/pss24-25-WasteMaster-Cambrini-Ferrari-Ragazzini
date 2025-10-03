@@ -18,15 +18,18 @@ import java.time.DayOfWeek;
 @Entity
 public final class WasteSchedule {
 
+    /** Unique identifier for the schedule, auto-generated. */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int scheduleId;
 
+    /** The waste associated with this schedule. Cannot be null. */
     @ManyToOne
     @JoinColumn(name = "waste_id", nullable = false)
     @NotNull(message = "Waste must not be null")
     private Waste waste;
 
+    /** Day of the week when the waste is collected. Cannot be null. */
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     @NotNull(message = "dayOfWeek must not be null")

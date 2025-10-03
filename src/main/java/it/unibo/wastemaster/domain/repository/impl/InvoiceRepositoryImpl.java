@@ -53,22 +53,7 @@ public class InvoiceRepositoryImpl implements InvoiceRepository {
 
     @Override
     public List<Invoice> findLast5InvoicesEvent() {
-        List<Invoice> created = invoiceDAO.findLast5Created();
-        List<Invoice> paid = invoiceDAO.findLast5Paid();
-
-        List<Invoice> combined = new ArrayList<>();
-        combined.addAll(created);
-        combined.addAll(paid);
-
-        combined.sort((i1, i2) -> {
-            LocalDateTime d1 = i1.getPaymentDate() != null ? i1.getPaymentDate() :
-                    i1.getIssueDate();
-            LocalDateTime d2 = i2.getPaymentDate() != null ? i2.getPaymentDate() : i2.getIssueDate();
-            return d2.compareTo(d1);
-        });
-
-        return combined.stream().limit(5).toList();
+        return invoiceDAO.findLast5InvoicesEvent();
     }
-
 }
 

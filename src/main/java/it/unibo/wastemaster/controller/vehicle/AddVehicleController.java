@@ -15,8 +15,8 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
 
 /**
- * Controller for the view that allows adding a new vehicle. Manages field initialization
- * and saving of the entered data.
+ * Controller for the view that allows adding a new vehicle.
+ * Manages field initialization and saving of the entered data.
  */
 public final class AddVehicleController {
 
@@ -43,10 +43,18 @@ public final class AddVehicleController {
 
     private VehicleManager vehicleManager;
 
+    /**
+     * Sets the vehicle manager used for vehicle operations.
+     *
+     * @param vehicleManager the VehicleManager to use
+     */
     public void setVehicleManager(VehicleManager vehicleManager) {
         this.vehicleManager = vehicleManager;
     }
 
+    /**
+     * Initializes the combo boxes with available licence types and statuses.
+     */
     @FXML
     private void initialize() {
         licenceComboBox.getItems().setAll(RequiredLicence.values());
@@ -56,6 +64,11 @@ public final class AddVehicleController {
         statusComboBox.getSelectionModel().selectFirst();
     }
 
+    /**
+     * Handles the save action, validating input and saving the new vehicle.
+     *
+     * @param event the action event from the save button
+     */
     @FXML
     private void handleSaveVehicle(final ActionEvent event) {
         try {
@@ -72,6 +85,11 @@ public final class AddVehicleController {
         }
     }
 
+    /**
+     * Builds a Vehicle object from the form fields.
+     *
+     * @return the Vehicle instance
+     */
     private Vehicle getVehicle() {
         String plate = plateField.getText();
         String brand = brandField.getText();
@@ -86,6 +104,11 @@ public final class AddVehicleController {
         return vehicle;
     }
 
+    /**
+     * Handles aborting the vehicle creation modal.
+     *
+     * @param event the action event from the abort button
+     */
     @FXML
     private void handleAbortVehicleCreation(final ActionEvent event) {
         closeModal(event);

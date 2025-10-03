@@ -8,7 +8,11 @@ import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
 
 /**
- * Represents a recurring schedule for waste collection.
+ * A recurring schedule for waste collection associated with a specific customer and
+ * waste type.
+ * Extends Schedule and adds a start date, frequency (weekly or monthly), and the next
+ * collection date.
+ * This entity is persisted with a discriminator value "RECURRING".
  */
 @Entity
 @DiscriminatorValue("RECURRING")

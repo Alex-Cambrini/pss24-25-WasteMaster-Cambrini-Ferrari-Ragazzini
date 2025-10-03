@@ -17,7 +17,6 @@ public final class EditCustomerController {
 
     private Customer customer;
     private CustomersController customerController;
-
     private CustomerManager customerManager;
 
     @FXML
@@ -44,6 +43,11 @@ public final class EditCustomerController {
     @FXML
     private TextField postalCodeField;
 
+    /**
+     * Sets the customer manager used for updating customers.
+     *
+     * @param customerManager the CustomerManager to use
+     */
     public void setCustomerManager(CustomerManager customerManager) {
         this.customerManager = customerManager;
     }
@@ -114,10 +118,6 @@ public final class EditCustomerController {
             if (this.customerController != null) {
                 this.customerController.loadCustomers();
             }
-
-            DialogUtils.showSuccess("Customer updated successfully.",
-                    AppContext.getOwner());
-            DialogUtils.closeModal(event);
 
             DialogUtils.showSuccess("Customer updated successfully.",
                     AppContext.getOwner());

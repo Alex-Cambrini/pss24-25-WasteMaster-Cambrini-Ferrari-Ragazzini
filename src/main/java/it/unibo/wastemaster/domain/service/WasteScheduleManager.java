@@ -65,6 +65,11 @@ public final class WasteScheduleManager {
         return schedule;
     }
 
+    /**
+     * Deletes the specified waste schedule.
+     *
+     * @param wasteSchedule the waste schedule to delete
+     */
     public void deleteSchedule(WasteSchedule wasteSchedule) {
         wasteScheduleRepository.delete(wasteSchedule);
     }

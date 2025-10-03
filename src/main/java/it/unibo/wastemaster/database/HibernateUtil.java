@@ -5,6 +5,8 @@ import jakarta.persistence.Persistence;
 
 /**
  * Utility class to manage the Hibernate EntityManagerFactory.
+ * Provides methods to obtain and close the singleton EntityManagerFactory instance
+ * used throughout the application for JPA operations.
  */
 public final class HibernateUtil {
 

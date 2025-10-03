@@ -48,15 +48,15 @@ public class CustomerManager {
      * Updates the given customer.
      *
      * @param toUpdateCustomer the customer with updated data
-     * @throws IllegalArgumentException if the customer is invalid or the email is used by
-     * another customer
+     * @throws IllegalArgumentException if the customer is invalid or the email is
+     *                                  used by
+     *                                  another customer
      */
     public void updateCustomer(final Customer toUpdateCustomer) {
         ValidateUtils.validateEntity(toUpdateCustomer);
         ValidateUtils.requireArgNotNull(toUpdateCustomer.getCustomerId(),
                 "Customer ID cannot be null");
-        Optional<Customer> existingOpt =
-                customerRepository.findByEmail(toUpdateCustomer.getEmail());
+        Optional<Customer> existingOpt = customerRepository.findByEmail(toUpdateCustomer.getEmail());
         if (existingOpt.isPresent() && !existingOpt.get().getCustomerId()
                 .equals(toUpdateCustomer.getCustomerId())) {
             throw new IllegalArgumentException(
@@ -66,10 +66,14 @@ public class CustomerManager {
     }
 
     /**
-     * Performs a soft delete on the customer by marking it deleted and updating it.
+     * Performs a soft delete on the customer by marking it as deleted and updating
+     * it.
+     * If validation fails, the method catches the exception and returns false
+     * instead
+     * of propagating it.
      *
      * @param customer the customer to soft delete
-     * @return true if deletion succeeded, false if any validation fails
+     * @return true if deletion and update succeeded, false if validation fails
      */
     public boolean softDeleteCustomer(final Customer customer) {
         try {
@@ -103,12 +107,22 @@ public class CustomerManager {
         return customerRepository.findAll();
     }
 
+    /**
+     * Retrieves all customers that are marked as active (not deleted).
+     *
+     * @return a list of active customers
+     */
     public List<Customer> getAllActiveCustomers() {
         return customerRepository.findActive();
     }
 
+    /**
+     * Finds a customer by their email address.
+     *
+     * @param email the email of the customer to search for
+     * @return an Optional containing the customer if found, or empty if not found
+     */
     public Optional<Customer> findCustomerByEmail(String email) {
         return customerRepository.findByEmail(email);
     }
-
 }

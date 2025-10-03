@@ -19,24 +19,41 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Represents a trip assigned to a vehicle and
- * a list of employees to perform waste collections.
+ * Represents a trip assigned to a vehicle and a list of employees to perform waste
+ * collections.
+ * Maps to the "trip" table in the database.
+ * This class is final to prevent inheritance and ensure consistent behavior.
  */
 @Entity
 @Table(name = "trip")
 public final class Trip {
 
+    /**
+     * Unique identifier for the trip, auto-generated.
+     */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer tripId;
 
+    /**
+     * Postal code of the area this trip covers.
+     * Cannot be null.
+     */
     @Column(name = "postal_code", nullable = false)
     private String postalCode;
 
+    /**
+     * Vehicle assigned to this trip.
+     * Cannot be null.
+     */
     @ManyToOne
     @JoinColumn(name = "vehicle_id", nullable = false)
     private Vehicle assignedVehicle;
 
+    /**
+     * List of employees assigned to this trip.
+     * Represented as a many-to-many relationship with the "trip_operators" join table.
+     */
     @ManyToMany
     @JoinTable(
             name = "trip_operators",
@@ -45,19 +62,43 @@ public final class Trip {
     )
     private List<Employee> operators;
 
+    /**
+     * Scheduled departure time of the trip.
+     * Cannot be null.
+     */
     @NotNull
     @Column(nullable = false)
     private LocalDateTime departureTime;
 
+    /**
+     * Expected return time of the trip.
+     * Cannot be null.
+     */
     @NotNull
     @Column(nullable = false)
     private LocalDateTime expectedReturnTime;
 
+    /**
+     * Timestamp of the last modification to this trip.
+     * Cannot be null.
+     */
+    @Column(nullable = false)
+    @NotNull(message = "The last modified date cannot be null")
+    private LocalDateTime lastModified;
+
+    /**
+     * Current status of the trip (e.g., PLANNED, IN_PROGRESS, COMPLETED).
+     * Cannot be null.
+     */
     @Enumerated(EnumType.STRING)
     @NotNull
     @Column(nullable = false)
     private TripStatus status;
 
+    /**
+     * Collections associated with this trip.
+     * Cannot be null.
+     */
     @NotNull(message = "collection cannot be null")
     @OneToMany(mappedBy = "trip")
     private List<Collection> collections = new ArrayList<>();
@@ -90,6 +131,7 @@ public final class Trip {
         this.expectedReturnTime = expectedReturnTime;
         this.collections = collections;
         this.status = TripStatus.ACTIVE;
+        this.lastModified = LocalDateTime.now();
     }
 
     /**
@@ -225,6 +267,24 @@ public final class Trip {
      */
     public void setCollections(final List<Collection> collections) {
         this.collections = collections;
+    }
+
+    /**
+     * Gets last modified.
+     *
+     * @return the last modified
+     */
+    public LocalDateTime getLastModified() {
+        return lastModified;
+    }
+
+    /**
+     * Sets last modified.
+     *
+     * @param lastModified the last modified
+     */
+    public void setLastModified(final LocalDateTime lastModified) {
+        this.lastModified = lastModified;
     }
 
     /**
