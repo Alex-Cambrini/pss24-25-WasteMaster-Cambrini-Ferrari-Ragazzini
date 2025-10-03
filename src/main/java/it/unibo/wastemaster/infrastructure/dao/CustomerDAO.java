@@ -10,6 +10,11 @@ import java.util.List;
 public final class CustomerDAO extends GenericDAO<Customer> {
 
     /**
+     * Maximum number of recent customers to retrieve.
+     */
+    private static final int LAST_INSERTED_LIMIT = 5;
+
+    /**
      * Constructs a CustomerDAO with the given entity manager.
      *
      * @param entityManager the EntityManager to use
@@ -57,11 +62,17 @@ public final class CustomerDAO extends GenericDAO<Customer> {
                 """, Customer.class).getResultList();
     }
 
+    /**
+     * Retrieves the last 5 inserted customers, ordered by creation date
+     * (descending).
+     *
+     * @return a list of the last 5 inserted customers
+     */
     public List<Customer> findLast5Inserted() {
-        return getEntityManager().createQuery(
-                        "SELECT c FROM Customer c ORDER BY c.createdDate DESC", Customer.class)
-                .setMaxResults(5)
+        return getEntityManager()
+                .createQuery("SELECT c FROM Customer c ORDER BY c.createdDate DESC",
+                        Customer.class)
+                .setMaxResults(LAST_INSERTED_LIMIT)
                 .getResultList();
     }
-
 }

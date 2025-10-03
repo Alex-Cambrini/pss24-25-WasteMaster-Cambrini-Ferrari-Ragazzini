@@ -2,7 +2,9 @@ package it.unibo.wastemaster.main;
 
 import javafx.application.Application;
 
-/** Main application entry-point's class. */
+/**
+ * Main application entry-point's class.
+ */
 
 public final class App {
 

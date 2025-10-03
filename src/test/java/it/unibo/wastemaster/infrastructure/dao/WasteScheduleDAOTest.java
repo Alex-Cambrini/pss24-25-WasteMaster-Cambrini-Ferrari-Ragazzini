@@ -3,9 +3,9 @@ package it.unibo.wastemaster.infrastructure.dao;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-import it.unibo.wastemaster.infrastructure.AbstractDatabaseTest;
 import it.unibo.wastemaster.domain.model.Waste;
 import it.unibo.wastemaster.domain.model.WasteSchedule;
+import it.unibo.wastemaster.infrastructure.AbstractDatabaseTest;
 import java.time.DayOfWeek;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

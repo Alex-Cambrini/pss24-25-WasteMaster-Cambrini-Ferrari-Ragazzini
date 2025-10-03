@@ -31,6 +31,24 @@ public class InvoiceManager {
     }
 
     /**
+     * Returns the fee applied to recurring collections.
+     *
+     * @return the recurring collection fee
+     */
+    public static double getRecurringFee() {
+        return RECURRING_FEE;
+    }
+
+    /**
+     * Returns the fee applied to one-time collections.
+     *
+     * @return the one-time collection fee
+     */
+    public static double getOneTimeFee() {
+        return ONE_TIME_FEE;
+    }
+
+    /**
      * Creates a new invoice for the given customer based on the provided
      * collections.
      * Each recurring collection adds a fixed recurring fee, and each one-time

@@ -110,7 +110,15 @@ public final class ValidateUtils {
         }
     }
 
-    public static void requireListNotEmpty(final List<?> list, final String errorMessage) {
+    /**
+     * Validates that a list is not null or empty.
+     *
+     * @param list the list to check
+     * @param errorMessage the error message to throw if null or empty
+     * @throws IllegalArgumentException if list is null or empty
+     */
+    public static void requireListNotEmpty(final List<?> list,
+                                           final String errorMessage) {
         requireArgNotNull(list, errorMessage);
         if (list.isEmpty()) {
             throw new IllegalArgumentException(errorMessage);

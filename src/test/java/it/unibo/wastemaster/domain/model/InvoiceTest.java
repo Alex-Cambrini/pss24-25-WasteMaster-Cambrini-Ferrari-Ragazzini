@@ -5,18 +5,20 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import it.unibo.wastemaster.infrastructure.AbstractDatabaseTest;
 import it.unibo.wastemaster.domain.model.Collection.CollectionStatus;
+import it.unibo.wastemaster.infrastructure.AbstractDatabaseTest;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Optional;
 import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 class InvoiceTest extends AbstractDatabaseTest {
 
     private static final double TEST_AMOUNT = 200.0;
+    private static final double TOTAL_RECURRING = 50.0;
+    private static final double TOTAL_ONETIME = 150.0;
 
     private Invoice invoice;
     private Collection collection;
@@ -46,7 +48,9 @@ class InvoiceTest extends AbstractDatabaseTest {
         getCollectionDAO().update(collection);
 
         LocalDateTime now = LocalDateTime.now();
-        invoice = new Invoice(customer, List.of(collection), 50.0, 150.0, 2, 3, now);
+        invoice =
+                new Invoice(customer, List.of(collection), TOTAL_RECURRING, TOTAL_ONETIME,
+                        2, 3, now);
         invoice.setAmount(100.0);
         invoice.setPaymentStatus(Invoice.PaymentStatus.PAID);
     }
@@ -55,8 +59,8 @@ class InvoiceTest extends AbstractDatabaseTest {
     void testGetterSetter() {
         invoice.setAmount(TEST_AMOUNT);
         invoice.setPaymentStatus(Invoice.PaymentStatus.UNPAID);
-        invoice.setTotalRecurring(50.0);
-        invoice.setTotalOnetime(150.0);
+        invoice.setTotalRecurring(TOTAL_RECURRING);
+        invoice.setTotalOnetime(TOTAL_ONETIME);
         invoice.setRecurringCount(2);
         invoice.setOnetimeCount(3);
         LocalDateTime now = LocalDateTime.now();
@@ -65,15 +69,14 @@ class InvoiceTest extends AbstractDatabaseTest {
 
         assertEquals(TEST_AMOUNT, invoice.getAmount());
         assertEquals(Invoice.PaymentStatus.UNPAID, invoice.getPaymentStatus());
-        assertEquals(50.0, invoice.getTotalRecurring());
-        assertEquals(150.0, invoice.getTotalOnetime());
+        assertEquals(TOTAL_RECURRING, invoice.getTotalRecurring());
+        assertEquals(TOTAL_ONETIME, invoice.getTotalOnetime());
         assertEquals(2, invoice.getRecurringCount());
         assertEquals(3, invoice.getOnetimeCount());
         assertEquals(now, invoice.getLastModified());
         assertEquals(now.plusDays(1), invoice.getPaymentDate());
         assertTrue(invoice.getCollections().contains(collection));
     }
-
 
     @Test
     void testToString() {

@@ -230,7 +230,7 @@ public final class Collection {
      *
      * @return the trip
      */
-    public final Trip getTrip() {
+    public Trip getTrip() {
         return trip;
     }
 

@@ -12,7 +12,7 @@ import java.util.List;
 /**
  * DAO for {@link Collection} entity operations.
  */
-public class CollectionDAO extends GenericDAO<Collection> {
+public final class CollectionDAO extends GenericDAO<Collection> {
 
     /**
      * Constructs a new CollectionDAO.
@@ -29,11 +29,17 @@ public class CollectionDAO extends GenericDAO<Collection> {
      * @param schedule the schedule to filter collections by
      * @return list of collections matching the schedule
      */
-    public final List<Collection> findAllCollectionsBySchedule(final Schedule schedule) {
+    public List<Collection> findAllCollectionsBySchedule(final Schedule schedule) {
+        final String jpql = """
+                SELECT c
+                FROM Collection c
+                WHERE c.schedule = :schedule
+                """;
+
         return getEntityManager()
-                .createQuery("SELECT c FROM Collection c WHERE c.schedule = :schedule",
-                        Collection.class)
-                .setParameter("schedule", schedule).getResultList();
+                .createQuery(jpql, Collection.class)
+                .setParameter("schedule", schedule)
+                .getResultList();
     }
 
     /**
@@ -43,58 +49,88 @@ public class CollectionDAO extends GenericDAO<Collection> {
      * @param status the collection status to filter by
      * @return list of collections matching the status
      */
-    public final List<Collection> findCollectionByStatus(
+    public List<Collection> findCollectionByStatus(
             final Collection.CollectionStatus status) {
-        return getEntityManager().createQuery(
-                "SELECT c FROM Collection c WHERE c.collectionStatus = :status",
-                Collection.class).setParameter("status", status).getResultList();
+        return getEntityManager()
+                .createQuery(
+                        """
+                                SELECT c FROM Collection c
+                                WHERE c.collectionStatus = :status
+                                """,
+                        Collection.class)
+                .setParameter("status", status)
+                .getResultList();
     }
 
     /**
      * Finds an active {@link Collection} linked to the given
-     * {@link RecurringSchedule}.
-     * An active collection is one whose status is not CANCELLED.
+     * {@link RecurringSchedule}. An active collection is one whose
+     * status is not CANCELLED.
      *
      * @param schedule the recurring schedule to search collections for
      * @return the active collection if found, otherwise null
      */
-    public final Collection findActiveCollectionByRecurringSchedule(
+    public Collection findActiveCollectionByRecurringSchedule(
             final RecurringSchedule schedule) {
         try {
             String jpql = """
-                        SELECT c FROM Collection c
-                        WHERE c.schedule = :schedule
-                        AND c.collectionStatus != :cancelledStatus
+                    SELECT c FROM Collection c
+                    WHERE c.schedule = :schedule
+                    AND c.collectionStatus != :cancelledStatus
                     """;
-            return getEntityManager().createQuery(jpql, Collection.class)
-                    .setParameter("schedule", schedule).setParameter("cancelledStatus",
+            return getEntityManager()
+                    .createQuery(jpql, Collection.class)
+                    .setParameter("schedule", schedule)
+                    .setParameter(
+                            "cancelledStatus",
                             Collection.CollectionStatus.CANCELLED)
                     .getSingleResult();
         } catch (NoResultException e) {
             return null;
         }
-
     }
 
     /**
-     * Retrieves a list of Collection entities whose date field is between the
-     * specified
-     * start and end dates (inclusive).
+     * Retrieves a list of Collection entities whose date field is
+     * between the specified start and end dates (inclusive).
      *
      * @param start the start date of the range (inclusive)
      * @param end the end date of the range (inclusive)
      * @return a list of Collection entities with dates between start and end
      */
-    public List<Collection> findByDateRange(final LocalDate start, final LocalDate end) {
-        return getEntityManager().createQuery("""
-                        SELECT c FROM Collection c
-                        WHERE c.date BETWEEN :start AND :end
-                        """, Collection.class).setParameter("start", start)
-                .setParameter("end", end).getResultList();
+    public List<Collection> findByDateRange(
+            final LocalDate start,
+            final LocalDate end) {
+        return getEntityManager()
+                .createQuery(
+                        """
+                                SELECT c
+                                FROM Collection c
+                                WHERE c.date BETWEEN :start AND :end
+                                """,
+                        Collection.class)
+                .setParameter("start", start)
+                .setParameter("end", end)
+                .getResultList();
     }
 
-    public List<Collection> findCollectionsByPostalCodeAndDate(final String postalCode,
-                                                               final LocalDate date) {
+    /**
+     * Retrieves collections taking place on a specific {@code date} for
+     * customers whose location has the given {@code postalCode}.
+     * Results include only collections currently in
+     * {@link Collection.CollectionStatus#ACTIVE} status.
+     * <p>
+     * Extension note: this DAO is {@code final} and not intended for
+     * subclassing. If different filtering strategies are needed, prefer
+     * creating a separate repository/DAO or adding new query methods here.
+     *
+     * @param postalCode the customer's location postal code to match
+     * @param date the collection date to match
+     * @return list of matching {@link Collection} entities
+     */
+    public List<Collection> findCollectionsByPostalCodeAndDate(
+            final String postalCode,
+            final LocalDate date) {
         final String jpql = """
                 SELECT c
                 FROM Collection c
@@ -106,10 +142,13 @@ public class CollectionDAO extends GenericDAO<Collection> {
                   AND c.collectionStatus = :status
                 """;
 
-        return getEntityManager().createQuery(jpql, Collection.class)
+        return getEntityManager()
+                .createQuery(jpql, Collection.class)
                 .setParameter("postal", postalCode)
                 .setParameter("date", date)
-                .setParameter("status", Collection.CollectionStatus.ACTIVE)
+                .setParameter(
+                        "status",
+                        Collection.CollectionStatus.ACTIVE)
                 .getResultList();
     }
 
@@ -118,9 +157,11 @@ public class CollectionDAO extends GenericDAO<Collection> {
      * for the specified customer.
      *
      * @param customer the customer whose collections are to be retrieved
-     * @return a list of completed and not yet billed collections for the given customer
+     * @return a list of completed and not yet billed collections for the
+     * given customer
      */
-    public List<Collection> findCompletedNotBilledByCustomer(final Customer customer) {
+    public List<Collection> findCompletedNotBilledByCustomer(
+            final Customer customer) {
         final String jpql = """
                 SELECT c
                 FROM Collection c
@@ -129,14 +170,14 @@ public class CollectionDAO extends GenericDAO<Collection> {
                   AND c.isBilled = false
                 """;
 
-        List<Collection> collections =
-                getEntityManager().createQuery(jpql, Collection.class)
-                        .setParameter("customerId", customer.getCustomerId())
-                        .setParameter("completedStatus",
-                                Collection.CollectionStatus.COMPLETED)
-                        .getResultList();
+        List<Collection> collections = getEntityManager()
+                .createQuery(jpql, Collection.class)
+                .setParameter("customerId", customer.getCustomerId())
+                .setParameter(
+                        "completedStatus",
+                        Collection.CollectionStatus.COMPLETED)
+                .getResultList();
 
         return collections;
     }
-
 }
