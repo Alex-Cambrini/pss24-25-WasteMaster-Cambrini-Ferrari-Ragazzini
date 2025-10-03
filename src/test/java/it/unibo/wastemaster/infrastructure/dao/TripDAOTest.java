@@ -29,6 +29,10 @@ import org.junit.jupiter.api.Test;
 
 class TripDAOTest extends AbstractDatabaseTest {
 
+    private static final int MINUTES_30 = 30;
+    private static final int MINUTES_15 = 15;
+    private static final int DAYS_7 = 7;
+
     private LocalDateTime tripStart;
     private LocalDateTime tripEnd;
 
@@ -56,7 +60,7 @@ class TripDAOTest extends AbstractDatabaseTest {
 
         Trip overlapping = new Trip(
                 "40100", v2, Collections.emptyList(),
-                tripStart.plusMinutes(30), tripEnd.minusMinutes(15),
+                tripStart.plusMinutes(MINUTES_30), tripEnd.minusMinutes(MINUTES_15),
                 Collections.emptyList()
         );
         overlapping.setStatus(TripStatus.ACTIVE);
@@ -130,7 +134,7 @@ class TripDAOTest extends AbstractDatabaseTest {
         getCustomerDAO().insert(c1);
         getCustomerDAO().insert(c2);
 
-        LocalDate targetDate = LocalDate.now().plusDays(7);
+        LocalDate targetDate = LocalDate.now().plusDays(DAYS_7);
 
         OneTimeSchedule s1 = new OneTimeSchedule(c1, plastic, targetDate);
         s1.setScheduleStatus(Schedule.ScheduleStatus.ACTIVE);
