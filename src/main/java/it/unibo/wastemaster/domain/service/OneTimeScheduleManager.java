@@ -23,8 +23,8 @@ public class OneTimeScheduleManager {
      * Constructs a OneTimeScheduleManager with required dependencies.
      *
      * @param oneTimeScheduleRepository the DAO for OneTimeSchedule persistence
-     * @param collectionManager         the manager handling related collection
-     *                                  logic
+     * @param collectionManager the manager handling related collection
+     * logic
      */
     public OneTimeScheduleManager(
             final OneTimeScheduleRepository oneTimeScheduleRepository,
@@ -36,15 +36,15 @@ public class OneTimeScheduleManager {
     /**
      * Creates a new one-time waste pickup schedule if the date is valid.
      *
-     * @param customer   the customer requesting the pickup
-     * @param waste      the waste to be collected
+     * @param customer the customer requesting the pickup
+     * @param waste the waste to be collected
      * @param pickupDate the desired pickup date
      * @return the created OneTimeSchedule
      * @throws IllegalArgumentException if the pickup date is too soon
      */
     public OneTimeSchedule createOneTimeSchedule(final Customer customer,
-            final Waste waste,
-            final LocalDate pickupDate) {
+                                                 final Waste waste,
+                                                 final LocalDate pickupDate) {
         if (!isDateValid(pickupDate, Collection.CANCEL_LIMIT_DAYS)) {
             throw new IllegalArgumentException("The pickup date must be at least "
                     + Collection.CANCEL_LIMIT_DAYS + " days from now.");
@@ -59,7 +59,7 @@ public class OneTimeScheduleManager {
      * Validates that the given date is at least a certain number of days in the
      * future.
      *
-     * @param date      the date to validate
+     * @param date the date to validate
      * @param limitDays the minimum number of days required
      * @return true if the date is valid, false otherwise
      */
@@ -82,12 +82,12 @@ public class OneTimeScheduleManager {
      *
      * @param schedule the schedule to cancel
      * @return {@code true} if the schedule and its collection were cancelled;
-     *         {@code false} if
-     *         cancellation is not allowed by date rules or the schedule is already
-     *         cancelled
+     * {@code false} if
+     * cancellation is not allowed by date rules or the schedule is already
+     * cancelled
      * @throws IllegalArgumentException if {@code schedule} or {@code scheduleId} is
-     *                                  null,
-     *                                  or if no associated collection is found
+     * null,
+     * or if no associated collection is found
      */
     public boolean softDeleteOneTimeSchedule(final OneTimeSchedule schedule) {
         ValidateUtils.requireArgNotNull(schedule, "Schedule cannot be null");
@@ -98,7 +98,8 @@ public class OneTimeScheduleManager {
             return false;
         }
 
-        final Collection collection = collectionManager.getAllCollectionBySchedule(schedule).get(0);
+        final Collection collection =
+                collectionManager.getAllCollectionBySchedule(schedule).get(0);
         ValidateUtils.requireArgNotNull(collection, "Associated collection not found");
 
         if (isDateValid(schedule.getPickupDate(), collection.getCancelLimitDays())) {
@@ -116,9 +117,9 @@ public class OneTimeScheduleManager {
      *
      * @param id the ID of the schedule to find (can be null)
      * @return an Optional containing the found OneTimeSchedule, or empty if not
-     *         found
+     * found
      */
-    public Optional<OneTimeSchedule> findOneTimeScheduleById(Integer id) {
+    public Optional<OneTimeSchedule> findOneTimeScheduleById(final Integer id) {
         return oneTimeScheduleRepository.findById(id);
     }
 }

@@ -13,20 +13,22 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Manages the creation, retrieval, and cancellation of waste collections.
+ * Manages the creation, retrieval, update, and cancellation of waste collections,
+ * including operations for one-time and recurring schedules.
  */
 public class CollectionManager {
+
     private final CollectionRepository collectionRepository;
     private final RecurringScheduleManager recurringScheduleManager;
 
     /**
      * Constructs a CollectionManager with the necessary dependencies.
      *
-     * @param collectionRepository     DAO used for Collection persistence
+     * @param collectionRepository DAO used for Collection persistence
      * @param recurringScheduleManager Manager for recurring schedule logic
      */
     public CollectionManager(final CollectionRepository collectionRepository,
-            final RecurringScheduleManager recurringScheduleManager) {
+                             final RecurringScheduleManager recurringScheduleManager) {
         this.collectionRepository = collectionRepository;
         this.recurringScheduleManager = recurringScheduleManager;
     }
@@ -68,9 +70,9 @@ public class CollectionManager {
      * Retrieves the currently active collection associated with the given recurring
      * schedule, if present.
      *
-     * @param schedule the recurring schedule (must not be null)
+     * @param schedule the recurring schedule
      * @return an Optional containing the active collection if found, or an empty
-     *         Optional otherwise
+     * Optional otherwise
      */
     public Optional<Collection> getActiveCollectionByRecurringSchedule(
             final RecurringSchedule schedule) {
@@ -87,9 +89,8 @@ public class CollectionManager {
     }
 
     /**
-     * Generates upcoming collections for all recurring schedules without an
-     * assigned
-     * collection.
+     * Generates collections for all recurring schedules that do not yet have an
+     * assigned collection.
      */
     public void generateRecurringCollections() {
         final List<RecurringSchedule> upcomingSchedules = recurringScheduleManager
@@ -146,11 +147,12 @@ public class CollectionManager {
      * Retrieves all collections for a specific postal code on a given date.
      *
      * @param postalCode the postal code to filter collections by
-     * @param date       the date for which to retrieve collections
+     * @param date the date for which to retrieve collections
      * @return a list of collections matching the postal code and date
      * @throws IllegalArgumentException if the postal code is null
      */
-    public List<Collection> getCollectionsByPostalCode(final String postalCode, final LocalDate date) {
+    public List<Collection> getCollectionsByPostalCode(final String postalCode,
+                                                       final LocalDate date) {
         ValidateUtils.requireArgNotNull(postalCode, "Postal code cannot be null");
         return collectionRepository.findCollectionsByPostalCodeAndDate(postalCode, date);
     }

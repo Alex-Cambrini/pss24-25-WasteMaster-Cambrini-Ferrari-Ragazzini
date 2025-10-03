@@ -16,7 +16,7 @@ public class ScheduleManager {
      *
      * @param scheduleRepository the repository used for schedule persistence operations
      */
-    public ScheduleManager(ScheduleRepository scheduleRepository) {
+    public ScheduleManager(final ScheduleRepository scheduleRepository) {
         this.scheduleRepository = scheduleRepository;
     }
 

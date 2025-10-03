@@ -8,13 +8,13 @@ import java.util.List;
  */
 
 public interface NotificationService {
-    
+
     /**
      * Sends a notification about a trip cancellation to the specified recipients.
      *
      * @param recipients list of recipient email addresses
-     * @param subject    the subject of the notification
-     * @param body       the body content of the notification
+     * @param subject the subject of the notification
+     * @param body the body content of the notification
      */
     void notifyTripCancellation(List<String> recipients, String subject, String body);
 }

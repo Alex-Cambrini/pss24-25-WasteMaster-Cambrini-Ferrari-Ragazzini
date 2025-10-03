@@ -70,7 +70,7 @@ public final class WasteScheduleManager {
      *
      * @param wasteSchedule the waste schedule to delete
      */
-    public void deleteSchedule(WasteSchedule wasteSchedule) {
+    public void deleteSchedule(final WasteSchedule wasteSchedule) {
         wasteScheduleRepository.delete(wasteSchedule);
     }
 }

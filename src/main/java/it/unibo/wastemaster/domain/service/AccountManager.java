@@ -20,7 +20,7 @@ public class AccountManager {
      * Constructs an AccountManager with the given AccountRepository.
      *
      * @param accountRepository the repository used for account persistence
-     *                          operations
+     * operations
      */
     public AccountManager(final AccountRepository accountRepository) {
         this.accountRepository = accountRepository;
@@ -32,15 +32,15 @@ public class AccountManager {
      * number)
      * and then hashed with BCrypt before being stored.
      *
-     * @param employee    the employee to associate with the new account (must not
-     *                    be null)
+     * @param employee the employee to associate with the new account (must not
+     * be null)
      * @param rawPassword the plain text password to validate and hash (must not be
-     *                    null/blank)
+     * null/blank)
      * @return the created Account entity
      * @throws IllegalArgumentException if the password is null/blank or does not
-     *                                  satisfy
-     *                                  the minimum policy (>= 8 chars, >= 1 letter,
-     *                                  >= 1 digit)
+     * satisfy
+     * the minimum policy (>= 8 chars, >= 1 letter,
+     * >= 1 digit)
      * @throws AccountCreationException if the account cannot be persisted
      */
     public Account createAccount(final Employee employee, final String rawPassword) {
@@ -81,7 +81,7 @@ public class AccountManager {
      *
      * @param email the email of the employee whose account is to be retrieved
      * @return an Optional containing the associated Account if found, or an empty
-     *         Optional otherwise
+     * Optional otherwise
      */
     public Optional<Account> findAccountByEmployeeEmail(final String email) {
         return accountRepository.findAccountByEmployeeEmail(email);

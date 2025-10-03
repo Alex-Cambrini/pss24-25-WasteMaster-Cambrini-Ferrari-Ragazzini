@@ -22,10 +22,10 @@ public class EmployeeManager {
      * Constructs an EmployeeManager with the given dependencies.
      *
      * @param employeeRepository the DAO used for employee persistence
-     * @param accountManager     the manager responsible for account operations
+     * @param accountManager the manager responsible for account operations
      */
     public EmployeeManager(final EmployeeRepository employeeRepository,
-            final AccountManager accountManager) {
+                           final AccountManager accountManager) {
         this.employeeRepository = employeeRepository;
         this.accountManager = accountManager;
     }
@@ -41,14 +41,14 @@ public class EmployeeManager {
      * persistence
      * may occur if account creation fails.
      *
-     * @param employee    the employee entity to add (must not be null)
+     * @param employee the employee entity to add (must not be null)
      * @param rawPassword the plain text password for the new account (must not be
-     *                    null)
+     * null)
      * @return the persisted employee entity
      * @throws IllegalArgumentException if the email is already registered or input
-     *                                  is invalid
-     * @throws RuntimeException         if account creation fails, after deleting
-     *                                  the persisted employee
+     * is invalid
+     * @throws RuntimeException if account creation fails, after deleting
+     * the persisted employee
      */
     public Employee addEmployee(final Employee employee, final String rawPassword) {
         ValidateUtils.requireArgNotNull(employee, EMPLOYEE_NULL_MSG);
@@ -65,7 +65,8 @@ public class EmployeeManager {
             accountManager.createAccount(employee, rawPassword);
         } catch (Exception e) {
             employeeRepository.delete(employee);
-            throw new RuntimeException("Failed to create account, employee rolled back", e);
+            throw new RuntimeException("Failed to create account, employee rolled back",
+                    e);
         }
         return employee;
     }
@@ -86,17 +87,18 @@ public class EmployeeManager {
      * address is not already used by another employee.
      *
      * @param toUpdateEmployee the employee to update (must not be null; must have a
-     *                         non-null ID)
+     * non-null ID)
      * @throws IllegalArgumentException if the employee is invalid, the ID is null,
-     *                                  or the email is already used by another
-     *                                  employee
+     * or the email is already used by another
+     * employee
      */
     public void updateEmployee(final Employee toUpdateEmployee) {
         ValidateUtils.validateEntity(toUpdateEmployee);
         ValidateUtils.requireArgNotNull(toUpdateEmployee.getEmployeeId(),
                 "Employee ID cannot be null");
 
-        final Optional<Employee> existingOpt = employeeRepository.findByEmail(toUpdateEmployee.getEmail());
+        final Optional<Employee> existingOpt =
+                employeeRepository.findByEmail(toUpdateEmployee.getEmail());
         if (existingOpt.isPresent() && !existingOpt.get().getEmployeeId()
                 .equals(toUpdateEmployee.getEmployeeId())) {
             throw new IllegalArgumentException(
@@ -135,7 +137,7 @@ public class EmployeeManager {
      * - B : can drive vehicles requiring B only
      *
      * @param employee the employee (must not be null)
-     * @param vehicle  the vehicle (must not be null)
+     * @param vehicle the vehicle (must not be null)
      * @return true if the employee can drive the vehicle; false otherwise
      * @throws IllegalArgumentException if employee or vehicle is null
      */
@@ -157,7 +159,7 @@ public class EmployeeManager {
      *
      * @param employeeId the ID of the employee
      * @return an Optional containing the employee if found, or an empty Optional
-     *         otherwise
+     * otherwise
      */
     public Optional<Employee> getEmployeeById(final int employeeId) {
         return employeeRepository.findById(employeeId);
@@ -166,11 +168,11 @@ public class EmployeeManager {
     /**
      * Finds an employee by their email address.
      *
-     * @param Email the email of the employee to search for
+     * @param email the email of the employee to search for
      * @return an Optional containing the employee if found, or empty if not found
      */
-    public Optional<Employee> findEmployeeByEmail(final String Email) {
-        return employeeRepository.findByEmail(Email);
+    public Optional<Employee> findEmployeeByEmail(final String email) {
+        return employeeRepository.findByEmail(email);
     }
 
     /**
@@ -178,7 +180,7 @@ public class EmployeeManager {
      *
      * @return a list of active employees
      */
-    public List<Employee> getAllActiveEmployee() {
+    public List<Employee> getAllActiveEmployees() {
         return employeeRepository.findAllActive();
     }
 }
