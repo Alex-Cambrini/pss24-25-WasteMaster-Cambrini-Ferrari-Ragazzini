@@ -40,18 +40,15 @@ class TripTest extends AbstractDatabaseTest {
         final int vehicleCapacity = 5;
 
         vehicle = new Vehicle("AB123CD", "Iveco", "Daily", vehicleYear,
-                Vehicle.RequiredLicence.C1,
-                Vehicle.VehicleStatus.IN_SERVICE, vehicleCapacity);
+                Vehicle.RequiredLicence.C1, Vehicle.VehicleStatus.IN_SERVICE,
+                vehicleCapacity);
         location = new Location("Via Roma", "10", "Bologna", "40100");
-        operator1 = new Employee("John", "Doe", location,
-                "john.doe@example.com", "1234567890",
-                Employee.Role.OPERATOR, Employee.Licence.C1);
+        operator1 = new Employee("John", "Doe", location, "john.doe@example.com",
+                "1234567890", Employee.Role.OPERATOR, Employee.Licence.C1);
         operator2 = new Employee("Jane", "Doe", location, "jane.doe@example.com",
-                "0987654321",
-                Employee.Role.OPERATOR, Employee.Licence.C1);
+                "0987654321", Employee.Role.OPERATOR, Employee.Licence.C1);
         operator3 = new Employee("Alice", "Smith", location, "alice.smith@example.com",
-                "1122334455",
-                Employee.Role.OPERATOR, Employee.Licence.C1);
+                "1122334455", Employee.Role.OPERATOR, Employee.Licence.C1);
 
         departureTime = LocalDateTime.now().plusHours(1);
         expectedReturnTime = departureTime.plusHours(fiveDaysAgo);
@@ -63,9 +60,7 @@ class TripTest extends AbstractDatabaseTest {
     @Test
     void testGetterSetter() {
         trip = new Trip("40100", vehicle, List.of(operator1, operator2, operator3),
-                departureTime,
-                expectedReturnTime,
-                Collections.emptyList());
+                departureTime, expectedReturnTime, Collections.emptyList());
 
         trip.setPostalCode("40200");
         assertEquals("40200", trip.getPostalCode());
@@ -97,13 +92,14 @@ class TripTest extends AbstractDatabaseTest {
         Customer customer1 = new Customer("Mario Rossi", null, null, null, null);
         Customer customer2 = new Customer("Anna Bianchi", null, null, null, null);
 
-        Waste waste1 = new Waste("Organico", null, null);
-        Waste waste2 = new Waste("Carta", null, null);
+        Waste waste1 = new Waste("Organic", null, null);
+        Waste waste2 = new Waste("Paper", null, null);
 
-        OneTimeSchedule oneTime1 = new OneTimeSchedule(customer1, waste1,
-                LocalDate.now().plusDays(1));
-        RecurringSchedule recurring = new RecurringSchedule(customer2, waste2,
-                LocalDate.now(), RecurringSchedule.Frequency.WEEKLY);
+        OneTimeSchedule oneTime1 =
+                new OneTimeSchedule(customer1, waste1, LocalDate.now().plusDays(1));
+        RecurringSchedule recurring =
+                new RecurringSchedule(customer2, waste2, LocalDate.now(),
+                        RecurringSchedule.Frequency.WEEKLY);
         recurring.setNextCollectionDate(
                 LocalDate.now().plusDays(daysUntilNextCollection));
 
@@ -119,9 +115,9 @@ class TripTest extends AbstractDatabaseTest {
 
         List<Employee> operators = List.of(operator1, operator2, operator3);
 
-        Trip createdTrip = new Trip("40100", vehicle, operators,
-                LocalDateTime.now().plusHours(1),
-                LocalDateTime.now().plusHours(hoursUntilReturn), collections);
+        Trip createdTrip =
+                new Trip("40100", vehicle, operators, LocalDateTime.now().plusHours(1),
+                        LocalDateTime.now().plusHours(hoursUntilReturn), collections);
 
         getTripDAO().insert(createdTrip);
 
@@ -141,8 +137,7 @@ class TripTest extends AbstractDatabaseTest {
     @Test
     void testDefaultStatusActive() {
         Trip t = new Trip("40100", vehicle, List.of(operator1), departureTime,
-                expectedReturnTime,
-                Collections.emptyList());
+                expectedReturnTime, Collections.emptyList());
         assertEquals(Trip.TripStatus.ACTIVE, t.getStatus());
     }
 
@@ -150,14 +145,14 @@ class TripTest extends AbstractDatabaseTest {
     void testValidationTripFields() {
         Trip invalid = new Trip();
         var violations =
-                it.unibo.wastemaster.infrastructure.utils.ValidateUtils.VALIDATOR.validate(
-                        invalid);
+                it.unibo.wastemaster.infrastructure.utils.ValidateUtils.VALIDATOR
+                        .validate(
+                                invalid);
 
         assertTrue(violations.stream()
                 .anyMatch(v -> v.getPropertyPath().toString().equals("departureTime")));
-        assertTrue(violations.stream()
-                .anyMatch(v -> v.getPropertyPath().toString()
-                        .equals("expectedReturnTime")));
+        assertTrue(violations.stream().anyMatch(
+                v -> v.getPropertyPath().toString().equals("expectedReturnTime")));
         assertTrue(violations.stream()
                 .anyMatch(v -> v.getPropertyPath().toString().equals("status")));
         assertTrue(violations.stream()
@@ -171,11 +166,12 @@ class TripTest extends AbstractDatabaseTest {
         getEmployeeDAO().insert(operator3);
         getVehicleDAO().insert(vehicle);
 
-        Customer customer = new Customer("Mario", "Rossi", location,
-                "mario.rossi@example.com", "1234567890");
+        Customer customer =
+                new Customer("Mario", "Rossi", location, "mario.rossi@example.com",
+                        "1234567890");
         getCustomerDAO().insert(customer);
 
-        Waste waste = new Waste("Organico", true, false);
+        Waste waste = new Waste("Organic", true, false);
         getWasteDAO().insert(waste);
 
         OneTimeSchedule schedule =
@@ -185,10 +181,10 @@ class TripTest extends AbstractDatabaseTest {
         Collection collection = new Collection(schedule);
         getCollectionDAO().insert(collection);
 
-        Trip trip = new Trip("40100", vehicle,
-                new ArrayList<>(List.of(operator1, operator2)),
-                departureTime, expectedReturnTime,
-                new ArrayList<>(List.of(collection)));
+        Trip trip =
+                new Trip("40100", vehicle, new ArrayList<>(List.of(operator1, operator2)),
+                        departureTime, expectedReturnTime,
+                        new ArrayList<>(List.of(collection)));
         getTripDAO().insert(trip);
 
         Trip reloaded = getTripDAO().findById(trip.getTripId()).orElseThrow();
