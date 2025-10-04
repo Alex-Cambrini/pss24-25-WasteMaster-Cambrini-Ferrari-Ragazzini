@@ -1,7 +1,9 @@
 package it.unibo.wastemaster.controller.trip;
 
 import static it.unibo.wastemaster.controller.utils.DialogUtils.closeModal;
+import static it.unibo.wastemaster.controller.utils.DialogUtils.showError;
 
+import it.unibo.wastemaster.application.context.AppContext;
 import it.unibo.wastemaster.domain.model.Collection;
 import it.unibo.wastemaster.domain.model.Employee;
 import it.unibo.wastemaster.domain.model.Vehicle;
@@ -23,8 +25,6 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.control.Alert;
-import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
@@ -361,26 +361,30 @@ public class AddTripController {
                 || postalCode.isEmpty() || vehicle == null
                 || depDate == null || retDate == null
                 || depDateTime == null || retDateTime == null) {
-            showAlert("All fields are required.");
+            showError("Validation error", "All fields are required.",
+                    AppContext.getOwner());
             return;
         }
 
         if (retDateTime.isBefore(depDateTime)) {
-            showAlert("Return date/time must be after departure.");
+            showError("Validation error", "Return date/time must be after departure.",
+                    AppContext.getOwner());
             return;
         }
 
         if (driver == null) {
-            showAlert("Please select a driver.");
+            showError("Validation error", "Please select a driver.",
+                    AppContext.getOwner());
             return;
         }
 
         List<Employee.Licence> allowedLicences =
                 vehicleManager.getAllowedLicences(vehicle);
         if (!allowedLicences.contains(driver.getLicence())) {
-            showAlert(
+            showError("Validation error",
                     "The selected driver does not have a suitable licence for this "
-                            + "vehicle.");
+                            + "vehicle.",
+                    AppContext.getOwner());
             return;
         }
 
@@ -393,15 +397,18 @@ public class AddTripController {
 
         int required = seatCapacity.get();
         if (totalPeople < required) {
-            showAlert(
+            showError("Validation error",
                     "Not enough crew members selected (" + totalPeople + " / " + required
                             + "). Please add more operators to meet the required crew "
-                            + "size.");
+                            + "size.",
+                    AppContext.getOwner());
             return;
         }
         if (totalPeople > seatCapacity.get()) {
-            showAlert("Too many people for this vehicle (" + totalPeople + " / "
-                    + seatCapacity.get() + ").");
+            showError("Validation error",
+                    "Too many people for this vehicle (" + totalPeople + " / "
+                            + seatCapacity.get() + ").",
+                    AppContext.getOwner());
             return;
         }
 
@@ -416,15 +423,22 @@ public class AddTripController {
         List<Collection> collections =
                 collectionManager.getCollectionsByPostalCode(postalCode, depDate);
 
-        tripManager.createTrip(
-                postalCode,
-                vehicle,
-                finalCrew,
-                depDateTime,
-                retDateTime,
-                collections);
-
-        closeModal(event);
+        try {
+            tripManager.createTrip(
+                    postalCode,
+                    vehicle,
+                    finalCrew,
+                    depDateTime,
+                    retDateTime,
+                    collections);
+            closeModal(event);
+        } catch (jakarta.validation.ConstraintViolationException e) {
+            showError("Validation error", "Trip contains invalid data: " + e.getMessage(),
+                    AppContext.getOwner());
+        } catch (jakarta.persistence.PersistenceException e) {
+            showError("Database error", "Could not save trip: " + e.getMessage(),
+                    AppContext.getOwner());
+        }
     }
 
     /**
@@ -437,8 +451,4 @@ public class AddTripController {
         closeModal(event);
     }
 
-    private void showAlert(final String msg) {
-        Alert alert = new Alert(Alert.AlertType.ERROR, msg, ButtonType.OK);
-        alert.showAndWait();
-    }
 }
