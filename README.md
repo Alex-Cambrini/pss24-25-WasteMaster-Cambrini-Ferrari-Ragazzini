@@ -12,7 +12,8 @@
 
 ## Requisiti
 
-L'applicazione gestisce le attività di un'azienda di smaltimento rifiuti, fornendo gli strumenti per la pianificazione, il monitoraggio e l'amministrazione dei servizi.  
+L'applicazione gestisce le attività di un'azienda di smaltimento rifiuti, fornendo strumenti per pianificazione, monitoraggio e amministrazione dei servizi.
+
 **Requisiti funzionali:**
 - Gestione anagrafiche clienti e operatori (dati dettagliati, ruoli)
 - Amministrazione risorse aziendali (mezzi/personale, stato operativo)
@@ -42,47 +43,47 @@ L'applicazione gestisce le attività di un'azienda di smaltimento rifiuti, forne
 ## Analisi e modello del dominio
 
 **Entità principali:**
-- Cliente
-- Operatore
-- Mezzo
-- Rifiuto
-- Raccolta
-- Rotta
-- Fattura
-- Segnalazione
-- Manutenzione
+- Customer
+- Operator
+- Vehicle
+- Waste
+- Collection
+- Route
+- Invoice
+- Report
+- Maintenance
 
 **Relazioni:**
-- Raccolta ↔ Cliente/Operatore/Mezzo/Rifiuto/Rotta/Fattura
-- Mezzo ↔ Raccolta/Manutenzione
-- Cliente ↔ Segnalazione
-- Raccolta → genera Fattura
+- Collection ↔ Customer/Operator/Vehicle/Waste/Route/Invoice
+- Vehicle ↔ Collection/Maintenance
+- Customer ↔ Report
+- Collection → genera Invoice
 
 **Descrizione a parole:**  
-Ogni raccolta rappresenta un servizio pianificato o speciale di ritiro rifiuti, coinvolge uno o più clienti, operatori e mezzi, e genera una fattura. I mezzi sono assegnati a rotte dinamiche e sono soggetti a manutenzione. I clienti possono inviare segnalazioni legate al servizio.
+Ogni collection rappresenta un servizio pianificato o speciale di ritiro rifiuti, coinvolge uno o più customer, operator e vehicle, e genera una invoice. I vehicle sono assegnati a route dinamiche e sono soggetti a maintenance. I customer possono inviare report legati al servizio.
 
 **Schema UML del dominio:**
 
 ```mermaid
 classDiagram
-    class Cliente
-    class Operatore
-    class Mezzo
-    class Rifiuto
-    class Raccolta
-    class Rotta
-    class Fattura
-    class Segnalazione
-    class Manutenzione
+    class Customer
+    class Operator
+    class Vehicle
+    class Waste
+    class Collection
+    class Route
+    class Invoice
+    class Report
+    class Maintenance
 
-    Cliente "1" -- "0..*" Raccolta
-    Operatore "1" -- "0..*" Raccolta
-    Mezzo "1" -- "0..*" Raccolta
-    Mezzo "1" -- "0..*" Manutenzione
-    Raccolta "0..*" -- "1" Rotta
-    Raccolta "1" -- "0..1" Fattura
-    Cliente "1" -- "0..*" Segnalazione
-    Raccolta "1" -- "0..*" Rifiuto
+    Customer "1" -- "0..*" Collection
+    Operator "1" -- "0..*" Collection
+    Vehicle "1" -- "0..*" Collection
+    Vehicle "1" -- "0..*" Maintenance
+    Collection "0..*" -- "1" Route
+    Collection "1" -- "0..1" Invoice
+    Customer "1" -- "0..*" Report
+    Collection "1" -- "0..*" Waste
 ```
 
 ---
@@ -93,7 +94,7 @@ classDiagram
 
 Il sistema adotta un'architettura modulare ispirata a MVC:
 
-- **Model:** entità di dominio e logica (Cliente, Mezzo, Raccolta, ecc.)
+- **Model:** entità di dominio e logica (Customer, Vehicle, Collection, ecc.)
 - **View:** interfaccia utente, dashboard, notifiche
 - **Controller:** coordinamento richieste, flusso operazioni e orchestrazione
 
@@ -101,15 +102,15 @@ Il sistema adotta un'architettura modulare ispirata a MVC:
 
 ```mermaid
 classDiagram
-    Model <|-- Cliente
-    Model <|-- Operatore
-    Model <|-- Mezzo
-    Model <|-- Rifiuto
-    Model <|-- Raccolta
-    Model <|-- Rotta
-    Model <|-- Fattura
-    Model <|-- Segnalazione
-    Model <|-- Manutenzione
+    Model <|-- Customer
+    Model <|-- Operator
+    Model <|-- Vehicle
+    Model <|-- Waste
+    Model <|-- Collection
+    Model <|-- Route
+    Model <|-- Invoice
+    Model <|-- Report
+    Model <|-- Maintenance
 
     Controller o-- Model
     View o-- Controller
@@ -121,7 +122,7 @@ classDiagram
 
 ### Gestione anagrafiche
 
-**Problema:** Gestire clienti/operatori in modo sicuro e aggiornabile, con notifica delle modifiche.
+**Problema:** Gestire customers/operators in modo sicuro e aggiornabile, con notifica delle modifiche.
 
 **Soluzione:**  
 - **Pattern Repository:** separa logica di accesso ai dati e servizi.
@@ -129,13 +130,13 @@ classDiagram
 
 ```mermaid
 classDiagram
-    interface AnagraficaRepository
-    class Cliente
-    class Operatore
-    class AnagraficaService
-    AnagraficaService o-- AnagraficaRepository
-    AnagraficaRepository <|.. Cliente
-    AnagraficaRepository <|.. Operatore
+    interface RegistryRepository
+    class Customer
+    class Operator
+    class RegistryService
+    RegistryService o-- RegistryRepository
+    RegistryRepository <|.. Customer
+    RegistryRepository <|.. Operator
 ```
 
 ---
@@ -145,77 +146,77 @@ classDiagram
 **Problema:** Gestire raccolte programmate/speciali, modificabili dinamicamente in base a richieste e disponibilità.
 
 **Soluzione:**  
-- **Pattern Strategy:** politiche di pianificazione (standard/speciale)
-- **Pattern State:** gestione stato raccolta (pianificata, in corso, completata, fallita)
+- **Pattern Strategy:** politiche di pianificazione (standard/special)
+- **Pattern State:** gestione stato collection (planned, ongoing, completed, failed)
 
 ```mermaid
 classDiagram
-    class Raccolta {
-      +pianifica()
-      +cambiaStato()
+    class Collection {
+      +plan()
+      +changeState()
     }
-    interface PianificazioneStrategy
-    class RaccoltaStandard
-    class RaccoltaSpeciale
-    class StatoRaccolta
-    class PianificatoreRaccolte
+    interface PlanningStrategy
+    class StandardCollection
+    class SpecialCollection
+    class CollectionState
+    class CollectionPlanner
 
-    Raccolta o-- PianificazioneStrategy
-    PianificazioneStrategy <|-- RaccoltaStandard
-    PianificazioneStrategy <|-- RaccoltaSpeciale
-    Raccolta o-- StatoRaccolta
-    PianificatoreRaccolte o-- Raccolta
+    Collection o-- PlanningStrategy
+    PlanningStrategy <|-- StandardCollection
+    PlanningStrategy <|-- SpecialCollection
+    Collection o-- CollectionState
+    CollectionPlanner o-- Collection
 ```
 
 ---
 
 ### Gestione fatturazione e pagamenti
 
-**Problema:** Automatizzare generazione fatture e tracciamento pagamenti.
+**Problema:** Automatizzare generazione invoice e tracciamento pagamenti.
 
 **Soluzione:**  
-- **Pattern Factory Method:** creazione fatture standard/speciali
+- **Pattern Factory Method:** creazione invoice standard/special
 - **Pattern Observer:** notifica cambiamenti stato pagamento
 
 ```mermaid
 classDiagram
-    class FatturaFactory
-    class Fattura
-    class FatturaStandard
-    class FatturaSpeciale
-    class GestorePagamenti
-    class Cliente
+    class InvoiceFactory
+    class Invoice
+    class StandardInvoice
+    class SpecialInvoice
+    class PaymentManager
+    class Customer
 
-    FatturaFactory <|-- FatturaStandard
-    FatturaFactory <|-- FatturaSpeciale
-    GestorePagamenti o-- Fattura
-    GestorePagamenti o-- Cliente
-    Fattura <|.. Observer
-    GestorePagamenti o-- Observer
+    InvoiceFactory <|-- StandardInvoice
+    InvoiceFactory <|-- SpecialInvoice
+    PaymentManager o-- Invoice
+    PaymentManager o-- Customer
+    Invoice <|.. Observer
+    PaymentManager o-- Observer
 ```
 
 ---
 
 ### Pianificazione rotte
 
-**Problema:** Ottimizzare e aggiornare dinamicamente le rotte dei mezzi.
+**Problema:** Ottimizzare e aggiornare dinamicamente le route dei vehicle.
 
 **Soluzione:**  
-- **Pattern Command:** gestione richieste modifica rotta e undo/redo
-- **Pattern Iterator:** scorrimento tappe rotta
+- **Pattern Command:** gestione richieste modifica route e undo/redo
+- **Pattern Iterator:** scorrimento tappe della route
 
 ```mermaid
 classDiagram
-    class Rotta
-    class Mezzo
-    class Tappa
-    class ComandoModificaRotta
-    class PianificatoreRotte
+    class Route
+    class Vehicle
+    class Waypoint
+    class RouteCommand
+    class RoutePlanner
 
-    Rotta o-- Tappa
-    Rotta o-- Mezzo
-    PianificatoreRotte o-- Rotta
-    PianificatoreRotte o-- ComandoModificaRotta
+    Route o-- Waypoint
+    Route o-- Vehicle
+    RoutePlanner o-- Route
+    RoutePlanner o-- RouteCommand
 ```
 
 ---
@@ -231,39 +232,39 @@ classDiagram
 ```mermaid
 classDiagram
     class Dashboard
-    class Notifica
+    class Notification
     class Alert
-    class Messaggio
-    class DecoratorMessaggio
+    class Message
+    class MessageDecorator
 
-    Dashboard o-- Notifica
-    Notifica <|-- Alert
-    Alert o-- Messaggio
-    DecoratorMessaggio <|-- Messaggio
+    Dashboard o-- Notification
+    Notification <|-- Alert
+    Alert o-- Message
+    MessageDecorator <|-- Message
 ```
 
 ---
 
 ### Gestione manutenzione mezzi
 
-**Problema:** Pianificare e tracciare manutenzioni senza interrompere l’operatività.
+**Problema:** Pianificare e tracciare maintenance senza interrompere l’operatività.
 
 **Soluzione:**  
 - **Pattern Template Method:** sequenza fasi intervento
-- **Pattern Strategy:** tipi diversi di manutenzione (ordinaria, straordinaria)
+- **Pattern Strategy:** tipi diversi di maintenance (ordinary, extraordinary)
 
 ```mermaid
 classDiagram
-    class ManutenzioneTemplate {
+    class MaintenanceTemplate {
         <<abstract>>
     }
-    class ManutenzioneOrdinaria
-    class ManutenzioneStraordinaria
-    class Mezzo
+    class OrdinaryMaintenance
+    class ExtraordinaryMaintenance
+    class Vehicle
 
-    ManutenzioneTemplate <|-- ManutenzioneOrdinaria
-    ManutenzioneTemplate <|-- ManutenzioneStraordinaria
-    Mezzo o-- ManutenzioneTemplate
+    MaintenanceTemplate <|-- OrdinaryMaintenance
+    MaintenanceTemplate <|-- ExtraordinaryMaintenance
+    Vehicle o-- MaintenanceTemplate
 ```
 
 ---
@@ -274,7 +275,7 @@ Sono stati sviluppati test automatici per:
 
 - Creazione e modifica delle anagrafiche
 - Pianificazione e modifica raccolte e rotte
-- Generazione fatture e verifica pagamenti
+- Generazione invoice e verifica pagamenti
 - Integrazione tra raccolte, rotte e disponibilità mezzi
 
 Il testing utilizza JUnit (o equivalente), è automatico e ripetibile, con test di unità e integrazione per le funzionalità core.
@@ -286,18 +287,18 @@ Il testing utilizza JUnit (o equivalente), è automatico e ripetibile, con test 
 ## Gestione anagrafiche
 
 - **Uso avanzato di Stream e Optional**  
-  *File:* `src/main/java/wastemaster/anagrafica/AnagraficaService.java`  
+  *File:* `src/main/java/wastemaster/registry/RegistryService.java`  
   ```java
-  public Optional<Cliente> cercaClientePerEmail(String email) {
-      return clienti.stream()
-          .filter(cliente -> cliente.getEmail().equalsIgnoreCase(email))
+  public Optional<Customer> findCustomerByEmail(String email) {
+      return customers.stream()
+          .filter(customer -> customer.getEmail().equalsIgnoreCase(email))
           .findFirst();
   }
   ```
   *Permette ricerca e gestione sicura (null-safe) dei risultati.*
 
 - **Validazione con annotazioni custom**  
-  *File:* `src/main/java/wastemaster/anagrafica/Cliente.java`  
+  *File:* `src/main/java/wastemaster/registry/Customer.java`  
   ```java
   @NotNull
   @Email
@@ -308,7 +309,7 @@ Il testing utilizza JUnit (o equivalente), è automatico e ripetibile, con test 
 - **Uso di generics per repository risorse**  
   *File:* `src/main/java/wastemaster/resources/ResourceRepository.java`  
   ```java
-  public class ResourceRepository<T extends Risorsa> { ... }
+  public class ResourceRepository<T extends Resource> { ... }
   ```
   *Permette riuso e tipizzazione sicura nella gestione di diversi tipi di risorse.*
 
@@ -317,25 +318,25 @@ Il testing utilizza JUnit (o equivalente), è automatico e ripetibile, con test 
 ## Pianificazione raccolte
 
 - **Algoritmo pianificazione dinamica**  
-  *File:* `src/main/java/wastemaster/raccolta/PianificatoreRaccolte.java`  
+  *File:* `src/main/java/wastemaster/collection/CollectionPlanner.java`  
   ```java
-  raccolte.sort(Comparator.comparing(Raccolta::getPriorita).reversed());
+  collections.sort(Comparator.comparing(Collection::getPriority).reversed());
   ```
   *Ottimizza l’assegnazione delle risorse in base a priorità e disponibilità.*
 
 - **Integrazione raccolte speciali con calendario**  
-  *File:* `src/main/java/wastemaster/raccolta/RaccoltaSpeciale.java`  
+  *File:* `src/main/java/wastemaster/collection/SpecialCollection.java`  
   ```java
-  calendario.addEvento(this.getData(), "Raccolta Speciale: " + this.getDescrizione());
+  calendar.addEvent(this.getDate(), "Special Collection: " + this.getDescription());
   ```
   *Gestione unificata eventi e raccolte straordinarie.*
 
 - **Pattern Observer per monitoraggio raccolte**  
-  *File:* `src/main/java/wastemaster/raccolta/Raccolta.java`  
+  *File:* `src/main/java/wastemaster/collection/Collection.java`  
   ```java
-  private List<RaccoltaObserver> observers = new ArrayList<>();
-  public void notificaStato() {
-      observers.forEach(o -> o.aggiorna(this));
+  private List<CollectionObserver> observers = new ArrayList<>();
+  public void notifyState() {
+      observers.forEach(o -> o.update(this));
   }
   ```
   *Notifica automatica di avanzamento stato a dashboard e operatori.*
@@ -344,25 +345,25 @@ Il testing utilizza JUnit (o equivalente), è automatico e ripetibile, con test 
 
 ## Fatturazione e rotte
 
-- **Generazione e invio automatico fatture**  
-  *File:* `src/main/java/wastemaster/fatturazione/FatturazioneService.java`  
+- **Generazione e invio automatico invoice**  
+  *File:* `src/main/java/wastemaster/invoice/InvoiceService.java`  
   ```java
-  EmailSender.send(emailCliente, "La tua fattura", fattura.toString());
+  EmailSender.send(customerEmail, "Your invoice", invoice.toString());
   ```
-  *Automatizza comunicazione con il cliente.*
+  *Automatizza comunicazione con il customer.*
 
 - **Algoritmo calcolo rotte con gestione imprevisti**  
-  *File:* `src/main/java/wastemaster/rotte/PianificatoreRotte.java`  
+  *File:* `src/main/java/wastemaster/routes/RoutePlanner.java`  
   ```java
-  return algoritmoOttimizzazione.calcola(mezzo, raccolte);
+  return optimizationAlgorithm.calculate(vehicle, collections);
   ```
   *Ricalcola percorso in tempo reale in risposta a eventi imprevisti.*
 
-- **Integrazione pagamenti e notifiche cliente**  
-  *File:* `src/main/java/wastemaster/fatturazione/PagamentiService.java`  
+- **Integrazione pagamenti e notifiche customer**  
+  *File:* `src/main/java/wastemaster/invoice/PaymentService.java`  
   ```java
-  fattura.setPagata(true);
-  Notificatore.avvisaCliente(fattura.getCliente(), "Pagamento ricevuto. Grazie!");
+  invoice.setPaid(true);
+  Notifier.notifyCustomer(invoice.getCustomer(), "Payment received. Thank you!");
   ```
   *Aggiornamento stato pagamenti e comunicazione tempestiva.*
 
@@ -373,25 +374,25 @@ Il testing utilizza JUnit (o equivalente), è automatico e ripetibile, con test 
 - **Dashboard aggiornata via Observer**  
   *File:* `src/main/java/wastemaster/dashboard/Dashboard.java`  
   ```java
-  raccolta.addObserver(this::aggiornaDashboard);
+  collection.addObserver(this::updateDashboard);
   ```
   *Aggiornamento automatico vista operativa.*
 
-- **Gestione Template Method in manutenzione**  
-  *File:* `src/main/java/wastemaster/manutenzione/ManutenzioneTemplate.java`  
+- **Gestione Template Method in maintenance**  
+  *File:* `src/main/java/wastemaster/maintenance/MaintenanceTemplate.java`  
   ```java
-  public final void eseguiManutenzione() {
-      verificaCondizioni();
-      eseguiIntervento();
-      aggiornaStorico();
+  public final void performMaintenance() {
+      checkConditions();
+      executeIntervention();
+      updateHistory();
   }
   ```
   *Sequenza fasi standard e personalizzazione per ciascun tipo di intervento.*
 
 - **Notifiche avanzate con Decorator**  
-  *File:* `src/main/java/wastemaster/notifiche/DecoratorMessaggio.java`  
+  *File:* `src/main/java/wastemaster/notifications/MessageDecorator.java`  
   ```java
-  Messaggio alert = new PrioritaDecorator(new MessaggioBase("Raccolta fallita!"));
+  Message alert = new PriorityDecorator(new BaseMessage("Collection failed!"));
   ```
   *Permette arricchimento dei messaggi di allerta.*
 
@@ -414,16 +415,16 @@ Il testing utilizza JUnit (o equivalente), è automatico e ripetibile, con test 
 
 # Guida utente
 
-1. **Accesso:** Login come operatore o amministratore.
+1. **Accesso:** Login come operator o admin.
 2. **Gestione anagrafiche:**  
-   - Aggiungi/modifica/elimina clienti e operatori.
-3. **Raccolte:**  
+   - Aggiungi/modifica/elimina customers e operators.
+3. **Collections:**  
    - Pianifica nuove raccolte, visualizza/modifica raccolte esistenti, gestisci raccolte speciali.
-4. **Mezzi:**  
-   - Visualizza stato, pianifica manutenzione.
-5. **Fatture:**  
-   - Genera/consulta fatture, registra pagamenti.
-6. **Rotte:**  
+4. **Vehicles:**  
+   - Visualizza stato, pianifica maintenance.
+5. **Invoices:**  
+   - Genera/consulta invoice, registra pagamenti.
+6. **Routes:**  
    - Visualizza/modifica rotte assegnate.
 7. **Dashboard:**  
    - Monitora statistiche operative e ricevi notifiche.
