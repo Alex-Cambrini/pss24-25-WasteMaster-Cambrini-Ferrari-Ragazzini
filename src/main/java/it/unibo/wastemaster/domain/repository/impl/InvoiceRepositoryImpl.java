@@ -4,7 +4,6 @@ import it.unibo.wastemaster.domain.model.Customer;
 import it.unibo.wastemaster.domain.model.Invoice;
 import it.unibo.wastemaster.domain.repository.InvoiceRepository;
 import it.unibo.wastemaster.infrastructure.dao.InvoiceDAO;
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -23,18 +22,6 @@ public class InvoiceRepositoryImpl implements InvoiceRepository {
      */
     public InvoiceRepositoryImpl(final InvoiceDAO invoiceDAO) {
         this.invoiceDAO = invoiceDAO;
-    }
-
-    /**
-     * Retrieves invoices within a date range.
-     *
-     * @param start the start date
-     * @param end the end date
-     * @return a list of invoices in the specified date range
-     */
-    @Override
-    public List<Invoice> findByDateRange(final LocalDate start, final LocalDate end) {
-        return invoiceDAO.findByDateRange(start, end);
     }
 
     /**
