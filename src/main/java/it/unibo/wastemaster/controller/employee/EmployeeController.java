@@ -156,7 +156,6 @@ public final class EmployeeController implements AutoRefreshable {
      * This method must be called after all required managers are injected.
      */
     public void initData() {
-        System.out.println("[DEBUG] initData EmployeeController called");
         loadEmployee();
     }
 

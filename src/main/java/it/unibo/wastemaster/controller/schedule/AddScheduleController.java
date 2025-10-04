@@ -116,7 +116,6 @@ public final class AddScheduleController {
      * This method must be called after all required managers have been set.
      */
     public void initData() {
-        System.out.println("[DEBUG] initData addSchedule Controller called");
         setupFrequencyComboBox();
         setupCustomerAutocomplete();
         setupWasteComboBox();
@@ -124,8 +123,6 @@ public final class AddScheduleController {
 
     private void setupCustomerAutocomplete() {
         allCustomers = customerManager.getAllCustomers();
-        System.out.println("[DEBUG] Loaded customers: " + allCustomers.size());
-
         customerField.textProperty().addListener((obs, oldText, newText) -> {
             if (newText == null || newText.isBlank()) {
                 suggestionsMenu.hide();
@@ -164,7 +161,6 @@ public final class AddScheduleController {
 
     private void setupWasteComboBox() {
         List<Waste> wasteList = wasteManager.getActiveWastes();
-        System.out.println("[DEBUG] Loaded wastes: " + wasteList.size());
 
         if (wasteList.isEmpty()) {
             wasteComboBox.setDisable(true);
