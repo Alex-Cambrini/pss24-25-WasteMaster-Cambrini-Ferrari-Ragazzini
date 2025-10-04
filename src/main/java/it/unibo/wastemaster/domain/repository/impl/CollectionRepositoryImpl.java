@@ -64,18 +64,6 @@ public class CollectionRepositoryImpl implements CollectionRepository {
     }
 
     /**
-     * Retrieves collections within a date range.
-     *
-     * @param start the start date
-     * @param end the end date
-     * @return a list of collections occurring within the specified date range
-     */
-    @Override
-    public List<Collection> findByDateRange(final LocalDate start, final LocalDate end) {
-        return collectionDAO.findByDateRange(start, end);
-    }
-
-    /**
      * Retrieves collections for a specific postal code and date.
      *
      * @param postalCode the postal code to filter collections

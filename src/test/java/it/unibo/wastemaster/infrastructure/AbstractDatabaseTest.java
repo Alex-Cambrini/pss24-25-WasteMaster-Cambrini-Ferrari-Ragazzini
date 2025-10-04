@@ -118,7 +118,7 @@ public abstract class AbstractDatabaseTest {
     public static void init() {
         emf = Persistence.createEntityManagerFactory("test-pu");
         if (emf == null) {
-            System.out.println("Failed to create EntityManagerFactory.");
+            throw new IllegalStateException("Failed to create EntityManagerFactory.");
         }
     }
 

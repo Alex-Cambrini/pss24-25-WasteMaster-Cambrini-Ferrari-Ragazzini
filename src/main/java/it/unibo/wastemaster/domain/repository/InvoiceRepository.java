@@ -1,7 +1,6 @@
 package it.unibo.wastemaster.domain.repository;
 
 import it.unibo.wastemaster.domain.model.Invoice;
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -10,15 +9,6 @@ import java.util.Optional;
  * Provides CRUD operations and retrieval methods by date, customer, and recent events.
  */
 public interface InvoiceRepository {
-
-    /**
-     * Retrieves all invoices within the specified date range.
-     *
-     * @param start the start date of the range (inclusive)
-     * @param end the end date of the range (inclusive)
-     * @return a list of Invoice entities within the date range
-     */
-    List<Invoice> findByDateRange(LocalDate start, LocalDate end);
 
     /**
      * Persists a new invoice.

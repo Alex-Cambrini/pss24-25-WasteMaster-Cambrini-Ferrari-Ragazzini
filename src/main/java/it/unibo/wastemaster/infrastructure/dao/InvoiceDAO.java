@@ -3,7 +3,6 @@ package it.unibo.wastemaster.infrastructure.dao;
 import it.unibo.wastemaster.domain.model.Customer;
 import it.unibo.wastemaster.domain.model.Invoice;
 import jakarta.persistence.EntityManager;
-import java.time.LocalDate;
 import java.util.List;
 
 /**
@@ -27,23 +26,6 @@ public final class InvoiceDAO extends GenericDAO<Invoice> {
      */
     public InvoiceDAO(final EntityManager entityManager) {
         super(entityManager, Invoice.class);
-    }
-
-    /**
-     * Finds invoices issued between the given start and end dates (inclusive).
-     *
-     * @param start the start date of the range
-     * @param end the end date of the range
-     * @return list of invoices issued in the given date range
-     */
-    public List<Invoice> findByDateRange(final LocalDate start, final LocalDate end) {
-        return getEntityManager().createQuery(
-                        "SELECT i FROM Invoice i WHERE i.issueDate BETWEEN :start AND "
-                                + ":end",
-                        Invoice.class)
-                .setParameter("start", start)
-                .setParameter("end", end)
-                .getResultList();
     }
 
     /**
