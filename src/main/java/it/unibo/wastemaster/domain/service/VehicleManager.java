@@ -109,6 +109,45 @@ public final class VehicleManager {
     }
 
     /**
+     * Handles the maintenance button logic.
+     * If the vehicle is IN_SERVICE, it is set to IN_MAINTENANCE.
+     * If the vehicle is IN_MAINTENANCE, maintenance is completed (status set to
+     * IN_SERVICE and dates updated).
+     *
+     * @param vehicle the vehicle whose maintenance status will be handled; must not be
+     * null
+     * @throws IllegalArgumentException if vehicle is null or invalid
+     */
+    public void handleMaintenanceButton(final Vehicle vehicle) {
+        ValidateUtils.validateEntity(vehicle);
+        if (vehicle.getVehicleStatus() == Vehicle.VehicleStatus.IN_SERVICE) {
+            vehicle.setVehicleStatus(Vehicle.VehicleStatus.IN_MAINTENANCE);
+            updateVehicle(vehicle);
+        } else if (vehicle.getVehicleStatus() == Vehicle.VehicleStatus.IN_MAINTENANCE) {
+            markMaintenanceAsComplete(vehicle);
+        }
+    }
+
+    /**
+     * Handles the service/out-of-service button logic.
+     * If the vehicle is IN_SERVICE, it is set to OUT_OF_SERVICE.
+     * If the vehicle is OUT_OF_SERVICE, it is set back to IN_SERVICE (no date updates).
+     *
+     * @param vehicle the vehicle whose service status will be toggled; must not be null
+     * @throws IllegalArgumentException if vehicle is null or invalid
+     */
+    public void handleServiceButton(final Vehicle vehicle) {
+        ValidateUtils.validateEntity(vehicle);
+        if (vehicle.getVehicleStatus() == Vehicle.VehicleStatus.IN_SERVICE) {
+            vehicle.setVehicleStatus(Vehicle.VehicleStatus.OUT_OF_SERVICE);
+            updateVehicle(vehicle);
+        } else if (vehicle.getVehicleStatus() == Vehicle.VehicleStatus.OUT_OF_SERVICE) {
+            vehicle.setVehicleStatus(Vehicle.VehicleStatus.IN_SERVICE);
+            updateVehicle(vehicle);
+        }
+    }
+
+    /**
      * Deletes the given vehicle if valid.
      *
      * @param vehicle the vehicle to delete
