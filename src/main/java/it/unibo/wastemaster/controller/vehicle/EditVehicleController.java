@@ -7,7 +7,6 @@ import static it.unibo.wastemaster.controller.utils.DialogUtils.showSuccess;
 import it.unibo.wastemaster.application.context.AppContext;
 import it.unibo.wastemaster.domain.model.Vehicle;
 import it.unibo.wastemaster.domain.model.Vehicle.RequiredLicence;
-import it.unibo.wastemaster.domain.model.Vehicle.VehicleStatus;
 import it.unibo.wastemaster.domain.service.VehicleManager;
 import java.util.Optional;
 import javafx.event.ActionEvent;
@@ -42,9 +41,6 @@ public final class EditVehicleController {
     @FXML
     private ComboBox<RequiredLicence> licenceComboBox;
 
-    @FXML
-    private ComboBox<VehicleStatus> statusComboBox;
-
     private VehicleManager vehicleManager;
 
     /**
@@ -73,9 +69,6 @@ public final class EditVehicleController {
 
         licenceComboBox.getItems().setAll(RequiredLicence.values());
         licenceComboBox.getSelectionModel().select(vehicle.getRequiredLicence());
-
-        statusComboBox.getItems().setAll(VehicleStatus.values());
-        statusComboBox.getSelectionModel().select(vehicle.getVehicleStatus());
     }
 
     /**
@@ -101,7 +94,6 @@ public final class EditVehicleController {
                             || vehicle.getRegistrationYear() != Integer
                             .parseInt(yearField.getText())
                             || vehicle.getRequiredLicence() != licenceComboBox.getValue()
-                            || vehicle.getVehicleStatus() != statusComboBox.getValue()
                             || vehicle.getRequiredOperators() != Integer
                             .parseInt(requiredOperatorsField.getText());
 
@@ -116,7 +108,6 @@ public final class EditVehicleController {
             vehicle.setModel(modelField.getText());
             vehicle.setRegistrationYear(Integer.parseInt(yearField.getText()));
             vehicle.setRequiredLicence(licenceComboBox.getValue());
-            vehicle.setVehicleStatus(statusComboBox.getValue());
             vehicle.setRequiredOperators(
                     Integer.parseInt(requiredOperatorsField.getText()));
 
