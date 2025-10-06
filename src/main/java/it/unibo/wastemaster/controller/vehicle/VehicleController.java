@@ -231,7 +231,19 @@ public final class VehicleController implements AutoRefreshable {
                 });
     }
 
-    private void updateButtons(Vehicle.VehicleStatus status) {
+    /**
+     * Updates the text and enabled state of maintenance and service buttons
+     * based on the current vehicle status.
+     *
+     * @param status the current status of the vehicle
+     */
+    private void updateButtons(final Vehicle.VehicleStatus status) {
+        if (status == null) {
+            markMaintenanceButton.setDisable(true);
+            markOutOfServiceButton.setDisable(true);
+            return;
+        }
+
         switch (status) {
             case IN_SERVICE -> {
                 markMaintenanceButton.setText("Mark as Maintenance");
@@ -245,16 +257,18 @@ public final class VehicleController implements AutoRefreshable {
                 markMaintenanceButton.setDisable(false);
 
                 markOutOfServiceButton.setText("Mark as Out of Service");
-                markOutOfServiceButton.setDisable(
-                        true);
+                markOutOfServiceButton.setDisable(true);
             }
             case OUT_OF_SERVICE -> {
                 markMaintenanceButton.setText("Mark as Maintenance");
-                markMaintenanceButton.setDisable(
-                        true);
+                markMaintenanceButton.setDisable(true);
 
                 markOutOfServiceButton.setText("Mark as In Service");
                 markOutOfServiceButton.setDisable(false);
+            }
+            default -> {
+                markMaintenanceButton.setDisable(true);
+                markOutOfServiceButton.setDisable(true);
             }
         }
     }
@@ -371,6 +385,13 @@ public final class VehicleController implements AutoRefreshable {
         }
     }
 
+    /**
+     * Handles the maintenance button action for the selected vehicle.
+     * If the vehicle is IN_SERVICE, asks for confirmation to set it in maintenance.
+     * If the vehicle is IN_MAINTENANCE, asks for confirmation to set it back in service.
+     * Executes the action via {@link VehicleManager#handleMaintenanceButton(Vehicle)},
+     * reloads the table, and updates the button states.
+     */
     @FXML
     private void handleMarkMaintenance() {
         VehicleRow selected = vehicleTable.getSelectionModel().getSelectedItem();
@@ -380,17 +401,17 @@ public final class VehicleController implements AutoRefreshable {
 
         Vehicle vehicle = vehicleManager.findVehicleByPlate(selected.getPlate()).get();
 
-        if (vehicle.getVehicleStatus() == Vehicle.VehicleStatus.IN_SERVICE &&
-                !DialogUtils.showConfirmationDialog("Set In Maintenance",
-                        "Do you want to set this vehicle in maintenance?",
-                        AppContext.getOwner())) {
+        if (vehicle.getVehicleStatus() == Vehicle.VehicleStatus.IN_SERVICE
+                && !DialogUtils.showConfirmationDialog("Set In Maintenance",
+                "Do you want to set this vehicle in maintenance?",
+                AppContext.getOwner())) {
             return;
         }
 
-        if (vehicle.getVehicleStatus() == Vehicle.VehicleStatus.IN_MAINTENANCE &&
-                !DialogUtils.showConfirmationDialog("Set In Service",
-                        "Do you want to set this vehicle in service?",
-                        AppContext.getOwner())) {
+        if (vehicle.getVehicleStatus() == Vehicle.VehicleStatus.IN_MAINTENANCE
+                && !DialogUtils.showConfirmationDialog("Set In Service",
+                "Do you want to set this vehicle in service?",
+                AppContext.getOwner())) {
             return;
         }
 
@@ -399,6 +420,13 @@ public final class VehicleController implements AutoRefreshable {
         updateButtons(vehicle.getVehicleStatus());
     }
 
+    /**
+     * Handles the service/out-of-service button action for the selected vehicle.
+     * If the vehicle is IN_SERVICE, asks for confirmation to set it OUT_OF_SERVICE.
+     * If the vehicle is OUT_OF_SERVICE, asks for confirmation to set it back IN_SERVICE.
+     * Executes the action via {@link VehicleManager#handleServiceButton(Vehicle)},
+     * reloads the table, and updates the button states.
+     */
     @FXML
     private void handleMarkOutOfService() {
         VehicleRow selected = vehicleTable.getSelectionModel().getSelectedItem();
@@ -408,17 +436,17 @@ public final class VehicleController implements AutoRefreshable {
 
         Vehicle vehicle = vehicleManager.findVehicleByPlate(selected.getPlate()).get();
 
-        if (vehicle.getVehicleStatus() == Vehicle.VehicleStatus.IN_SERVICE &&
-                !DialogUtils.showConfirmationDialog("Set Out Of Service",
-                        "Do you want to set this vehicle out of service?",
-                        AppContext.getOwner())) {
+        if (vehicle.getVehicleStatus() == Vehicle.VehicleStatus.IN_SERVICE
+                && !DialogUtils.showConfirmationDialog("Set Out Of Service",
+                "Do you want to set this vehicle out of service?",
+                AppContext.getOwner())) {
             return;
         }
 
-        if (vehicle.getVehicleStatus() == Vehicle.VehicleStatus.OUT_OF_SERVICE &&
-                !DialogUtils.showConfirmationDialog("Set In Service",
-                        "Do you want to set this vehicle in service?",
-                        AppContext.getOwner())) {
+        if (vehicle.getVehicleStatus() == Vehicle.VehicleStatus.OUT_OF_SERVICE
+                && !DialogUtils.showConfirmationDialog("Set In Service",
+                "Do you want to set this vehicle in service?",
+                AppContext.getOwner())) {
             return;
         }
 
