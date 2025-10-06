@@ -122,14 +122,6 @@ public final class TripController implements AutoRefreshable {
     @FXML
     private CheckBox showCompletedCheckBox;
 
-    /**
-     * Sets the notification service used for sending trip notifications.
-     *
-     * @param notificationService the NotificationService to use
-     */
-    public void setNotificationService(final NotificationService notificationService) {
-        this.notificationService = notificationService;
-    }
 
     /**
      * Sets the trip manager used for trip operations.
@@ -338,7 +330,7 @@ public final class TripController implements AutoRefreshable {
         if (success) {
             try {
                 List<String> recipients = extractCustomerEmails(trip);
-                if (!recipients.isEmpty() && notificationService != null) {
+                if (!recipients.isEmpty()) {
                     DateTimeFormatter fmt =
                             DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
                     String formattedDeparture = trip.getDepartureTime().format(fmt);
