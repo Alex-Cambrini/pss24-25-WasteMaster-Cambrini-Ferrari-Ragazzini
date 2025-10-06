@@ -13,40 +13,39 @@
     <children>
         <HBox alignment="TOP_CENTER" minHeight="40" prefHeight="60" prefWidth="600.0" spacing="10.0">
             <children>
-                <Button fx:id="addVehicleButton" mnemonicParsing="false" onAction="#handleAddVehicle"
-                        styleClass="success" text="Add Vehicle"/>
-                <Region prefHeight="20.0" prefWidth="0.0" HBox.hgrow="ALWAYS"/>
-                <Button fx:id="filterButton" onMouseClicked="#showFilterMenu" styleClass="accent" text="Filter ▼"/>
-                <TextField fx:id="searchField" promptText="Search..."/>
-                <Button mnemonicParsing="false" onAction="#handleResetSearch" styleClass="accent, button-outlined"
-                        text="Reset"/>
+                <Button fx:id="addVehicleButton" mnemonicParsing="false" onAction="#handleAddVehicle" styleClass="success" text="Add Vehicle" />
+                <Region prefHeight="20.0" prefWidth="0.0" HBox.hgrow="ALWAYS" />
+                <Button fx:id="filterButton" onMouseClicked="#showFilterMenu" styleClass="accent" text="Filter ▼" />
+                <TextField fx:id="searchField" promptText="Search..." />
+                <Button mnemonicParsing="false" onAction="#handleResetSearch" styleClass="accent, button-outlined" text="Reset" />
             </children>
         </HBox>
 
-        <TableView fx:id="vehicleTable" prefHeight="300.0" prefWidth="600.0" styleClass="table-view"
-                   VBox.vgrow="ALWAYS">
+        <TableView fx:id="vehicleTable" prefHeight="300.0" prefWidth="600.0" styleClass="table-view" VBox.vgrow="ALWAYS">
             <columns>
-                <TableColumn fx:id="plateColumn" prefWidth="80.0" text="Plate"/>
-                <TableColumn fx:id="brandColumn" prefWidth="120.0" text="Brand"/>
-                <TableColumn fx:id="modelColumn" prefWidth="130.0" text="Model"/>
-                <TableColumn fx:id="yearColumn" prefWidth="80.0" text="Year"/>
-                <TableColumn fx:id="requiredOperatorColumn" prefWidth="100.0" text="Required Operator"/>
-                <TableColumn fx:id="licenceTypeColumn" prefWidth="120.0" text="Required Licence"/>
-                <TableColumn fx:id="vehicleStatusColumn" prefWidth="120.0" text="Status"/>
-                <TableColumn fx:id="lastMaintenanceDateColumn" prefWidth="140.0" text="Last Maintenance"/>
-                <TableColumn fx:id="nextMaintenanceDateColumn" prefWidth="140.0" text="Next Maintenance"/>
+                <TableColumn fx:id="plateColumn" prefWidth="80.0" text="Plate" />
+                <TableColumn fx:id="brandColumn" prefWidth="120.0" text="Brand" />
+                <TableColumn fx:id="modelColumn" prefWidth="130.0" text="Model" />
+                <TableColumn fx:id="yearColumn" prefWidth="80.0" text="Year" />
+                <TableColumn fx:id="requiredOperatorColumn" prefWidth="100.0" text="Required Operator" />
+                <TableColumn fx:id="licenceTypeColumn" prefWidth="120.0" text="Required Licence" />
+                <TableColumn fx:id="vehicleStatusColumn" prefWidth="120.0" text="Status" />
+                <TableColumn fx:id="lastMaintenanceDateColumn" prefWidth="140.0" text="Last Maintenance" />
+                <TableColumn fx:id="nextMaintenanceDateColumn" prefWidth="140.0" text="Next Maintenance" />
             </columns>
         </TableView>
 
         <HBox alignment="TOP_RIGHT" minHeight="50.0" prefHeight="100.0" prefWidth="600.0" spacing="10.0">
             <children>
-                <Button fx:id="editVehicleButton" disable="true" mnemonicParsing="false" onAction="#handleEditVehicle"
-                        styleClass="accent" text="Edit"/>
-                <Button fx:id="deleteVehicleButton" disable="true" mnemonicParsing="false"
-                        onAction="#handleDeleteVehicle" styleClass="danger" text="Delete"/>
+                <Button fx:id="markOutOfServiceButton" styleClass="accent" text="Out/In Service" mnemonicParsing="false" onAction="#handleMarkOutOfService"/>
+                <Button fx:id="markMaintenanceButton" styleClass="accent" text="Maintenance/In Service" mnemonicParsing="false" onAction="#handleMarkMaintenance"/>
+
+            <Region HBox.hgrow="ALWAYS" />
+                <Button fx:id="editVehicleButton" disable="true" mnemonicParsing="false" onAction="#handleEditVehicle" styleClass="accent" text="Edit" />
+                <Button fx:id="deleteVehicleButton" disable="true" mnemonicParsing="false" onAction="#handleDeleteVehicle" styleClass="danger" text="Delete" />
             </children>
             <padding>
-                <Insets top="10.0"/>
+                <Insets top="10.0" />
             </padding>
         </HBox>
     </children>
