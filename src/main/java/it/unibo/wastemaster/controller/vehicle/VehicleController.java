@@ -23,6 +23,7 @@ import javafx.scene.control.ContextMenu;
 import javafx.scene.control.CustomMenuItem;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -70,6 +71,12 @@ public final class VehicleController implements AutoRefreshable {
 
     @FXML
     private Button deleteVehicleButton;
+
+    @FXML
+    private Button markMaintenanceButton;
+
+    @FXML
+    private Button markOutOfServiceButton;
 
     @FXML
     private TableView<VehicleRow> vehicleTable;
@@ -143,9 +150,31 @@ public final class VehicleController implements AutoRefreshable {
                     boolean selected = newVal != null;
                     editVehicleButton.setDisable(!selected);
                     deleteVehicleButton.setDisable(!selected);
-                });
 
+                    if (selected) {
+                        updateButtons(
+                                vehicleManager.findVehicleByPlate(newVal.getPlate()).get()
+                                        .getVehicleStatus());
+                    }
+                });
         searchField.textProperty().addListener((obs, oldText, newText) -> handleSearch());
+
+        vehicleTable.setRowFactory(tv -> new TableRow<VehicleRow>() {
+            @Override
+            protected void updateItem(final VehicleRow item, final boolean empty) {
+                super.updateItem(item, empty);
+                if (item == null || empty) {
+                    setStyle("");
+                } else {
+                    LocalDate nextDate = item.getNextMaintenanceDate();
+                    if (nextDate != null && !nextDate.isAfter(LocalDate.now())) {
+                        setStyle("-fx-background-color: #ffcccc;");
+                    } else {
+                        setStyle("");
+                    }
+                }
+            }
+        });
     }
 
     /**
@@ -200,6 +229,48 @@ public final class VehicleController implements AutoRefreshable {
                         setText(empty || item == null ? "" : item.toString());
                     }
                 });
+    }
+
+    /**
+     * Updates the text and enabled state of maintenance and service buttons
+     * based on the current vehicle status.
+     *
+     * @param status the current status of the vehicle
+     */
+    private void updateButtons(final Vehicle.VehicleStatus status) {
+        if (status == null) {
+            markMaintenanceButton.setDisable(true);
+            markOutOfServiceButton.setDisable(true);
+            return;
+        }
+
+        switch (status) {
+            case IN_SERVICE -> {
+                markMaintenanceButton.setText("Mark as Maintenance");
+                markMaintenanceButton.setDisable(false);
+
+                markOutOfServiceButton.setText("Mark as Out of Service");
+                markOutOfServiceButton.setDisable(false);
+            }
+            case IN_MAINTENANCE -> {
+                markMaintenanceButton.setText("Mark as In Service");
+                markMaintenanceButton.setDisable(false);
+
+                markOutOfServiceButton.setText("Mark as Out of Service");
+                markOutOfServiceButton.setDisable(true);
+            }
+            case OUT_OF_SERVICE -> {
+                markMaintenanceButton.setText("Mark as Maintenance");
+                markMaintenanceButton.setDisable(true);
+
+                markOutOfServiceButton.setText("Mark as In Service");
+                markOutOfServiceButton.setDisable(false);
+            }
+            default -> {
+                markMaintenanceButton.setDisable(true);
+                markOutOfServiceButton.setDisable(true);
+            }
+        }
     }
 
     /**
@@ -312,6 +383,76 @@ public final class VehicleController implements AutoRefreshable {
                     AppContext.getOwner());
             e.printStackTrace();
         }
+    }
+
+    /**
+     * Handles the maintenance button action for the selected vehicle.
+     * If the vehicle is IN_SERVICE, asks for confirmation to set it in maintenance.
+     * If the vehicle is IN_MAINTENANCE, asks for confirmation to set it back in service.
+     * Executes the action via {@link VehicleManager#handleMaintenanceButton(Vehicle)},
+     * reloads the table, and updates the button states.
+     */
+    @FXML
+    private void handleMarkMaintenance() {
+        VehicleRow selected = vehicleTable.getSelectionModel().getSelectedItem();
+        if (selected == null) {
+            return;
+        }
+
+        Vehicle vehicle = vehicleManager.findVehicleByPlate(selected.getPlate()).get();
+
+        if (vehicle.getVehicleStatus() == Vehicle.VehicleStatus.IN_SERVICE
+                && !DialogUtils.showConfirmationDialog("Set In Maintenance",
+                "Do you want to set this vehicle in maintenance?",
+                AppContext.getOwner())) {
+            return;
+        }
+
+        if (vehicle.getVehicleStatus() == Vehicle.VehicleStatus.IN_MAINTENANCE
+                && !DialogUtils.showConfirmationDialog("Set In Service",
+                "Do you want to set this vehicle in service?",
+                AppContext.getOwner())) {
+            return;
+        }
+
+        vehicleManager.handleMaintenanceButton(vehicle);
+        loadVehicles();
+        updateButtons(vehicle.getVehicleStatus());
+    }
+
+    /**
+     * Handles the service/out-of-service button action for the selected vehicle.
+     * If the vehicle is IN_SERVICE, asks for confirmation to set it OUT_OF_SERVICE.
+     * If the vehicle is OUT_OF_SERVICE, asks for confirmation to set it back IN_SERVICE.
+     * Executes the action via {@link VehicleManager#handleServiceButton(Vehicle)},
+     * reloads the table, and updates the button states.
+     */
+    @FXML
+    private void handleMarkOutOfService() {
+        VehicleRow selected = vehicleTable.getSelectionModel().getSelectedItem();
+        if (selected == null) {
+            return;
+        }
+
+        Vehicle vehicle = vehicleManager.findVehicleByPlate(selected.getPlate()).get();
+
+        if (vehicle.getVehicleStatus() == Vehicle.VehicleStatus.IN_SERVICE
+                && !DialogUtils.showConfirmationDialog("Set Out Of Service",
+                "Do you want to set this vehicle out of service?",
+                AppContext.getOwner())) {
+            return;
+        }
+
+        if (vehicle.getVehicleStatus() == Vehicle.VehicleStatus.OUT_OF_SERVICE
+                && !DialogUtils.showConfirmationDialog("Set In Service",
+                "Do you want to set this vehicle in service?",
+                AppContext.getOwner())) {
+            return;
+        }
+
+        vehicleManager.handleServiceButton(vehicle);
+        loadVehicles();
+        updateButtons(vehicle.getVehicleStatus());
     }
 
     /**

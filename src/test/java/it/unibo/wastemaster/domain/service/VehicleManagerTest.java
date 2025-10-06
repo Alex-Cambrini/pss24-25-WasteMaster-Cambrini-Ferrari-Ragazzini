@@ -149,6 +149,57 @@ class VehicleManagerTest extends AbstractDatabaseTest {
     }
 
     @Test
+    void testHandleMaintenanceButton() {
+        assertEquals(Vehicle.VehicleStatus.IN_SERVICE, v1.getVehicleStatus());
+        getVehicleManager().handleMaintenanceButton(v1);
+
+        Optional<Vehicle> v1ReloadedOpt =
+                getVehicleManager().findVehicleByPlate("DD444DD");
+        assertTrue(v1ReloadedOpt.isPresent());
+        Vehicle v1Reloaded = v1ReloadedOpt.get();
+        assertEquals(Vehicle.VehicleStatus.IN_MAINTENANCE, v1Reloaded.getVehicleStatus());
+
+        assertEquals(Vehicle.VehicleStatus.IN_MAINTENANCE, v2.getVehicleStatus());
+        LocalDate today = LocalDate.now();
+        getVehicleManager().handleMaintenanceButton(v2);
+
+        Optional<Vehicle> v2ReloadedOpt =
+                getVehicleManager().findVehicleByPlate("EE555EE");
+        assertTrue(v2ReloadedOpt.isPresent());
+        Vehicle v2Reloaded = v2ReloadedOpt.get();
+        assertEquals(Vehicle.VehicleStatus.IN_SERVICE, v2Reloaded.getVehicleStatus());
+        assertEquals(today, v2Reloaded.getLastMaintenanceDate());
+        assertEquals(today.plusYears(1), v2Reloaded.getNextMaintenanceDate());
+
+        assertThrows(IllegalArgumentException.class,
+                () -> getVehicleManager().handleMaintenanceButton(null));
+    }
+
+    @Test
+    void testHandleServiceButton() {
+        assertEquals(Vehicle.VehicleStatus.IN_SERVICE, v1.getVehicleStatus());
+        getVehicleManager().handleServiceButton(v1);
+
+        Optional<Vehicle> v1ReloadedOpt =
+                getVehicleManager().findVehicleByPlate("DD444DD");
+        assertTrue(v1ReloadedOpt.isPresent());
+        Vehicle v1Reloaded = v1ReloadedOpt.get();
+        assertEquals(Vehicle.VehicleStatus.OUT_OF_SERVICE, v1Reloaded.getVehicleStatus());
+
+        assertEquals(Vehicle.VehicleStatus.OUT_OF_SERVICE, v3.getVehicleStatus());
+        getVehicleManager().handleServiceButton(v3);
+
+        Optional<Vehicle> v3ReloadedOpt =
+                getVehicleManager().findVehicleByPlate("FF666FF");
+        assertTrue(v3ReloadedOpt.isPresent());
+        Vehicle v3Reloaded = v3ReloadedOpt.get();
+        assertEquals(Vehicle.VehicleStatus.IN_SERVICE, v3Reloaded.getVehicleStatus());
+
+        assertThrows(IllegalArgumentException.class,
+                () -> getVehicleManager().handleServiceButton(null));
+    }
+
+    @Test
     void testDeleteVehicle() {
         Vehicle toDelete =
                 new Vehicle("HH777HH", "Iveco", "Daily", VEHICLE_REGISTRATION_YEAR,
