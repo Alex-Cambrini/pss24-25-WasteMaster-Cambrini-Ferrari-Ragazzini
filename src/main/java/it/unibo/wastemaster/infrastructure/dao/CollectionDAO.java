@@ -91,30 +91,6 @@ public final class CollectionDAO extends GenericDAO<Collection> {
     }
 
     /**
-     * Retrieves a list of Collection entities whose date field is
-     * between the specified start and end dates (inclusive).
-     *
-     * @param start the start date of the range (inclusive)
-     * @param end the end date of the range (inclusive)
-     * @return a list of Collection entities with dates between start and end
-     */
-    public List<Collection> findByDateRange(
-            final LocalDate start,
-            final LocalDate end) {
-        return getEntityManager()
-                .createQuery(
-                        """
-                                SELECT c
-                                FROM Collection c
-                                WHERE c.date BETWEEN :start AND :end
-                                """,
-                        Collection.class)
-                .setParameter("start", start)
-                .setParameter("end", end)
-                .getResultList();
-    }
-
-    /**
      * Retrieves collections taking place on a specific {@code date} for
      * customers whose location has the given {@code postalCode}.
      * Results include only collections currently in

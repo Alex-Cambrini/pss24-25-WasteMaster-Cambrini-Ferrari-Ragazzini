@@ -41,15 +41,6 @@ public interface CollectionRepository {
     Optional<Collection> findActiveByRecurringSchedule(RecurringSchedule schedule);
 
     /**
-     * Retrieves all collections within the specified date range.
-     *
-     * @param start the start date of the range (inclusive)
-     * @param end the end date of the range (inclusive)
-     * @return a list of Collection entities within the date range
-     */
-    List<Collection> findByDateRange(LocalDate start, LocalDate end);
-
-    /**
      * Retrieves all collections for a specific postal code on a given date.
      *
      * @param postalCode the postal code to filter collections
