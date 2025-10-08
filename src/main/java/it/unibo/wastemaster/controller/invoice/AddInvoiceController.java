@@ -5,7 +5,7 @@ import it.unibo.wastemaster.domain.model.Customer;
 import it.unibo.wastemaster.domain.service.CollectionManager;
 import it.unibo.wastemaster.domain.service.CustomerManager;
 import it.unibo.wastemaster.domain.service.InvoiceManager;
-import it.unibo.wastemaster.viewmodels.CollectionRow;
+import it.unibo.wastemaster.presentationdto.CollectionRow;
 import java.util.List;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.collections.FXCollections;

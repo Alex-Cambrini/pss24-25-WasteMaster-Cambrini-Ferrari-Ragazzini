@@ -12,7 +12,7 @@ import it.unibo.wastemaster.domain.service.CollectionManager;
 import it.unibo.wastemaster.domain.service.NotificationService;
 import it.unibo.wastemaster.domain.service.TripManager;
 import it.unibo.wastemaster.domain.service.VehicleManager;
-import it.unibo.wastemaster.viewmodels.TripRow;
+import it.unibo.wastemaster.presentationdto.TripRow;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
@@ -121,7 +121,6 @@ public final class TripController implements AutoRefreshable {
 
     @FXML
     private CheckBox showCompletedCheckBox;
-
 
     /**
      * Sets the trip manager used for trip operations.

@@ -16,7 +16,7 @@ import it.unibo.wastemaster.domain.service.CollectionManager;
 import it.unibo.wastemaster.domain.service.OneTimeScheduleManager;
 import it.unibo.wastemaster.domain.service.RecurringScheduleManager;
 import it.unibo.wastemaster.domain.service.ScheduleManager;
-import it.unibo.wastemaster.viewmodels.ScheduleRow;
+import it.unibo.wastemaster.presentationdto.ScheduleRow;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;

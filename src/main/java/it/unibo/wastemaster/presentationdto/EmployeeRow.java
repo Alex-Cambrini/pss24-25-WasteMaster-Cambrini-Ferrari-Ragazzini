@@ -1,4 +1,4 @@
-package it.unibo.wastemaster.viewmodels;
+package it.unibo.wastemaster.presentationdto;
 
 import it.unibo.wastemaster.domain.model.Employee;
 import it.unibo.wastemaster.domain.model.Employee.Licence;
@@ -7,7 +7,7 @@ import it.unibo.wastemaster.domain.model.Location;
 import java.time.format.DateTimeFormatter;
 
 /**
- * ViewModel class representing an employee row to be shown in UI tables.
+ * Presentation DTO class representing an employee row to be shown in UI tables.
  * It wraps employee and location details for display.
  */
 public final class EmployeeRow {

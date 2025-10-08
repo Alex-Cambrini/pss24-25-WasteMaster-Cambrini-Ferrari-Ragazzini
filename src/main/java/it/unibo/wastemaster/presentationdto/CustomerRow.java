@@ -1,10 +1,11 @@
-package it.unibo.wastemaster.viewmodels;
+package it.unibo.wastemaster.presentationdto;
 
 import it.unibo.wastemaster.domain.model.Customer;
 import java.time.format.DateTimeFormatter;
 
 /**
- * ViewModel class representing a customer row to be shown in UI tables. It wraps relevant
+ * Presentation DTO class representing a customer row to be shown in UI tables. It
+ * wraps relevant
  * customer and location details for display.
  */
 public final class CustomerRow {

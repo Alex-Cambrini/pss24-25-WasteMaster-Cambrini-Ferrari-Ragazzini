@@ -1,4 +1,4 @@
-package it.unibo.wastemaster.viewmodels;
+package it.unibo.wastemaster.presentationdto;
 
 import it.unibo.wastemaster.domain.model.OneTimeSchedule;
 import it.unibo.wastemaster.domain.model.RecurringSchedule;
@@ -6,7 +6,8 @@ import it.unibo.wastemaster.domain.model.Schedule;
 import java.time.LocalDate;
 
 /**
- * ViewModel class for displaying schedule information in tables. Supports both one-time
+ * Presentation DTO class for displaying schedule information in tables. Supports both
+ * one-time
  * and recurring schedules.
  */
 public final class ScheduleRow {

@@ -1,4 +1,4 @@
-package it.unibo.wastemaster.viewmodels;
+package it.unibo.wastemaster.presentationdto;
 
 import it.unibo.wastemaster.domain.model.Vehicle;
 import it.unibo.wastemaster.domain.model.Vehicle.RequiredLicence;
@@ -6,7 +6,7 @@ import it.unibo.wastemaster.domain.model.Vehicle.VehicleStatus;
 import java.time.LocalDate;
 
 /**
- * ViewModel class for representing a vehicle in table format.
+ * Presentation DTO class for representing a vehicle in table format.
  */
 public final class VehicleRow {
 

@@ -6,7 +6,7 @@ import it.unibo.wastemaster.controller.utils.AutoRefreshable;
 import it.unibo.wastemaster.controller.utils.DialogUtils;
 import it.unibo.wastemaster.domain.model.Vehicle;
 import it.unibo.wastemaster.domain.service.VehicleManager;
-import it.unibo.wastemaster.viewmodels.VehicleRow;
+import it.unibo.wastemaster.presentationdto.VehicleRow;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;

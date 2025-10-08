@@ -10,7 +10,7 @@ import it.unibo.wastemaster.domain.service.RecurringScheduleManager;
 import it.unibo.wastemaster.domain.service.ScheduleManager;
 import it.unibo.wastemaster.domain.service.TripManager;
 import it.unibo.wastemaster.domain.service.VehicleManager;
-import it.unibo.wastemaster.viewmodels.CollectionRow;
+import it.unibo.wastemaster.presentationdto.CollectionRow;
 import java.util.List;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;

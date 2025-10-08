@@ -1,4 +1,4 @@
-package it.unibo.wastemaster.viewmodels;
+package it.unibo.wastemaster.presentationdto;
 
 import it.unibo.wastemaster.domain.model.Collection;
 import it.unibo.wastemaster.domain.model.Collection.CollectionStatus;
@@ -7,7 +7,8 @@ import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 
 /**
- * ViewModel class representing a row in the collection table. It wraps a Collection
+ * Presentation DTO class representing a row in the collection table. It wraps a
+ * Collection
  * entity for displaying in the UI.
  */
 public final class CollectionRow {
