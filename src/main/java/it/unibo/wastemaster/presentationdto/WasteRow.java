@@ -1,11 +1,11 @@
-package it.unibo.wastemaster.viewmodels;
+package it.unibo.wastemaster.presentationdto;
 
 import it.unibo.wastemaster.domain.model.Waste;
 import it.unibo.wastemaster.domain.model.WasteSchedule;
 import java.time.DayOfWeek;
 
 /**
- * ViewModel class that represents a waste with its collection schedule.
+ * Presentation DTO class that represents a waste with its collection schedule.
  */
 public final class WasteRow {
 

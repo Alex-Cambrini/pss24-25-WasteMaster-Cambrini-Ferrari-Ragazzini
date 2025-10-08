@@ -6,7 +6,7 @@ import it.unibo.wastemaster.controller.utils.AutoRefreshable;
 import it.unibo.wastemaster.controller.utils.DialogUtils;
 import it.unibo.wastemaster.domain.model.Customer;
 import it.unibo.wastemaster.domain.service.CustomerManager;
-import it.unibo.wastemaster.viewmodels.CustomerRow;
+import it.unibo.wastemaster.presentationdto.CustomerRow;
 import java.util.List;
 import java.util.Optional;
 import javafx.animation.Animation;

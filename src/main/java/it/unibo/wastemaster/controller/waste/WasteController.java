@@ -8,7 +8,7 @@ import it.unibo.wastemaster.domain.model.Waste;
 import it.unibo.wastemaster.domain.model.WasteSchedule;
 import it.unibo.wastemaster.domain.service.WasteManager;
 import it.unibo.wastemaster.domain.service.WasteScheduleManager;
-import it.unibo.wastemaster.viewmodels.WasteRow;
+import it.unibo.wastemaster.presentationdto.WasteRow;
 import java.io.IOException;
 import java.time.DayOfWeek;
 import java.util.List;

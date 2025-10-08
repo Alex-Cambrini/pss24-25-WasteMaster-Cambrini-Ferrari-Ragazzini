@@ -1,11 +1,11 @@
-package it.unibo.wastemaster.viewmodels;
+package it.unibo.wastemaster.presentationdto;
 
 import it.unibo.wastemaster.domain.model.Trip;
 import java.time.format.DateTimeFormatter;
 import java.util.stream.Collectors;
 
 /**
- * ViewModel class that represents a trip for the table view.
+ * Presentation DTO class that represents a trip for the table view.
  */
 public final class TripRow {
 

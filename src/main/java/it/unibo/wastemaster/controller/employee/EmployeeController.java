@@ -7,7 +7,7 @@ import it.unibo.wastemaster.domain.model.Employee;
 import it.unibo.wastemaster.domain.model.Employee.Licence;
 import it.unibo.wastemaster.domain.model.Employee.Role;
 import it.unibo.wastemaster.domain.service.EmployeeManager;
-import it.unibo.wastemaster.viewmodels.EmployeeRow;
+import it.unibo.wastemaster.presentationdto.EmployeeRow;
 import java.util.List;
 import java.util.Optional;
 import javafx.animation.KeyFrame;

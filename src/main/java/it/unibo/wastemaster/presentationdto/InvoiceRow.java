@@ -1,11 +1,11 @@
-package it.unibo.wastemaster.viewmodels;
+package it.unibo.wastemaster.presentationdto;
 
 import it.unibo.wastemaster.domain.model.Invoice;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 /**
- * ViewModel class that represents an invoice row for a table view.
+ * Presentation DTO class that represents an invoice row for a table view.
  * It formats and exposes invoice data as strings suitable for display.
  */
 public final class InvoiceRow {
