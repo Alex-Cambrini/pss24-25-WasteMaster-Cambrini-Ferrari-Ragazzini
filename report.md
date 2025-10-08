@@ -944,3 +944,405 @@ sequenceDiagram
 | Transazioni distribuite a livello di manager | Posticipata | L’attuale livello di persistenza è sufficiente; possibile evoluzione futura |
 
 ---
+
+
+## Testing automatizzato
+
+Per garantire l’affidabilità delle funzionalità principali, il progetto adotta una strategia di testing automatico basata su **JUnit 5**. I test sono organizzati per coprire le principali componenti del dominio.
+
+### Componenti testate
+
+- **Anagrafiche e risorse**: verifica di creazione, aggiornamento e validazione di clienti, personale, veicoli e rifiuti.
+- **Pianificazione e raccolte**: test su pianificazioni, modifiche, cancellazioni e transizioni di stato di raccolte e viaggi.
+- **Gestione mezzi e viaggi**: verifica delle regole di assegnazione veicoli/operatori, pianificazione viaggi e gestione delle disponibilità.
+- **Fatturazione e pagamenti**: test automatici su generazione e aggiornamento delle fatture, integrazione con i pagamenti.
+
+### Strumenti utilizzati
+
+- **Framework di testing:**  
+  - JUnit 5
+- **Componenti coperti:**  
+  - Entità di dominio:  
+    - `VehicleTest`  
+    - `CustomerTest`  
+    - `WasteTest`  
+    - `InvoiceTest`
+  - Manager e repository:  
+    - `TripManagerTest`  
+    - `VehicleManagerTest`  
+    - `TripDAOTest`
+
+    
+### Esempi di test automatici
+
+```java
+// Verifica validazione dati veicolo (VehicleTest)
+@Test
+void testValidVehicle() {
+    Set<ConstraintViolation<Vehicle>> violations = ValidateUtils.VALIDATOR.validate(vehicle);
+    assertTrue(violations.isEmpty());
+}
+
+// Verifica inserimento e ricerca cliente (CustomerTest)
+@Test
+void testPersistenceAndGetter() {
+    getCustomerDAO().insert(customer);
+    int customerId = customer.getCustomerId();
+    Optional<Customer> foundOpt = getCustomerDAO().findById(customerId);
+    assertTrue(foundOpt.isPresent());
+    Customer found = foundOpt.get();
+    assertEquals(customer.getName(), found.getName());
+    getCustomerDAO().delete(customer);
+    Optional<Customer> deletedOpt = getCustomerDAO().findById(customerId);
+    assertTrue(deletedOpt.isEmpty());
+}
+
+// Test integrazione: cancellazione viaggio e ripianificazione raccolta (TripManagerTest)
+@Test
+void testSoftDeleteAndRescheduleNextCollection() {
+    tripManager.softDeleteAndRescheduleNextCollection(trip);
+    // Verifica che la Collection sia ripianificata correttamente
+}
+
+// Verifica generazione e pagamento fattura (InvoiceTest)
+@Test
+void testPersistence() {
+    getInvoiceDAO().insert(invoice);
+    Optional<Invoice> foundOpt = getInvoiceDAO().findById(invoice.getInvoiceId());
+    assertTrue(foundOpt.isPresent());
+    Invoice found = foundOpt.get();
+    assertEquals(invoice.getAmount(), found.getAmount());
+    getInvoiceDAO().delete(found);
+    Optional<Invoice> deletedOpt = getInvoiceDAO().findById(found.getInvoiceId());
+    assertTrue(deletedOpt.isEmpty());
+}
+```
+
+
+## Note di sviluppo
+
+---
+
+### Lorenzo Ferrari
+
+#### 1. Uso di Stream e Optional per la ricerca tra entità
+**Dove:** `src/main/java/it/unibo/wastemaster/domain/repository/VehicleRepositoryImpl.java`
+```java
+@Override
+public Optional<Vehicle> findByPlate(String plate) {
+    return vehicles.stream()
+        .filter(v -> v.getPlate().equalsIgnoreCase(plate))
+        .findFirst();
+}
+```
+*Implementa una ricerca null-safe, concisa ed efficiente, sfruttando costrutti funzionali avanzati.*
+
+---
+
+#### 2. Validazione avanzata con annotazioni Bean Validation
+**Dove:** `src/main/java/it/unibo/wastemaster/domain/model/Vehicle.java`
+```java
+@NotNull(message = "Plate must not be null")
+@Pattern(regexp = "[A-Z0-9]{7}", message = "Invalid plate format")
+private String plate;
+```
+*Garantisce la correttezza dei dati direttamente a livello di modello.*
+
+---
+
+#### 3. Normalizzazione automatica dei dati in setter
+**Dove:** `src/main/java/it/unibo/wastemaster/domain/model/Vehicle.java`
+```java
+public void setPlate(String plate) {
+    if (plate != null) {
+        this.plate = plate.trim().toUpperCase();
+    } else {
+        throw new IllegalArgumentException("Plate must not be null");
+    }
+}
+```
+*Centralizza la normalizzazione, prevenendo errori di inserimento e confronti.*
+
+---
+
+#### 4. Uso di Enum per stati e policy sulle licenze
+**Dove:** `src/main/java/it/unibo/wastemaster/domain/model/Vehicle.java`
+```java
+public enum VehicleStatus {
+    IN_SERVICE, IN_MAINTENANCE, OUT_OF_SERVICE
+}
+```
+*Rende il codice robusto e facilmente estendibile nella gestione degli stati.*
+
+---
+
+#### 5. Gestione automatica delle date di manutenzione
+**Dove:** `src/main/java/it/unibo/wastemaster/domain/service/VehicleManager.java`
+```java
+public void markMaintenanceAsComplete(Vehicle vehicle) {
+    vehicle.setVehicleStatus(Vehicle.VehicleStatus.IN_SERVICE);
+    vehicle.setLastMaintenanceDate(LocalDate.now());
+    vehicle.setNextMaintenanceDate(LocalDate.now().plusYears(1));
+    vehicleDAO.update(vehicle);
+}
+```
+*Automatizza la gestione delle scadenze manutentive e lo stato del mezzo.*
+
+---
+
+**Codice adattato:**  
+Per la validazione dati sono stati seguiti esempi dalla documentazione ufficiale di Hibernate Validator.
+
+---
+
+### Alex Cambrini
+
+#### 1. Calcolo dinamico della prossima raccolta ricorrente
+**Dove:** `src/main/java/it/unibo/wastemaster/domain/model/RecurringSchedule.java`
+```java
+public LocalDate calculateNextCollectionDate(LocalDate from, Frequency freq, DayOfWeek dayOfWeek) {
+    LocalDate next = from.with(TemporalAdjusters.nextOrSame(dayOfWeek));
+    return freq == Frequency.MONTHLY ? next.plusMonths(1) : next.plusWeeks(1);
+}
+```
+*Gestisce la ricorrenza delle raccolte in modo flessibile ed estendibile.*
+
+---
+
+#### 2. Uso di Stream e Optional per la raccolta attiva
+**Dove:** `src/main/java/it/unibo/wastemaster/domain/service/CollectionManager.java`
+```java
+public Optional<Collection> getActiveCollectionByRecurringSchedule(RecurringSchedule schedule) {
+    return collectionDAO.findAll().stream()
+        .filter(c -> c.getSchedule().equals(schedule) && c.isActive())
+        .findFirst();
+}
+```
+*Permette di individuare la raccolta attiva in modo elegante e funzionale.*
+
+---
+
+#### 3. Validazione parametrica delle cancellazioni
+**Dove:** `src/main/java/it/unibo/wastemaster/domain/service/OneTimeScheduleManager.java`
+```java
+public boolean softDeleteOneTimeSchedule(OneTimeSchedule schedule) {
+    if (Days.between(LocalDate.now(), schedule.getPickupDate()) >= CANCEL_LIMIT_DAYS) {
+        schedule.setDeleted(true);
+        repository.update(schedule);
+        return true;
+    }
+    return false;
+}
+```
+*Applica in modo centralizzato e sicuro le regole di business sulle cancellazioni.*
+
+---
+
+#### 4. Factory method per generazione di Collection
+**Dove:** `src/main/java/it/unibo/wastemaster/domain/service/CollectionManager.java`
+```java
+public Collection generateCollection(Schedule schedule) {
+    Collection collection = new Collection(schedule);
+    collectionDAO.insert(collection);
+    return collection;
+}
+```
+*Centralizza e rende coerente la creazione delle Collection.*
+
+---
+
+#### 5. Uso di Enum per categorizzazione degli stati
+**Dove:** `src/main/java/it/unibo/wastemaster/domain/model/Schedule.java`
+```java
+public enum ScheduleStatus {
+    ACTIVE, PAUSED, CANCELLED, COMPLETED
+}
+```
+*Rende il codice leggibile e meno soggetto a errori.*
+
+---
+
+**Codice adattato:**  
+Per la gestione delle date ricorrenti sono stati consultati esempi di uso di `TemporalAdjusters` dalla documentazione Java.
+
+---
+
+### Manuel Ragazzini
+
+#### 1. Algoritmo per la ricerca delle risorse disponibili tramite Stream
+**Dove:** `src/main/java/it/unibo/wastemaster/domain/service/TripManager.java`
+```java
+public List<Vehicle> getAvailableVehicles(LocalDateTime from, LocalDateTime to) {
+    return vehicleDAO.findAll().stream()
+        .filter(v -> v.isAvailable(from, to))
+        .collect(Collectors.toList());
+}
+```
+*Permette di individuare dinamicamente i mezzi disponibili per nuove rotte.*
+
+---
+
+#### 2. Gestione e aggiornamento stato pagamenti
+**Dove:** `src/main/java/it/unibo/wastemaster/domain/service/InvoiceManager.java`
+```java
+public void registerPayment(Invoice invoice, LocalDateTime paymentDate) {
+    invoice.setPaymentStatus(Invoice.PaymentStatus.PAID);
+    invoice.setPaymentDate(paymentDate);
+    invoiceDAO.update(invoice);
+}
+```
+*Automatizza la gestione dello stato dei pagamenti e la loro storicizzazione.*
+
+---
+
+#### 3. Invio automatico di email ai clienti
+**Dove:** `src/main/java/it/unibo/wastemaster/infrastructure/utils/MailUtils.java`
+```java
+public static void sendInvoiceEmail(String to, Invoice invoice) {
+    // ... setup SMTP
+    EmailSender.send(to, "Nuova fattura", invoice.toString());
+}
+```
+*Automatizza la comunicazione con il cliente per la fatturazione.*
+
+---
+
+#### 4. Calcolo dei CAP disponibili tramite Stream e distinct
+**Dove:** `src/main/java/it/unibo/wastemaster/domain/service/TripManager.java`
+```java
+public List<String> getAvailablePostalCodes(LocalDate date) {
+    return collectionDAO.findAll().stream()
+        .filter(c -> c.getDate().equals(date))
+        .map(c -> c.getCustomer().getLocation().getPostalCode())
+        .distinct()
+        .collect(Collectors.toList());
+}
+```
+*Ottimizza la pianificazione delle tratte in base alle raccolte effettive.*
+
+---
+
+#### 5. Gestione rollback e ripianificazione in caso di annullamento viaggio
+**Dove:** `src/main/java/it/unibo/wastemaster/domain/service/TripManager.java`
+```java
+public boolean softDeleteAndRescheduleNextCollection(Trip trip) {
+    trip.setStatus(Trip.TripStatus.CANCELED);
+    tripDAO.update(trip);
+    recurringScheduleManager.rescheduleNextCollection(trip.getCollections().get(0));
+    return true;
+}
+```
+*Garantisce la coerenza tra annullamento viaggio e pianificazione futura.*
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## Guida utente
+
+
+### Avvio dell’applicazione
+
+1. **Avvio**
+   - Avvia l’applicazione tramite il file eseguibile 
+   - All’avvio viene mostrata la schermata di login.
+
+2. **Login**
+   - Inserisci le tue credenziali (utente e password) fornite dall’amministratore.
+   - In base al ruolo (amministratore, operatore) avrai accesso a diverse funzionalità.
+
+---
+
+### Funzionalità principali
+
+#### 1. Gestione clienti e personale
+- Dal menu **Anagrafiche** puoi:
+  - Visualizzare, aggiungere, modificare o eliminare clienti e personale.
+  - Assegnare ruoli e aggiornare informazioni di contatto.
+- Per aggiungere un nuovo cliente, premi su “Nuovo cliente”, compila i dati richiesti e salva.
+
+#### 2. Gestione mezzi e rifiuti
+- Dal menu **Risorse** puoi:
+  - Visualizzare la lista dei mezzi aziendali e il loro stato (in servizio, in manutenzione, fuori servizio).
+  - Aggiornare dati su veicoli e pianificare la manutenzione.
+  - Gestire il catalogo dei rifiuti raccolti, aggiungendo nuovi tipi o modificando esistenti.
+
+#### 3. Pianificazione raccolte
+- Dal menu **Pianificazione raccolte** puoi:
+  - Inserire nuove raccolte, sia programmate (ricorrenti) che occasionali (one-time).
+  - Modificare, sospendere o cancellare raccolte future.
+  - Consultare il calendario delle raccolte già pianificate.
+
+#### 4. Gestione viaggi e rotte operative
+- Dal menu **Viaggi** puoi:
+  - Visualizzare e pianificare i viaggi dei mezzi, associando più raccolte nello stesso viaggio.
+  - Assegnare personale e mezzi disponibili.
+  - Modificare le assegnazioni in caso di imprevisti.
+
+#### 5. Monitoraggio e notifiche
+- La dashboard principale mostra tutte le attività pianificate, lo stato delle raccolte (attiva, completata, annullata) e segnala eventuali criticità.
+- Riceverai notifiche automatiche in caso di problemi sulle raccolte o sui pagamenti.
+
+#### 6. Fatturazione e pagamenti
+- Dal menu **Fatture** puoi:
+  - Visualizzare le fatture emesse per ogni cliente.
+  - Segnare come pagata una fattura o registrare un nuovo pagamento.
+  - Esportare o stampare la fattura.
+
+---
+
+### Operazioni comuni
+
+- **Aggiungere una raccolta:** vai su "Pianificazione raccolte" > "Nuova raccolta", inserisci cliente, tipo di rifiuto, data e salva.
+- **Modificare una raccolta:** seleziona la raccolta dalla lista, premi "Modifica", aggiorna i dati e conferma.
+- **Marcare come completata una raccolta:** seleziona la raccolta e clicca su "Completa".
+- **Annullare un viaggio:** seleziona il viaggio e clicca su "Annulla"; le raccolte saranno ripianificate automaticamente.
+
+---
+
+### Note finali
+
+- Tutte le operazioni principali sono accessibili dai menu laterali o dalla dashboard iniziale.
+- In caso di errori o dati mancanti, il sistema mostra messaggi di errore chiari.
+- Per sicurezza, effettua sempre il logout a fine sessione.
+
+
+
+
+
+
