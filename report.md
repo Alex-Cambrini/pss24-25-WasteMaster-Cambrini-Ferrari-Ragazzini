@@ -25,3 +25,163 @@ Il sistema dovrà inoltre garantire la coerenza operativa, evitando assegnazioni
 - **Monitoraggio e notifiche**: il sistema deve aggiornare lo stato delle attività in tempo reale e notificare agli utenti eventuali criticità o aggiornamenti rilevanti.
 - **Fatturazione e pagamenti**: il sistema deve generare fatture per i clienti basate sui ritiri completati e registrare lo stato di ciascuna fattura come pagata o non pagata.
 - **Regole di coerenza operativa**: il sistema deve garantire che le risorse assegnate siano adeguate alle attività previste, evitando conflitti tra mezzi, personale e ritiri pianificati.
+
+---
+
+# Analisi e modello del dominio
+
+Il dominio riguarda la gestione operativa e amministrativa di un’azienda di smaltimento rifiuti. L’applicazione dovrà supportare le principali attività aziendali, consentendo la pianificazione dei ritiri, l’organizzazione delle risorse operative (personale e mezzi), il monitoraggio dello stato delle attività e la gestione della fatturazione verso i clienti.
+
+Gli attori principali sono i clienti, che richiedono il servizio di raccolta dei rifiuti, e il personale amministrativo e operativo, responsabile della pianificazione, della raccolta e del monitoraggio delle attività.
+
+---
+
+## Diagramma 1 – Utenti e Fatturazione
+
+### Descrizione
+Questo diagramma rappresenta le entità legate agli utenti e alla gestione economica.  
+Le entità principali sono:
+
+- **Person** (astratta): chiunque interagisca con il sistema.
+- **Customer**: estende Person, utente del servizio di raccolta.
+- **Employee**: estende Person, personale operativo o amministrativo.
+- **Invoice**: fattura emessa ai clienti in base ai ritiri completati.
+- **Notification**: comunica aggiornamenti o criticità agli utenti o al personale.
+- **Collection** (riferimento): raccolta effettuata, definita in Diagramma 2/3.
+
+**Relazioni chiave:**
+
+- Customer può avere molte Invoice.
+- Invoice può riguardare più Collection.
+- Customer può ricevere più Notification.
+
+### UML
+```mermaid
+classDiagram
+class Person {
+  <<abstract>>
+}
+class Customer {
+  <<entity>>
+}
+class Employee {
+  <<entity>>
+}
+class Invoice {
+  <<entity>>
+}
+class Notification {
+  <<value/object>>
+}
+class Collection {
+  <<ref>>
+}
+
+Person <|-- Customer
+Person <|-- Employee
+Customer "1" --> "*" Invoice
+Invoice "1" --> "*" Collection
+Customer "1" --> "*" Notification
+```
+
+## Diagramma 2 – Pianificazione dei ritiri
+
+### Descrizione
+Questo diagramma mostra le entità legate alla pianificazione dei ritiri e alla gestione dei rifiuti:
+
+- **Schedule** (astratta): piano di raccolta.
+- **OneTimeSchedule**: sottoclasse per ritiri occasionali.
+- **RecurringSchedule**: sottoclasse per ritiri ricorrenti.
+- **Waste**: tipi di rifiuto.
+- **WasteSchedule**: gestisce raccolte ricorrenti.
+- **Collection**: singolo evento di raccolta.
+- **Customer** (riferimento): definito in Diagramma 1.
+
+**Relazioni chiave:**
+
+- Customer può avere molti Schedule.
+- Waste può essere associato a molti Schedule.
+- Schedule include molte Collection.
+- Waste può avere molti WasteSchedule.
+
+### UML
+```mermaid
+classDiagram
+class Schedule {
+  <<abstract>>
+}
+class OneTimeSchedule {
+  <<entity>>
+}
+class RecurringSchedule {
+  <<entity>>
+}
+class Waste {
+  <<entity>>
+}
+class WasteSchedule {
+  <<entity>>
+}
+class Collection {
+  <<entity>>
+}
+class Customer {
+  <<ref>>
+}
+
+Schedule <|-- OneTimeSchedule
+Schedule <|-- RecurringSchedule
+Customer "1" --> "*" Schedule
+Waste "1" --> "*" Schedule
+Schedule "1" --> "*" Collection
+Waste "1" --> "*" WasteSchedule
+```
+
+
+## Diagramma 3 – Operazioni e risorse
+
+### Descrizione
+Questo diagramma riguarda la gestione operativa delle risorse e dei viaggi:
+
+- **Trip**: raggruppa più Collection in un’area geografica.
+- **Vehicle**: mezzi utilizzati per le raccolte.
+- **Employee**: come risorsa operativa.
+- **Collection**: raccolta associata a Trip, Vehicle e Employee.
+- **Customer** (riferimento): definito in Diagramma 1.
+- **Waste** (riferimento): definito in Diagramma 2.
+
+**Relazioni chiave:**
+
+- Trip include molte Collection.
+- Trip utilizza un Vehicle.
+- Trip ha più Employee assegnati.
+- Customer e Waste sono legati alle Collection.
+
+### UML
+```mermaid
+classDiagram
+class Trip {
+  <<entity>>
+}
+class Vehicle {
+  <<entity>>
+}
+class Employee {
+  <<ref>>
+}
+class Collection {
+  <<entity>>
+}
+class Customer {
+  <<ref>>
+}
+class Waste {
+  <<ref>>
+}
+
+Trip "1" --> "*" Collection
+Trip "1" --> "1" Vehicle
+Trip "1" --> "*" Employee
+Customer "1" --> "*" Collection
+Waste "1" --> "*" Collection
+```
