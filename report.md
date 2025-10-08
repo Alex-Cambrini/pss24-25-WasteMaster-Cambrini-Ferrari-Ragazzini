@@ -24,25 +24,27 @@ e viaggi, e comunicare in modo chiaro eventuali errori o aggiornamenti agli uten
 # Requisiti
 
 - **Gestione clienti e personale**: il sistema deve permettere di registrare e aggiornare informazioni su clienti e
-  personale, includendo la gestione dei ruoli del personale e la verifica delle abilitazioni necessarie per le attività
-  operative.
+  personale, includendo la gestione dei ruoli.
 - **Gestione mezzi operativi**: il sistema deve consentire di gestire i mezzi disponibili, controllando la
   disponibilità, la manutenzione e l’adeguatezza dei mezzi rispetto alle attività pianificate.
 - **Gestione dei rifiuti e pianificazione settimanale**: il sistema deve supportare la definizione dei tipi di rifiuti
   da raccogliere e la pianificazione dei ritiri in base a giorni della settimana o periodi specifici.
 - **Pianificazione dei ritiri**: il sistema deve consentire di creare, modificare, sospendere o cancellare i ritiri, sia
   occasionali che ricorrenti, e monitorarne lo stato fino al completamento.
-- **Esecuzione delle raccolte**: il sistema deve registrare le raccolte effettuate, consentendo la segnalazione di
-  completamenti, cancellazioni o problemi durante il ritiro.
-- **Organizzazione dei viaggi operativi**: il sistema deve permettere di raggruppare più ritiri in un viaggio per area,
-  assegnando personale e mezzi in modo coerente e senza sovrapposizioni.
-- **Monitoraggio e notifiche**: il sistema deve aggiornare lo stato delle attività in tempo reale e notificare agli
-  utenti eventuali criticità o aggiornamenti rilevanti.
+- **Esecuzione delle raccolte**: il sistema deve registrare le raccolte effettuate e segnalare eventuali problemi.
+- **Organizzazione dei viaggi operativi**: il sistema deve consentire di raggruppare più ritiri in un viaggio per area e assegnare personale e mezzi.
+- **Monitoraggio e notifiche**: il sistema deve aggiornare lo stato delle attività e notificare agli utenti eventuali criticità o aggiornamenti.
 - **Fatturazione e pagamenti**: il sistema deve generare fatture per i clienti basate sui ritiri completati e registrare
   lo stato di ciascuna fattura come pagata o non pagata.
-- **Regole di coerenza operativa**: il sistema deve garantire che le risorse assegnate siano adeguate alle attività
-  previste, evitando conflitti tra mezzi, personale e ritiri pianificati.
+- **Regole di coerenza operativa**: il sistema deve garantire che le risorse assegnate siano adeguate alle attività previste.
 
+## Requisiti non funzionali
+
+- Il sistema deve garantire affidabilità, chiarezza delle informazioni e coerenza nello stato delle attività visualizzate agli utenti.
+
+## Nota finale
+
+- L’analisi dei requisiti definisce ciò che l’applicazione deve fare, senza entrare nel design interno o nelle tecnologie utilizzate.
 ---
 
 # Analisi e modello del dominio
