@@ -1,23 +1,27 @@
-
 # Analisi
 
-Il dominio riguarda la gestione operativa e amministrativa di un’azienda di smaltimento rifiuti. Le principali attività includono la pianificazione dei ritiri, l’organizzazione delle risorse (personale e mezzi), il monitoraggio dell’avanzamento operativo e la rendicontazione economica.
+Il dominio riguarda la gestione operativa e amministrativa di un’azienda di smaltimento rifiuti. L’applicazione dovrà supportare le principali attività dell’azienda, tra cui la pianificazione dei ritiri dei rifiuti, l’organizzazione delle risorse operative (personale e mezzi), il monitoraggio dello stato dei ritiri e la rendicontazione economica.
 
-Gli attori principali sono i **Customer** (utenti serviti) e gli **Employee** (personale amministrativo o operativo). Le entità cardine del dominio sono **Schedule**, **Collection**, **Trip**, **Vehicle**, **Waste**, **Invoice**, con supporto di **WasteSchedule** per la calendarizzazione settimanale dei rifiuti e **Notification** per la gestione di segnalazioni operative.
+Gli attori principali sono i clienti dell’azienda, che richiedono il servizio di raccolta dei rifiuti, e il personale amministrativo e operativo, che gestisce la pianificazione, la raccolta e il monitoraggio delle attività.
 
-Le pianificazioni dei ritiri possono essere **one-time** o **recurring**, con stati di avanzamento che riflettono la loro evoluzione. Le raccolte effettive (**Collection**) possono essere cancellate entro un limite temporale definito rispetto alla data prevista. I viaggi operativi (**Trip**) raggruppano più raccolte nella stessa area, associando veicoli e operatori in base a vincoli di licenza e capacità.
+Le attività chiave comprendono:
+- Pianificazione dei ritiri, occasionali o ricorrenti, con possibilità di modificare, sospendere o cancellare un ritiro prima della sua esecuzione.
+- Organizzazione dei viaggi operativi, che raggruppano più ritiri in una stessa area e assegnano le risorse necessarie.
+- Gestione della raccolta dei rifiuti, con registrazione delle attività completate e segnalazione di eventuali problemi o criticità.
+- Fatturazione ai clienti, basata sui ritiri completati, e monitoraggio dei pagamenti.
 
-Il sistema prevede inoltre la possibilità di generare **Invoice** per i Customer aggregando le raccolte completate, distinguendo pagamenti effettuati o pendenti (**Invoice.PaymentStatus**). Le **Notification** vengono utilizzate per segnalare esiti e criticità nel flusso operativo.
+Il sistema dovrà inoltre garantire la coerenza operativa, evitando assegnazioni errate di risorse o conflitti tra ritiri e viaggi, e comunicare in modo chiaro eventuali errori o aggiornamenti agli utenti interessati.
 
+---
 
-## Requisiti
+# Requisiti
 
-- **Gestione anagrafiche**: registrazione e aggiornamento di **Customer** e **Employee**, con **Employee.Role** (`ADMINISTRATOR | OFFICE_WORKER | OPERATOR`) e **Employee.Licence** (`NONE | B | C1 | C`); indirizzi rappresentati come **Location**.
-- **Gestione mezzi**: amministrazione dei **Vehicle** con **Vehicle.RequiredLicence** (`B | C1 | C`), capacità in termini di numero minimo di operatori, stato (**Vehicle.VehicleStatus** = `IN_SERVICE | IN_MAINTENANCE | OUT_OF_SERVICE`) e manutenzioni pianificate.
-- **Gestione rifiuti**: definizione dei **Waste** con attributi (`isRecyclable`, `isDangerous`) e pianificazione settimanale tramite **WasteSchedule** (associazione Waste ↔ `DayOfWeek`).
-- **Pianificazione dei ritiri**: creazione e amministrazione di **Schedule** per un **Customer** e un **Waste**, in forma **OneTimeSchedule** (**ScheduleCategory.ONE_TIME**) o **RecurringSchedule** (**ScheduleCategory.RECURRING** con `Frequency` = `WEEKLY | MONTHLY`). Ogni Schedule ha uno **ScheduleStatus** (`ACTIVE | CANCELLED | PAUSED | COMPLETED`).
-- **Esecuzione dei ritiri**: generazione di **Collection** con `collectionDate`, stato (**CollectionStatus** = `ACTIVE | COMPLETED | CANCELLED`), limite di cancellazione (`cancelLimitDays`) e indicazione di fatturabilità (`isBilled`).
-- **Pianificazione dei viaggi**: organizzazione dei **Trip** per area (`postalCode`) con **assignedVehicle**, operatori assegnati, `departureTime`, `expectedReturnTime`, raccolte associate; stato **TripStatus** (`ACTIVE | COMPLETED | CANCELED`).
-- **Monitoraggio avanzamento**: aggiornamento coerente degli stati di **Schedule**, **Collection** e **Trip**, con emissione di **Notification** in caso di esiti o criticità.
-- **Fatturazione e pagamenti**: emissione di **Invoice** per **Customer**, aggregando le **Collection** associate, con valori come `amount`, `totalRecurring`, `totalOnetime`, `issueDate`, `paymentDate` e **Invoice.PaymentStatus** (`PAID | UNPAID`).
-- **Regole trasversali**: controllo automatico della coerenza tra licenze richieste dai mezzi e licenze degli operatori assegnati, rispetto della capacità operativa e assenza di overbooking tra **Trip** e **Collection**.
+- **Gestione clienti e personale**: il sistema deve permettere di registrare e aggiornare informazioni su clienti e personale, includendo la gestione dei ruoli del personale e la verifica delle abilitazioni necessarie per le attività operative.
+- **Gestione mezzi operativi**: il sistema deve consentire di gestire i mezzi disponibili, controllando la disponibilità, la manutenzione e l’adeguatezza dei mezzi rispetto alle attività pianificate.
+- **Gestione dei rifiuti e pianificazione settimanale**: il sistema deve supportare la definizione dei tipi di rifiuti da raccogliere e la pianificazione dei ritiri in base a giorni della settimana o periodi specifici.
+- **Pianificazione dei ritiri**: il sistema deve consentire di creare, modificare, sospendere o cancellare i ritiri, sia occasionali che ricorrenti, e monitorarne lo stato fino al completamento.
+- **Esecuzione delle raccolte**: il sistema deve registrare le raccolte effettuate, consentendo la segnalazione di completamenti, cancellazioni o problemi durante il ritiro.
+- **Organizzazione dei viaggi operativi**: il sistema deve permettere di raggruppare più ritiri in un viaggio per area, assegnando personale e mezzi in modo coerente e senza sovrapposizioni.
+- **Monitoraggio e notifiche**: il sistema deve aggiornare lo stato delle attività in tempo reale e notificare agli utenti eventuali criticità o aggiornamenti rilevanti.
+- **Fatturazione e pagamenti**: il sistema deve generare fatture per i clienti basate sui ritiri completati e registrare lo stato di ciascuna fattura come pagata o non pagata.
+- **Regole di coerenza operativa**: il sistema deve garantire che le risorse assegnate siano adeguate alle attività previste, evitando conflitti tra mezzi, personale e ritiri pianificati.
