@@ -200,19 +200,19 @@ Le criticità principali del dominio riguardano la gestione delle risorse in sce
 
 # Design
 
-L’architettura di *WasteMaster* adotta una variante del pattern **MVC**, ispirata al modello **ECB (Entity–Control–Boundary)**, al fine di garantire una chiara separazione tra interfaccia grafica, logica applicativa e modello di dominio.
+L’architettura di *WasteMaster* adotta una variante del pattern **MVC**, in cui i **Controller UI** non contengono logica di business ma fungono esclusivamente da mediatori tra la **View** e un **service layer** composto dai *manager*, che implementano il **Model** applicativo. Questo approccio mantiene separati **presentazione**, **orchestrazione** e **dominio**.
 
-L’interfaccia utente è sviluppata in **JavaFX**. Ogni schermata è composta da un file FXML e dal relativo *controller*, responsabile esclusivamente della gestione degli input dell’utente e dell’aggiornamento della vista. I controller fungono quindi da semplici adattatori verso la logica sottostante, senza contenere regole di business.
+L’interfaccia utente è sviluppata in **JavaFX**. Ogni schermata è composta da un file **FXML** (View) e dal relativo **Controller**, incaricato esclusivamente di gestire gli input dell’utente e aggiornare la vista. I controller non contengono logica di business, ma si limitano a delegare le operazioni ai componenti applicativi sottostanti.
 
-La logica applicativa è incapsulata in specifici **manager**, ciascuno dedicato a un’area funzionale (gestione clienti, pianificazione raccolte, assegnazione viaggi, fatturazione, notifiche). Essi orchestrano la collaborazione tra più entità e applicano regole e validazioni centralizzate.
+La **logica applicativa** è centralizzata in specifici *manager* (Model/Service Layer), ciascuno dedicato a una funzionalità del sistema, come la gestione delle raccolte, dei viaggi operativi o della fatturazione. I manager coordinano più entità e applicano regole e validazioni comuni.
 
-Le **entità di dominio** — come `Customer`, `Schedule`, `Collection`, `Trip`, `Vehicle`, `Invoice` — rappresentano lo stato persistente del sistema e sono manipolate esclusivamente dai manager, prevenendo modifiche dirette da parte dell’interfaccia utente.
+Le **entità di dominio** — ad esempio `Customer`, `Schedule`, `Collection`, `Trip`, `Vehicle`, `Invoice` — rappresentano lo stato persistente del sistema e vengono manipolate esclusivamente dai manager, evitando accessi diretti da parte della UI.
 
-Il flusso di interazione segue una struttura uniforme:
+Il flusso di interazione segue lo schema:
 
-Vista (FXML) → Controller UI → Manager applicativo → Entità di dominio → ritorno al Controller → aggiornamento della UI
+View (FXML) → Controller → Manager (Model) → Entità → ritorno al Controller → aggiornamento della View
 
-Questa organizzazione rende l’applicativo **estendibile e manutenibile**: l’introduzione di nuove funzionalità richiede unicamente l’aggiunta o l’estensione di un manager, senza impattare sui controller o sulle entità esistenti.
+Questa struttura rende l’applicazione facilmente **estendibile e manutenibile**: l’aggiunta di una nuova funzionalità richiede unicamente l’introduzione di un nuovo manager e della relativa interfaccia grafica, senza modificare i componenti esistenti.
 
 ---
 
