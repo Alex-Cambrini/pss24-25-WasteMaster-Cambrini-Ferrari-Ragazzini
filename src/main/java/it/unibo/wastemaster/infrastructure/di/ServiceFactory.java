@@ -1,5 +1,7 @@
 package it.unibo.wastemaster.infrastructure.di;
 
+import it.unibo.wastemaster.domain.factory.CollectionFactory;
+import it.unibo.wastemaster.domain.factory.CollectionFactoryImpl;
 import it.unibo.wastemaster.domain.model.Location;
 import it.unibo.wastemaster.domain.repository.impl.AccountRepositoryImpl;
 import it.unibo.wastemaster.domain.repository.impl.CollectionRepositoryImpl;
@@ -66,6 +68,7 @@ public class ServiceFactory {
     private final LoginManager loginManager;
     private final NotificationManager notificationManager;
     private final NotificationService notificationService;
+    private final CollectionFactory collectionFactory;
 
     /**
      * Constructs all services and their dependencies using the provided EntityManager.
@@ -103,6 +106,7 @@ public class ServiceFactory {
         var invoiceRepository = new InvoiceRepositoryImpl(invoiceDao);
         var scheduleRepository = new ScheduleRepositoryImpl(scheduleDao);
 
+        this.collectionFactory = new CollectionFactoryImpl();
         this.accountManager = new AccountManager(accountRepository);
         this.loginManager = new LoginManager(accountRepository);
         this.wasteManager = new WasteManager(wasteRepository);
@@ -112,7 +116,8 @@ public class ServiceFactory {
                 new RecurringScheduleManager(recurringScheduleRepository,
                         wasteScheduleManager);
         this.collectionManager =
-                new CollectionManager(collectionRepository, recurringScheduleManager);
+                new CollectionManager(collectionRepository, recurringScheduleManager,
+                        collectionFactory);
         this.recurringScheduleManager.setCollectionManager(collectionManager);
         this.oneTimeScheduleManager =
                 new OneTimeScheduleManager(oneTimeScheduleRepository, collectionManager);
@@ -126,6 +131,7 @@ public class ServiceFactory {
                 new NotificationManager(tripRepository, invoiceRepository,
                         customerRepository);
         this.notificationService = new FakeNotificationService();
+
     }
 
     /**
