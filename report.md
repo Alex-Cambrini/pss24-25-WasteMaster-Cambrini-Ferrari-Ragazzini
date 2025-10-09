@@ -200,114 +200,95 @@ Le criticità principali del dominio riguardano la gestione delle risorse in sce
 
 # Design
 
-L’architettura di *WasteMaster* adotta una variante del pattern **MVC**, in cui i **Controller UI** non contengono logica di business ma fungono esclusivamente da mediatori tra la **View** e un **service layer** composto dai *manager*, che implementano il **Model** applicativo. Questo approccio mantiene separati **presentazione**, **orchestrazione** e **dominio**.
+L’architettura di *WasteMaster* segue un approccio **Clean Architecture / 3-layer**, che separa chiaramente **UI**, **logica applicativa** e **dominio**.
 
-L’interfaccia utente è sviluppata in **JavaFX**. Ogni schermata è composta da un file **FXML** (View) e dal relativo **Controller**, incaricato esclusivamente di gestire gli input dell’utente e aggiornare la vista. I controller non contengono logica di business, ma si limitano a delegare le operazioni ai componenti applicativi sottostanti.
+I **Controller UI** (Boundary) gestiscono esclusivamente input e output della View e delegano ogni logica ai manager.  
+I **Manager applicativi** (Control) centralizzano i casi d’uso e orchestrano le entità e i repository.  
+Le **Entità di dominio** (Entity) rappresentano lo stato persistente e sono manipolate solo dai manager.  
+I **Repository** definiscono le interfacce per l’accesso ai dati, separate dall’implementazione concreta.
 
-La **logica applicativa** è centralizzata in specifici *manager* (Model/Service Layer), ciascuno dedicato a una funzionalità del sistema, come la gestione delle raccolte, dei viaggi operativi o della fatturazione. I manager coordinano più entità e applicano regole e validazioni comuni.
+Il flusso di interazione ad alto livello è:
 
-Le **entità di dominio** — ad esempio `Customer`, `Schedule`, `Collection`, `Trip`, `Vehicle`, `Invoice` — rappresentano lo stato persistente del sistema e vengono manipolate esclusivamente dai manager, evitando accessi diretti da parte della UI.
+View → Controller UI → Manager → Repository / Entity → Controller UI → View
 
-Il flusso di interazione segue lo schema:
 
-View (FXML) → Controller → Manager (Model) → Entità → ritorno al Controller → aggiornamento della View
-
-Questa struttura rende l’applicazione facilmente **estendibile e manutenibile**: l’aggiunta di una nuova funzionalità richiede unicamente l’introduzione di un nuovo manager e della relativa interfaccia grafica, senza modificare i componenti esistenti.
+Questa struttura rende l’applicazione **estendibile e manutenibile**, senza che modifiche alla UI richiedano interventi sul dominio o sui manager.
 
 ---
 
 ## Architettura
 
-Questa sezione illustra come le principali componenti di *WasteMaster* interagiscono tra loro, descrivendone i ruoli e lo scambio di informazioni ad **alto livello** (senza dettagli implementativi).
-
 ### Componenti e ruoli
 
 - **Controller UI (Boundary)**
-    - Gestiscono input e navigazione delle viste JavaFX (FXML).
-    - Delegano ogni operazione applicativa ai componenti di controllo (manager).
-    - Raccolgono i risultati e aggiornano la UI (nessuna logica di business al loro interno).
+    - Gestiscono input dell’utente e navigazione tra le viste.
+    - Delegano operazioni ai manager.
+    - Raccolgono risultati e aggiornano la UI.
 
 - **Manager applicativi (Control)**
-    - Incapsulano i casi d’uso (p.es. *Schedule/Recurring/OneTimeScheduleManager*, *CollectionManager*).
-    - Applicano regole e validazioni, orchestrando più entità e collaborando tra manager quando necessario (es. generazione collection a partire da schedule).
-    - Espongono metodi coesi e di alto livello ai controller.
+    - Incapsulano i casi d’uso principali.
+    - Applicano regole e validazioni.
+    - Coordinano più entità e repository.
 
 - **Entità di dominio (Entity)**
-    - Rappresentano lo stato del sistema: `Schedule` (astratta), `OneTimeSchedule`, `RecurringSchedule`, `Collection`, ecc.
-    - Espongono comportamenti minimi e stati tipizzati (es. `ScheduleStatus`, `CollectionStatus`).
-    - Sono manipolate esclusivamente dai manager.
+    - Rappresentano lo stato del sistema.
+    - Espongono comportamenti minimi.
+    - Manipolate solo dai manager.
 
-- **Repository (Porte del dominio)**
-    - Definiscono i contratti di accesso ai dati (interfacce lato dominio).
-    - Forniscono ai manager operazioni di lettura/scrittura senza esporre dettagli di persistenza.
+- **Repository**
+    - Definiscono i contratti per l’accesso ai dati.
+    - Permettono ai manager di leggere e scrivere dati senza conoscere i dettagli di persistenza.
 
-### Interazioni principali (panoramica)
+### Interazioni principali
 
-1. **Vista → Controller:** l’utente compie un’azione (crea/aggiorna/cancella una pianificazione).
-2. **Controller → Manager:** il controller invoca il manager appropriato con gli input dell’utente.
-3. **Manager → Repository / Entità:** il manager applica le regole, coordina le entità e persiste/recupera dati tramite i repository.
-4. **Manager → Controller → Vista:** il risultato (esito/oggetti/mesi successivi) torna al controller che aggiorna la UI.
+1. **Vista → Controller:** l’utente compie un’azione (creazione/aggiornamento/cancellazione).
+2. **Controller → Manager:** il controller invoca il manager corrispondente.
+3. **Manager → Repository / Entità:** il manager applica le regole, coordina le entità e persiste i dati.
+4. **Manager → Controller → Vista:** i risultati tornano al controller che aggiorna la View.
 
 ### Schema UML architetturale
 
-> Il diagramma mostra **soltanto** i macro–ruoli e le dipendenze tra componenti: controller → manager → repository → entità.  
-> Sono **omessi** campi e metodi di dettaglio per mantenere la leggibilità.
+> Sono mostrati solo i ruoli principali e le relazioni, senza dettagli di campi o metodi.
 
 ```mermaid
 classDiagram
-direction LR
+%% --- Domain Layer ---
+class Customer
+class Trip
 
-%% === Boundary ===
-class ScheduleController
-class CollectionController
+%% --- Service Layer ---
+class CustomerManager
+class TripManager
 
-%% === Control ===
-class ScheduleManager
-class RecurringScheduleManager
-class OneTimeScheduleManager
-class CollectionManager
+%% --- Controller Layer ---
+class CustomerController
+class TripController
+class MainController
 
-%% === Ports (Domain) ===
-class ScheduleRepository
-<<interface>> ScheduleRepository
-class RecurringScheduleRepository
-<<interface>> RecurringScheduleRepository
-class OneTimeScheduleRepository
-<<interface>> OneTimeScheduleRepository
-class CollectionRepository
-<<interface>> CollectionRepository
+%% --- Repository Layer ---
+class CustomerRepository
+class TripRepository
 
-%% === Entities (Domain) ===
-class Schedule
-<<abstract>> Schedule
-class RecurringSchedule
-class OneTimeSchedule
-class Collection
+%% --- View / Boundary ---
+class CustomerView
+class TripView
 
-%% Boundary -> Control
-ScheduleController --> ScheduleManager
-ScheduleController --> RecurringScheduleManager
-ScheduleController --> OneTimeScheduleManager
-CollectionController --> CollectionManager
+%% --- Relationships ---
+MainController --> CustomerController : coordina
+MainController --> TripController : coordina
 
-%% Control -> Ports
-ScheduleManager --> ScheduleRepository
-RecurringScheduleManager --> RecurringScheduleRepository
-OneTimeScheduleManager --> OneTimeScheduleRepository
-CollectionManager --> CollectionRepository
-RecurringScheduleManager --> CollectionManager
+CustomerController --> CustomerManager : utilizza
+CustomerController --> CustomerView : aggiorna
 
-%% Control -> Entities (uso)
-ScheduleManager ..> Schedule
-RecurringScheduleManager ..> RecurringSchedule
-OneTimeScheduleManager ..> OneTimeSchedule
-CollectionManager ..> Collection
+TripController --> TripManager : utilizza
+TripController --> TripView : aggiorna
 
-%% Entity inheritance
-Schedule <|-- RecurringSchedule
-Schedule <|-- OneTimeSchedule
-
+CustomerManager --> CustomerRepository : legge/scrive dati
+TripManager --> TripRepository : legge/scrive dati
+CustomerManager --> Customer : gestisce
+TripManager --> Trip : gestisce
 ```
+
 ---
 ## Design Dettagliato — Vehicle Management (Ferrari Lorenzo)
 
@@ -1340,9 +1321,3 @@ public boolean softDeleteAndRescheduleNextCollection(Trip trip) {
 - Tutte le operazioni principali sono accessibili dai menu laterali o dalla dashboard iniziale.
 - In caso di errori o dati mancanti, il sistema mostra messaggi di errore chiari.
 - Per sicurezza, effettua sempre il logout a fine sessione.
-
-
-
-
-
-
