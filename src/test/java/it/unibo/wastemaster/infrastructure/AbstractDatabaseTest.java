@@ -1,5 +1,7 @@
 package it.unibo.wastemaster.infrastructure;
 
+import it.unibo.wastemaster.domain.factory.CollectionFactory;
+import it.unibo.wastemaster.domain.factory.CollectionFactoryImpl;
 import it.unibo.wastemaster.domain.model.Location;
 import it.unibo.wastemaster.domain.repository.AccountRepository;
 import it.unibo.wastemaster.domain.repository.CollectionRepository;
@@ -110,6 +112,7 @@ public abstract class AbstractDatabaseTest {
     private VehicleManager vehicleManager;
     private TripManager tripManager;
     private InvoiceManager invoiceManager;
+    private CollectionFactory collectionFactory;
 
     /**
      * Initializes the EntityManagerFactory before any test runs.
@@ -150,6 +153,8 @@ public abstract class AbstractDatabaseTest {
         em = emf.createEntityManager();
         em.getTransaction().begin();
 
+        collectionFactory = new CollectionFactoryImpl();
+
         // DAO init
         locationDAO = new GenericDAO<>(em, Location.class);
         accountDAO = new AccountDAO(em);
@@ -188,7 +193,8 @@ public abstract class AbstractDatabaseTest {
                 new RecurringScheduleManager(recurringScheduleRepository,
                         wasteScheduleManager);
         collectionManager =
-                new CollectionManager(collectionRepository, recurringScheduleManager);
+                new CollectionManager(collectionRepository, recurringScheduleManager,
+                        collectionFactory);
         recurringScheduleManager.setCollectionManager(collectionManager);
         oneTimeScheduleManager =
                 new OneTimeScheduleManager(oneTimeScheduleRepository, collectionManager);
