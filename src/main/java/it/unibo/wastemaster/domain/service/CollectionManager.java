@@ -79,7 +79,7 @@ public class CollectionManager {
      * @param schedule the schedule to validate
      * @return true if the collection date is after today, false otherwise
      */
-    private boolean isCollectionDateValid(Schedule schedule) {
+    private boolean isCollectionDateValid(final Schedule schedule) {
         return schedule.getCollectionDate().isAfter(LocalDate.now());
     }
 
@@ -103,7 +103,8 @@ public class CollectionManager {
      * If valid, it uses the injected {@link CollectionFactory} to create a new
      * {@link Collection} instance and saves it via the repository.
      *
-     * @param schedule the recurring schedule for which to generate a collection; must not be null
+     * @param schedule the recurring schedule for which to generate a collection; must
+     * not be null
      * @throws IllegalArgumentException if the schedule is null
      */
     public void generateRecurringCollection(final RecurringSchedule schedule) {
@@ -112,7 +113,6 @@ public class CollectionManager {
             collectionRepository.save(collection);
         }
     }
-
 
     /**
      * Generates collections for all upcoming recurring schedules that do not yet have

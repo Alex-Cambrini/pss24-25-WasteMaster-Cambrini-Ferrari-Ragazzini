@@ -4,6 +4,10 @@ import it.unibo.wastemaster.domain.model.RecurringSchedule;
 import it.unibo.wastemaster.domain.model.WasteSchedule;
 import java.time.LocalDate;
 
+/**
+ * Strategy interface for calculating the next collection date
+ * of a recurring schedule based on its associated waste schedule.
+ */
 public interface NextCollectionCalculator {
 
     /**
