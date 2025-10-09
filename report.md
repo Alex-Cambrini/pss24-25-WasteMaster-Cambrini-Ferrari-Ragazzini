@@ -252,28 +252,22 @@ Questa struttura rende l’applicazione **estendibile e manutenibile**, senza ch
 
 ```mermaid
 classDiagram
-%% --- Domain Layer ---
 class Customer
 class Trip
 
-%% --- Service Layer ---
 class CustomerManager
 class TripManager
 
-%% --- Controller Layer ---
 class CustomerController
 class TripController
 class MainController
 
-%% --- Repository Layer ---
 class CustomerRepository
 class TripRepository
 
-%% --- View / Boundary ---
 class CustomerView
 class TripView
 
-%% --- Relationships ---
 MainController --> CustomerController : coordina
 MainController --> TripController : coordina
 
@@ -290,139 +284,172 @@ TripManager --> Trip : gestisce
 ```
 
 ---
-## Design Dettagliato — Vehicle Management (Ferrari Lorenzo)
+## Design dettagliato - Vehicle Management (Ferrari Lorenzo)
 
-### Problema affrontato
+### Problema - Gestione dello stato operativo del veicolo
 
-La gestione dei veicoli nel sistema *WasteMaster* non si limita al semplice salvataggio dei dati anagrafici: ogni veicolo deve poter:
+Ogni veicolo nel sistema *WasteMaster* deve poter cambiare stato operativo (es. da `IN_SERVICE` a `IN_MAINTENANCE`, oppure a `OUT_OF_SERVICE`) in modo consistente e centralizzato. Inizialmente, una possibile soluzione sarebbe stata quella di gestire queste transizioni direttamente nella UI o nei Controller tramite semplici `if-else`, ma ciò avrebbe causato duplicazione di logica e facile introduzione di inconsistenze tra componenti diversi.
 
-- **Cambiare stato operativo** (IN_SERVICE → IN_MAINTENANCE → OUT_OF_SERVICE e viceversa),
-- **Gestire automaticamente la manutenzione programmata**, aggiornando le date in modo consistente,
-- **Essere compatibile solo con determinati autisti**, in base alla **patente richiesta**.
+### Soluzione
 
-La sfida progettuale è quindi modellare un’entità che non sia un mero contenitore di dati, ma che **incapsuli regole di dominio reali**, mantenendo al contempo **pulita la logica applicativa** nei servizi esterni (es. `TripManager` e `EmployeeManager`).
+La responsabilità è stata suddivisa in due livelli distinti:
 
----
+- L’entità `Vehicle` mantiene lo **stato corrente** tramite l’enum `VehicleStatus`, ed espone metodi come `updateStatus(...)` per garantire cambiamenti atomici.
+- La classe `VehicleManager` funge da **domain service** e applica le regole di transizione consentite, esponendo metodi come `handleMaintenanceButton(...)` o `handleServiceButton(...)`.
 
-### Soluzione adottata
+Questo approccio permette di **accorpare la logica di dominio** in un unico punto, evitando comportamenti divergenti tra componenti diversi come `TripManager` o `EmployeeManager`.
 
-La responsabilità è stata suddivisa in due livelli:
+### Riuso / Pattern
 
-1. **`Vehicle` come *Entity ricca***
-    - Mantiene lo **stato operativo** tramite l’enum `VehicleStatus` (`IN_SERVICE`, `IN_MAINTENANCE`, `OUT_OF_SERVICE`);
-    - Espone metodi come `updateStatus(...)` e `handleMaintenanceButton(...)` per permettere cambiamenti **atomici e consistenti** dello stato;
-    - Gestisce in autonomia **normalizzazione dei dati** (`@PrePersist` / `@PreUpdate` sulla targa).
+È stato applicato un **pattern State in forma semplificata**:
 
-2. **`VehicleManager` come *Control/Domain Service***
-    - Applica **regole di business più complesse**, come:
-        - transizione corretta dello stato operativo;
-        - aggiornamento automatico della data di manutenzione (`markMaintenanceAsComplete`);
-        - calcolo delle **patenti compatibili** per l’assegnazione del veicolo (`getAllowedLicences`).
+- `VehicleStatus` rappresenta gli **stati concreti** dell’entità;
+- `VehicleManager` funge da **contesto** che definisce le **transizioni ammesse** tra stati (`handleMaintenanceButton`, `handleServiceButton`, ...);
+- `Vehicle` esegue il **cambio di stato atomico** tramite `updateStatus(...)`.
 
-In questo modo **la logica del dominio rimane centralizzata e riusabile**, evitando duplicazioni in altri servizi come `TripManager`.
+Questo evita che le transizioni vengano replicate in UI o Controller, garantendo **coerenza del flusso di stato**.
 
----
-
-### Pattern utilizzati
-
-| Pattern | Applicazione nel progetto | Descrizione |
-|---------|--------------------------|-------------|
-| **State (semplificato)** | `VehicleStatus` + metodi di transizione nel `VehicleManager` | Ogni stato (`IN_SERVICE`, `IN_MAINTENANCE`, ...) definisce transizioni ammesse tramite metodi dedicati (`handleMaintenanceButton`, `handleServiceButton`). |
-| **Validation Layer** | `ValidateUtils` + annotazioni `jakarta.validation` | Validazione dichiarativa sui campi, unita a controlli espliciti nel manager. |
-| **Policy Strategy (per le licenze)** | `Vehicle.RequiredLicence` ↔ `Employee.Licence` | La compatibilità tra licenze è gestita tramite uno *switch* che funge da regola di policy esterna al dominio. |
-
----
-
-### Schema UML della soluzione
+### Schema UML
 
 ```mermaid
 classDiagram
-direction LR
+    direction LR
 
-class Vehicle {
-    - int vehicleId
-    - String plate
-    - String brand
-    - String model
-    - int registrationYear
-    - RequiredLicence requiredLicence
-    - int requiredOperators
-    - VehicleStatus vehicleStatus
-    - LocalDate lastMaintenanceDate
-    - LocalDate nextMaintenanceDate
-    + updateStatus(status)
-}
+    class Vehicle {
+        - VehicleStatus vehicleStatus
+        + updateStatus(status)
+    }
 
-class VehicleManager {
-    + addVehicle(vehicle)
-    + updateVehicle(vehicle)
-    + handleMaintenanceButton(vehicle)
-    + handleServiceButton(vehicle)
-    + markMaintenanceAsComplete(vehicle)
-    + List~Licence~ getAllowedLicences(vehicle)
-}
+    class VehicleManager {
+        + handleMaintenanceButton(vehicle)
+        + handleServiceButton(vehicle)
+        + markMaintenanceAsComplete(vehicle)
+    }
 
-VehicleManager --> Vehicle
+    class VehicleStatus {
+        <<enumeration>>
+        IN_SERVICE
+        IN_MAINTENANCE
+        OUT_OF_SERVICE
+    }
 
-class VehicleStatus {
-    <<enumeration>>
-    IN_SERVICE
-    IN_MAINTENANCE
-    OUT_OF_SERVICE
-}
-
-class RequiredLicence {
-    <<enumeration>>
-    B
-    C1
-    C
-}
+    VehicleManager --> Vehicle
 ```
-### Diagramma di Stato — VehicleStatus
+#### Diagramma di Stato - Transizioni del VehicleStatus
 ```mermaid
 stateDiagram-v2
-[*] --> IN_SERVICE
+    [*] --> IN_SERVICE
 
     IN_SERVICE --> IN_MAINTENANCE : handleMaintenanceButton()\n(Manutenzione avviata)
     IN_MAINTENANCE --> IN_SERVICE : markMaintenanceAsComplete()\n(Manutenzione conclusa)
 
-    IN_SERVICE --> OUT_OF_SERVICE : handleServiceButton()\n(Disattivazione forzata)
+    IN_SERVICE --> OUT_OF_SERVICE : handleServiceButton()\n(Disattivazione)
     IN_MAINTENANCE --> OUT_OF_SERVICE : handleServiceButton()\n(Disattivazione)
 
     OUT_OF_SERVICE --> IN_SERVICE : restoreService()\n(Rimessa in servizio)
-    note right of IN_MAINTENANCE
-        Durante la manutenzione
-        il veicolo non è assegnabile
-        a Trip attivi.
-    end note
 ```
+### Problema - Gestione automatica della manutenzione programmata
 
-### Diagramma di Interazione — Transizione Manutenzione
+Ogni veicolo deve mantenere aggiornate due date: `lastMaintenanceDate` e `nextMaintenanceDate`.  
+Il rischio era che queste venissero aggiornate **manualmente in più punti dell’applicazione**, con alta probabilità di **inconsistenze o dimenticanze**.
+
+### Soluzione
+
+La gestione è stata **accentrata nel `VehicleManager`**, che nel metodo `markMaintenanceAsComplete(vehicle)`:
+
+- aggiorna `lastMaintenanceDate` alla **data corrente**;
+- calcola automaticamente `nextMaintenanceDate` in base a una **politica predefinita** (es. `+6 mesi`).
+
+In questo modo la logica rimane **riusabile e coerente**, e nessun altro componente dell’applicazione può modificare direttamente queste informazioni.
+
+### Riuso / Pattern
+
+Non è stato utilizzato un design pattern strutturato, ma la logica è stata organizzata secondo il **principio di centralizzazione delle regole di business**.  
+`VehicleManager` funge da **servizio di dominio**, incaricato di applicare in modo coerente la politica di aggiornamento delle date di manutenzione, mantenendo l’entità `Vehicle` focalizzata solo sul proprio stato.
+
+### Schema UML
+
 ```mermaid
-sequenceDiagram
-    participant UI
-    participant VehicleManager
-    participant Vehicle
+classDiagram
+    direction LR
 
-    UI ->> VehicleManager: handleMaintenanceButton(vehicle)
-    VehicleManager ->> Vehicle: updateStatus(IN_MAINTENANCE)
-    Vehicle --> VehicleManager: conferma stato aggiornato
-    VehicleManager ->> Vehicle: aggiorna nextMaintenanceDate
-    VehicleManager --> UI: return success
+    class Vehicle {
+        - LocalDate lastMaintenanceDate
+        - LocalDate nextMaintenanceDate
+        + updateStatus(status)
+    }
+
+    class VehicleManager {
+        + markMaintenanceAsComplete(vehicle)
+    }
+
+    VehicleManager --> Vehicle
 ```
+### Problema - Compatibilità tra veicoli e autisti in base alla patente
 
-### Motivazioni e alternative scartate
+Un veicolo può essere assegnato solo ad autisti con una patente adeguata (`RequiredLicence`).  
+Se la verifica fosse effettuata **manualmente in più punti dell’applicazione** (es. UI, Controller, `TripManager`), il rischio sarebbe quello di introdurre **eccezioni e incoerenze nei controlli**.
 
-Una possibile alternativa sarebbe stata quella di gestire gli stati operativi del veicolo **direttamente nei Controller o nella UI**, attraverso semplici blocchi condizionali (`if-else`).  
-Questa soluzione è stata **scartata** per tre motivi principali:
+### Soluzione
 
-- **Duplicazione della logica** in più punti dell'applicazione;
-- **Scarsa estendibilità**: l’aggiunta di nuovi stati futuri (es. `DECOMMISSIONED`) avrebbe richiesto modifiche sparse in molti componenti;
-- **Alto rischio di inconsistenze**, poiché sviluppatori disattenti potrebbero ad esempio consentire l'assegnazione di un veicolo *in manutenzione* a un `Trip`.
+La compatibilità viene calcolata dal metodo `getAllowedLicences(vehicle)` del `VehicleManager`, che confronta la `RequiredLicence` del veicolo con la `Licence` degli autisti disponibili.  
+Solo gli autisti che rispettano la regola stabilita vengono restituiti per l’assegnazione.
 
-Con l’approccio adottato — **logica centralizzata nel dominio (Entity + Manager)** — le regole vengono applicate in modo coerente e restano **facilmente estendibili senza impattare il resto del sistema**.
+Questa logica diventa così **configurabile e centralizzata**, ed eventualmente **estensibile in futuro** (es. aggiunta di nuove patenti o eccezioni).
 
-## Design Dettagliato — Pianificazione delle Raccolte (Alex Cambrini)
+### Riuso / Pattern
+
+Non è stato adottato un design pattern formale.  
+La compatibilità è implementata come **policy di matching centralizzata** in `VehicleManager.getAllowedLicences(vehicle)`, che confronta la `RequiredLicence` del veicolo con le licenze disponibili degli autisti.  
+Questo approccio riduce duplicazioni e incongruenze tra componenti e rende **semplice estendere la regola** (es. nuove categorie o eccezioni) senza impattare i client.
+
+### Schema UML
+
+```mermaid
+classDiagram
+    direction LR
+
+    class Vehicle {
+        - RequiredLicence requiredLicence
+    }
+
+    class VehicleManager {
+        + List~Licence~ getAllowedLicences(vehicle)
+    }
+
+    class RequiredLicence {
+        <<enumeration>>
+        B
+        C1
+        C
+    }
+
+    class Licence {
+        <<enumeration>>
+        B
+        C1
+        C
+    }
+
+    VehicleManager --> Vehicle
+```
+### Considerazioni finali e alternative scartate
+
+Una possibile alternativa per tutti e tre i problemi sarebbe stata quella di **gestire le regole direttamente nei Controller o nella UI tramite codice condizionale**.  
+Tale approccio è stato scartato perché:
+
+- avrebbe comportato **duplicazione di logica** in più componenti;
+- avrebbe reso **difficile aggiungere nuovi stati o patenti in futuro** (bassa estendibilità);
+- avrebbe introdotto **alto rischio di inconsistenze**, ad esempio consentendo l’assegnazione di un veicolo *in manutenzione* a un `Trip`.
+
+Con l’approccio adottato - **logica centralizzata nel dominio (Entity + Manager)** - tutte le regole risultano:
+
+- **coerenti**,
+- **estensibili**,
+- **facilmente riusabili in futuro** senza impattare il resto del sistema.
+---
+
+## Design Dettagliato - Pianificazione delle Raccolte (Alex Cambrini)
 
 ### Problema affrontato
 
@@ -612,7 +639,7 @@ RecurringScheduleManager --> CollectionManager
 OneTimeScheduleManager --> CollectionManager
 RecurringScheduleManager ..> WasteScheduleManager
 ```
-### Diagramma di Stato — Schedule/RecurringSchedule
+### Diagramma di Stato - Schedule/RecurringSchedule
 ```mermaid
 stateDiagram-v2
     [*] --> ACTIVE : creazione valida
@@ -645,7 +672,7 @@ stateDiagram-v2
         Stato terminale del ciclo.
     end note
 ```
-### Diagramma di Interazione — Creazione Recurring + Generazione Collection
+### Diagramma di Interazione - Creazione Recurring + Generazione Collection
 ```mermaid
 sequenceDiagram
     participant UI
@@ -667,7 +694,7 @@ sequenceDiagram
     
     RecurringScheduleManager -->> UI: RecurringSchedule con nextCollectionDate e Collection attiva
 ```
-### Diagramma di Interazione — Cambio Stato Recurring (Pause/Resume/Cancel)
+### Diagramma di Interazione - Cambio Stato Recurring (Pause/Resume/Cancel)
 ```mermaid
 sequenceDiagram
     participant UI
@@ -705,7 +732,7 @@ sequenceDiagram
 - Calcolo ricorrenze lato UI: scartata; la logica rimane nel dominio per estendibilità e testabilità.
 - Allineamento al calendario del rifiuto demandato al DB: scartata; si perderebbe chiarezza del dominio.
 
-### Design Dettagliato — Trip (Manuel Ragazzini)
+### Design Dettagliato - Trip (Manuel Ragazzini)
 
 ### Problema affrontato
 
@@ -859,7 +886,7 @@ Trip --> " * " Employee
 Collection --> Customer
 Trip --> TripStatus
 ```
-### Diagramma di Stato — TripStatus
+### Diagramma di Stato - TripStatus
 ```mermaid
 stateDiagram-v2
     [*] --> ACTIVE : creazione valida
@@ -887,7 +914,7 @@ stateDiagram-v2
       Le Collection vengono marcate come completate.
     end note
 ```
-### Diagramma di Interazione — Cancellazione Trip con Notifica
+### Diagramma di Interazione - Cancellazione Trip con Notifica
 ```mermaid
 sequenceDiagram
     participant UI
