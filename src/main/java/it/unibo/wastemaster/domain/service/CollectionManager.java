@@ -1,5 +1,6 @@
 package it.unibo.wastemaster.domain.service;
 
+import it.unibo.wastemaster.domain.factory.CollectionFactory;
 import it.unibo.wastemaster.domain.model.Collection;
 import it.unibo.wastemaster.domain.model.Collection.CollectionStatus;
 import it.unibo.wastemaster.domain.model.Customer;
@@ -20,17 +21,23 @@ public class CollectionManager {
 
     private final CollectionRepository collectionRepository;
     private final RecurringScheduleManager recurringScheduleManager;
+    private final CollectionFactory collectionFactory;  // aggiungi questo attributo
 
     /**
      * Constructs a CollectionManager with the necessary dependencies.
      *
-     * @param collectionRepository DAO used for Collection persistence
-     * @param recurringScheduleManager Manager for recurring schedule logic
+     * @param collectionRepository DAO used for Collection persistence, must not be null
+     * @param recurringScheduleManager Manager for recurring schedule logic, must not
+     * be null
+     * @param collectionFactory Factory responsible for creating Collection instances,
+     * must not be null
      */
     public CollectionManager(final CollectionRepository collectionRepository,
-                             final RecurringScheduleManager recurringScheduleManager) {
+                             final RecurringScheduleManager recurringScheduleManager,
+                             final CollectionFactory collectionFactory) {
         this.collectionRepository = collectionRepository;
         this.recurringScheduleManager = recurringScheduleManager;
+        this.collectionFactory = collectionFactory;
     }
 
     /**
@@ -54,19 +61,6 @@ public class CollectionManager {
     }
 
     /**
-     * Generates a collection for a schedule if the collection date is in the
-     * future.
-     *
-     * @param schedule the schedule to generate a collection for
-     */
-    public void generateCollection(final Schedule schedule) {
-        if (schedule.getCollectionDate().isAfter(LocalDate.now())) {
-            final Collection collection = new Collection(schedule);
-            collectionRepository.save(collection);
-        }
-    }
-
-    /**
      * Retrieves the currently active collection associated with the given recurring
      * schedule, if present.
      *
@@ -80,23 +74,62 @@ public class CollectionManager {
     }
 
     /**
-     * Generates a collection specifically for a one-time schedule.
+     * Checks if the collection date of the given schedule is in the future.
      *
-     * @param schedule the one-time schedule
+     * @param schedule the schedule to validate
+     * @return true if the collection date is after today, false otherwise
      */
-    public void generateOneTimeCollection(final OneTimeSchedule schedule) {
-        generateCollection(schedule);
+    private boolean isCollectionDateValid(final Schedule schedule) {
+        return schedule.getCollectionDate().isAfter(LocalDate.now());
     }
 
     /**
-     * Generates collections for all recurring schedules that do not yet have an
-     * assigned collection.
+     * Generates a collection for a one-time schedule if its collection date is in the
+     * future.
+     * Uses the CollectionFactory to create the collection and saves it in the repository.
+     *
+     * @param schedule the one-time schedule for which to generate a collection
+     */
+    public void generateOneTimeCollection(final OneTimeSchedule schedule) {
+        if (isCollectionDateValid(schedule)) {
+            Collection collection = collectionFactory.createOneTimeCollection(schedule);
+            collectionRepository.save(collection);
+        }
+    }
+
+    /**
+     * Generates and persists a collection for a given recurring schedule.
+     * The method first checks if the schedule's next collection date is in the future.
+     * If valid, it uses the injected {@link CollectionFactory} to create a new
+     * {@link Collection} instance and saves it via the repository.
+     *
+     * @param schedule the recurring schedule for which to generate a collection; must
+     * not be null
+     * @throws IllegalArgumentException if the schedule is null
+     */
+    public void generateRecurringCollection(final RecurringSchedule schedule) {
+        if (isCollectionDateValid(schedule)) {
+            Collection collection = collectionFactory.createRecurringCollection(schedule);
+            collectionRepository.save(collection);
+        }
+    }
+
+    /**
+     * Generates collections for all upcoming recurring schedules that do not yet have
+     * a collection,
+     * only if their collection dates are in the future. Uses the CollectionFactory to
+     * create each
+     * collection and saves it in the repository.
      */
     public void generateRecurringCollections() {
         final List<RecurringSchedule> upcomingSchedules = recurringScheduleManager
                 .getRecurringSchedulesWithoutCollections();
         for (final RecurringSchedule schedule : upcomingSchedules) {
-            generateCollection(schedule);
+            if (isCollectionDateValid(schedule)) {
+                Collection collection =
+                        collectionFactory.createRecurringCollection(schedule);
+                collectionRepository.save(collection);
+            }
         }
     }
 

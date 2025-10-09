@@ -8,6 +8,9 @@ import it.unibo.wastemaster.domain.model.Schedule.ScheduleStatus;
 import it.unibo.wastemaster.domain.model.Waste;
 import it.unibo.wastemaster.domain.model.WasteSchedule;
 import it.unibo.wastemaster.domain.repository.RecurringScheduleRepository;
+import it.unibo.wastemaster.domain.strategy.MonthlyCalculator;
+import it.unibo.wastemaster.domain.strategy.NextCollectionCalculator;
+import it.unibo.wastemaster.domain.strategy.WeeklyCalculator;
 import it.unibo.wastemaster.infrastructure.utils.ValidateUtils;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
@@ -71,7 +74,7 @@ public class RecurringScheduleManager {
         LocalDate nextCollectionDate = calculateNextDate(schedule);
         schedule.setNextCollectionDate(nextCollectionDate);
         recurringScheduleRepository.save(schedule);
-        collectionManager.generateCollection(schedule);
+        collectionManager.generateRecurringCollection(schedule);
         return schedule;
     }
 
@@ -80,40 +83,27 @@ public class RecurringScheduleManager {
         ValidateUtils.requireArgNotNull(schedule.getScheduleId(),
                 "Schedule ID must not be null");
 
-        if (schedule.getNextCollectionDate() == null) {
-            return calculateFirstDate(schedule);
-        } else {
-            return calculateRecurringDate(schedule);
-        }
-    }
-
-    private LocalDate calculateFirstDate(final RecurringSchedule schedule) {
         WasteSchedule scheduleData =
                 wasteScheduleManager.getWasteScheduleByWaste(schedule.getWaste());
-        LocalDate date = schedule.getStartDate().plusDays(2);
 
-        return alignToScheduledDay(date, scheduleData.getDayOfWeek());
+        NextCollectionCalculator calculator = switch (schedule.getFrequency()) {
+            case WEEKLY -> new WeeklyCalculator();
+            case MONTHLY -> new MonthlyCalculator();
+        };
+
+        return calculator.calculateNextDate(schedule, scheduleData);
     }
 
-    private LocalDate calculateRecurringDate(final RecurringSchedule schedule) {
-        WasteSchedule scheduleData =
-                wasteScheduleManager.getWasteScheduleByWaste(schedule.getWaste());
-        LocalDate date = schedule.getNextCollectionDate();
-        LocalDate today = LocalDate.now();
-        do {
-            if (schedule.getFrequency() == RecurringSchedule.Frequency.WEEKLY) {
-                date = date.plusWeeks(1);
-            } else {
-                date = date.plusMonths(1);
-            }
-            date = alignToScheduledDay(date, scheduleData.getDayOfWeek());
-        } while (!date.isAfter(today));
-
-        return date;
-    }
-
-    private LocalDate alignToScheduledDay(final LocalDate date,
-                                          final DayOfWeek scheduledDay) {
+    /**
+     * Aligns the given date to the next occurrence of the specified day of the week.
+     * If the date is already on the scheduled day, it is returned unchanged.
+     *
+     * @param date the date to align, must not be null
+     * @param scheduledDay the day of the week to align to, must not be null
+     * @return the next date that falls on the scheduled day
+     */
+    public static LocalDate alignToScheduledDay(final LocalDate date,
+                                                final DayOfWeek scheduledDay) {
         LocalDate adjustedDate = date;
         while (adjustedDate.getDayOfWeek() != scheduledDay) {
             adjustedDate = adjustedDate.plusDays(1);
@@ -201,7 +191,7 @@ public class RecurringScheduleManager {
                     schedule.setNextCollectionDate(nextDate);
                     schedule.setScheduleStatus(ScheduleStatus.ACTIVE);
                     recurringScheduleRepository.update(schedule);
-                    collectionManager.generateCollection(schedule);
+                    collectionManager.generateRecurringCollection(schedule);
                     return true;
                 }
                 return false;
@@ -272,7 +262,7 @@ public class RecurringScheduleManager {
         if (activeCollectionOpt.isPresent()) {
             collectionManager.softDeleteCollection(activeCollectionOpt.get());
         }
-        collectionManager.generateCollection(schedule);
+        collectionManager.generateRecurringCollection(schedule);
 
         return true;
     }
@@ -300,7 +290,7 @@ public class RecurringScheduleManager {
             LocalDate next = calculateNextDate(rs);
             rs.setNextCollectionDate(next);
             recurringScheduleRepository.update(rs);
-            collectionManager.generateCollection(rs);
+            collectionManager.generateRecurringCollection(rs);
         }
     }
 }
