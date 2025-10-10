@@ -50,7 +50,7 @@ e viaggi, e comunicare in modo chiaro eventuali errori o aggiornamenti agli uten
 # Analisi e modello del dominio
 
 Il dominio riguarda la gestione operativa e amministrativa di un’azienda di smaltimento rifiuti. L’applicazione supporta
-le principali attività aziendali, consentendo la pianificazione dei ritiri, l’organizzazione delle risorse operative (
+le principali attività aziendali, consentendo la pianificazione dei ritiri, l’organizzazione delle risorse operative(
 personale e mezzi), il monitoraggio dello stato delle attività e la gestione della fatturazione verso i clienti.
 Gli attori principali sono i clienti, che richiedono il servizio di raccolta dei rifiuti, e il personale amministrativo
 e operativo, responsabile della pianificazione, della raccolta e del monitoraggio delle attività.
@@ -190,7 +190,7 @@ classDiagram
 
 I tre diagrammi descrivono il dominio in maniera coerente e integrata:
 
-- **Diagramma 1**: utenti e entità economiche (`Customer`, `Employee`, `Invoice`), collegando le raccolte agli utenti.
+- **Diagramma 1**: utenti ed entità economiche (`Customer`, `Employee`, `Invoice`), collegando le raccolte agli utenti.
 - **Diagramma 2**: pianificazione dei ritiri, mostrando la relazione tra `Customer`, `Schedule`, `Waste` e `WasteSchedule`.
 - **Diagramma 3**: gestione operativa con `Trip`, `Vehicle` e `Employee`, collegati alle `Collection`.
 
@@ -282,32 +282,54 @@ TripManager --> TripRepository : legge/scrive dati
 CustomerManager --> Customer : gestisce
 TripManager --> Trip : gestisce
 ```
-
 ---
-## Design dettagliato - Vehicle Management (Ferrari Lorenzo)
+# Design Dettagliato — Gestione Veicoli (Ferrari Lorenzo)
 
-### Problema - Gestione dello stato operativo del veicolo
+## 1. Gestione dello Stato Operativo del Veicolo
 
-Ogni veicolo nel sistema *WasteMaster* deve poter cambiare stato operativo (es. da `IN_SERVICE` a `IN_MAINTENANCE`, oppure a `OUT_OF_SERVICE`) in modo consistente e centralizzato. Inizialmente, una possibile soluzione sarebbe stata quella di gestire queste transizioni direttamente nella UI o nei Controller tramite semplici `if-else`, ma ciò avrebbe causato duplicazione di logica e facile introduzione di inconsistenze tra componenti diversi.
+### Problema
+
+Ogni veicolo può trovarsi in diversi stati operativi (`IN_SERVICE`, `IN_MAINTENANCE`, `OUT_OF_SERVICE`) e tali stati devono poter cambiare in base alle azioni degli operatori.
+
+Una gestione manuale basata su `if/else` dispersi tra UI, Controller o altri Manager (es. `TripManager`) avrebbe comportato:
+
+- Duplicazione della logica in più componenti.
+- Incoerenze nei flussi (es. un componente consente un cambio stato che un altro blocca).
+- Difficoltà nell’aggiungere nuovi stati in futuro, richiedendo modifiche globali.
+
+### Alternative valutate
+
+Una possibile soluzione iniziale era gestire tutte le transizioni direttamente nei Controller o nella UI, verificando lo stato con condizioni procedurali (`if(vehicle.status == ...) ...`).
+
+Soluzione scartata perché:
+
+- Poco estensibile e difficile da mantenere.
+- Ogni modifica alle regole avrebbe imposto aggiornamenti manuali su più componenti.
+- Violazione del Single Responsibility Principle, con la UI che si occupa di logica di dominio.
 
 ### Soluzione
 
-La responsabilità è stata suddivisa in due livelli distinti:
+È stata centralizzata la gestione dello stato attraverso:
 
-- L’entità `Vehicle` mantiene lo **stato corrente** tramite l’enum `VehicleStatus`, ed espone metodi come `updateStatus(...)` per garantire cambiamenti atomici.
-- La classe `VehicleManager` funge da **domain service** e applica le regole di transizione consentite, esponendo metodi come `handleMaintenanceButton(...)` o `handleServiceButton(...)`.
+- L’entità `Vehicle`, che mantiene lo stato corrente e fornisce `updateStatus(...)` per eseguire cambiamenti atomici.
+- Il `VehicleManager`, che funge da domain service e applica le regole di transizione consentite, tramite metodi come `handleMaintenanceButton(...)` o `handleServiceButton(...)`.
 
-Questo approccio permette di **accorpare la logica di dominio** in un unico punto, evitando comportamenti divergenti tra componenti diversi come `TripManager` o `EmployeeManager`.
+In questo modo tutte le transizioni avvengono in un unico punto, evitando comportamenti divergenti nei vari componenti dell'applicazione.
 
-### Riuso / Pattern
+### Pattern di progettazione applicato
 
-È stato applicato un **pattern State in forma semplificata**:
+È stato applicato un **pattern State semplificato**:
 
-- `VehicleStatus` rappresenta gli **stati concreti** dell’entità;
-- `VehicleManager` funge da **contesto** che definisce le **transizioni ammesse** tra stati (`handleMaintenanceButton`, `handleServiceButton`, ...);
-- `Vehicle` esegue il **cambio di stato atomico** tramite `updateStatus(...)`.
+- `VehicleStatus` → rappresenta gli **stati concreti**.
+- `Vehicle` → contiene lo **stato attuale e il cambio atomico** (`updateStatus`).
+- `VehicleManager` → funge da **contesto**, definendo le **transizioni ammesse**.
 
-Questo evita che le transizioni vengano replicate in UI o Controller, garantendo **coerenza del flusso di stato**.
+### Vantaggi della soluzione
+
+- Coerenza delle regole tra tutti i componenti.
+- Riduzione della duplicazione di logica.
+- Facilità nell’aggiungere nuovi stati o regole.
+- Rispetto del SRP e principio Open/Closed (nuovi stati senza modificare codice esistente).
 
 ### Schema UML
 
@@ -348,24 +370,44 @@ stateDiagram-v2
 
     OUT_OF_SERVICE --> IN_SERVICE : restoreService()\n(Rimessa in servizio)
 ```
-### Problema - Gestione automatica della manutenzione programmata
+## 2. Gestione Automatica delle Date di Manutenzione
 
-Ogni veicolo deve mantenere aggiornate due date: `lastMaintenanceDate` e `nextMaintenanceDate`.  
-Il rischio era che queste venissero aggiornate **manualmente in più punti dell’applicazione**, con alta probabilità di **inconsistenze o dimenticanze**.
+### Problema
+
+Ogni veicolo deve mantenere coerenti due date:
+
+- `lastMaintenanceDate`
+- `nextMaintenanceDate`
+
+Se tali date venissero aggiornate manualmente in più punti dell’applicazione, si rischierebbe:
+
+- Dimenticanze di aggiornamento
+- Inconsistenze tra i dati
+- Regole duplicate in UI o Controller
+
+### Alternative valutate
+
+Una possibile alternativa era lasciare che ogni componente aggiornasse manualmente le date, ad esempio quando viene chiusa una manutenzione o avviato un intervento.
+
+Soluzione scartata perché soggetta a errori umani e difficile da verificare.
 
 ### Soluzione
 
-La gestione è stata **accentrata nel `VehicleManager`**, che nel metodo `markMaintenanceAsComplete(vehicle)`:
+La gestione è stata accentrata nel `VehicleManager`, in particolare nel metodo `markMaintenanceAsComplete(vehicle)` che:
 
-- aggiorna `lastMaintenanceDate` alla **data corrente**;
-- calcola automaticamente `nextMaintenanceDate` in base a una **politica predefinita** (es. `+6 mesi`).
+- Imposta `lastMaintenanceDate` alla data corrente.
+- Calcola `nextMaintenanceDate` secondo una politica predefinita (es. +6 mesi).
 
-In questo modo la logica rimane **riusabile e coerente**, e nessun altro componente dell’applicazione può modificare direttamente queste informazioni.
+### Pattern e principi applicati
 
-### Riuso / Pattern
+- Nessun pattern strutturato, ma forte applicazione del principio di **centralizzazione della business logic**.
+- Il `VehicleManager` funge da servizio di dominio responsabile delle politiche sulle date.
 
-Non è stato utilizzato un design pattern strutturato, ma la logica è stata organizzata secondo il **principio di centralizzazione delle regole di business**.  
-`VehicleManager` funge da **servizio di dominio**, incaricato di applicare in modo coerente la politica di aggiornamento delle date di manutenzione, mantenendo l’entità `Vehicle` focalizzata solo sul proprio stato.
+### Vantaggi
+
+- Coerenza garantita.
+- Nessun altro componente può modificare direttamente le date.
+- Facilità di estendere la politica di manutenzione in futuro.
 
 ### Schema UML
 
@@ -385,26 +427,42 @@ classDiagram
 
     VehicleManager --> Vehicle
 ```
-### Problema - Compatibilità tra veicoli e autisti in base alla patente
+## 3. Compatibilità tra Veicoli e Autisti in base alla Patente
 
-Un veicolo può essere assegnato solo ad autisti con una patente adeguata (`RequiredLicence`).  
-Se la verifica fosse effettuata **manualmente in più punti dell’applicazione** (es. UI, Controller, `TripManager`), il rischio sarebbe quello di introdurre **eccezioni e incoerenze nei controlli**.
+### Problema
+
+Un veicolo può essere assegnato solo ad autisti con patente compatibile (`RequiredLicence`).  
+Se la verifica viene effettuata in più punti (UI, `TripManager`, Controller), si rischiano:
+
+- Eccezioni e incoerenze
+- Possibilità di assegnare veicoli non idonei
+
+### Alternative valutate
+
+Una gestione distribuita con verifiche condizionali ovunque (`if(driver.licence >= vehicle.licence) ...`).
+
+Soluzione scartata per rischio di duplicazione e buchi di controllo.
 
 ### Soluzione
 
-La compatibilità viene calcolata dal metodo `getAllowedLicences(vehicle)` del `VehicleManager`, che confronta la `RequiredLicence` del veicolo con la `Licence` degli autisti disponibili.  
-Solo gli autisti che rispettano la regola stabilita vengono restituiti per l’assegnazione.
+È stato introdotto il metodo:
 
-Questa logica diventa così **configurabile e centralizzata**, ed eventualmente **estensibile in futuro** (es. aggiunta di nuove patenti o eccezioni).
+```java
+VehicleManager.getAllowedLicences(vehicle)
+```
+Confronta la `RequiredLicence` del veicolo con le licenze degli autisti disponibili e restituisce solo quelli idonei.
 
-### Riuso / Pattern
+### Pattern / Principi applicati
 
-Non è stato adottato un design pattern formale.  
-La compatibilità è implementata come **policy di matching centralizzata** in `VehicleManager.getAllowedLicences(vehicle)`, che confronta la `RequiredLicence` del veicolo con le licenze disponibili degli autisti.  
-Questo approccio riduce duplicazioni e incongruenze tra componenti e rende **semplice estendere la regola** (es. nuove categorie o eccezioni) senza impattare i client.
+- Nessun pattern formale, ma approccio di **policy centralizzata**: la regola è definita in un solo punto e riusata ovunque.
+
+### Vantaggi
+
+- Nessuna duplicazione di logica.
+- Facile estendere nuove licenze o eccezioni.
+- Maggiore affidabilità operativa.
 
 ### Schema UML
-
 ```mermaid
 classDiagram
     direction LR
@@ -433,20 +491,6 @@ classDiagram
 
     VehicleManager --> Vehicle
 ```
-### Considerazioni finali e alternative scartate
-
-Una possibile alternativa per tutti e tre i problemi sarebbe stata quella di **gestire le regole direttamente nei Controller o nella UI tramite codice condizionale**.  
-Tale approccio è stato scartato perché:
-
-- avrebbe comportato **duplicazione di logica** in più componenti;
-- avrebbe reso **difficile aggiungere nuovi stati o patenti in futuro** (bassa estendibilità);
-- avrebbe introdotto **alto rischio di inconsistenze**, ad esempio consentendo l’assegnazione di un veicolo *in manutenzione* a un `Trip`.
-
-Con l’approccio adottato - **logica centralizzata nel dominio (Entity + Manager)** - tutte le regole risultano:
-
-- **coerenti**,
-- **estensibili**,
-- **facilmente riusabili in futuro** senza impattare il resto del sistema.
 ---
 
 # Design Dettagliato — Pianificazione delle Raccolte (Alex Cambrini)
@@ -638,7 +682,7 @@ La gestione delle transizioni di stato è **centralizzata** nel metodo
 - Gestisce solo le **transizioni valide**:
   - `PAUSED → CANCELLED`: aggiorna lo stato e salva.
   - `PAUSED → ACTIVE`: ricalcola la prossima data, aggiorna lo stato, genera nuova collection.
-  - `ACTIVE → PAUSED` o `ACTIVE → CANCELLED`: aggiorna lo stato e elimina la collection attiva.
+  - `ACTIVE → PAUSED` o `ACTIVE → CANCELLED`: aggiorna lo stato ed elimina la collection attiva.
 - Aggiornamento repository e collection tramite `CollectionManager`.
 - Le transizioni non valide restituiscono `false`, evitando stati inconsistenti o side effect indesiderati.
 
