@@ -448,7 +448,7 @@ Soluzione scartata per rischio di duplicazione e buchi di controllo.
 È stato introdotto il metodo:
 
 ```java
-VehicleManager.getAllowedLicences(vehicle)
+VehicleManager.getAllowedLicences(vehicle);
 ```
 Confronta la `RequiredLicence` del veicolo con le licenze degli autisti disponibili e restituisce solo quelli idonei.
 
@@ -973,63 +973,85 @@ Per garantire l’affidabilità delle funzionalità principali, il progetto adot
 
 - **Framework di testing:**  
   - JUnit 5
-- **Componenti coperti:**  
-  - Entità di dominio:  
-    - `VehicleTest`  
-    - `CustomerTest`  
-    - `WasteTest`  
-    - `InvoiceTest`
-  - Manager e repository:  
-    - `TripManagerTest`  
-    - `VehicleManagerTest`  
-    - `TripDAOTest`
+- **Database di test**:
+  - H2 (in-memory), configurato per essere creato e distrutto automaticamente a ogni esecuzione. Garantisce isolamento dei test e assenza di effetti collaterali sul database reale.
+- **Livelli coperti:**
+  - **DAO** – verifica di inserimento, ricerca e cancellazione dei dati.
+  - **Model** – validazione e coerenza delle entità di dominio.
+  - **Service (manager)** – test delle regole di business e delle interazioni tra componenti.
+- **Classi di test rappresentative:**
+  - DAO: `GenericDAOTest`, `CustomerDAOTest`
+  - Model: `RecurringScheduleTest`, `InvoiceTest`
+  - Service: `RecurringScheduleManagerTest`, `VehicleManagerTest`
 
+- **Architettura di supporto:**  
+    Tutti i test ereditano da `AbstractDatabaseTest`, che gestisce automaticamente il ciclo di vita del database (EntityManager, transazioni, inizializzazione di DAO, repository e manager).  
+    L’intero processo è completamente automatico e non richiede intervento manuale.
     
 ### Esempi di test automatici
 
+Verifica il corretto funzionamento di `GenericDAO` per la ricerca di entità di esempio (`Location` e `Customer`) tramite `findById`.
+
 ```java
-// Verifica validazione dati veicolo (VehicleTest)
 @Test
-void testValidVehicle() {
-    Set<ConstraintViolation<Vehicle>> violations = ValidateUtils.VALIDATOR.validate(vehicle);
-    assertTrue(violations.isEmpty());
-}
+public void testFindById() {
+    getLocationDAO().insert(location1);
+    getCustomerDAO().insert(customer1);
 
-// Verifica inserimento e ricerca cliente (CustomerTest)
-@Test
-void testPersistenceAndGetter() {
-    getCustomerDAO().insert(customer);
-    int customerId = customer.getCustomerId();
-    Optional<Customer> foundOpt = getCustomerDAO().findById(customerId);
-    assertTrue(foundOpt.isPresent());
-    Customer found = foundOpt.get();
-    assertEquals(customer.getName(), found.getName());
-    getCustomerDAO().delete(customer);
-    Optional<Customer> deletedOpt = getCustomerDAO().findById(customerId);
-    assertTrue(deletedOpt.isEmpty());
-}
+    Optional<Location> foundLocation = getLocationDAO().findById(location1.getId());
+    assertTrue(foundLocation.isPresent());
+    assertEquals(location1.getId(), foundLocation.get().getId());
 
-// Test integrazione: cancellazione viaggio e ripianificazione raccolta (TripManagerTest)
-@Test
-void testSoftDeleteAndRescheduleNextCollection() {
-    tripManager.softDeleteAndRescheduleNextCollection(trip);
-    // Verifica che la Collection sia ripianificata correttamente
-}
-
-// Verifica generazione e pagamento fattura (InvoiceTest)
-@Test
-void testPersistence() {
-    getInvoiceDAO().insert(invoice);
-    Optional<Invoice> foundOpt = getInvoiceDAO().findById(invoice.getInvoiceId());
-    assertTrue(foundOpt.isPresent());
-    Invoice found = foundOpt.get();
-    assertEquals(invoice.getAmount(), found.getAmount());
-    getInvoiceDAO().delete(found);
-    Optional<Invoice> deletedOpt = getInvoiceDAO().findById(found.getInvoiceId());
-    assertTrue(deletedOpt.isEmpty());
+    Optional<Customer> foundCustomer =
+            getCustomerDAO().findById(customer1.getCustomerId());
+    assertTrue(foundCustomer.isPresent());
+    assertEquals(customer1.getCustomerId(), foundCustomer.get().getCustomerId());
 }
 ```
 
+Verifica che la validazione delle entità `RecurringSchedule` rilevi correttamente vincoli null per attributi obbligatori.
+
+```java
+@Test
+void testRecurringScheduleValidation() {
+    RecurringSchedule invalid = new RecurringSchedule();
+    invalid.setFrequency(null);
+    invalid.setCustomer(null);
+    invalid.setWaste(null);
+    invalid.setScheduleStatus(null);
+
+    Set<ConstraintViolation<RecurringSchedule>> violations =
+            ValidateUtils.VALIDATOR.validate(invalid);
+    assertFalse(violations.isEmpty());
+
+    assertTrue(violations.stream()
+            .anyMatch(v -> v.getMessage().contains("Frequency cannot be null")));
+    assertTrue(violations.stream()
+            .anyMatch(v -> v.getMessage().contains("Customer cannot be null")));
+    assertTrue(violations.stream()
+            .anyMatch(v -> v.getMessage().contains("WasteType cannot be null")));
+    assertTrue(violations.stream()
+            .anyMatch(v -> v.getMessage().contains("Status cannot be null")));
+}
+```
+
+Verifica che la creazione di un `RecurringSchedule` calcoli correttamente la prossima data di raccolta.
+
+```java
+@Test
+void testCreateRecurringScheduleCalculatesNextCollectionDate() {
+  RecurringSchedule schedule =
+          getRecurringScheduleManager().createRecurringSchedule(customer, waste,
+                  LocalDate.now(), Frequency.WEEKLY);
+  assertNotNull(schedule.getNextCollectionDate());
+  WasteSchedule ws = getWasteScheduleDAO().findSchedulebyWaste(waste);
+  LocalDate expectedDate = LocalDate.now().plusDays(1);
+  while (expectedDate.getDayOfWeek() != ws.getDayOfWeek()) {
+    expectedDate = expectedDate.plusDays(1);
+  }
+  assertEquals(expectedDate, schedule.getNextCollectionDate());
+}
+```
 
 ## Note di sviluppo
 
