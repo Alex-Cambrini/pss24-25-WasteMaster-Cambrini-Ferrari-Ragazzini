@@ -115,25 +115,6 @@ public class CollectionManager {
     }
 
     /**
-     * Generates collections for all upcoming recurring schedules that do not yet have
-     * a collection,
-     * only if their collection dates are in the future. Uses the CollectionFactory to
-     * create each
-     * collection and saves it in the repository.
-     */
-    public void generateRecurringCollections() {
-        final List<RecurringSchedule> upcomingSchedules = recurringScheduleManager
-                .getRecurringSchedulesWithoutCollections();
-        for (final RecurringSchedule schedule : upcomingSchedules) {
-            if (isCollectionDateValid(schedule)) {
-                Collection collection =
-                        collectionFactory.createRecurringCollection(schedule);
-                collectionRepository.save(collection);
-            }
-        }
-    }
-
-    /**
      * Attempts to cancel a collection, if not already cancelled.
      *
      * @param collection the collection to cancel
