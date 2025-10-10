@@ -131,20 +131,24 @@ public class RecurringScheduleManager {
     }
 
     /**
-     * Updates the status of a given recurring schedule if allowed.
+     * Updates the status of a recurring schedule if allowed.
      * <p>
-     * This method returns false if the current status is CANCELLED or COMPLETED. If the
-     * current status is PAUSED, it can be changed to CANCELLED or ACTIVE. If the current
-     * status is ACTIVE, it can be changed to PAUSED or CANCELLED. When switching to
-     * ACTIVE, the method updates the next collection date and generates a new collection.
-     * When switching from ACTIVE to PAUSED or CANCELLED, it soft deletes the associated
-     * collection.
+     * Blocks changes if the current status is CANCELLED or COMPLETED.
+     * Valid transitions:
+     * PAUSED → CANCELLED: updates the status and persists it.
+     * PAUSED → ACTIVE: updates the status, calculates the next collection date if null
+     * or in the past,
+     * and generates a new collection.
+     * ACTIVE → PAUSED or ACTIVE → CANCELLED: updates the status and soft deletes the
+     * active collection.
+     * Invalid transitions return false without modifying the schedule.
      *
      * @param schedule the recurring schedule to update (must not be null)
      * @param newStatus the new status to set (must not be null)
-     * @return true if the status was successfully updated; false otherwise
-     * @throws IllegalArgumentException if schedule or newStatus is null
-     * @throws IllegalStateException if associated collection is missing when required
+     * @return true if the status was successfully updated, false otherwise
+     * @throws IllegalArgumentException if schedule or newStatus are null
+     * @throws IllegalStateException if the transition requires an active collection
+     * but none exists
      */
     public final boolean updateStatusRecurringSchedule(final RecurringSchedule schedule,
                                                        final ScheduleStatus newStatus) {
@@ -153,6 +157,7 @@ public class RecurringScheduleManager {
 
         ScheduleStatus currentStatus = schedule.getScheduleStatus();
 
+        // Blocks modifications for CANCELLED or COMPLETED
         if (currentStatus == ScheduleStatus.CANCELLED
                 || currentStatus == ScheduleStatus.COMPLETED) {
             return false;
@@ -165,40 +170,50 @@ public class RecurringScheduleManager {
                     recurringScheduleRepository.update(schedule);
                     return true;
                 }
+
                 if (newStatus == ScheduleStatus.ACTIVE) {
                     LocalDate today = LocalDate.now();
                     LocalDate nextDate = schedule.getNextCollectionDate();
-                    if (nextDate != null && !nextDate.isBefore(today)) {
-                        nextDate = schedule.getNextCollectionDate();
-                    } else {
+
+                    // Calculates next collection date only if null or in the past
+                    if (nextDate == null || nextDate.isBefore(today)) {
                         nextDate = calculateNextDate(schedule);
                     }
+
                     schedule.setNextCollectionDate(nextDate);
                     schedule.setScheduleStatus(ScheduleStatus.ACTIVE);
                     recurringScheduleRepository.update(schedule);
+
                     collectionManager.generateRecurringCollection(schedule);
                     return true;
                 }
-                return false;
+
+                return false; // Invalid transition from PAUSED
+
             }
+
             case ACTIVE -> {
                 if (newStatus == ScheduleStatus.PAUSED
                         || newStatus == ScheduleStatus.CANCELLED) {
                     schedule.setScheduleStatus(newStatus);
                     recurringScheduleRepository.update(schedule);
 
-                    Collection associatedCollection = collectionManager
+                    // Soft delete the active collection
+                    Collection activeCollection = collectionManager
                             .getActiveCollectionByRecurringSchedule(schedule)
                             .orElseThrow(() -> new IllegalStateException(
                                     "Associated collection must not be null"));
 
-                    collectionManager.softDeleteCollection(associatedCollection);
+                    collectionManager.softDeleteCollection(activeCollection);
                     return true;
                 }
+
                 return false;
             }
+
             default -> {
-                return false;
+                return false; // Unexpected state
+
             }
         }
     }
