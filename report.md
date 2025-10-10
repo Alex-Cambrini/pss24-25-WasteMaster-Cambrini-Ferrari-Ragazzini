@@ -464,7 +464,7 @@ Una singola implementazione nel manager avrebbe richiesto continue modifiche e c
 
 **Esempio concreto:** Se oggi è lunedì e la raccolta settimanale è prevista per mercoledì, il sistema deve restituire la data del prossimo mercoledì; se la frequenza è mensile, deve restituire il giorno corrispondente del mese successivo.
 
-### Alternative considerate
+### Alternative valutate
 Un approccio alternativo avrebbe potuto essere implementare tutta la logica di calcolo della prossima data direttamente nel `RecurringScheduleManager` usando strutture condizionali (`if/else`) basate sulla frequenza dello schedule.  
 **Svantaggi di questa soluzione:**
 - Poco estensibile: aggiungere nuove frequenze richiederebbe modifiche continue al manager.
@@ -545,7 +545,7 @@ Distribuire la logica tra i manager rischia incoerenze, difficoltà di manutenzi
 
 **Esempio concreto:** Se più schedule ricorrenti hanno date che coincidono o si sovrappongono, il sistema deve generare le collection corrette senza creare duplicati o errori di persistenza.
 
-### Vecchio approccio considerato
+### Vecchio approccio implementativo
 Inizialmente era stata implementata una funzione `generateRecurringCollections()` eseguita come **task giornaliero automatico**, che calcolava tutte le date future delle collection ricorrenti.
 - Garantiva coerenza anche se il software rimaneva spento per più giorni.
 - Evitava date nel passato e duplicazioni.
@@ -616,6 +616,81 @@ classDiagram
 
 
 ```
+
+## 3. Gestione degli stati dello Schedule
+
+### Problema
+Un `RecurringSchedule` può assumere diversi stati (`ACTIVE`, `PAUSED`, `CANCELLED`, `COMPLETED`).  
+Ogni transizione può richiedere azioni collaterali, come cancellare una `Collection`, generarne una nuova o aggiornare la prossima data di raccolta.  
+Se tali logiche fossero distribuite tra più componenti (UI, repository, manager vari), si rischierebbero **incoerenze** e **duplicazioni**.
+
+**Esempio concreto:**  
+Se uno schedule `PAUSED` viene riattivato (`ACTIVE`), il sistema deve ricalcolare la prossima data e generare la collection corretta senza duplicazioni.
+
+### Soluzione
+La gestione delle transizioni di stato è **centralizzata** nel metodo
+```java
+`RecurringScheduleManager.updateStatusRecurringSchedule(schedule: RecurringSchedule, newStatus: ScheduleStatus)`.
+```
+
+### Logica principale implementata
+- Blocca modifiche su schedule già `CANCELLED` o `COMPLETED`.
+- Gestisce solo le **transizioni valide**:
+  - `PAUSED → CANCELLED`: aggiorna lo stato e salva.
+  - `PAUSED → ACTIVE`: ricalcola la prossima data, aggiorna lo stato, genera nuova collection.
+  - `ACTIVE → PAUSED` o `ACTIVE → CANCELLED`: aggiorna lo stato e elimina la collection attiva.
+- Aggiornamento repository e collection tramite `CollectionManager`.
+- Le transizioni non valide restituiscono `false`, evitando stati inconsistenti o side effect indesiderati.
+
+### Vantaggi della soluzione
+- **Centralizzazione della logica**: facilità di manutenzione e test.
+- **Chiarezza operativa**: un punto unico per le transizioni.
+- **Rispetto del Single Responsibility Principle (SRP)**: la gestione degli stati è separata dalla UI e dalla persistenza.
+- **Estensibilità**: nuove transizioni possono essere aggiunte modificando solo il manager, senza impattare altri componenti.
+
+### Alternative valutate
+Si è valutato l’uso del **State Pattern**, che rappresenta ogni stato come oggetto separato con comportamenti e transizioni proprie, delegando al contesto l’esecuzione delle operazioni.
+
+**Motivo per cui non è stato adottato**:
+- Il numero di stati è limitato e le azioni collaterali sono semplici.
+- L’uso del pattern avrebbe aumentato la complessità senza benefici significativi in termini di estensibilità o chiarezza.
+- La gestione centralizzata risulta più leggibile, testabile e sufficiente per il progetto.
+
+
+### Pattern applicati
+- Nessun pattern di progettazione noto è stato applicato in questa parte del progetto.
+
+### Principi di design applicati
+- Principio di singola responsabilità (SRP): il RecurringScheduleManager gestisce esclusivamente le transizioni di stato, separando la logica di business dalla UI e dalla persistenza.
+
+### Schema UML
+```mermaid
+classDiagram
+class RecurringSchedule {
+    -status: ScheduleStatus
+    -nextCollectionDate: LocalDate
+}
+
+class RecurringScheduleManager {
+    +updateStatusRecurringSchedule(schedule: RecurringSchedule, newStatus: ScheduleStatus)
+}
+
+class CollectionManager {
+    +getActiveCollectionByRecurringSchedule(schedule: RecurringSchedule)
+    +softDeleteCollection(collection: Collection)
+    +generateCollection(schedule: RecurringSchedule)
+}
+
+class Collection
+
+RecurringScheduleManager --> RecurringSchedule : manages
+RecurringScheduleManager --> CollectionManager : coordinates
+CollectionManager --> Collection : manipulates
+
+
+```
+
+---
 
 ### Design Dettagliato - Trip (Manuel Ragazzini)
 
