@@ -75,13 +75,13 @@ class CollectionManagerTest extends AbstractDatabaseTest {
 
         getOneTimeScheduleDAO().insert(futureSchedule);
 
-        getCollectionManager().generateCollection(futureSchedule);
+        getCollectionManager().generateOneTimeCollection(futureSchedule);
 
         LocalDate pastDate = LocalDate.now().minusDays(2);
         OneTimeSchedule pastSchedule = new OneTimeSchedule(customer, plastic, pastDate);
         pastSchedule.setScheduleStatus(Schedule.ScheduleStatus.ACTIVE);
 
-        getCollectionManager().generateCollection(pastSchedule);
+        getCollectionManager().generateOneTimeCollection(pastSchedule);
         List<Collection> all = getCollectionDAO().findAll();
         assertEquals(2, all.size());
     }
@@ -98,20 +98,6 @@ class CollectionManagerTest extends AbstractDatabaseTest {
 
         List<Collection> all = getCollectionDAO().findAll();
         assertEquals(2, all.size());
-    }
-
-    @Test
-    void testGenerateRecurringCollections() {
-        getRecurringScheduleDAO().insert(recurringSchedule);
-
-        assertEquals(1, getRecurringScheduleManager()
-                .getRecurringSchedulesWithoutCollections().size());
-
-        getCollectionManager().generateRecurringCollections();
-
-        List<Collection> collections = getCollectionDAO().findAll();
-        assertEquals(2, collections.size());
-        assertEquals(plastic, collections.get(1).getSchedule().getWaste());
     }
 
     @Test
@@ -154,7 +140,7 @@ class CollectionManagerTest extends AbstractDatabaseTest {
         schedule.setNextCollectionDate(futureDate);
 
         getRecurringScheduleDAO().insert(schedule);
-        getCollectionManager().generateCollection(schedule);
+        getCollectionManager().generateRecurringCollection(schedule);
 
         Optional<Collection> active =
                 getCollectionManager().getActiveCollectionByRecurringSchedule(schedule);

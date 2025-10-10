@@ -8,6 +8,9 @@ import it.unibo.wastemaster.domain.model.Schedule.ScheduleStatus;
 import it.unibo.wastemaster.domain.model.Waste;
 import it.unibo.wastemaster.domain.model.WasteSchedule;
 import it.unibo.wastemaster.domain.repository.RecurringScheduleRepository;
+import it.unibo.wastemaster.domain.strategy.MonthlyCalculator;
+import it.unibo.wastemaster.domain.strategy.NextCollectionCalculator;
+import it.unibo.wastemaster.domain.strategy.WeeklyCalculator;
 import it.unibo.wastemaster.infrastructure.utils.ValidateUtils;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
@@ -71,7 +74,7 @@ public class RecurringScheduleManager {
         LocalDate nextCollectionDate = calculateNextDate(schedule);
         schedule.setNextCollectionDate(nextCollectionDate);
         recurringScheduleRepository.save(schedule);
-        collectionManager.generateCollection(schedule);
+        collectionManager.generateRecurringCollection(schedule);
         return schedule;
     }
 
@@ -80,40 +83,27 @@ public class RecurringScheduleManager {
         ValidateUtils.requireArgNotNull(schedule.getScheduleId(),
                 "Schedule ID must not be null");
 
-        if (schedule.getNextCollectionDate() == null) {
-            return calculateFirstDate(schedule);
-        } else {
-            return calculateRecurringDate(schedule);
-        }
-    }
-
-    private LocalDate calculateFirstDate(final RecurringSchedule schedule) {
         WasteSchedule scheduleData =
                 wasteScheduleManager.getWasteScheduleByWaste(schedule.getWaste());
-        LocalDate date = schedule.getStartDate().plusDays(2);
 
-        return alignToScheduledDay(date, scheduleData.getDayOfWeek());
+        NextCollectionCalculator calculator = switch (schedule.getFrequency()) {
+            case WEEKLY -> new WeeklyCalculator();
+            case MONTHLY -> new MonthlyCalculator();
+        };
+
+        return calculator.calculateNextDate(schedule, scheduleData);
     }
 
-    private LocalDate calculateRecurringDate(final RecurringSchedule schedule) {
-        WasteSchedule scheduleData =
-                wasteScheduleManager.getWasteScheduleByWaste(schedule.getWaste());
-        LocalDate date = schedule.getNextCollectionDate();
-        LocalDate today = LocalDate.now();
-        do {
-            if (schedule.getFrequency() == RecurringSchedule.Frequency.WEEKLY) {
-                date = date.plusWeeks(1);
-            } else {
-                date = date.plusMonths(1);
-            }
-            date = alignToScheduledDay(date, scheduleData.getDayOfWeek());
-        } while (!date.isAfter(today));
-
-        return date;
-    }
-
-    private LocalDate alignToScheduledDay(final LocalDate date,
-                                          final DayOfWeek scheduledDay) {
+    /**
+     * Aligns the given date to the next occurrence of the specified day of the week.
+     * If the date is already on the scheduled day, it is returned unchanged.
+     *
+     * @param date the date to align, must not be null
+     * @param scheduledDay the day of the week to align to, must not be null
+     * @return the next date that falls on the scheduled day
+     */
+    public static LocalDate alignToScheduledDay(final LocalDate date,
+                                                final DayOfWeek scheduledDay) {
         LocalDate adjustedDate = date;
         while (adjustedDate.getDayOfWeek() != scheduledDay) {
             adjustedDate = adjustedDate.plusDays(1);
@@ -131,21 +121,6 @@ public class RecurringScheduleManager {
     }
 
     /**
-     * Updates the next collection dates for active recurring schedules with next dates
-     * before today, and triggers generation of recurring collections.
-     */
-    public final void updateNextDates() {
-        List<RecurringSchedule> schedules =
-                recurringScheduleRepository.findActiveSchedulesWithNextDateBeforeToday();
-        for (RecurringSchedule schedule : schedules) {
-            LocalDate nextDate = calculateNextDate(schedule);
-            schedule.setNextCollectionDate(nextDate);
-            recurringScheduleRepository.update(schedule);
-        }
-        collectionManager.generateRecurringCollections();
-    }
-
-    /**
      * Returns a list of recurring schedules for the given customer.
      *
      * @param customer the customer whose schedules are retrieved
@@ -156,20 +131,24 @@ public class RecurringScheduleManager {
     }
 
     /**
-     * Updates the status of a given recurring schedule if allowed.
+     * Updates the status of a recurring schedule if allowed.
      * <p>
-     * This method returns false if the current status is CANCELLED or COMPLETED. If the
-     * current status is PAUSED, it can be changed to CANCELLED or ACTIVE. If the current
-     * status is ACTIVE, it can be changed to PAUSED or CANCELLED. When switching to
-     * ACTIVE, the method updates the next collection date and generates a new collection.
-     * When switching from ACTIVE to PAUSED or CANCELLED, it soft deletes the associated
-     * collection.
+     * Blocks changes if the current status is CANCELLED or COMPLETED.
+     * Valid transitions:
+     * PAUSED → CANCELLED: updates the status and persists it.
+     * PAUSED → ACTIVE: updates the status, calculates the next collection date if null
+     * or in the past,
+     * and generates a new collection.
+     * ACTIVE → PAUSED or ACTIVE → CANCELLED: updates the status and soft deletes the
+     * active collection.
+     * Invalid transitions return false without modifying the schedule.
      *
      * @param schedule the recurring schedule to update (must not be null)
      * @param newStatus the new status to set (must not be null)
-     * @return true if the status was successfully updated; false otherwise
-     * @throws IllegalArgumentException if schedule or newStatus is null
-     * @throws IllegalStateException if associated collection is missing when required
+     * @return true if the status was successfully updated, false otherwise
+     * @throws IllegalArgumentException if schedule or newStatus are null
+     * @throws IllegalStateException if the transition requires an active collection
+     * but none exists
      */
     public final boolean updateStatusRecurringSchedule(final RecurringSchedule schedule,
                                                        final ScheduleStatus newStatus) {
@@ -178,6 +157,7 @@ public class RecurringScheduleManager {
 
         ScheduleStatus currentStatus = schedule.getScheduleStatus();
 
+        // Blocks modifications for CANCELLED or COMPLETED
         if (currentStatus == ScheduleStatus.CANCELLED
                 || currentStatus == ScheduleStatus.COMPLETED) {
             return false;
@@ -190,40 +170,50 @@ public class RecurringScheduleManager {
                     recurringScheduleRepository.update(schedule);
                     return true;
                 }
+
                 if (newStatus == ScheduleStatus.ACTIVE) {
                     LocalDate today = LocalDate.now();
                     LocalDate nextDate = schedule.getNextCollectionDate();
-                    if (nextDate != null && !nextDate.isBefore(today)) {
-                        nextDate = schedule.getNextCollectionDate();
-                    } else {
+
+                    // Calculates next collection date only if null or in the past
+                    if (nextDate == null || nextDate.isBefore(today)) {
                         nextDate = calculateNextDate(schedule);
                     }
+
                     schedule.setNextCollectionDate(nextDate);
                     schedule.setScheduleStatus(ScheduleStatus.ACTIVE);
                     recurringScheduleRepository.update(schedule);
-                    collectionManager.generateCollection(schedule);
+
+                    collectionManager.generateRecurringCollection(schedule);
                     return true;
                 }
-                return false;
+
+                return false; // Invalid transition from PAUSED
+
             }
+
             case ACTIVE -> {
                 if (newStatus == ScheduleStatus.PAUSED
                         || newStatus == ScheduleStatus.CANCELLED) {
                     schedule.setScheduleStatus(newStatus);
                     recurringScheduleRepository.update(schedule);
 
-                    Collection associatedCollection = collectionManager
+                    // Soft delete the active collection
+                    Collection activeCollection = collectionManager
                             .getActiveCollectionByRecurringSchedule(schedule)
                             .orElseThrow(() -> new IllegalStateException(
                                     "Associated collection must not be null"));
 
-                    collectionManager.softDeleteCollection(associatedCollection);
+                    collectionManager.softDeleteCollection(activeCollection);
                     return true;
                 }
+
                 return false;
             }
+
             default -> {
-                return false;
+                return false; // Unexpected state
+
             }
         }
     }
@@ -272,7 +262,7 @@ public class RecurringScheduleManager {
         if (activeCollectionOpt.isPresent()) {
             collectionManager.softDeleteCollection(activeCollectionOpt.get());
         }
-        collectionManager.generateCollection(schedule);
+        collectionManager.generateRecurringCollection(schedule);
 
         return true;
     }
@@ -300,7 +290,7 @@ public class RecurringScheduleManager {
             LocalDate next = calculateNextDate(rs);
             rs.setNextCollectionDate(next);
             recurringScheduleRepository.update(rs);
-            collectionManager.generateCollection(rs);
+            collectionManager.generateRecurringCollection(rs);
         }
     }
 }
