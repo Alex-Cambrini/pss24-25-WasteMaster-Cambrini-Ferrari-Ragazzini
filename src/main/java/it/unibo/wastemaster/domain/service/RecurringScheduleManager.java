@@ -121,21 +121,6 @@ public class RecurringScheduleManager {
     }
 
     /**
-     * Updates the next collection dates for active recurring schedules with next dates
-     * before today, and triggers generation of recurring collections.
-     */
-    public final void updateNextDates() {
-        List<RecurringSchedule> schedules =
-                recurringScheduleRepository.findActiveSchedulesWithNextDateBeforeToday();
-        for (RecurringSchedule schedule : schedules) {
-            LocalDate nextDate = calculateNextDate(schedule);
-            schedule.setNextCollectionDate(nextDate);
-            recurringScheduleRepository.update(schedule);
-        }
-        collectionManager.generateRecurringCollections();
-    }
-
-    /**
      * Returns a list of recurring schedules for the given customer.
      *
      * @param customer the customer whose schedules are retrieved
