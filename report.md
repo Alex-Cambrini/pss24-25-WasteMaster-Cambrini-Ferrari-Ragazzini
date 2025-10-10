@@ -61,7 +61,6 @@ e operativo, responsabile della pianificazione, della raccolta e del monitoraggi
 - la gestione di modifiche last-minute o ritardi nelle raccolte;
 - la corretta associazione tra programmi di raccolta e tipo di rifiuto previsto;
 - la gestione di clienti con più programmi di raccolta diversi.
--
 
 ---
 
@@ -1312,65 +1311,110 @@ public boolean softDeleteAndRescheduleNextCollection(Trip trip) {
 
 ### Avvio dell’applicazione
 
-1. **Avvio**
-   - Avvia l’applicazione tramite il file eseguibile 
-   - All’avvio viene mostrata la schermata di login.
+#### 1. Prerequisiti
+- Assicurati di avere **XAMPP** installato e che il servizio **MySQL** sia attivo.
+- Prima di avviare l’applicazione, è necessario **creare il database MySQL** con i seguenti parametri:
+  - **Nome DB:** `wastemaster_db`
+  - **Utente:** `wastemaster`
+  - **Password:** `wastemaster`
 
-2. **Login**
-   - Inserisci le tue credenziali (utente e password) fornite dall’amministratore.
-   - In base al ruolo (amministratore, operatore) avrai accesso a diverse funzionalità.
+> Per comodità sono stati creati dei **dati d’esempio** che possono essere inseriti tramite una **query SQL**, disponibile in [AGGIUNGERE LINK].
 
 ---
+
+#### 2. Avvio
+- Dopo aver creato il database, **avvia l’applicazione** tramite il file eseguibile.
+- All’avvio viene mostrata la **schermata di login**.
+
+---
+
+#### 3. Credenziali iniziali
+Al primo avvio viene generato automaticamente un **account di default**.
+
+**Amministratore**
+- Email: `admin@admin.com`
+- Password: `admin123`
+
+All'interno dei dati d'esempio sono presenti altri utenti già registrati:
+
+**Office Worker**
+- Email: `mario.rossi@yahoo.com`
+- Password: `mario.rossi25`
+
+**Operatore**
+- Email: `marco.esposito@yahoo.com`
+- Password: `marco.esposito7`
+
+> **Nota:** Le password dei dati d’esempio seguono sempre il formato  
+> `nome.cognome + numero civico`, per comodità di accesso.
+
+---
+
+#### 4. Flusso operativo
+Per utilizzare il software, è necessario creare dipendenti e clienti, aggiungere rifiuti e veicoli, pianificare le raccolte, organizzare i viaggi e gestire le fatture; questa sequenza rappresenta il normale flusso operativo dell’applicativo.
+
+---
+
+#### 5. Login
+- Inserisci l’**email** e la **password** corrispondente.
+- Dopo l’accesso, le **funzionalità disponibili** dipendono dal ruolo dell’utente (*Amministratore*, *Office Worker*, *Operatore*).
 
 ### Funzionalità principali
 
-#### 1. Gestione clienti e personale
-- Dal menu **Anagrafiche** puoi:
-  - Visualizzare, aggiungere, modificare o eliminare clienti e personale.
+#### 1. Dashboard
+- La dashboard principale offre una panoramica rapida delle attività:
+  - **Customer:** numero totale di clienti attivi.
+  - **Collection attive:** numero di raccolte in corso.
+  - **Trip completati:** numero di viaggi conclusi.
+  - **Fatture da pagare:** numero di fatture ancora non saldate.
+- Visualizza un grafico a barre con tutte le collection, suddivise tra **cancellate**, **attive** e **completate**.
+- Mostra le **notifiche recenti**.
+- Non richiede interazioni: serve principalmente per monitorare lo stato delle operazioni.
+
+#### 2. Gestione clienti e personale
+- Dal menu **Customers** puoi:
+  - Visualizzare, aggiungere, modificare o eliminare clienti.
   - Assegnare ruoli e aggiornare informazioni di contatto.
-- Per aggiungere un nuovo cliente, premi su “Nuovo cliente”, compila i dati richiesti e salva.
+  - Per aggiungere un nuovo cliente, premi su **Nuovo cliente**, compila i dati richiesti e salva.
+- Dal menu **Employee** puoi:
+  - Visualizzare, aggiungere, modificare o eliminare il personale.
+  - Assegnare ruoli e aggiornare informazioni.
+  - Per aggiungere un nuovo dipendente, premi su **Nuovo Employee**, compila i dati richiesti e salva.
 
-#### 2. Gestione mezzi e rifiuti
-- Dal menu **Risorse** puoi:
-  - Visualizzare la lista dei mezzi aziendali e il loro stato (in servizio, in manutenzione, fuori servizio).
-  - Aggiornare dati su veicoli e pianificare la manutenzione.
-  - Gestire il catalogo dei rifiuti raccolti, aggiungendo nuovi tipi o modificando esistenti.
+#### 3. Gestione rifiuti
+- Dal menu **Waste** puoi:
+  - Visualizzare la lista dei rifiuti e aggiungere, modificare o eliminare elementi.
+  - Premendo **Add Programm** puoi aggiungere un giorno di raccolta per il rifiuto selezionato.
+    - Premendo **Change Day** puoi modificare il giorno di raccolta già impostato.
 
-#### 3. Pianificazione raccolte
-- Dal menu **Pianificazione raccolte** puoi:
-  - Inserire nuove raccolte, sia programmate (ricorrenti) che occasionali (one-time).
-  - Modificare, sospendere o cancellare raccolte future.
-  - Consultare il calendario delle raccolte già pianificate.
+#### 4. Gestione mezzi
+- Dal menu **Vehicle** puoi:
+  - Visualizzare la lista dei mezzi e aggiungere, modificare o eliminare elementi.
+  - Impostare lo stato del mezzo (**in servizio**, **fuori servizio**, **in manutenzione**).
 
-#### 4. Gestione viaggi e rotte operative
-- Dal menu **Viaggi** puoi:
-  - Visualizzare e pianificare i viaggi dei mezzi, associando più raccolte nello stesso viaggio.
+#### 5. Pianificazione raccolte
+- Dal menu **Schedule** puoi:
+  - Visualizzare le raccolte già inserite.
+  - Inserire nuove raccolte, sia programmate che occasionali.
+  - Modificare, sospendere o cancellare programmazioni esistenti.
+  - Premendo **Show Collection** puoi visualizzare i ritiri collegati alla programmazione selezionata.
+  - Premendo **Change Frequency** puoi modificare la frequenza delle raccolte ricorrenti.
+
+#### 6. Gestione viaggi
+- Dal menu **Trip** puoi:
+  - Visualizzare i viaggi pianificati.
+  - Pianificare nuovi viaggi, associando più raccolte nello stesso viaggio.
   - Assegnare personale e mezzi disponibili.
   - Modificare le assegnazioni in caso di imprevisti.
+  - Premendo **Delete Permanently** elimini il viaggio selezionato e notifichi i clienti; il viaggio non sarà più riprogrammato se collegato a raccolte ricorrenti.
+  - Premendo **Delete** elimini il viaggio ma puoi riprogrammarlo successivamente.
+  - Premendo **Show Collections** visualizzi le raccolte relative al viaggio selezionato.
+  - Premendo **Complete Trip** concludi il viaggio e segni le raccolte come completate.
 
-#### 5. Monitoraggio e notifiche
-- La dashboard principale mostra tutte le attività pianificate, lo stato delle raccolte (attiva, completata, annullata) e segnala eventuali criticità.
-- Riceverai notifiche automatiche in caso di problemi sulle raccolte o sui pagamenti.
-
-#### 6. Fatturazione e pagamenti
-- Dal menu **Fatture** puoi:
+#### 7. Fatturazione e pagamenti
+- Dal menu **Invoice** puoi:
   - Visualizzare le fatture emesse per ogni cliente.
-  - Segnare come pagata una fattura o registrare un nuovo pagamento.
-  - Esportare o stampare la fattura.
-
----
-
-### Operazioni comuni
-
-- **Aggiungere una raccolta:** vai su "Pianificazione raccolte" > "Nuova raccolta", inserisci cliente, tipo di rifiuto, data e salva.
-- **Modificare una raccolta:** seleziona la raccolta dalla lista, premi "Modifica", aggiorna i dati e conferma.
-- **Marcare come completata una raccolta:** seleziona la raccolta e clicca su "Completa".
-- **Annullare un viaggio:** seleziona il viaggio e clicca su "Annulla"; le raccolte saranno ripianificate automaticamente.
-
----
-
-### Note finali
-
-- Tutte le operazioni principali sono accessibili dai menu laterali o dalla dashboard iniziale.
-- In caso di errori o dati mancanti, il sistema mostra messaggi di errore chiari.
-- Per sicurezza, effettua sempre il logout a fine sessione.
+  - Creare una nuova fattura scegliendo di includere **una o più collection** dello stesso cliente.
+  - Segnare una fattura come pagata.
+  - Esportare le fatture in formato PDF.
+  - Cancellare fatture non ancora pagate in caso di errori di compilazione.
