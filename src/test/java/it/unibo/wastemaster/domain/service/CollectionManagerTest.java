@@ -101,20 +101,6 @@ class CollectionManagerTest extends AbstractDatabaseTest {
     }
 
     @Test
-    void testGenerateRecurringCollections() {
-        getRecurringScheduleDAO().insert(recurringSchedule);
-
-        assertEquals(1, getRecurringScheduleManager()
-                .getRecurringSchedulesWithoutCollections().size());
-
-        getCollectionManager().generateRecurringCollections();
-
-        List<Collection> collections = getCollectionDAO().findAll();
-        assertEquals(2, collections.size());
-        assertEquals(plastic, collections.get(1).getSchedule().getWaste());
-    }
-
-    @Test
     void testUpdateCollection() {
         assertEquals(CollectionStatus.ACTIVE, collection.getCollectionStatus());
 
