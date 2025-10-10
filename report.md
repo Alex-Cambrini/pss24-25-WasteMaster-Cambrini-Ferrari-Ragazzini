@@ -41,6 +41,7 @@ e viaggi, e comunicare in modo chiaro eventuali errori o aggiornamenti agli uten
 ## Requisiti non funzionali
 
 - Il sistema deve garantire affidabilità, chiarezza delle informazioni e coerenza nello stato delle attività visualizzate agli utenti.
+- Il sistema deve gestire diversi livelli di accesso in base alla tipologia di dipendente (Administrator, Office Worker e Operator), limitando determinate funzionalità dell’interfaccia in base al ruolo assegnato.
 
 ## Nota finale
 
@@ -75,6 +76,7 @@ Rappresenta le entità legate alle persone e ai clienti, mostrando l’ereditari
 - **Person**: entità base per tutte le persone.
 - **Customer**: cliente che eredita da `Person`.
 - **Employee**: dipendente che eredita da `Person`.
+- **Account**: credenziali di accesso associate a un dipendente del sistema.
 - **Location**: indirizzo di residenza dei clienti.
 - **Invoice**: fattura emessa per un cliente in seguito ai servizi di raccolta erogati.
 - **Collection**: operazione di raccolta associata a una fattura.
@@ -83,6 +85,7 @@ Rappresenta le entità legate alle persone e ai clienti, mostrando l’ereditari
 
 - `Customer` eredita da `Person`.
 - `Employee` eredita da `Person`.
+- Ogni `Employee` ha un singolo `Account` (1:1).
 - Ogni `Customer` risiede in una singola `Location` (1:1).
 - Ogni `Customer` può ricevere una o più `Invoice` (1:N).
 - Ogni `Invoice` include una o più `Collection` (1:N).
@@ -91,18 +94,20 @@ Rappresenta le entità legate alle persone e ai clienti, mostrando l’ereditari
 
 ```mermaid
 classDiagram
-    class Person
-    class Customer
-    class Employee
-    class Location
-    class Invoice
-    class Collection
+  class Person
+  class Customer
+  class Employee
+  class Location
+  class Invoice
+  class Collection
+  class Account
 
-    Person <|-- Customer
-    Person <|-- Employee
-    Customer "1" --> "1" Location : residesAt
-    Customer "1" --> "*" Invoice : receives
-    Invoice "1" --> "*" Collection : includes
+  Person <|-- Customer
+  Person <|-- Employee
+  Customer "1" --> "1" Location : residesAt
+  Customer "1" --> "*" Invoice : receives
+  Invoice "1" --> "*" Collection : includes
+  Employee "1" --> "1" Account : has
 ```
 
 ## Diagramma 2 – Programmazione della raccolta
@@ -234,15 +239,21 @@ Questa struttura rende l’applicazione **estendibile e manutenibile**, senza ch
     - Espongono comportamenti minimi.
     - Manipolate solo dai manager.
 
-- **Repository**
-    - Definiscono i contratti per l’accesso ai dati.
-    - Permettono ai manager di leggere e scrivere dati senza conoscere i dettagli di persistenza.
+- **Repository (Repository Pattern)**
+  - Agiscono come ponte tra dominio e persistenza.
+  - Sono interfacce definite nel layer applicativo/dominio, mentre le implementazioni concrete risiedono nel layer di infrastruttura.
+  - Permettono ai manager di leggere e scrivere dati senza conoscere tecnologia o formato di memorizzazione.
+
+### Tecnologia di persistenza
+
+L’implementazione concreta dei repository utilizza un **database relazionale MySQL** come sistema di persistenza,
+gestendo operazioni di lettura e scrittura dei dati attraverso query SQL.
 
 ### Interazioni principali
 
 1. **Vista → Controller:** l’utente compie un’azione (creazione/aggiornamento/cancellazione).
 2. **Controller → Manager:** il controller invoca il manager corrispondente.
-3. **Manager → Repository / Entità:** il manager applica le regole, coordina le entità e persiste i dati.
+3. **Manager → Repository / Entità:** il manager applica le regole, coordina le entità e passa ai repository le operazioni di persistenza.
 4. **Manager → Controller → Vista:** i risultati tornano al controller che aggiorna la View.
 
 ### Schema UML architetturale
