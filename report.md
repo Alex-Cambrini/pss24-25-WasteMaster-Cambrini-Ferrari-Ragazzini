@@ -449,288 +449,173 @@ Con l’approccio adottato - **logica centralizzata nel dominio (Entity + Manage
 - **facilmente riusabili in futuro** senza impattare il resto del sistema.
 ---
 
-## Design Dettagliato - Pianificazione delle Raccolte (Alex Cambrini)
+# Design Dettagliato — Pianificazione delle Raccolte (Alex Cambrini)
 
-### Problema affrontato
-
-Il dominio *WasteMaster* richiede di gestire due tipologie di pianificazione delle raccolte:
-
-- **One–Time**: una singola data richiesta dal cliente;
-- **Recurring**: un ciclo (settimanale/mensile) allineato al giorno previsto dal calendario di quel rifiuto (*WasteSchedule*).
-
-Vincoli principali:
-
-- calcolare e **mantenere la prossima data utile** in base alla frequenza e al giorno prefissato dal *WasteSchedule*;
-- **generare automaticamente la `Collection`** ogni volta che una pianificazione diventa effettiva;
-- **regolare gli stati** (ACTIVE/PAUSED/CANCELLED/COMPLETED) e le transizioni consentite;
-- **validare le cancellazioni** (es. One–Time cancellabile solo entro una soglia di giorni);
-- evitare duplicazioni di logica tra UI e service, **centralizzando il comportamento nel dominio**.
+- **OneTimeSchedule**: una singola data richiesta dal cliente
+- **RecurringSchedule**: un ciclo (settimanale/mensile) allineato al giorno previsto dal calendario di quel rifiuto (*WasteSchedule*).
 
 ---
 
-### Soluzione adottata
+## 1. Calcolo della prossima data di raccolta
 
-La soluzione è stata strutturata in **Entity + Domain Service** ben separati:
+### Problema
+La logica di calcolo della prossima data di raccolta varia in base alla frequenza dello schedule (settimanale o mensile).  
+Una singola implementazione nel manager avrebbe richiesto continue modifiche e condizionali, rendendo difficile aggiungere nuovi tipi di frequenza e aumentando il rischio di errori: duplicazioni, raccolte mancanti o date incoerenti.
 
-1. **Gerarchia di dominio per la pianificazione**
-    - `Schedule` (astratta) definisce l’interfaccia comune e il **template** per ottenere la “data di raccolta” (`getCollectionDate()`).
-    - `OneTimeSchedule` fornisce la **data unica** (`pickupDate`) e la restituisce come `getCollectionDate()`.
-    - `RecurringSchedule` mantiene `startDate`, `frequency (WEEKLY/MONTHLY)` e `nextCollectionDate`, che viene **calcolata e aggiornata** dai servizi.
+**Esempio concreto:** Se oggi è lunedì e la raccolta settimanale è prevista per mercoledì, il sistema deve restituire la data del prossimo mercoledì; se la frequenza è mensile, deve restituire il giorno corrispondente del mese successivo.
 
-2. **Servizi applicativi coesi**
-    - `OneTimeScheduleManager`
-        - valida la data (>= `CANCEL_LIMIT_DAYS`);
-        - persiste lo schedule e **chiede a `CollectionManager`** di generare la relativa `Collection`.
-    - `RecurringScheduleManager`
-        - calcola la **prima** `nextCollectionDate` e le **successive** (allineando al giorno previsto dal `WasteSchedule`);
-        - gestisce **stato e transizioni** (ACTIVE ⇄ PAUSED, ACTIVE → CANCELLED) e la **rigenerazione/annullamento** delle `Collection` associate;
-        - aggiorna la `frequency` ricalcolando coerentemente la `nextCollectionDate`.
-    - `CollectionManager`
-        - fornisce un’API unica per **generare/aggiornare/annullare** `Collection` a partire da uno `Schedule`.
+### Alternative considerate
+Un approccio alternativo avrebbe potuto essere implementare tutta la logica di calcolo della prossima data direttamente nel `RecurringScheduleManager` usando strutture condizionali (`if/else`) basate sulla frequenza dello schedule.  
+**Svantaggi di questa soluzione:**
+- Poco estensibile: aggiungere nuove frequenze richiederebbe modifiche continue al manager.
+- Maggiore rischio di errori: duplicazioni, date incoerenti o raccolte mancanti.
+- Violazione dei principi SOLID, in particolare Open/Closed e Single Responsibility.
+- Testabilità ridotta, poiché tutta la logica è concentrata in un unico componente.
 
-3. **Allineamento al calendario del rifiuto**
-    - Il calcolo della `nextCollectionDate` usa `WasteScheduleManager` per recuperare il **giorno della settimana valido** per quel rifiuto e allineare la data richiesta (es. “ogni martedì”).
+### Soluzione
+È stato applicato il **pattern Strategy**, separando la logica di calcolo in strategie indipendenti e intercambiabili.  
+Il manager (`RecurringScheduleManager`) agisce come **contesto**, delegando il calcolo alla strategia appropriata tramite l’interfaccia comune `NextCollectionCalculator`.
 
----
-### Pattern utilizzati
+**Metodi principali della soluzione:**
 
-#### Template Method (sui dati di pianificazione)
-Il metodo `Schedule#getCollectionDate()` funge da **template method**:
+- `calculateNextDate(schedule: RecurringSchedule): LocalDate`
+- `alignToScheduledDay(date: LocalDate, dayOfWeek: DayOfWeek): LocalDate`
 
-- `OneTimeSchedule` lo implementa restituendo `pickupDate`;
-- `RecurringSchedule` lo implementa restituendo `nextCollectionDate`.
+**Vantaggi della soluzione:**
 
-Questo consente di trattare entrambi gli schedule in modo uniforme a livello di dominio.
+- Aggiungere nuove frequenze richiede solo nuove strategie, senza modifiche al manager.
+- Migliore leggibilità e testabilità.
+- Rispetto dei principi SOLID (Open/Closed, Single Responsibility).
+- Chiara separazione fra business logic e policy di calcolo.
 
+### Pattern di progettazione
+- **Strategy:**
+    - `NextCollectionCalculator` rappresenta l’interfaccia della strategia.
+    - `WeeklyCalculator` e `MonthlyCalculator` sono implementazioni concrete della strategia.
+    - `RecurringScheduleManager` funge da contesto, delegando il calcolo alla strategia selezionata in base alla frequenza dello schedule.
 
-#### Strategy (frequenza di ricorrenza)
-La strategia è rappresentata da `RecurringSchedule.Frequency` (`WEEKLY`, `MONTHLY`).
+**Dinamica di selezione della strategia:**  
+Il `RecurringScheduleManager` determina quale strategia utilizzare al momento della richiesta del calcolo della prossima data. La scelta avviene tipicamente tramite un semplice mapping tra la frequenza dello schedule e l’implementazione concreta corrispondente. In questo modo, il manager **non contiene logica condizionale complessa**, ma delega dinamicamente la responsabilità di calcolo alla strategia appropriata.
 
-Il calcolo della prossima data applica **la politica scelta** ed è facilmente estendibile (es. aggiungendo `QUARTERLY`) **senza modificare la UI né le entità**.
-
----
-
-#### Factory Method / Creation Service (generazione di `Collection`)
-La responsabilità di creare una nuova `Collection` è centralizzata in:
-
-```java
-CollectionManager.generateCollection(schedule)
-```
-Questo approccio consente di evitare:
-
-- costruttori sparsi nel codice;
-- generazioni incoerenti (ad esempio con date non ammissibili);
-
-Poiché tutte le regole di business sono custodite all'interno del service dedicato.
-
----
-
-#### State (transizioni di Schedule)
-
-Il metodo:
-
-```java
-RecurringScheduleManager.updateStatusRecurringSchedule(...)
-```
-
-Il metodo `RecurringScheduleManager.updateStatusRecurringSchedule(...)` governa le transizioni tra gli stati:
-
-`ACTIVE → PAUSED → CANCELLED → COMPLETED`
-
-Durante tali cambiamenti, applica automaticamente le regole di coerenza del dominio:
-
-- annulla la **Collection attiva** quando lo stato diventa `PAUSED` o `CANCELLED`;
-- genera una **nuova Collection** quando lo stato ritorna `ACTIVE`.
-
-In questo modo la UI non deve conoscere la logica delle transizioni, ma si limita a richiedere un cambio di stato.
-
----
-
-### Validation Layer (Guard Clauses + Bean Validation)
-
-Il progetto adotta un duplice sistema di validazione che combina dichiarazioni a livello di entità e controlli espliciti nei metodi:
-
-| Tipo                                 | Esempi                          | Scopo                                     |
-|--------------------------------------|---------------------------------|-------------------------------------------|
-| `jakarta.validation`                 | `@NotNull`, `@FutureOrPresent` | Validazione dichiarativa sulle entità     |
-| `ValidateUtils.requireArgNotNull(...)` | Invocata nei manager o nei service | Difesa immediata dei contratti (fail-fast) |
-
-Questo approccio impedisce che logiche di business vengano eseguite su dati incompleti o incoerenti, garantendo robustezza del dominio.
-
----
-
-### Schema UML della soluzione
-
+### Schema UML
 ```mermaid
 classDiagram
-direction LR
+    direction LR
 
-class Schedule {
-  <<abstract>>
-  - int id
-  - Customer customer
-  - Waste waste
-  - ScheduleStatus status
-  - LocalDate creationDate
-  - ScheduleCategory scheduleCategory
-  + LocalDate getCollectionDate()
-}
-
-class OneTimeSchedule {
-  - LocalDate pickupDate
-  + LocalDate getCollectionDate()
-}
-
-class RecurringSchedule {
-  - LocalDate startDate
-  - Frequency frequency
-  - LocalDate nextCollectionDate
-  + LocalDate getCollectionDate()
-}
-
-class Collection {
-  - int collectionId
-  - LocalDate date
-  - CollectionStatus collectionStatus
-  - int cancelLimitDays
-}
-
-class Frequency {
-  <<enumeration>>
-  WEEKLY
-  MONTHLY
-}
-
-class OneTimeScheduleManager {
-  + OneTimeSchedule createOneTimeSchedule(customer, waste, pickupDate)
-  + boolean softDeleteOneTimeSchedule(schedule)
-}
-
-class RecurringScheduleManager {
-  + RecurringSchedule createRecurringSchedule(customer, waste, startDate, frequency)
-  + boolean updateStatusRecurringSchedule(schedule, newStatus)
-  + boolean updateFrequency(schedule, newFrequency)
-  + rescheduleNextCollection(collection)
-  - LocalDate calculateNextDate(schedule)
-  - LocalDate alignToScheduledDay(date, dayOfWeek)
-}
-
-class CollectionManager {
-  + generateOneTimeCollection(schedule)
-  + generateCollection(schedule)
-  + boolean softDeleteCollection(collection)
-  + Optional~Collection~ getActiveCollectionByRecurringSchedule(schedule)
-}
-
-class WasteScheduleManager {
-  + WasteSchedule getWasteScheduleByWaste(waste)
-}
-
-Schedule <|-- OneTimeSchedule
-Schedule <|-- RecurringSchedule
-
-RecurringSchedule --> Frequency : uses
-
-RecurringScheduleManager ..> RecurringSchedule
-OneTimeScheduleManager ..> OneTimeSchedule
-CollectionManager ..> Collection
-
-RecurringScheduleManager --> CollectionManager
-OneTimeScheduleManager --> CollectionManager
-RecurringScheduleManager ..> WasteScheduleManager
-```
-### Diagramma di Stato - Schedule/RecurringSchedule
-```mermaid
-stateDiagram-v2
-    [*] --> ACTIVE : creazione valida
-
-    state RecurringSchedule {
-        [*] --> ACTIVE
-
-        ACTIVE --> PAUSED : updateStatus(PAUSED) / annulla Collection attiva
-        PAUSED --> ACTIVE : updateStatus(ACTIVE) / rigenera prossima Collection
-
-        ACTIVE --> CANCELLED : updateStatus(CANCELLED) / annulla Collection attiva
-        PAUSED --> CANCELLED : updateStatus(CANCELLED)
-
-        ACTIVE --> COMPLETED : complete() / marca Collection completata, calcola nextCollectionDate (se continua)
-        COMPLETED --> ACTIVE : riattiva ciclo (opzionale)
+    class RecurringScheduleManager {
+        +calculateNextDate(schedule: RecurringSchedule): LocalDate
     }
 
-    note right of ACTIVE
-        In ACTIVE esiste al più
-        una Collection "attiva".
-    end note
+    class NextCollectionCalculator {
+        <<interface>>
+        +calculateNextDate(schedule: RecurringSchedule, wasteSchedule: WasteSchedule): LocalDate
+    }
 
-    note right of PAUSED
-        Nessuna Collection attiva.
-        Riparte alla ri-attivazione
-        allineando al WasteSchedule.
-    end note
+    class WeeklyCalculator {
+        +calculateNextDate(schedule: RecurringSchedule, wasteSchedule: WasteSchedule): LocalDate
+    }
 
-    note right of CANCELLED
-        Stato terminale del ciclo.
-    end note
+    class MonthlyCalculator {
+        +calculateNextDate(schedule: RecurringSchedule, wasteSchedule: WasteSchedule): LocalDate
+    }
+
+    class RecurringSchedule {
+        +startDate: LocalDate
+        +nextCollectionDate: LocalDate
+        +frequency: Frequency
+    }
+
+    class WasteSchedule {
+        +dayOfWeek: DayOfWeek
+    }
+
+    RecurringScheduleManager --> NextCollectionCalculator : delegates
+    NextCollectionCalculator <|.. WeeklyCalculator
+    NextCollectionCalculator <|.. MonthlyCalculator
+    RecurringScheduleManager --> RecurringSchedule
+    RecurringScheduleManager --> WasteSchedule
 ```
-### Diagramma di Interazione - Creazione Recurring + Generazione Collection
+
+## 2. Generazione automatica e coordinamento delle Collection
+
+### Problema
+Ogni schedule deve generare una **Collection** coerente senza duplicazioni o errori di data.  
+Più manager (**RecurringScheduleManager**, **CollectionManager**, **WasteScheduleManager**) devono collaborare senza duplicare logica.  
+Distribuire la logica tra i manager rischia incoerenze, difficoltà di manutenzione e ridotta testabilità.
+
+**Esempio concreto:** Se più schedule ricorrenti hanno date che coincidono o si sovrappongono, il sistema deve generare le collection corrette senza creare duplicati o errori di persistenza.
+
+### Vecchio approccio considerato
+Inizialmente era stata implementata una funzione `generateRecurringCollections()` eseguita come **task giornaliero automatico**, che calcolava tutte le date future delle collection ricorrenti.
+- Garantiva coerenza anche se il software rimaneva spento per più giorni.
+- Evitava date nel passato e duplicazioni.
+- Richiedeva controlli aggiuntivi e generava un **costo prestazionale** maggiore.
+
+Questo approccio automatizzava tutto, ma introdusse complessità, difficoltà di manutenzione e test più complicati.
+
+### Nuovo approccio adottato
+- La collection viene generata **solo al momento della creazione dello schedule**.
+- Le collection vengono raggruppate in un **trip**, cioè un insieme di ritiri fisici nella stessa zona.
+- Una volta completato un trip, l’operatore lo marca come completato.
+- Solo le collection coinvolte vengono aggiornate in caso di modifiche o errori (ad esempio mezzo rotto o annullo).
+
+**Motivazioni della scelta:**
+- Riduzione della complessità e del carico di lavoro.
+- Miglior testabilità: ogni schedule genera solo le collection coinvolte.
+- Maggiore chiarezza operativa e manutenzione più semplice.
+- Estensibilità futura: se in futuro servono nuovi tipi di collection, basta aggiungere nuove implementazioni della factory senza modificare i manager.
+
+### Pattern di progettazione
+È stato utilizzato il **Factory Pattern** per la creazione delle collection:
+- `CollectionFactory` definisce l’interfaccia per creare collection one-time e ricorrenti.
+- `CollectionFactoryImpl` implementa la logica concreta di costruzione.
+- `CollectionManager` coordina la creazione e persistenza delle collection, **senza contenere logica di costruzione**, usando la factory come unico punto di creazione.
+
+**Metodi principali della soluzione:**
+- `generateOneTimeCollection(schedule: OneTimeSchedule)`
+- `generateRecurringCollection(schedule: RecurringSchedule)`
+
+**Vantaggi della soluzione:**
+- Separazione chiara tra **coordinamento** e **creazione degli oggetti**.
+- Aggiornamento mirato delle collection coinvolte, evitando ricalcoli globali.
+- Prestazioni ottimizzate rispetto al vecchio task automatico.
+- Chiarezza delle responsabilità e facilità di test.
+- Applicazione di un pattern noto (Factory) per migliorare riuso ed estensibilità.
+
+### Schema UML
 ```mermaid
-sequenceDiagram
-    participant UI
-    participant RecurringScheduleManager as RecurringScheduleManager
-    participant WasteScheduleManager as WasteScheduleManager
-    participant CollectionManager as CollectionManager
-    participant RecurringSchedule as RecurringSchedule
-    
-    UI ->> RecurringScheduleManager: createRecurringSchedule(customer, waste, startDate, frequency)
-    RecurringScheduleManager ->> WasteScheduleManager: getWasteScheduleByWaste(waste)
-    WasteScheduleManager -->> RecurringScheduleManager: dayOfWeek previsto
-    
-    RecurringScheduleManager ->> RecurringSchedule: new(...) + set ACTIVE
-    RecurringScheduleManager ->> RecurringSchedule: calculateNextDate(startDate, frequency, dayOfWeek)
-    RecurringSchedule -->> RecurringScheduleManager: nextCollectionDate
-    
-    RecurringScheduleManager ->> CollectionManager: generateCollection(RecurringSchedule)
-    CollectionManager -->> RecurringScheduleManager: Collection creata
-    
-    RecurringScheduleManager -->> UI: RecurringSchedule con nextCollectionDate e Collection attiva
+classDiagram
+    direction LR
+
+    %% Manager
+    class CollectionManager {
+        +generateOneTimeCollection(schedule: OneTimeSchedule)
+        +generateRecurringCollection(schedule: RecurringSchedule)
+    }
+
+    class RecurringScheduleManager {
+        +createRecurringSchedule(customer: Customer, waste: Waste, startDate: LocalDate, frequency: Frequency): RecurringSchedule
+    }
+
+    %% Factory
+    class CollectionFactory {
+        <<interface>>
+        +createRecurringCollection(schedule: RecurringSchedule): Collection
+        +createOneTimeCollection(schedule: OneTimeSchedule): Collection
+    }
+
+    class CollectionFactoryImpl {
+        +createRecurringCollection(schedule: RecurringSchedule): Collection
+        +createOneTimeCollection(schedule: OneTimeSchedule): Collection
+    }
+
+    %% Relazioni
+    CollectionManager --> CollectionFactory : uses
+    CollectionFactoryImpl ..|> CollectionFactory
+    CollectionManager --> RecurringScheduleManager : retrieves schedule info
+
+
 ```
-### Diagramma di Interazione - Cambio Stato Recurring (Pause/Resume/Cancel)
-```mermaid
-sequenceDiagram
-    participant UI
-    participant RecurringScheduleManager as RecurringScheduleManager
-    participant CollectionManager as CollectionManager
-    participant WasteScheduleManager as WasteScheduleManager
-    participant RecurringSchedule as RecurringSchedule
-
-    UI ->> RecurringScheduleManager: updateStatusRecurringSchedule(schedule, PAUSED)
-    RecurringScheduleManager ->> CollectionManager: getActiveCollectionByRecurringSchedule(schedule)
-    CollectionManager -->> RecurringScheduleManager: Optional<Collection>
-    RecurringScheduleManager ->> CollectionManager: softDeleteCollection(collection)  %% se presente
-    RecurringScheduleManager ->> RecurringSchedule: setStatus(PAUSED)
-    RecurringScheduleManager -->> UI: OK
-
-    UI ->> RecurringScheduleManager: updateStatusRecurringSchedule(schedule, ACTIVE)
-    RecurringScheduleManager ->> WasteScheduleManager: getWasteScheduleByWaste(schedule.waste)
-    WasteScheduleManager -->> RecurringScheduleManager: dayOfWeek
-    RecurringScheduleManager ->> RecurringSchedule: calculateNextDate(from=now, freq, dayOfWeek)
-    RecurringSchedule -->> RecurringScheduleManager: nextCollectionDate
-    RecurringScheduleManager ->> CollectionManager: generateCollection(schedule)
-    RecurringScheduleManager ->> RecurringSchedule: setStatus(ACTIVE)
-    RecurringScheduleManager -->> UI: OK
-
-    UI ->> RecurringScheduleManager: updateStatusRecurringSchedule(schedule, CANCELLED)
-    RecurringScheduleManager ->> CollectionManager: getActiveCollectionByRecurringSchedule(schedule)
-    CollectionManager -->> RecurringScheduleManager: Optional<Collection>
-    RecurringScheduleManager ->> CollectionManager: softDeleteCollection(collection)  %% se presente
-    RecurringScheduleManager ->> RecurringSchedule: setStatus(CANCELLED)
-    RecurringScheduleManager -->> UI: OK
-```
-
-### Motivazioni e alternative scartate
-- Calcolo/creazione Collection direttamente in Controller: scartata per duplicazione logica e rischio inconsistenze.
-- Calcolo ricorrenze lato UI: scartata; la logica rimane nel dominio per estendibilità e testabilità.
-- Allineamento al calendario del rifiuto demandato al DB: scartata; si perderebbe chiarezza del dominio.
 
 ### Design Dettagliato - Trip (Manuel Ragazzini)
 
