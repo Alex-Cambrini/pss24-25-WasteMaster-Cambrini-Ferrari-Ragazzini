@@ -394,9 +394,9 @@ public final class InvoiceController implements AutoRefreshable {
 
             boolean matchesCancelled = showDeleted == isCancelled;
 
-            boolean matchesStatus = !anyStatusSelected
-                    || ("PAID".equalsIgnoreCase(status) && showPaid)
-                    || ("UNPAID".equalsIgnoreCase(status) && showUnpaid);
+            boolean matchesStatus =
+                    (showPaid && "PAID".equalsIgnoreCase(status)) ||
+                            (showUnpaid && "UNPAID".equalsIgnoreCase(status));
 
             if (matchesQuery && matchesCancelled && matchesStatus) {
                 filtered.add(row);
