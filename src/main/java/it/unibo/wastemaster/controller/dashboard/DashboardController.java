@@ -116,12 +116,17 @@ public class DashboardController {
      */
     private void updateTotals() {
         if (customerManager != null) {
-            totalCustomersLabel.setText(
-                    String.valueOf(customerManager.getAllCustomers().size()));
+            long activeCustomers = customerManager.getAllCustomers().stream()
+                    .filter(c -> !c.isDeleted())
+                    .count();
+            totalCustomersLabel.setText(String.valueOf(activeCustomers));
         }
         if (collectionManager != null) {
-            totalCollectionsLabel.setText(
-                    String.valueOf(collectionManager.getAllCollections().size()));
+            long activeCollections = collectionManager.getAllCollections().stream()
+                    .filter(c -> c.getCollectionStatus()
+                            == Collection.CollectionStatus.ACTIVE)
+                    .count();
+            totalCollectionsLabel.setText(String.valueOf(activeCollections));
         }
         if (tripManager != null) {
             totalTripsLabel.setText(String.valueOf(tripManager.countCompletedTrips()));
@@ -135,7 +140,7 @@ public class DashboardController {
     }
 
     /**
-     * Updates the monthly collections chart with cancelled, to pay, and completed series.
+     * Updates the monthly collections chart with cancelled, active, and completed series.
      */
     private void updateCollectionsChart() {
         if (collectionsChart == null || collectionManager == null) {
