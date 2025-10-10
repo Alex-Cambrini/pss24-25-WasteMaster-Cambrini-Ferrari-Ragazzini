@@ -116,12 +116,17 @@ public class DashboardController {
      */
     private void updateTotals() {
         if (customerManager != null) {
-            totalCustomersLabel.setText(
-                    String.valueOf(customerManager.getAllCustomers().size()));
+            long activeCustomers = customerManager.getAllCustomers().stream()
+                    .filter(c -> !c.isDeleted())
+                    .count();
+            totalCustomersLabel.setText(String.valueOf(activeCustomers));
         }
         if (collectionManager != null) {
-            totalCollectionsLabel.setText(
-                    String.valueOf(collectionManager.getAllCollections().size()));
+            long activeCollections = collectionManager.getAllCollections().stream()
+                    .filter(c -> c.getCollectionStatus()
+                            == Collection.CollectionStatus.ACTIVE)
+                    .count();
+            totalCollectionsLabel.setText(String.valueOf(activeCollections));
         }
         if (tripManager != null) {
             totalTripsLabel.setText(String.valueOf(tripManager.countCompletedTrips()));
@@ -135,7 +140,7 @@ public class DashboardController {
     }
 
     /**
-     * Updates the monthly collections chart with cancelled, to pay, and completed series.
+     * Updates the monthly collections chart with cancelled, active, and completed series.
      */
     private void updateCollectionsChart() {
         if (collectionsChart == null || collectionManager == null) {
@@ -146,8 +151,8 @@ public class DashboardController {
 
         XYChart.Series<String, Number> cancelledSeries = new XYChart.Series<>();
         cancelledSeries.setName("Cancelled");
-        XYChart.Series<String, Number> toPaySeries = new XYChart.Series<>();
-        toPaySeries.setName("To Pay");
+        XYChart.Series<String, Number> activeSeries = new XYChart.Series<>();
+        activeSeries.setName("Active");
         XYChart.Series<String, Number> completedSeries = new XYChart.Series<>();
         completedSeries.setName("Completed");
 
@@ -164,7 +169,7 @@ public class DashboardController {
                     .filter(c -> c.getCollectionStatus()
                             == Collection.CollectionStatus.CANCELLED)
                     .count();
-            long toPay = collectionManager.getAllCollections().stream()
+            long active = collectionManager.getAllCollections().stream()
                     .filter(c -> c.getCollectionDate().getMonth()
                             .getDisplayName(TextStyle.SHORT, Locale.ENGLISH)
                             .equals(month))
@@ -180,11 +185,11 @@ public class DashboardController {
                     .count();
 
             cancelledSeries.getData().add(new XYChart.Data<>(month, cancelled));
-            toPaySeries.getData().add(new XYChart.Data<>(month, toPay));
+            activeSeries.getData().add(new XYChart.Data<>(month, active));
             completedSeries.getData().add(new XYChart.Data<>(month, completed));
         }
 
-        collectionsChart.getData().addAll(cancelledSeries, toPaySeries, completedSeries);
+        collectionsChart.getData().addAll(cancelledSeries, activeSeries, completedSeries);
     }
 
     /**
