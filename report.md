@@ -1278,9 +1278,34 @@ public boolean softDeleteAndRescheduleNextCollection(Trip trip) {
 ```
 *Garantisce la coerenza tra annullamento viaggio e pianificazione futura.*
 
+## Commenti finali
 
+### Autovalutazione e lavori futuri
 
+#### Ferrari Lorenzo
+La realizzazione di questo progetto mi ha permesso di lavorare su un sistema gestionale sviluppato in Java, pensato per coprire l’intero flusso operativo di un’azienda che si occupa di smaltimento rifiuti.
 
+Mi sono occupato in particolare di:
+
+- Gestione delle anagrafiche di clienti e operatori
+
+- Amministrazione delle risorse aziendali (mezzi e personale)
+
+- Gestione dei rifiuti
+
+- Implementazione delle notifiche automatiche
+
+- Sistema di manutenzione dei mezzi
+
+Tra tutte le funzionalità, quella che ha richiesto maggiore approfondimento è stata la gestione delle notifiche automatiche: più che lo sviluppo in sé, la parte più impegnativa è stata lo studio preliminare necessario a trovare una soluzione adatta ai vincoli del progetto universitario. Ho quindi optato per una simulazione dell’invio, visualizzando le notifiche tramite stampa su terminale, così da mantenere la coerenza logica del sistema e poter testare facilmente il flusso.
+
+Un aspetto fondamentale è stata la collaborazione con il gruppo. Le mie funzionalità erano strettamente collegate a quelle degli altri componenti, quindi è stato essenziale coordinarsi e mantenere una struttura condivisa del progetto. Questo mi ha fatto comprendere quanto la comunicazione e la divisione dei compiti siano cruciali nello sviluppo software reale.
+
+In generale, sento di aver migliorato notevolmente la mia capacità di scrivere codice strutturato e, soprattutto, di lavorare efficacemente in un contesto collaborativo.
+
+In futuro, mi piacerebbe collegare realmente il sistema di notifiche a un servizio email esterno.
+
+In conclusione, considero questa esperienza estremamente formativa: mi ha fatto crescere sia dal punto di vista tecnico che organizzativo e mi ha dato una visione più chiara di cosa significhi applicare concretamente la programmazione orientata agli oggetti.
 
 
 
