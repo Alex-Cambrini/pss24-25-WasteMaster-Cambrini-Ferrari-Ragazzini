@@ -1069,73 +1069,161 @@ void testCreateRecurringScheduleCalculatesNextCollectionDate() {
 
 ### Lorenzo Ferrari
 
-#### 1. Uso di Stream e Optional per la ricerca tra entità
-**Dove:** `src/main/java/it/unibo/wastemaster/domain/repository/VehicleRepositoryImpl.java`
+1) Query JPA null-safe con Optional e stream
+
+**Dove:** `src/main/java/it/unibo/wastemaster/infrastructure/dao/EmployeeDAO.java`
+
+**Permalink:** https://github.com/Alex-Cambrini/pss24-25-WasteMaster-Cambrini-Ferrari-Ragazzini/blob/main/src/main/java/it/unibo/wastemaster/infrastructure/dao/EmployeeDAO.java
+
+**Snippet**
 ```java
-@Override
-public Optional<Vehicle> findByPlate(String plate) {
-    return vehicles.stream()
-        .filter(v -> v.getPlate().equalsIgnoreCase(plate))
-        .findFirst();
+public Optional<Employee> findByEmail(final String email) {
+  return getEntityManager()
+          .createQuery("SELECT e FROM Employee e WHERE e.email = :email",
+                  Employee.class)
+          .setParameter("email", email)
+          .getResultStream()
+          .findFirst();
 }
 ```
-*Implementa una ricerca null-safe, concisa ed efficiente, sfruttando costrutti funzionali avanzati.*
+**Descrizione:** utilizzo di getResultStream().findFirst() al posto di getSingleResult(), evitando la gestione manuale di NoResultException e restituendo direttamente un Optional<Employee>. Questo rende la query null-safe, concisa e pienamente componibile all'interno del service layer.
 
 ---
 
-#### 2. Validazione avanzata con annotazioni Bean Validation
-**Dove:** `src/main/java/it/unibo/wastemaster/domain/model/Vehicle.java`
-```java
-@NotNull(message = "Plate must not be null")
-@Pattern(regexp = "[A-Z0-9]{7}", message = "Invalid plate format")
-private String plate;
-```
-*Garantisce la correttezza dei dati direttamente a livello di modello.*
+2) Policy di dominio con switch expression ed enum
 
----
+**Dove:** `src/main/java/it/unibo/wastemaster/domain/service/EmployeeManager.java`
 
-#### 3. Normalizzazione automatica dei dati in setter
-**Dove:** `src/main/java/it/unibo/wastemaster/domain/model/Vehicle.java`
+**Permalink:** https://github.com/Alex-Cambrini/pss24-25-WasteMaster-Cambrini-Ferrari-Ragazzini/blob/main/src/main/java/it/unibo/wastemaster/domain/service/EmployeeManager.java
+
+**Snippet**
 ```java
-public void setPlate(String plate) {
-    if (plate != null) {
-        this.plate = plate.trim().toUpperCase();
-    } else {
-        throw new IllegalArgumentException("Plate must not be null");
-    }
+public boolean canDriveVehicle(final Employee employee, final Vehicle vehicle) {
+  ValidateUtils.requireArgNotNull(employee, EMPLOYEE_NULL_MSG);
+  ValidateUtils.requireArgNotNull(vehicle, "Vehicle cannot be null");
+
+  return switch (employee.getLicence()) {
+    case C -> true;
+    case C1 -> vehicle.getRequiredLicence() == Vehicle.RequiredLicence.B
+            || vehicle.getRequiredLicence() == Vehicle.RequiredLicence.C1;
+    case B -> vehicle.getRequiredLicence() == Vehicle.RequiredLicence.B;
+    default -> false;
+  };
 }
 ```
-*Centralizza la normalizzazione, prevenendo errori di inserimento e confronti.*
+**Descrizione:** modellazione delle regole di abilitazione alla guida tramite enum e switch expression moderna, sostituendo catene di if con una logica compatta, leggibile e facilmente estendibile.
 
 ---
 
-#### 4. Uso di Enum per stati e policy sulle licenze
-**Dove:** `src/main/java/it/unibo/wastemaster/domain/model/Vehicle.java`
+3) Rollback applicativo con validazione centralizzata
+
+**Dove:** `src/main/java/it/unibo/wastemaster/domain/service/EmployeeManager.java`
+
+**Permalink:** https://github.com/Alex-Cambrini/pss24-25-WasteMaster-Cambrini-Ferrari-Ragazzini/blob/main/src/main/java/it/unibo/wastemaster/domain/service/EmployeeManager.java
+
+**Snippet**
 ```java
-public enum VehicleStatus {
-    IN_SERVICE, IN_MAINTENANCE, OUT_OF_SERVICE
+public Employee addEmployee(final Employee employee, final String rawPassword) {
+  ValidateUtils.requireArgNotNull(employee, EMPLOYEE_NULL_MSG);
+  ValidateUtils.requireArgNotNull(rawPassword, "Password cannot be null");
+  ValidateUtils.validateEntity(employee);
+
+  if (isEmailRegistered(employee.getEmail())) {
+    throw new IllegalArgumentException("Email already registered");
+  }
+
+  employeeRepository.save(employee);
+
+  try {
+    accountManager.createAccount(employee, rawPassword);
+  } catch (Exception e) {
+    employeeRepository.delete(employee);
+    throw new RuntimeException("Failed to create account, employee rolled back",
+            e);
+  }
+  return employee;
 }
 ```
-*Rende il codice robusto e facilmente estendibile nella gestione degli stati.*
+**Descrizione:** combina validazione a livello service con rollback compensativo quando il passo esterno (creazione account) fallisce. Approccio pragmatico in assenza di transazioni distribuite: consistenza applicativa e messaggistica d’errore chiara.
 
 ---
 
-#### 5. Gestione automatica delle date di manutenzione
-**Dove:** `src/main/java/it/unibo/wastemaster/domain/service/VehicleManager.java`
+4) Menu filtri dinamico per ricerca multi-campo (ContextMenu + CheckBox)
+
+**Dove:** `src/main/java/it/unibo/wastemaster/controller/customer/CustomersController.java`
+
+**Permalink:** https://github.com/Alex-Cambrini/pss24-25-WasteMaster-Cambrini-Ferrari-Ragazzini/blob/main/src/main/java/it/unibo/wastemaster/controller/customer/CustomersController.java
+
+**Snippet**
 ```java
-public void markMaintenanceAsComplete(Vehicle vehicle) {
-    vehicle.setVehicleStatus(Vehicle.VehicleStatus.IN_SERVICE);
-    vehicle.setLastMaintenanceDate(LocalDate.now());
-    vehicle.setNextMaintenanceDate(LocalDate.now().plusYears(1));
-    vehicleDAO.update(vehicle);
+@FXML
+private void showFilterMenu(final javafx.scene.input.MouseEvent event) {
+  if (filterMenu != null && filterMenu.isShowing()) {
+    filterMenu.hide();
+    return;
+  }
+
+  filterMenu = new ContextMenu();
+  String[] fields = {FIELD_NAME, FIELD_SURNAME, FIELD_EMAIL, FILTER_LOCATION};
+  String[] labels = {"Name", "Surname", "Email", "Location"};
+
+  for (int i = 0; i < fields.length; i++) {
+    String key = fields[i];
+    String label = labels[i];
+
+    CheckBox checkBox = new CheckBox(label);
+    checkBox.setSelected(activeFilters.contains(key));
+    checkBox.selectedProperty().addListener((obs, wasSelected, isSelected) -> {
+      if (isSelected.booleanValue()) {
+        activeFilters.add(key);
+      } else {
+        activeFilters.remove(key);
+      }
+      handleSearch();
+    });
+
+    CustomMenuItem item = new CustomMenuItem(checkBox);
+    item.setHideOnClick(false);
+    filterMenu.getItems().add(item);
+  }
+
+  filterMenu.show(filterButton, event.getScreenX(), event.getScreenY());
 }
 ```
-*Automatizza la gestione delle scadenze manutentive e lo stato del mezzo.*
+**Descrizione:** creazione on-the-fly di un menu filtri con ContextMenu e CustomMenuItem che pilota un set reattivo di campi (activeFilters). Ogni CheckBox aggiorna i filtri e richiama immediatamente handleSearch(), abilitando una ricerca multi-campo live senza duplicare logica nel modello e mantenendo la complessità confinata nel controller.
 
 ---
 
-**Codice adattato:**  
-Per la validazione dati sono stati seguiti esempi dalla documentazione ufficiale di Hibernate Validator.
+5) DTO immutabile con formattazione locale per la UI
+
+**Dove:** `src/main/java/it/unibo/wastemaster/presentationdto/CustomerRow.java`
+
+**Permalink:** https://github.com/Alex-Cambrini/pss24-25-WasteMaster-Cambrini-Ferrari-Ragazzini/blob/main/src/main/java/it/unibo/wastemaster/presentationdto/CustomerRow.java
+
+**Snippet**
+```java
+public final class CustomerRow {
+  private final String name, surname, email, street, civic, city, postalCode;
+  private final String creationDate;
+
+  public CustomerRow(final Customer customer) {
+    this.name = customer.getName();
+    this.surname = customer.getSurname();
+    this.email = customer.getEmail();
+    this.street = customer.getLocation().getStreet();
+    this.civic = customer.getLocation().getCivicNumber();
+    this.city = customer.getLocation().getCity();
+    this.postalCode = customer.getLocation().getPostalCode();
+    this.creationDate = customer.getCreatedDate()
+            .format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"));
+  }
+
+  public String getFullLocation() {
+    return street + " " + civic + ", " + city + " (" + postalCode + ")";
+  }
+}
+```
+**Descrizione:** classe DTO immutabile che estrae solo i dati realmente necessari alla UI, trasformandoli in formati già pronti alla visualizzazione (es. data formattata e indirizzo concatenato). In questo modo si alleggeriscono i controller e le celle della TableView, mantenendo il dominio pulito da dettagli di presentazione.
 
 ---
 
