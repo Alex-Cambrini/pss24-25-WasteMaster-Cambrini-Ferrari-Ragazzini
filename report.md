@@ -1318,72 +1318,102 @@ Rende la logica di scheduling modulare e facilmente estendibile.
 > **Nota generale:** tutto il codice riportato nel presente documento è stato scritto dagli autori del progetto e non contiene snippet presi da altre fonti.
 
 
-### Manuel Ragazzini
+## Note di sviluppo — Trip & Invoice (Manuel Ragazzini)
 
-#### 1. Algoritmo per la ricerca delle risorse disponibili tramite Stream
-**Dove:** `src/main/java/it/unibo/wastemaster/domain/service/TripManager.java`
-```java
-public List<Vehicle> getAvailableVehicles(LocalDateTime from, LocalDateTime to) {
-    return vehicleDAO.findAll().stream()
-        .filter(v -> v.isAvailable(from, to))
-        .collect(Collectors.toList());
-}
-```
-*Permette di individuare dinamicamente i mezzi disponibili per nuove rotte.*
+Durante lo sviluppo ho lavorato soprattutto sulla logica di dominio per Trip (viaggi di raccolta) e Invoice (fatture), concentrandomi su coerenza degli stati, automazione delle transizioni e testabilità del codice.  
+Riporto alcune delle principali tecniche avanzate utilizzate.
 
 ---
 
-#### 2. Gestione e aggiornamento stato pagamenti
-**Dove:** `src/main/java/it/unibo/wastemaster/domain/service/InvoiceManager.java`
+### 1. Validazione e guard clause sulle transizioni di Trip e Invoice
+
+**Dove:** `TripManager`, `InvoiceManager`  
+**Permalink:** [TripManager.java](https://github.com/Alex-Cambrini/pss24-25-WasteMaster-Cambrini-Ferrari-Ragazzini/blob/report/src/main/java/it/unibo/wastemaster/trip/TripManager.java)
+
 ```java
-public void registerPayment(Invoice invoice, LocalDateTime paymentDate) {
-    invoice.setPaymentStatus(Invoice.PaymentStatus.PAID);
-    invoice.setPaymentDate(paymentDate);
-    invoiceDAO.update(invoice);
+if (trip == null || trip.getStatus() != TripStatus.ACTIVE) {
+    throw new IllegalArgumentException("Invalid trip or already completed.");
+}
+if (invoice == null || invoice.getStatus() != InvoiceStatus.EMITTED) {
+    throw new IllegalArgumentException("Invalid invoice or already paid/cancelled.");
 }
 ```
-*Automatizza la gestione dello stato dei pagamenti e la loro storicizzazione.*
+*Descrizione:*  
+Controllo che ogni transizione di stato sia effettuata solo se l’oggetto si trova effettivamente in uno stato valido. Previene errori come il completamento di un Trip già cancellato o il pagamento di una Invoice già annullata.
 
 ---
 
-#### 3. Invio automatico di email ai clienti
-**Dove:** `src/main/java/it/unibo/wastemaster/infrastructure/utils/MailUtils.java`
+### 2. Mocking di servizi e repository per testare notifiche e aggiornamento fatture
+
+**Dove:** `TripManagerTest`, `InvoiceManagerTest`  
+**Permalink:** [TripManagerTest.java](https://github.com/Alex-Cambrini/pss24-25-WasteMaster-Cambrini-Ferrari-Ragazzini/blob/report/src/test/java/it/unibo/wastemaster/trip/TripManagerTest.java)
+
 ```java
-public static void sendInvoiceEmail(String to, Invoice invoice) {
-    // ... setup SMTP
-    EmailSender.send(to, "Nuova fattura", invoice.toString());
-}
+NotificationService mockService = Mockito.mock(NotificationService.class);
+InvoiceRepository mockInvoiceRepo = Mockito.mock(InvoiceRepository.class);
+tripManager.setNotificationService(mockService);
+// ...
+verify(mockService).notifyTripCancellation(any(), any(), any());
+verify(mockInvoiceRepo).update(any(Invoice.class));
 ```
-*Automatizza la comunicazione con il cliente per la fatturazione.*
+*Descrizione:*  
+Utilizzo dei mock per simulare servizi esterni (notifiche e repository) nei test automatici. In questo modo posso verificare che i metodi di notifica o aggiornamento vengano effettivamente invocati nei casi corretti, senza dipendere dall’implementazione reale o da effetti collaterali sul database.
 
 ---
 
-#### 4. Calcolo dei CAP disponibili tramite Stream e distinct
-**Dove:** `src/main/java/it/unibo/wastemaster/domain/service/TripManager.java`
+### 3. Aggiornamento atomico di Collection e Invoice in caso di annullamento Trip
+
+**Dove:** `TripManager`  
+**Permalink:** [TripManager.java](https://github.com/Alex-Cambrini/pss24-25-WasteMaster-Cambrini-Ferrari-Ragazzini/blob/report/src/main/java/it/unibo/wastemaster/trip/TripManager.java)
+
 ```java
-public List<String> getAvailablePostalCodes(LocalDate date) {
-    return collectionDAO.findAll().stream()
-        .filter(c -> c.getDate().equals(date))
-        .map(c -> c.getCustomer().getLocation().getPostalCode())
-        .distinct()
-        .collect(Collectors.toList());
+trip.setStatus(TripStatus.CANCELLED);
+for (Collection c : trip.getCollections()) {
+    c.setStatus(CollectionStatus.CANCELLED);
+}
+Invoice invoice = invoiceRepository.findByTrip(trip);
+if (invoice != null) {
+    invoice.setStatus(InvoiceStatus.CANCELLED);
 }
 ```
-*Ottimizza la pianificazione delle tratte in base alle raccolte effettive.*
+*Descrizione:*  
+Quando un Trip viene annullato, tutte le Collection associate e la relativa Invoice vengono aggiornate nello stesso flusso, così da mantenere coerenza tra gli stati delle varie entità e prevenire incoerenti nel sistema.
 
 ---
 
-#### 5. Gestione rollback e ripianificazione in caso di annullamento viaggio
-**Dove:** `src/main/java/it/unibo/wastemaster/domain/service/TripManager.java`
+### 4. Validazione della compatibilità patente-veicolo
+
+**Dove:** `TripManager`  
+**Permalink:** [TripManager.java](https://github.com/Alex-Cambrini/pss24-25-WasteMaster-Cambrini-Ferrari-Ragazzini/blob/report/src/main/java/it/unibo/wastemaster/trip/TripManager.java)
+
 ```java
-public boolean softDeleteAndRescheduleNextCollection(Trip trip) {
-    trip.setStatus(Trip.TripStatus.CANCELED);
-    tripDAO.update(trip);
-    recurringScheduleManager.rescheduleNextCollection(trip.getCollections().get(0));
-    return true;
+if (!driver.getLicences().contains(vehicle.getRequiredLicence())) {
+    throw new IllegalArgumentException("Driver's licence is not compatible with the assigned vehicle.");
 }
 ```
-*Garantisce la coerenza tra annullamento viaggio e pianificazione futura.*
+*Descrizione:*  
+Questa logica centralizza la verifica della compatibilità tra la patente dell’operatore e il veicolo assegnato, impedendo errori di assegnazione e garantendo che solo operatori abilitati possano guidare determinati mezzi.
+
+---
+
+### 5. Test parametrizzati sulle transizioni di stato delle Invoice
+
+**Dove:** `InvoiceManagerTest`  
+**Permalink:** [InvoiceManagerTest.java](https://github.com/Alex-Cambrini/pss24-25-WasteMaster-Cambrini-Ferrari-Ragazzini/blob/report/src/test/java/it/unibo/wastemaster/invoice/InvoiceManagerTest.java)
+
+```java
+@ParameterizedTest
+@ValueSource(strings = {"PAID", "CANCELLED"})
+void testNoStatusChangeFromFinalStates(String initialStatus) {
+    Invoice invoice = new Invoice();
+    invoice.setStatus(InvoiceStatus.valueOf(initialStatus));
+    assertThrows(IllegalArgumentException.class, () -> invoiceManager.markAsPaid(invoice));
+}
+```
+*Descrizione:*  
+Uso test parametrizzati per verificare che non sia possibile cambiare lo stato di una fattura già pagata o annullata.
+
+---
 
 ## Commenti finali
 
