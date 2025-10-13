@@ -1434,7 +1434,7 @@ Setup che garantisce la presenza delle risorse necessarie per i test su Trip: ve
 ### 5. Calcolo dell’importo totale pagato per cliente
 
 **Dove:** src/test/java/it/unibo/wastemaster/domain/service/InvoiceManagerTest.java  
-Permalink: https://github.com/Alex-Cambrini/pss24-25-WasteMaster-Cambrini-Ferrari-Ragazzini/blob/925f05189fa63debcb40e850869faae40e9f675a/src/test/java/it/unibo/wastemaster/domain/service/InvoiceManagerTest.java##L17-L33
+Permalink: https://github.com/Alex-Cambrini/pss24-25-WasteMaster-Cambrini-Ferrari-Ragazzini/blob/925f05189fa63debcb40e850869faae40e9f675a/src/test/java/it/unibo/wastemaster/domain/service/InvoiceManagerTest.java##L81-L100
 
 ```java
 @Test
