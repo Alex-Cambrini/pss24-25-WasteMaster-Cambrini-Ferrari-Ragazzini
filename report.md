@@ -1086,7 +1086,7 @@ public Optional<Employee> findByEmail(final String email) {
           .findFirst();
 }
 ```
-**Descrizione:** utilizzo di getResultStream().findFirst() al posto di getSingleResult(), evitando la gestione manuale di NoResultException e restituendo direttamente un Optional<Employee>. Questo rende la query null-safe, concisa e pienamente componibile all'interno del service layer.
+**Descrizione:** anziché utilizzare getSingleResult(), che solleva una NoResultException quando la query non trova risultati, qui si ricorre a getResultStream().findFirst(). Questo approccio restituisce direttamente un Optional<Employee>, evitando la gestione esplicita delle eccezioni e rendendo il metodo più sicuro e lineare da utilizzare nel service layer.
 
 ---
 
@@ -1144,7 +1144,7 @@ public Employee addEmployee(final Employee employee, final String rawPassword) {
   return employee;
 }
 ```
-**Descrizione:** combina validazione a livello service con rollback compensativo quando il passo esterno (creazione account) fallisce. Approccio pragmatico in assenza di transazioni distribuite: consistenza applicativa e messaggistica d’errore chiara.
+**Descrizione:** la validazione viene eseguita all’inizio del metodo, così eventuali dati errati vengono bloccati prima di toccare il database. Dopo il salvataggio, se la creazione dell’account esterno fallisce, l’operazione viene annullata eliminando l’employee appena inserito. Questo agisce come un rollback applicativo esplicito, garantendo coerenza dei dati pur senza affidarsi a transazioni distribuite.
 
 ---
 
@@ -1190,7 +1190,7 @@ private void showFilterMenu(final javafx.scene.input.MouseEvent event) {
   filterMenu.show(filterButton, event.getScreenX(), event.getScreenY());
 }
 ```
-**Descrizione:** creazione on-the-fly di un menu filtri con ContextMenu e CustomMenuItem che pilota un set reattivo di campi (activeFilters). Ogni CheckBox aggiorna i filtri e richiama immediatamente handleSearch(), abilitando una ricerca multi-campo live senza duplicare logica nel modello e mantenendo la complessità confinata nel controller.
+**Descrizione:** il menu dei filtri viene generato dinamicamente tramite ContextMenu e CustomMenuItem, senza doverlo definire staticamente nell’FXML. Ogni CheckBox è collegata alla lista activeFilters e, quando cambia stato, aggiorna i filtri attivi e richiama subito handleSearch(). In questo modo la ricerca multi-campo è reattiva e centralizzata nel controller, senza duplicare logica nel modello o nella view.
 
 ---
 
