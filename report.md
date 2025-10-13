@@ -1320,93 +1320,146 @@ Rende la logica di scheduling modulare e facilmente estendibile.
 
 #### Note di sviluppo — Trip & Invoice (Manuel Ragazzini)
 
-### 1. Validazione e guard clause sulle transizioni di Trip e Invoice
+### 1. Cancellazione di una Invoice e aggiornamento delle Collection associate
 
-**Dove:** `TripManager`, `InvoiceManager`  
-**Permalink:** [TripManager.java](https://github.com/Alex-Cambrini/pss24-25-WasteMaster-Cambrini-Ferrari-Ragazzini/blob/report/src/main/java/it/unibo/wastemaster/trip/TripManager.java)
+**Dove:** src/test/java/it/unibo/wastemaster/domain/service/InvoiceManagerTest.java  
+Permalink: https://github.com/Alex-Cambrini/pss24-25-WasteMaster-Cambrini-Ferrari-Ragazzini/blob/925f05189fa63debcb40e850869faae40e9f675a/src/test/java/it/unibo/wastemaster/domain/service/InvoiceManagerTest.java#L54-L70
 
 ```java
-if (trip == null || trip.getStatus() != TripStatus.ACTIVE) {
-    throw new IllegalArgumentException("Invalid trip or already completed.");
-}
-if (invoice == null || invoice.getStatus() != InvoiceStatus.EMITTED) {
-    throw new IllegalArgumentException("Invalid invoice or already paid/cancelled.");
+@Test
+void testDeleteInvoiceSetsDeletedAndUnbillsCollections() {
+    Collection c1 = insertCompletedCollection(LocalDate.now());
+    Invoice invoice =
+            getInvoiceManager().createInvoice(customer, new ArrayList<>(List.of(c1)));
+    int invoiceId = invoice.getInvoiceId();
+
+    boolean canceled = getInvoiceManager().deleteInvoice(invoiceId);
+    assertTrue(canceled);
+
+    Invoice canceledInvoice = getInvoiceDAO().findById(invoiceId).get();
+    assertTrue(canceledInvoice.isDeleted());
+    for (Collection c : canceledInvoice.getCollections()) {
+        assertFalse(c.getIsBilled());
+    }
 }
 ```
-*Descrizione:*  
-Controllo che ogni transizione di stato sia effettuata solo se l’oggetto si trova effettivamente in uno stato valido. Previene errori come il completamento di un Trip già cancellato o il pagamento di una Invoice già annullata.
+**Descrizione:**  
+Test che verifica che l’eliminazione di una Invoice imposti il flag di cancellazione e rimuova la fatturazione dalle Collection collegate.
 
 ---
 
-### 2. Mocking di servizi e repository per testare notifiche e aggiornamento fatture
+### 2. Calcolo dell’importo totale fatturato per cliente
 
-**Dove:** `TripManagerTest`, `InvoiceManagerTest`  
-**Permalink:** [TripManagerTest.java](https://github.com/Alex-Cambrini/pss24-25-WasteMaster-Cambrini-Ferrari-Ragazzini/blob/report/src/test/java/it/unibo/wastemaster/trip/TripManagerTest.java)
+**Dove:** src/test/java/it/unibo/wastemaster/domain/service/InvoiceManagerTest.java  
+Permalink: https://github.com/Alex-Cambrini/pss24-25-WasteMaster-Cambrini-Ferrari-Ragazzini/blob/925f05189fa63debcb40e850869faae40e9f675a/src/test/java/it/unibo/wastemaster/domain/service/InvoiceManagerTest.java#L71-L95
 
 ```java
-NotificationService mockService = Mockito.mock(NotificationService.class);
-InvoiceRepository mockInvoiceRepo = Mockito.mock(InvoiceRepository.class);
-tripManager.setNotificationService(mockService);
-// ...
-verify(mockService).notifyTripCancellation(any(), any(), any());
-verify(mockInvoiceRepo).update(any(Invoice.class));
+@Test
+void testGetTotalBilledAmountForCustomer() {
+    Collection c1 = insertCompletedCollection(LocalDate.now());
+    Collection c2 = insertCompletedCollection(LocalDate.now().plusDays(1));
+
+    Invoice invoice1 =
+            getInvoiceManager().createInvoice(customer, new ArrayList<>(List.of(c1)));
+    invoice1.setAmount(50.0);
+    invoice1.setPaymentStatus(PaymentStatus.UNPAID);
+    getInvoiceDAO().update(invoice1);
+
+    Invoice invoice2 =
+            getInvoiceManager().createInvoice(customer, new ArrayList<>(List.of(c2)));
+    invoice2.setAmount(100.0);
+    invoice2.setPaymentStatus(PaymentStatus.PAID);
+    getInvoiceDAO().update(invoice2);
+
+    double total = getInvoiceManager().getTotalBilledAmountForCustomer(customer);
+    assertEquals(150.0, total, 0.001);
+}
 ```
-*Descrizione:*  
-Utilizzo dei mock per simulare servizi esterni (notifiche e repository) nei test automatici. In questo modo posso verificare che i metodi di notifica o aggiornamento vengano effettivamente invocati nei casi corretti, senza dipendere dall’implementazione reale o da effetti collaterali sul database.
+**Descrizione:**  
+Test che assicura il corretto calcolo della somma totale fatturata da un cliente, validando la logica di aggregazione sulle Invoice.
 
 ---
 
-### 3. Aggiornamento atomico di Collection e Invoice in caso di annullamento Trip
+### 3. Settaggio e verifica dello stato pagato su una Invoice
 
-**Dove:** `TripManager`  
-**Permalink:** [TripManager.java](https://github.com/Alex-Cambrini/pss24-25-WasteMaster-Cambrini-Ferrari-Ragazzini/blob/report/src/main/java/it/unibo/wastemaster/trip/TripManager.java)
+**Dove:** src/test/java/it/unibo/wastemaster/domain/service/InvoiceManagerTest.java  
+Permalink: https://github.com/Alex-Cambrini/pss24-25-WasteMaster-Cambrini-Ferrari-Ragazzini/blob/925f05189fa63debcb40e850869faae40e9f675a/src/test/java/it/unibo/wastemaster/domain/service/InvoiceManagerTest.java#L96-L110
 
 ```java
-trip.setStatus(TripStatus.CANCELLED);
-for (Collection c : trip.getCollections()) {
-    c.setStatus(CollectionStatus.CANCELLED);
-}
-Invoice invoice = invoiceRepository.findByTrip(trip);
-if (invoice != null) {
-    invoice.setStatus(InvoiceStatus.CANCELLED);
+@Test
+void testSetInvoicePaid() {
+    Collection c1 = insertCompletedCollection(LocalDate.now());
+    Invoice invoice = getInvoiceManager().createInvoice(customer, new ArrayList<>(List.of(c1)));
+    invoice.setAmount(50.0);
+    invoice.setPaymentStatus(PaymentStatus.UNPAID);
+    getInvoiceDAO().update(invoice);
+
+    invoice.setPaymentStatus(PaymentStatus.PAID);
+    getInvoiceDAO().update(invoice);
+
+    Invoice updated = getInvoiceDAO().findById(invoice.getInvoiceId()).get();
+    assertEquals(PaymentStatus.PAID, updated.getPaymentStatus());
 }
 ```
-*Descrizione:*  
-Quando un Trip viene annullato, tutte le Collection associate e la relativa Invoice vengono aggiornate nello stesso flusso, così da mantenere coerenza tra gli stati delle varie entità e prevenire incoerenti nel sistema.
+**Descrizione:**  
+Test che verifica che la marcatura come “paid” di una Invoice aggiorni correttamente lo stato e sia persistita senza errori.
 
 ---
 
-### 4. Validazione della compatibilità patente-veicolo
+### 4. Setup avanzato per test su Trip e risorse associate
 
-**Dove:** `TripManager`  
-**Permalink:** [TripManager.java](https://github.com/Alex-Cambrini/pss24-25-WasteMaster-Cambrini-Ferrari-Ragazzini/blob/report/src/main/java/it/unibo/wastemaster/trip/TripManager.java)
+**Dove:** src/test/java/it/unibo/wastemaster/domain/service/TripManagerTest.java  
+Permalink: https://github.com/Alex-Cambrini/pss24-25-WasteMaster-Cambrini-Ferrari-Ragazzini/blob/925f05189fa63debcb40e850869faae40e9f675a/src/test/java/it/unibo/wastemaster/domain/service/TripManagerTest.java#L29-L100
 
 ```java
-if (!driver.getLicences().contains(vehicle.getRequiredLicence())) {
-    throw new IllegalArgumentException("Driver's licence is not compatible with the assigned vehicle.");
+@BeforeEach
+public void setUp() {
+    super.setUp();
+    // Inserimento location, vehicle, employee/operator
+    vehicle1 = new Vehicle("AB123CD", "Iveco", "Daily", 2020,
+            Vehicle.RequiredLicence.C1, Vehicle.VehicleStatus.IN_SERVICE, 3);
+    getVehicleDAO().insert(vehicle1);
+    operator1 = new Employee("John", "Doe", locBo,
+            "john.doe@example.com", "+391234567890",
+            Employee.Role.OPERATOR, Employee.Licence.C1);
+    getEmployeeDAO().insert(operator1);
+    // ...
 }
 ```
-*Descrizione:*  
-Questa logica centralizza la verifica della compatibilità tra la patente dell’operatore e il veicolo assegnato, impedendo errori di assegnazione e garantendo che solo operatori abilitati possano guidare determinati mezzi.
+**Descrizione:**  
+Setup che garantisce la presenza delle risorse necessarie per i test su Trip: veicoli, operatori, location, permettendo test robusti su tutto il ciclo di vita dei viaggi.
 
 ---
 
-### 5. Test parametrizzati sulle transizioni di stato delle Invoice
+### 5. Calcolo dell’importo totale pagato per cliente
 
-**Dove:** `InvoiceManagerTest`  
-**Permalink:** [InvoiceManagerTest.java](https://github.com/Alex-Cambrini/pss24-25-WasteMaster-Cambrini-Ferrari-Ragazzini/blob/report/src/test/java/it/unibo/wastemaster/invoice/InvoiceManagerTest.java)
+**Dove:** src/test/java/it/unibo/wastemaster/domain/service/InvoiceManagerTest.java  
+Permalink: https://github.com/Alex-Cambrini/pss24-25-WasteMaster-Cambrini-Ferrari-Ragazzini/blob/925f05189fa63debcb40e850869faae40e9f675a/src/test/java/it/unibo/wastemaster/domain/service/InvoiceManagerTest.java#L34-L53
 
 ```java
-@ParameterizedTest
-@ValueSource(strings = {"PAID", "CANCELLED"})
-void testNoStatusChangeFromFinalStates(String initialStatus) {
-    Invoice invoice = new Invoice();
-    invoice.setStatus(InvoiceStatus.valueOf(initialStatus));
-    assertThrows(IllegalArgumentException.class, () -> invoiceManager.markAsPaid(invoice));
+@Test
+void testGetTotalPaidAmountForCustomer() {
+    Collection c1 = insertCompletedCollection(LocalDate.now());
+    Collection c2 = insertCompletedCollection(LocalDate.now().plusDays(1));
+
+    Invoice invoice1 =
+            getInvoiceManager().createInvoice(customer, new ArrayList<>(List.of(c1)));
+    invoice1.setAmount(50.0);
+    invoice1.setPaymentStatus(PaymentStatus.UNPAID);
+    getInvoiceDAO().update(invoice1);
+
+    Invoice invoice2 =
+            getInvoiceManager().createInvoice(customer, new ArrayList<>(List.of(c2)));
+    invoice2.setAmount(100.0);
+    invoice2.setPaymentStatus(PaymentStatus.PAID);
+    getInvoiceDAO().update(invoice2);
+
+    double totalPaid = getInvoiceManager().getTotalPaidAmountForCustomer(customer);
+    assertEquals(100.0, totalPaid, 0.001);
 }
 ```
-*Descrizione:*  
-Uso test parametrizzati per verificare che non sia possibile cambiare lo stato di una fattura già pagata o annullata.
+**Descrizione:**  
+Test che verifica che la somma degli importi pagati venga calcolata correttamente solo sulle Invoice effettivamente saldate dal cliente.
 
 ---
 
