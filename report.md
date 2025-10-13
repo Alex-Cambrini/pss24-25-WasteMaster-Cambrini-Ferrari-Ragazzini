@@ -19,8 +19,6 @@ Le attività chiave comprendono:
 Il sistema dovrà inoltre garantire la coerenza operativa, evitando assegnazioni errate di risorse o conflitti tra ritiri
 e viaggi, e comunicare in modo chiaro eventuali errori o aggiornamenti agli utenti interessati.
 
----
-
 # Requisiti
 
 - **Gestione clienti e personale**: il sistema deve permettere di registrare e aggiornare informazioni su clienti e
@@ -46,7 +44,7 @@ e viaggi, e comunicare in modo chiaro eventuali errori o aggiornamenti agli uten
 ## Nota finale
 
 - L’analisi dei requisiti definisce ciò che l’applicazione deve fare, senza entrare nel design interno o nelle tecnologie utilizzate.
----
+
 
 # Analisi e modello del dominio
 
@@ -63,7 +61,6 @@ e operativo, responsabile della pianificazione, della raccolta e del monitoraggi
 - la corretta associazione tra programmi di raccolta e tipo di rifiuto previsto;
 - la gestione di clienti con più programmi di raccolta diversi.
 
----
 
 ## Diagramma 1 – Persone e Clienti
 
@@ -218,8 +215,6 @@ View → Controller UI → Manager → Repository / Entity → Controller UI →
 
 Questa struttura rende l’applicazione **estendibile e manutenibile**, senza che modifiche alla UI richiedano interventi sul dominio o sui manager.
 
----
-
 ## Architettura
 
 ### Componenti e ruoli
@@ -292,12 +287,12 @@ TripManager --> TripRepository : legge/scrive dati
 CustomerManager --> Customer : gestisce
 TripManager --> Trip : gestisce
 ```
----
-# Design Dettagliato — Gestione Veicoli (Ferrari Lorenzo)
 
-## 1. Gestione dello Stato Operativo del Veicolo
+## Design Dettagliato - Gestione Veicoli (Ferrari Lorenzo)
 
-### Problema
+### 1. Gestione dello Stato Operativo del Veicolo
+
+#### Problema
 
 Ogni veicolo può trovarsi in diversi stati operativi (`IN_SERVICE`, `IN_MAINTENANCE`, `OUT_OF_SERVICE`) e tali stati devono poter cambiare in base alle azioni degli operatori.
 
@@ -307,7 +302,7 @@ Una gestione manuale basata su `if/else` dispersi tra UI, Controller o altri Man
 - Incoerenze nei flussi (es. un componente consente un cambio stato che un altro blocca).
 - Difficoltà nell’aggiungere nuovi stati in futuro, richiedendo modifiche globali.
 
-### Alternative valutate
+#### Alternative valutate
 
 Una possibile soluzione iniziale era gestire tutte le transizioni direttamente nei Controller o nella UI, verificando lo stato con condizioni procedurali (`if(vehicle.status == ...) ...`).
 
@@ -317,7 +312,7 @@ Soluzione scartata perché:
 - Ogni modifica alle regole avrebbe imposto aggiornamenti manuali su più componenti.
 - Violazione del Single Responsibility Principle, con la UI che si occupa di logica di dominio.
 
-### Soluzione
+#### Soluzione
 
 È stata centralizzata la gestione dello stato attraverso:
 
@@ -326,7 +321,7 @@ Soluzione scartata perché:
 
 In questo modo tutte le transizioni avvengono in un unico punto, evitando comportamenti divergenti nei vari componenti dell'applicazione.
 
-### Pattern di progettazione applicato
+#### Pattern di progettazione applicato
 
 È stato applicato un **pattern State semplificato**:
 
@@ -334,14 +329,14 @@ In questo modo tutte le transizioni avvengono in un unico punto, evitando compor
 - `Vehicle` → contiene lo **stato attuale e il cambio atomico** (`updateStatus`).
 - `VehicleManager` → funge da **contesto**, definendo le **transizioni ammesse**.
 
-### Vantaggi della soluzione
+#### Vantaggi della soluzione
 
 - Coerenza delle regole tra tutti i componenti.
 - Riduzione della duplicazione di logica.
 - Facilità nell’aggiungere nuovi stati o regole.
 - Rispetto del SRP e principio Open/Closed (nuovi stati senza modificare codice esistente).
 
-### Schema UML
+#### Schema UML
 
 ```mermaid
 classDiagram
@@ -367,7 +362,7 @@ classDiagram
 
     VehicleManager --> Vehicle
 ```
-#### Diagramma di Stato - Transizioni del VehicleStatus
+##### Diagramma di Stato - Transizioni del VehicleStatus
 ```mermaid
 stateDiagram-v2
     [*] --> IN_SERVICE
@@ -380,9 +375,9 @@ stateDiagram-v2
 
     OUT_OF_SERVICE --> IN_SERVICE : restoreService()\n(Rimessa in servizio)
 ```
-## 2. Gestione Automatica delle Date di Manutenzione
+### 2. Gestione Automatica delle Date di Manutenzione
 
-### Problema
+#### Problema
 
 Ogni veicolo deve mantenere coerenti due date:
 
@@ -395,31 +390,31 @@ Se tali date venissero aggiornate manualmente in più punti dell’applicazione,
 - Inconsistenze tra i dati
 - Regole duplicate in UI o Controller
 
-### Alternative valutate
+#### Alternative valutate
 
 Una possibile alternativa era lasciare che ogni componente aggiornasse manualmente le date, ad esempio quando viene chiusa una manutenzione o avviato un intervento.
 
 Soluzione scartata perché soggetta a errori umani e difficile da verificare.
 
-### Soluzione
+#### Soluzione
 
 La gestione è stata accentrata nel `VehicleManager`, in particolare nel metodo `markMaintenanceAsComplete(vehicle)` che:
 
 - Imposta `lastMaintenanceDate` alla data corrente.
 - Calcola `nextMaintenanceDate` secondo una politica predefinita (es. +6 mesi).
 
-### Pattern e principi applicati
+#### Pattern e principi applicati
 
 - Nessun pattern strutturato, ma forte applicazione del principio di **centralizzazione della business logic**.
 - Il `VehicleManager` funge da servizio di dominio responsabile delle politiche sulle date.
 
-### Vantaggi
+#### Vantaggi
 
 - Coerenza garantita.
 - Nessun altro componente può modificare direttamente le date.
 - Facilità di estendere la politica di manutenzione in futuro.
 
-### Schema UML
+#### Schema UML
 
 ```mermaid
 classDiagram
@@ -437,9 +432,9 @@ classDiagram
 
     VehicleManager --> Vehicle
 ```
-## 3. Compatibilità tra Veicoli e Autisti in base alla Patente
+### 3. Compatibilità tra Veicoli e Autisti in base alla Patente
 
-### Problema
+#### Problema
 
 Un veicolo può essere assegnato solo ad autisti con patente compatibile (`RequiredLicence`).  
 Se la verifica viene effettuata in più punti (UI, `TripManager`, Controller), si rischiano:
@@ -447,13 +442,13 @@ Se la verifica viene effettuata in più punti (UI, `TripManager`, Controller), s
 - Eccezioni e incoerenze
 - Possibilità di assegnare veicoli non idonei
 
-### Alternative valutate
+#### Alternative valutate
 
 Una gestione distribuita con verifiche condizionali ovunque (`if(driver.licence >= vehicle.licence) ...`).
 
 Soluzione scartata per rischio di duplicazione e buchi di controllo.
 
-### Soluzione
+#### Soluzione
 
 È stato introdotto il metodo:
 
@@ -462,17 +457,17 @@ VehicleManager.getAllowedLicences(vehicle);
 ```
 Confronta la `RequiredLicence` del veicolo con le licenze degli autisti disponibili e restituisce solo quelli idonei.
 
-### Pattern / Principi applicati
+#### Pattern / Principi applicati
 
 - Nessun pattern formale, ma approccio di **policy centralizzata**: la regola è definita in un solo punto e riusata ovunque.
 
-### Vantaggi
+#### Vantaggi
 
 - Nessuna duplicazione di logica.
 - Facile estendere nuove licenze o eccezioni.
 - Maggiore affidabilità operativa.
 
-### Schema UML
+#### Schema UML
 ```mermaid
 classDiagram
     direction LR
@@ -501,24 +496,22 @@ classDiagram
 
     VehicleManager --> Vehicle
 ```
----
 
-# Design Dettagliato — Pianificazione delle Raccolte (Alex Cambrini)
+## Design Dettagliato - Pianificazione delle Raccolte (Alex Cambrini)
 
 - **OneTimeSchedule**: una singola data richiesta dal cliente
 - **RecurringSchedule**: un ciclo (settimanale/mensile) allineato al giorno previsto dal calendario di quel rifiuto (*WasteSchedule*).
 
----
 
-## 1. Calcolo della prossima data di raccolta
+### 1. Calcolo della prossima data di raccolta
 
-### Problema
+#### Problema
 La logica di calcolo della prossima data di raccolta varia in base alla frequenza dello schedule (settimanale o mensile).  
 Una singola implementazione nel manager avrebbe richiesto continue modifiche e condizionali, rendendo difficile aggiungere nuovi tipi di frequenza e aumentando il rischio di errori: duplicazioni, raccolte mancanti o date incoerenti.
 
 **Esempio concreto:** Se oggi è lunedì e la raccolta settimanale è prevista per mercoledì, il sistema deve restituire la data del prossimo mercoledì; se la frequenza è mensile, deve restituire il giorno corrispondente del mese successivo.
 
-### Alternative valutate
+#### Alternative valutate
 Un approccio alternativo avrebbe potuto essere implementare tutta la logica di calcolo della prossima data direttamente nel `RecurringScheduleManager` usando strutture condizionali (`if/else`) basate sulla frequenza dello schedule.  
 **Svantaggi di questa soluzione:**
 - Poco estensibile: aggiungere nuove frequenze richiederebbe modifiche continue al manager.
@@ -526,7 +519,7 @@ Un approccio alternativo avrebbe potuto essere implementare tutta la logica di c
 - Violazione dei principi SOLID, in particolare Open/Closed e Single Responsibility.
 - Testabilità ridotta, poiché tutta la logica è concentrata in un unico componente.
 
-### Soluzione
+#### Soluzione
 È stato applicato il **pattern Strategy**, separando la logica di calcolo in strategie indipendenti e intercambiabili.  
 Il manager (`RecurringScheduleManager`) agisce come **contesto**, delegando il calcolo alla strategia appropriata tramite l’interfaccia comune `NextCollectionCalculator`.
 
@@ -542,7 +535,7 @@ Il manager (`RecurringScheduleManager`) agisce come **contesto**, delegando il c
 - Rispetto dei principi SOLID (Open/Closed, Single Responsibility).
 - Chiara separazione fra business logic e policy di calcolo.
 
-### Pattern di progettazione
+#### Pattern di progettazione
 - **Strategy:**
     - `NextCollectionCalculator` rappresenta l’interfaccia della strategia.
     - `WeeklyCalculator` e `MonthlyCalculator` sono implementazioni concrete della strategia.
@@ -551,7 +544,7 @@ Il manager (`RecurringScheduleManager`) agisce come **contesto**, delegando il c
 **Dinamica di selezione della strategia:**  
 Il `RecurringScheduleManager` determina quale strategia utilizzare al momento della richiesta del calcolo della prossima data. La scelta avviene tipicamente tramite un semplice mapping tra la frequenza dello schedule e l’implementazione concreta corrispondente. In questo modo, il manager **non contiene logica condizionale complessa**, ma delega dinamicamente la responsabilità di calcolo alla strategia appropriata.
 
-### Schema UML
+#### Schema UML
 ```mermaid
 classDiagram
     direction LR
@@ -590,16 +583,16 @@ classDiagram
     RecurringScheduleManager --> WasteSchedule
 ```
 
-## 2. Generazione automatica e coordinamento delle Collection
+### 2. Generazione automatica e coordinamento delle Collection
 
-### Problema
+#### Problema
 Ogni schedule deve generare una **Collection** coerente senza duplicazioni o errori di data.  
 Più manager (**RecurringScheduleManager**, **CollectionManager**, **WasteScheduleManager**) devono collaborare senza duplicare logica.  
 Distribuire la logica tra i manager rischia incoerenze, difficoltà di manutenzione e ridotta testabilità.
 
 **Esempio concreto:** Se più schedule ricorrenti hanno date che coincidono o si sovrappongono, il sistema deve generare le collection corrette senza creare duplicati o errori di persistenza.
 
-### Vecchio approccio implementativo
+#### Vecchio approccio implementativo
 Inizialmente era stata implementata una funzione `generateRecurringCollections()` eseguita come **task giornaliero automatico**, che calcolava tutte le date future delle collection ricorrenti.
 - Garantiva coerenza anche se il software rimaneva spento per più giorni.
 - Evitava date nel passato e duplicazioni.
@@ -607,7 +600,7 @@ Inizialmente era stata implementata una funzione `generateRecurringCollections()
 
 Questo approccio automatizzava tutto, ma introdusse complessità, difficoltà di manutenzione e test più complicati.
 
-### Nuovo approccio adottato
+#### Nuovo approccio adottato
 - La collection viene generata **solo al momento della creazione dello schedule**.
 - Le collection vengono raggruppate in un **trip**, cioè un insieme di ritiri fisici nella stessa zona.
 - Una volta completato un trip, l’operatore lo marca come completato.
@@ -619,7 +612,7 @@ Questo approccio automatizzava tutto, ma introdusse complessità, difficoltà di
 - Maggiore chiarezza operativa e manutenzione più semplice.
 - Estensibilità futura: se in futuro servono nuovi tipi di collection, basta aggiungere nuove implementazioni della factory senza modificare i manager.
 
-### Pattern di progettazione
+#### Pattern di progettazione
 È stato utilizzato il **Factory Pattern** per la creazione delle collection:
 - `CollectionFactory` definisce l’interfaccia per creare collection one-time e ricorrenti.
 - `CollectionFactoryImpl` implementa la logica concreta di costruzione.
@@ -636,7 +629,7 @@ Questo approccio automatizzava tutto, ma introdusse complessità, difficoltà di
 - Chiarezza delle responsabilità e facilità di test.
 - Applicazione di un pattern noto (Factory) per migliorare riuso ed estensibilità.
 
-### Schema UML
+#### Schema UML
 ```mermaid
 classDiagram
     direction LR
@@ -667,13 +660,11 @@ classDiagram
     CollectionManager --> CollectionFactory : uses
     CollectionFactoryImpl ..|> CollectionFactory
     CollectionManager --> RecurringScheduleManager : retrieves schedule info
-
-
 ```
 
-## 3. Gestione degli stati dello Schedule
+### 3. Gestione degli stati dello Schedule
 
-### Problema
+#### Problema
 Un `RecurringSchedule` può assumere diversi stati (`ACTIVE`, `PAUSED`, `CANCELLED`, `COMPLETED`).  
 Ogni transizione può richiedere azioni collaterali, come cancellare una `Collection`, generarne una nuova o aggiornare la prossima data di raccolta.  
 Se tali logiche fossero distribuite tra più componenti (UI, repository, manager vari), si rischierebbero **incoerenze** e **duplicazioni**.
@@ -681,13 +672,13 @@ Se tali logiche fossero distribuite tra più componenti (UI, repository, manager
 **Esempio concreto:**  
 Se uno schedule `PAUSED` viene riattivato (`ACTIVE`), il sistema deve ricalcolare la prossima data e generare la collection corretta senza duplicazioni.
 
-### Soluzione
+#### Soluzione
 La gestione delle transizioni di stato è **centralizzata** nel metodo
 ```java
 `RecurringScheduleManager.updateStatusRecurringSchedule(schedule: RecurringSchedule, newStatus: ScheduleStatus)`.
 ```
 
-### Logica principale implementata
+#### Logica principale implementata
 - Blocca modifiche su schedule già `CANCELLED` o `COMPLETED`.
 - Gestisce solo le **transizioni valide**:
   - `PAUSED → CANCELLED`: aggiorna lo stato e salva.
@@ -696,13 +687,13 @@ La gestione delle transizioni di stato è **centralizzata** nel metodo
 - Aggiornamento repository e collection tramite `CollectionManager`.
 - Le transizioni non valide restituiscono `false`, evitando stati inconsistenti o side effect indesiderati.
 
-### Vantaggi della soluzione
+#### Vantaggi della soluzione
 - **Centralizzazione della logica**: facilità di manutenzione e test.
 - **Chiarezza operativa**: un punto unico per le transizioni.
 - **Rispetto del Single Responsibility Principle (SRP)**: la gestione degli stati è separata dalla UI e dalla persistenza.
 - **Estensibilità**: nuove transizioni possono essere aggiunte modificando solo il manager, senza impattare altri componenti.
 
-### Alternative valutate
+#### Alternative valutate
 Si è valutato l’uso del **State Pattern**, che rappresenta ogni stato come oggetto separato con comportamenti e transizioni proprie, delegando al contesto l’esecuzione delle operazioni.
 
 **Motivo per cui non è stato adottato**:
@@ -711,10 +702,10 @@ Si è valutato l’uso del **State Pattern**, che rappresenta ogni stato come og
 - La gestione centralizzata risulta più leggibile, testabile e sufficiente per il progetto.
 
 
-### Pattern applicati
+#### Pattern applicati
 - Nessun pattern di progettazione noto è stato applicato in questa parte del progetto.
 
-### Principi di design applicati
+#### Principi di design applicati
 - Principio di singola responsabilità (SRP): il RecurringScheduleManager gestisce esclusivamente le transizioni di stato, separando la logica di business dalla UI e dalla persistenza.
 
 ### Schema UML
@@ -740,13 +731,9 @@ class Collection
 RecurringScheduleManager --> RecurringSchedule : manages
 RecurringScheduleManager --> CollectionManager : coordinates
 CollectionManager --> Collection : manipulates
-
-
 ```
 
----
-
-# Design Dettagliato — Gestione Trip & Invoice (Manuel Ragazzini)
+## Design Dettagliato - Gestione Trip & Invoice (Manuel Ragazzini)
 
 - **Trip**: Viaggio di raccolta che aggrega una o più Collection, assegnato a veicolo e operatori.
 - **Invoice**: Fattura generata sulle Collection completate, associata a un Customer, con gestione di pagamenti e cancellazioni.
@@ -754,9 +741,9 @@ CollectionManager --> Collection : manipulates
 
 ---
 
-## 1. Gestione delle transizioni di stato e propagazione tra entità
+### 1. Gestione delle transizioni di stato e propagazione tra entità
 
-### Problema
+#### Problema
 
 Trip, Invoice e Collection hanno cicli di vita distinti ma intrecciati: certe transizioni (es. cancellazione, completamento, pagamento) devono propagarsi tra le entità correlate per mantenere la coerenza.
 
@@ -764,12 +751,12 @@ Trip, Invoice e Collection hanno cicli di vita distinti ma intrecciati: certe tr
 Quando viene chiamato il metodo `InvoiceManager.deleteInvoice(invoiceId)`, la fattura viene marcata come cancellata tramite `setDeleted(true)` e tutte le Collection collegate vengono “sbillate” (`setIsBilled(false)`).  
 Allo stesso modo, `TripManager.deleteTrip(tripId)` mette tutte le Collection associate in stato `CANCELLED` aggiornando il loro attributo `CollectionStatus`.
 
-### Alternative valutate
+#### Alternative valutate
 
 - Gestire transizioni e propagazioni direttamente nelle entità (`Trip`, `Invoice`) o nei Controller avrebbe portato a duplicazione di codice, rischio di inconsistenze e difficoltà di manutenzione.
 - Demandare la propagazione all’UI o a più componenti avrebbe reso il sistema fragile e difficile da testare.
 
-### Soluzione
+#### Soluzione
 
 La logica di dominio è **centralizzata nei manager**:
 - `TripManager` e `InvoiceManager` orchestrano tutte le transizioni di stato e si occupano di propagare gli effetti su entità collegate.
@@ -812,11 +799,9 @@ classDiagram
     InvoiceManager --> Collection : aggiorna stato
 ```
 
----
+### 2. Calcolo aggregato di importi e pagamenti
 
-## 2. Calcolo aggregato di importi e pagamenti
-
-### Problema
+#### Problema
 
 Per ogni Customer è necessario calcolare in modo affidabile:
 - Il totale fatturato (somma delle Invoice emesse, escluse quelle cancellate).
@@ -826,12 +811,12 @@ Per ogni Customer è necessario calcolare in modo affidabile:
 I metodi `InvoiceManager.getTotalBilledAmountForCustomer(customer)` e `InvoiceManager.getTotalPaidAmountForCustomer(customer)` interrogano il DAO delle invoice (`InvoiceDAO`) e aggregano solo gli importi delle fatture in stato valido o pagato.  
 Se una Invoice viene cancellata tramite `deleteInvoice()`, viene esclusa dai calcoli, grazie al controllo dell’attributo `deleted`.
 
-### Alternative valutate
+#### Alternative valutate
 
 - Calcolare i totali ad ogni richiesta iterando su tutte le Collection e Invoice (semplice ma inefficiente e potenzialmente soggetto a errori se la logica è duplicata).
 - Salvare valori aggregati come attributi persistenti (rischio di inconsistenza).
 
-### Soluzione
+#### Soluzione
 
 I metodi di calcolo sono centralizzati in `InvoiceManager`:
 - `getTotalBilledAmountForCustomer(customer)` calcola la somma delle Invoice valide interrogando il DAO.
@@ -871,23 +856,22 @@ classDiagram
     InvoiceManager --> Invoice : aggrega
     Invoice --> Customer : riferimento
 ```
----
 
-## 3. Validazione di compatibilità e regole di dominio
+### 3. Validazione di compatibilità e regole di dominio
 
-### Problema
+#### Problema
 
 Operazioni come assegnare operatori a un Trip o saldare una Invoice richiedono validazioni di dominio:
 - Un Trip può essere assegnato solo a operatori con la patente richiesta dal veicolo.
 - Una Invoice può essere pagata solo se è in stato `EMESSA`.
 
 
-### Alternative valutate
+#### Alternative valutate
 
 - Verifiche distribuite in UI/Controller (rischio di errori e duplicazione logica).
 - Controlli sparsi nelle entità (difficile da mantenere).
 
-### Soluzione
+#### Soluzione
 
 La validazione è **centralizzata nei Manager**:
 - Prima di ogni operazione critica il manager esegue tutti i controlli sulle entità coinvolte.
@@ -938,7 +922,7 @@ classDiagram
     TripManager --> Vehicle : assegna
     InvoiceManager --> Invoice : aggiorna
 ```
----
+# Sviluppo
 
 ## Testing automatizzato
 
@@ -1035,13 +1019,8 @@ void testCreateRecurringScheduleCalculatesNextCollectionDate() {
 }
 ```
 
-## Note di sviluppo
-
----
-
-### Lorenzo Ferrari
-
-#### 1. Query JPA null-safe con Optional e stream
+## Note di sviluppo - Lorenzo Ferrari
+### 1. Query JPA null-safe con Optional e stream
 
 **Dove:** `src/main/java/it/unibo/wastemaster/infrastructure/dao/EmployeeDAO.java`
 
@@ -1062,7 +1041,7 @@ public Optional<Employee> findByEmail(final String email) {
 
 ---
 
-#### 2. Policy di dominio con switch expression ed enum
+### 2. Policy di dominio con switch expression ed enum
 
 **Dove:** `src/main/java/it/unibo/wastemaster/domain/service/EmployeeManager.java`
 
@@ -1086,7 +1065,7 @@ public boolean canDriveVehicle(final Employee employee, final Vehicle vehicle) {
 
 ---
 
-#### 3. Rollback applicativo con validazione centralizzata
+### 3. Rollback applicativo con validazione centralizzata
 
 **Dove:** `src/main/java/it/unibo/wastemaster/domain/service/EmployeeManager.java`
 
@@ -1119,7 +1098,7 @@ public Employee addEmployee(final Employee employee, final String rawPassword) {
 
 ---
 
-#### 4. Menu filtri dinamico per ricerca multi-campo (ContextMenu + CheckBox)
+### 4. Menu filtri dinamico per ricerca multi-campo (ContextMenu + CheckBox)
 
 **Dove:** `src/main/java/it/unibo/wastemaster/controller/customer/CustomersController.java`
 
@@ -1165,7 +1144,7 @@ private void showFilterMenu(final javafx.scene.input.MouseEvent event) {
 
 ---
 
-#### 5. DTO immutabile con formattazione locale per la UI
+### 5. DTO immutabile con formattazione locale per la UI
 
 **Dove:** `src/main/java/it/unibo/wastemaster/presentationdto/CustomerRow.java`
 
@@ -1200,9 +1179,9 @@ public final class CustomerRow {
 
 ---
 
-### Alex Cambrini
+## Note di sviluppo - Alex Cambrini
 
-#### 1. Switch su enum per selezione dinamica della strategia
+### 1. Switch su enum per selezione dinamica della strategia
 
 **Dove:** `src/main/java/it/unibo/wastemaster/domain/service/RecurringScheduleManager.java`
 **Permalink:** https://github.com/Alex-Cambrini/pss24-25-WasteMaster-Cambrini-Ferrari-Ragazzini/blob/925f05189fa63debcb40e850869faae40e9f675a/src/main/java/it/unibo/wastemaster/domain/service/RecurringScheduleManager.java#L89-L92
@@ -1224,7 +1203,7 @@ raccolta. Riduce if-else annidati e rende il codice più leggibile e facilmente 
 
 ---
 
-#### 2. Uso di Optional per gestione sicura di valori potenzialmente nulli
+### 2. Uso di Optional per gestione sicura di valori potenzialmente nulli
 
 **Dove:** `src/main/java/it/unibo/wastemaster/domain/service/RecurringScheduleManager.java`
 **Permalink:** https://github.com/Alex-Cambrini/pss24-25-WasteMaster-Cambrini-Ferrari-Ragazzini/blob/925f05189fa63debcb40e850869faae40e9f675a/src/main/java/it/unibo/wastemaster/domain/service/RecurringScheduleManager.java#L260-L264
@@ -1247,7 +1226,7 @@ funzionalità avanzata del linguaggio Java.
 
 ---
 
-#### 3. Algoritmo per allineamento della data al giorno programmato
+### 3. Algoritmo per allineamento della data al giorno programmato
 
 **Dove:** `src/main/java/it/unibo/wastemaster/domain/service/RecurringScheduleManager.java`
 **Permalink:** https://github.com/Alex-Cambrini/pss24-25-WasteMaster-Cambrini-Ferrari-Ragazzini/blob/925f05189fa63debcb40e850869faae40e9f675a/src/main/java/it/unibo/wastemaster/domain/service/RecurringScheduleManager.java#L105-L112
@@ -1270,7 +1249,7 @@ Calcola e riallinea automaticamente una data al giorno della settimana programma
 
 ---
 
-#### 4. Filtraggio dinamico e aggiornamento dello stato delle raccolte (CollectionController)
+### 4. Filtraggio dinamico e aggiornamento dello stato delle raccolte (CollectionController)
 
 **Dove:** `src/main/java/it/unibo/wastemaster/controller/collection/CollectionController.java`  
 **Permalink:** https://github.com/Alex-Cambrini/pss24-25-WasteMaster-Cambrini-Ferrari-Ragazzini/blob/925f05189fa63debcb40e850869faae40e9f675a/src/main/java/it/unibo/wastemaster/controller/collection/CollectionController.java#L256-L263
@@ -1292,7 +1271,7 @@ Uso avanzato di switch expression con `case ->` per valutare dinamicamente lo st
 
 ---
 
-#### 5. Strategia di calcolo date mensili (MonthlyCalculator)
+### 5. Strategia di calcolo date mensili (MonthlyCalculator)
 
 Strategia di calcolo date per raccolte mensili, integrata con l’allineamento al giorno della settimana.
 
@@ -1323,7 +1302,7 @@ Rende la logica di scheduling modulare e facilmente estendibile.
 > **Nota generale:** tutto il codice riportato nel presente documento è stato scritto dagli autori del progetto e non contiene snippet presi da altre fonti.
 
 
-#### Note di sviluppo — Trip & Invoice (Manuel Ragazzini)
+## Note di sviluppo - Manuel Ragazzini
 
 ### 1. Cancellazione di una Invoice e aggiornamento delle Collection associate
 
@@ -1468,11 +1447,11 @@ Test che verifica che la somma degli importi pagati venga calcolata correttament
 
 ---
 
-## Commenti finali
+# Commenti finali
 
-### Autovalutazione e lavori futuri
+## Autovalutazione e lavori futuri
 
-#### Ferrari Lorenzo
+### Ferrari Lorenzo
 La realizzazione di questo progetto mi ha permesso di lavorare su un sistema gestionale sviluppato in Java, pensato per coprire l’intero flusso operativo di un’azienda che si occupa di smaltimento rifiuti.
 
 Mi sono occupato in particolare di:
@@ -1499,7 +1478,7 @@ In conclusione, considero questa esperienza estremamente formativa: mi ha fatto 
 
 
 
-#### Alex Cambrini
+### Alex Cambrini
 
 Nel gruppo di tre persone, ho contribuito principalmente allo sviluppo della parte relativa alle **collection** e alla **schedule** (comprendente sia le *one time schedule* sia le *recurring schedule*).  
 Questa componente gestisce la pianificazione delle collection, generandole una tantum o periodicamente in base alla frequenza impostata.
@@ -1522,10 +1501,7 @@ Dal momento che le funzionalità da me implementate erano strettamente collegate
 
 Tra i punti di forza metto la cura per la validazione degli input, la copertura dei casi limite nei test e la propensione a documentare le motivazioni delle scelte progettuali.
 
-
-
-
----
+## Difficoltà incontrate e commenti per i docenti
 
 
 
@@ -1546,12 +1522,12 @@ Tra i punti di forza metto la cura per la validazione degli input, la copertura 
 
 
 
-## Guida utente
 
+# Guida utente
 
-### Avvio dell’applicazione
+## Avvio dell’applicazione
 
-#### 1. Prerequisiti
+### 1. Prerequisiti
 - Assicurati di avere **XAMPP** installato e che il servizio **MySQL** sia attivo.
 - Prima di avviare l’applicazione, è necessario **creare il database MySQL** con i seguenti parametri:
   - **Nome DB:** `wastemaster_db`
@@ -1576,12 +1552,12 @@ FLUSH PRIVILEGES;
 > 4. Riavvia l’applicazione.
 ---
 
-#### 2. Avvio
+### 2. Avvio
 - Dopo aver creato il database, **avvia l’applicazione** tramite il file eseguibile.
 - All’avvio viene mostrata la **schermata di login**.
 ---
 
-#### 3. Credenziali iniziali
+### 3. Credenziali iniziali
 Al primo avvio viene generato automaticamente un **account di default**.
 
 **Amministratore**
@@ -1603,18 +1579,18 @@ All'interno dei dati d'esempio sono presenti altri utenti già registrati:
 
 ---
 
-#### 4. Flusso operativo
+### 4. Flusso operativo
 Per utilizzare il software, è necessario creare dipendenti e clienti, aggiungere rifiuti e veicoli, pianificare le raccolte, organizzare i viaggi e gestire le fatture; questa sequenza rappresenta il normale flusso operativo dell’applicativo.
 
 ---
 
-#### 5. Login
+### 5. Login
 - Inserisci l’**email** e la **password** corrispondente.
 - Dopo l’accesso, le **funzionalità disponibili** dipendono dal ruolo dell’utente (*Amministratore*, *Office Worker*, *Operatore*).
 
-### Funzionalità principali
+## Funzionalità principali
 
-#### 1. Dashboard
+### 1. Dashboard
 - La dashboard principale offre una panoramica rapida delle attività:
   - **Customer:** numero totale di clienti attivi.
   - **Collection attive:** numero di raccolte in corso.
@@ -1624,7 +1600,7 @@ Per utilizzare il software, è necessario creare dipendenti e clienti, aggiunger
 - Mostra le **notifiche recenti**.
 - Non richiede interazioni: serve principalmente per monitorare lo stato delle operazioni.
 
-#### 2. Gestione clienti e personale
+### 2. Gestione clienti e personale
 - Dal menu **Customers** puoi:
   - Visualizzare, aggiungere, modificare o eliminare clienti.
   - Assegnare ruoli e aggiornare informazioni di contatto.
@@ -1634,18 +1610,18 @@ Per utilizzare il software, è necessario creare dipendenti e clienti, aggiunger
   - Assegnare ruoli e aggiornare informazioni.
   - Per aggiungere un nuovo dipendente, premi su **Nuovo Employee**, compila i dati richiesti e salva.
 
-#### 3. Gestione rifiuti
+### 3. Gestione rifiuti
 - Dal menu **Waste** puoi:
   - Visualizzare la lista dei rifiuti e aggiungere, modificare o eliminare elementi.
   - Premendo **Add Programm** puoi aggiungere un giorno di raccolta per il rifiuto selezionato.
     - Premendo **Change Day** puoi modificare il giorno di raccolta già impostato.
 
-#### 4. Gestione mezzi
+### 4. Gestione mezzi
 - Dal menu **Vehicle** puoi:
   - Visualizzare la lista dei mezzi e aggiungere, modificare o eliminare elementi.
   - Impostare lo stato del mezzo (**in servizio**, **fuori servizio**, **in manutenzione**).
 
-#### 5. Pianificazione raccolte
+### 5. Pianificazione raccolte
 - Dal menu **Schedule** puoi:
   - Visualizzare le raccolte già inserite.
   - Inserire nuove raccolte, sia programmate che occasionali.
@@ -1653,7 +1629,7 @@ Per utilizzare il software, è necessario creare dipendenti e clienti, aggiunger
   - Premendo **Show Collection** puoi visualizzare i ritiri collegati alla programmazione selezionata.
   - Premendo **Change Frequency** puoi modificare la frequenza delle raccolte ricorrenti.
 
-#### 6. Gestione viaggi
+### 6. Gestione viaggi
 - Dal menu **Trip** puoi:
   - Visualizzare i viaggi pianificati.
   - Pianificare nuovi viaggi, associando più raccolte nello stesso viaggio.
@@ -1664,7 +1640,7 @@ Per utilizzare il software, è necessario creare dipendenti e clienti, aggiunger
   - Premendo **Show Collections** visualizzi le raccolte relative al viaggio selezionato.
   - Premendo **Complete Trip** concludi il viaggio e segni le raccolte come completate.
 
-#### 7. Fatturazione e pagamenti
+### 7. Fatturazione e pagamenti
 - Dal menu **Invoice** puoi:
   - Visualizzare le fatture emesse per ogni cliente.
   - Creare una nuova fattura scegliendo di includere **una o più collection** dello stesso cliente.
