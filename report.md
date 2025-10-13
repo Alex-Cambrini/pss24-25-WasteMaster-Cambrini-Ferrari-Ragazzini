@@ -1442,14 +1442,27 @@ In conclusione, considero questa esperienza estremamente formativa: mi ha fatto 
   - **Utente:** `wastemaster`
   - **Password:** `wastemaster`
 
-> Per comodità sono stati creati dei **dati d’esempio** che possono essere inseriti tramite una **query SQL**, disponibile in [AGGIUNGERE LINK].
+Esegui le seguenti query nel **pannello SQL di phpMyAdmin** oppure nella **console MySQL**:
 
+```sql
+CREATE DATABASE wastemaster_db;
+CREATE USER 'wastemaster'@'localhost' IDENTIFIED BY 'wastemaster';
+GRANT ALL PRIVILEGES ON wastemaster_db.* TO 'wastemaster'@'localhost';
+FLUSH PRIVILEGES;
+```
+> Per comodità sono disponibili dei **dati d’esempio** in un file SQL opzionale.  
+> L’applicazione crea automaticamente la struttura del database e l’utente amministratore al primo avvio.
+>
+> **Per importare i dati d’esempio:**
+> 1. Avvia l’applicazione una prima volta (per creare le tabelle e l’admin).
+> 2. Chiudi l’app.
+> 3. Esegui la query SQL di popolamento dei dati.
+> 4. Riavvia l’applicazione.
 ---
 
 #### 2. Avvio
 - Dopo aver creato il database, **avvia l’applicazione** tramite il file eseguibile.
 - All’avvio viene mostrata la **schermata di login**.
-
 ---
 
 #### 3. Credenziali iniziali
