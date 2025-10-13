@@ -1318,12 +1318,7 @@ Rende la logica di scheduling modulare e facilmente estendibile.
 > **Nota generale:** tutto il codice riportato nel presente documento è stato scritto dagli autori del progetto e non contiene snippet presi da altre fonti.
 
 
-## Note di sviluppo — Trip & Invoice (Manuel Ragazzini)
-
-Durante lo sviluppo ho lavorato soprattutto sulla logica di dominio per Trip (viaggi di raccolta) e Invoice (fatture), concentrandomi su coerenza degli stati, automazione delle transizioni e testabilità del codice.  
-Riporto alcune delle principali tecniche avanzate utilizzate.
-
----
+#### Note di sviluppo — Trip & Invoice (Manuel Ragazzini)
 
 ### 1. Validazione e guard clause sulle transizioni di Trip e Invoice
 
