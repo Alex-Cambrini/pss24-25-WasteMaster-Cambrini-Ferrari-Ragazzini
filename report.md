@@ -1041,7 +1041,7 @@ void testCreateRecurringScheduleCalculatesNextCollectionDate() {
 
 **Dove:** `src/main/java/it/unibo/wastemaster/infrastructure/dao/EmployeeDAO.java`
 
-**Permalink:** https://github.com/Alex-Cambrini/pss24-25-WasteMaster-Cambrini-Ferrari-Ragazzini/blob/main/src/main/java/it/unibo/wastemaster/infrastructure/dao/EmployeeDAO.java
+**Permalink:** https://github.com/Alex-Cambrini/pss24-25-WasteMaster-Cambrini-Ferrari-Ragazzini/blob/1502b350bfc2575f5485cfdaa0d44c75661a3405/src/main/java/it/unibo/wastemaster/infrastructure/dao/EmployeeDAO.java#L42-L49
 
 **Snippet**
 ```java
@@ -1062,8 +1062,7 @@ public Optional<Employee> findByEmail(final String email) {
 
 **Dove:** `src/main/java/it/unibo/wastemaster/domain/service/EmployeeManager.java`
 
-**Permalink:** https://github.com/Alex-Cambrini/pss24-25-WasteMaster-Cambrini-Ferrari-Ragazzini/blob/main/src/main/java/it/unibo/wastemaster/domain/service/EmployeeManager.java
-
+**Permalink:** https://github.com/Alex-Cambrini/pss24-25-WasteMaster-Cambrini-Ferrari-Ragazzini/blob/1502b350bfc2575f5485cfdaa0d44c75661a3405/src/main/java/it/unibo/wastemaster/domain/service/EmployeeManager.java#L144-L155
 **Snippet**
 ```java
 public boolean canDriveVehicle(final Employee employee, final Vehicle vehicle) {
@@ -1087,7 +1086,7 @@ public boolean canDriveVehicle(final Employee employee, final Vehicle vehicle) {
 
 **Dove:** `src/main/java/it/unibo/wastemaster/domain/service/EmployeeManager.java`
 
-**Permalink:** https://github.com/Alex-Cambrini/pss24-25-WasteMaster-Cambrini-Ferrari-Ragazzini/blob/main/src/main/java/it/unibo/wastemaster/domain/service/EmployeeManager.java
+**Permalink:** https://github.com/Alex-Cambrini/pss24-25-WasteMaster-Cambrini-Ferrari-Ragazzini/blob/1502b350bfc2575f5485cfdaa0d44c75661a3405/src/main/java/it/unibo/wastemaster/domain/service/EmployeeManager.java#L53-L72
 
 **Snippet**
 ```java
@@ -1120,7 +1119,7 @@ public Employee addEmployee(final Employee employee, final String rawPassword) {
 
 **Dove:** `src/main/java/it/unibo/wastemaster/controller/customer/CustomersController.java`
 
-**Permalink:** https://github.com/Alex-Cambrini/pss24-25-WasteMaster-Cambrini-Ferrari-Ragazzini/blob/main/src/main/java/it/unibo/wastemaster/controller/customer/CustomersController.java
+**Permalink:** https://github.com/Alex-Cambrini/pss24-25-WasteMaster-Cambrini-Ferrari-Ragazzini/blob/1502b350bfc2575f5485cfdaa0d44c75661a3405/src/main/java/it/unibo/wastemaster/controller/customer/CustomersController.java#L310-L342
 
 **Snippet**
 ```java
@@ -1166,7 +1165,9 @@ private void showFilterMenu(final javafx.scene.input.MouseEvent event) {
 
 **Dove:** `src/main/java/it/unibo/wastemaster/presentationdto/CustomerRow.java`
 
-**Permalink:** https://github.com/Alex-Cambrini/pss24-25-WasteMaster-Cambrini-Ferrari-Ragazzini/blob/main/src/main/java/it/unibo/wastemaster/presentationdto/CustomerRow.java
+**Permalink (costruttore con formattazione data):** https://github.com/Alex-Cambrini/pss24-25-WasteMaster-Cambrini-Ferrari-Ragazzini/blob/1502b350bfc2575f5485cfdaa0d44c75661a3405/src/main/java/it/unibo/wastemaster/presentationdto/CustomerRow.java#L27-L37
+
+**Permalink (metodo per indirizzo completo):** https://github.com/Alex-Cambrini/pss24-25-WasteMaster-Cambrini-Ferrari-Ragazzini/blob/1502b350bfc2575f5485cfdaa0d44c75661a3405/src/main/java/it/unibo/wastemaster/presentationdto/CustomerRow.java#L107-L109
 
 **Snippet**
 ```java
