@@ -19,7 +19,7 @@ Le attività chiave comprendono:
 Il sistema dovrà inoltre garantire la coerenza operativa, evitando assegnazioni errate di risorse o conflitti tra ritiri
 e viaggi, e comunicare in modo chiaro eventuali errori o aggiornamenti agli utenti interessati.
 
-# Requisiti
+## Requisiti
 
 - **Gestione clienti e personale**: il sistema deve permettere di registrare e aggiornare informazioni su clienti e
   personale, includendo la gestione dei ruoli.
@@ -36,17 +36,17 @@ e viaggi, e comunicare in modo chiaro eventuali errori o aggiornamenti agli uten
   lo stato di ciascuna fattura come pagata o non pagata.
 - **Regole di coerenza operativa**: il sistema deve garantire che le risorse assegnate siano adeguate alle attività previste.
 
-## Requisiti non funzionali
+### Requisiti non funzionali
 
 - Il sistema deve garantire affidabilità, chiarezza delle informazioni e coerenza nello stato delle attività visualizzate agli utenti.
 - Il sistema deve gestire diversi livelli di accesso in base alla tipologia di dipendente (Administrator, Office Worker e Operator), limitando determinate funzionalità dell’interfaccia in base al ruolo assegnato.
 
-## Nota finale
+### Nota finale
 
 - L’analisi dei requisiti definisce ciò che l’applicazione deve fare, senza entrare nel design interno o nelle tecnologie utilizzate.
 
 
-# Analisi e modello del dominio
+## Analisi e modello del dominio
 
 Il dominio riguarda la gestione operativa e amministrativa di un’azienda di smaltimento rifiuti. L’applicazione supporta
 le principali attività aziendali, consentendo la pianificazione dei ritiri, l’organizzazione delle risorse operative(
@@ -54,7 +54,7 @@ personale e mezzi), il monitoraggio dello stato delle attività e la gestione de
 Gli attori principali sono i clienti, che richiedono il servizio di raccolta dei rifiuti, e il personale amministrativo
 e operativo, responsabile della pianificazione, della raccolta e del monitoraggio delle attività.
 
-## Difficoltà principali del dominio:
+### Difficoltà principali del dominio:
 
 - il coordinamento tra personale e veicoli in caso di ritiri multipli contemporanei;
 - la gestione di modifiche last-minute o ritardi nelle raccolte;
@@ -62,13 +62,13 @@ e operativo, responsabile della pianificazione, della raccolta e del monitoraggi
 - la gestione di clienti con più programmi di raccolta diversi.
 
 
-## Diagramma 1 – Persone e Clienti
+### Diagramma 1 – Persone e Clienti
 
-### Descrizione
+#### Descrizione
 
 Rappresenta le entità legate alle persone e ai clienti, mostrando l’ereditarietà tra tipi di persone e le relazioni con le loro ubicazioni e attività economiche.
 
-### Entità principali
+#### Entità principali
 
 - **Person**: entità base per tutte le persone.
 - **Customer**: cliente che eredita da `Person`.
@@ -78,7 +78,7 @@ Rappresenta le entità legate alle persone e ai clienti, mostrando l’ereditari
 - **Invoice**: fattura emessa per un cliente in seguito ai servizi di raccolta erogati.
 - **Collection**: operazione di raccolta associata a una fattura.
 
-### Relazioni chiave
+#### Relazioni chiave
 
 - `Customer` eredita da `Person`.
 - `Employee` eredita da `Person`.
@@ -87,7 +87,7 @@ Rappresenta le entità legate alle persone e ai clienti, mostrando l’ereditari
 - Ogni `Customer` può ricevere una o più `Invoice` (1:N).
 - Ogni `Invoice` include una o più `Collection` (1:N).
 
-### UML
+#### UML
 
 ```mermaid
 classDiagram
@@ -107,13 +107,13 @@ classDiagram
   Employee "1" --> "1" Account : has
 ```
 
-## Diagramma 2 – Programmazione della raccolta
+### Diagramma 2 – Programmazione della raccolta
 
-### Descrizione
+#### Descrizione
 
 Rappresenta le entità legate alla pianificazione e gestione della raccolta dei rifiuti. Mostra come i programmi di raccolta si collegano ai clienti e alle singole operazioni di raccolta.
 
-### Entità principali
+#### Entità principali
 
 - **Schedule**: piano di raccolta generico.
 - **OneTimeSchedule**: pianificazione di raccolta singola, eredita da `Schedule`.
@@ -123,7 +123,7 @@ Rappresenta le entità legate alla pianificazione e gestione della raccolta dei 
 - **Collection**: rappresenta un’operazione di raccolta specifica.
 - **Customer**: cliente associato a uno specifico programma di raccolta.
 
-### Relazioni chiave
+#### Relazioni chiave
 
 - `OneTimeSchedule` e `RecurringSchedule` ereditano da `Schedule`.
 - Ogni `Schedule` appartiene a un singolo `Customer`.
@@ -131,7 +131,7 @@ Rappresenta le entità legate alla pianificazione e gestione della raccolta dei 
 - Ogni `Collection` appartiene a un singolo `Schedule`.
 - Ogni `Collection` raccoglie il `Waste` previsto dal `WasteSchedule`.
 
-### UML
+#### UML
 
 ```mermaid
 classDiagram
@@ -152,27 +152,27 @@ classDiagram
     WasteSchedule "1" --> "1" Waste : waste
 ```
 
-## Diagramma 3 – Logistica e Trasporto
+### Diagramma 3 – Logistica e Trasporto
 
-### Descrizione
+#### Descrizione
 
 Rappresenta le entità legate alla gestione operativa della raccolta, inclusi viaggi, mezzi e operatori, mostrando come le attività di raccolta vengono organizzate sul campo.
 
-### Entità principali
+#### Entità principali
 
 - **Trip**: viaggio operativo per effettuare le raccolte.
 - **Vehicle**: veicolo utilizzato per eseguire uno o più viaggi.
 - **Employee**: operatore assegnato a uno o più viaggi.
 - **Collection**: raccolta specifica eseguita durante un viaggio.
 
-### Relazioni chiave
+#### Relazioni chiave
 
 - Ogni `Trip` utilizza un singolo `Vehicle`.
 - Ogni `Trip` coinvolge uno o più `Employee` come operatori.
 - Ogni `Trip` comprende una o più `Collection`.
 - Ogni `Vehicle` può essere utilizzato in zero o più `Trip`.
 
-### UML
+#### UML
 
 ```mermaid
 classDiagram
@@ -187,9 +187,9 @@ classDiagram
     Vehicle "1" --> "0..*" Trip : usedIn
 ```
 
-## Sintesi del modello del dominio
+### Sintesi del modello del dominio
 
-I tre diagrammi descrivono il dominio in maniera coerente e integrata:
+Di seguito è riportata una panoramica dei tre diagrammi principali, evidenziando come ciascuno rappresenta aspetti complementari del dominio:
 
 - **Diagramma 1**: utenti ed entità economiche (`Customer`, `Employee`, `Invoice`), collegando le raccolte agli utenti.
 - **Diagramma 2**: pianificazione dei ritiri, mostrando la relazione tra `Customer`, `Schedule`, `Waste` e `WasteSchedule`.
@@ -708,7 +708,7 @@ Si è valutato l’uso del **State Pattern**, che rappresenta ogni stato come og
 #### Principi di design applicati
 - Principio di singola responsabilità (SRP): il RecurringScheduleManager gestisce esclusivamente le transizioni di stato, separando la logica di business dalla UI e dalla persistenza.
 
-### Schema UML
+#### Schema UML
 ```mermaid
 classDiagram
 class RecurringSchedule {
