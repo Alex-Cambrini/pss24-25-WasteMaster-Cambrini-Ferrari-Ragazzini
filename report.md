@@ -1229,75 +1229,126 @@ public final class CustomerRow {
 
 ### Alex Cambrini
 
-#### 1. Calcolo dinamico della prossima raccolta ricorrente
-**Dove:** `src/main/java/it/unibo/wastemaster/domain/model/RecurringSchedule.java`
+#### 1. Switch su enum per selezione dinamica della strategia
+
+**Dove:** `src/main/java/it/unibo/wastemaster/domain/service/RecurringScheduleManager.java`
+**Permalink:** https://github.com/Alex-Cambrini/pss24-25-WasteMaster-Cambrini-Ferrari-Ragazzini/blob/925f05189fa63debcb40e850869faae40e9f675a/src/main/java/it/unibo/wastemaster/domain/service/RecurringScheduleManager.java#L89-L92
+
+**Snippet:**
+
 ```java
-public LocalDate calculateNextCollectionDate(LocalDate from, Frequency freq, DayOfWeek dayOfWeek) {
-    LocalDate next = from.with(TemporalAdjusters.nextOrSame(dayOfWeek));
-    return freq == Frequency.MONTHLY ? next.plusMonths(1) : next.plusWeeks(1);
-}
+
+NextCollectionCalculator calculator = switch (schedule.getFrequency()) {
+    case WEEKLY -> new WeeklyCalculator();
+    case MONTHLY -> new MonthlyCalculator();
+};
+
 ```
-*Gestisce la ricorrenza delle raccolte in modo flessibile ed estendibile.*
+
+**Descrizione:**  
+Uso avanzato di `switch` expressions con enum per selezionare dinamicamente la strategia di calcolo della prossima
+raccolta. Riduce if-else annidati e rende il codice più leggibile e facilmente estendibile.
 
 ---
 
-#### 2. Uso di Stream e Optional per la raccolta attiva
-**Dove:** `src/main/java/it/unibo/wastemaster/domain/service/CollectionManager.java`
+#### 2. Uso di Optional per gestione sicura di valori potenzialmente nulli
+
+**Dove:** `src/main/java/it/unibo/wastemaster/domain/service/RecurringScheduleManager.java`
+**Permalink:** https://github.com/Alex-Cambrini/pss24-25-WasteMaster-Cambrini-Ferrari-Ragazzini/blob/925f05189fa63debcb40e850869faae40e9f675a/src/main/java/it/unibo/wastemaster/domain/service/RecurringScheduleManager.java#L260-L264
+
+**Snippet:**
+
 ```java
-public Optional<Collection> getActiveCollectionByRecurringSchedule(RecurringSchedule schedule) {
-    return collectionDAO.findAll().stream()
-        .filter(c -> c.getSchedule().equals(schedule) && c.isActive())
-        .findFirst();
-}
+Optional<Collection> activeCollectionOpt =
+        collectionManager.getActiveCollectionByRecurringSchedule(schedule);
+
+if (activeCollectionOpt.isPresent()) {
+        collectionManager.softDeleteCollection(activeCollectionOpt.get());
+        }
+   
 ```
-*Permette di individuare la raccolta attiva in modo elegante e funzionale.*
+
+**Descrizione:**  
+Gestione sicura di oggetti che possono essere null, evitando NullPointerException, con utilizzo di `Optional`,
+funzionalità avanzata del linguaggio Java.
 
 ---
 
-#### 3. Validazione parametrica delle cancellazioni
-**Dove:** `src/main/java/it/unibo/wastemaster/domain/service/OneTimeScheduleManager.java`
+#### 3. Algoritmo per allineamento della data al giorno programmato
+
+**Dove:** `src/main/java/it/unibo/wastemaster/domain/service/RecurringScheduleManager.java`
+**Permalink:** https://github.com/Alex-Cambrini/pss24-25-WasteMaster-Cambrini-Ferrari-Ragazzini/blob/925f05189fa63debcb40e850869faae40e9f675a/src/main/java/it/unibo/wastemaster/domain/service/RecurringScheduleManager.java#L105-L112
+
 ```java
-public boolean softDeleteOneTimeSchedule(OneTimeSchedule schedule) {
-    if (Days.between(LocalDate.now(), schedule.getPickupDate()) >= CANCEL_LIMIT_DAYS) {
-        schedule.setDeleted(true);
-        repository.update(schedule);
-        return true;
+public static LocalDate alignToScheduledDay(final LocalDate date,
+                                            final DayOfWeek scheduledDay) {
+    LocalDate adjustedDate = date;
+    while (adjustedDate.getDayOfWeek() != scheduledDay) {
+        adjustedDate = adjustedDate.plusDays(1);
     }
-    return false;
+    return adjustedDate;
 }
+
 ```
-*Applica in modo centralizzato e sicuro le regole di business sulle cancellazioni.*
+
+**Descrizione:**
+
+Calcola e riallinea automaticamente una data al giorno della settimana programmato usando `java.time.LocalDate`. Metodo generico e riutilizzabile per la gestione coerente delle pianificazioni.
 
 ---
 
-#### 4. Factory method per generazione di Collection
-**Dove:** `src/main/java/it/unibo/wastemaster/domain/service/CollectionManager.java`
+#### 4. Filtraggio dinamico e aggiornamento dello stato delle raccolte (CollectionController)
+
+**Dove:** `src/main/java/it/unibo/wastemaster/controller/collection/CollectionController.java`  
+**Permalink:** https://github.com/Alex-Cambrini/pss24-25-WasteMaster-Cambrini-Ferrari-Ragazzini/blob/925f05189fa63debcb40e850869faae40e9f675a/src/main/java/it/unibo/wastemaster/controller/collection/CollectionController.java#L256-L263
+
 ```java
-public Collection generateCollection(Schedule schedule) {
-    Collection collection = new Collection(schedule);
-    collectionDAO.insert(collection);
-    return collection;
+private boolean isStatusVisible(final CollectionRow row) {
+  return switch (row.getStatus()) {
+    case COMPLETED -> showCompletedCheckBox.isSelected();
+    case CANCELLED -> showCancelledCheckBox.isSelected();
+    case ACTIVE -> showActiveCheckBox.isSelected();
+    default -> false;
+  };
 }
+
 ```
-*Centralizza e rende coerente la creazione delle Collection.*
+
+**Descrizione:**
+Uso avanzato di switch expression con `case ->` per valutare dinamicamente lo stato delle raccolte. Riduce if-else annidati e rende il codice più leggibile e compatto.
 
 ---
 
-#### 5. Uso di Enum per categorizzazione degli stati
-**Dove:** `src/main/java/it/unibo/wastemaster/domain/model/Schedule.java`
+#### 5. Strategia di calcolo date mensili (MonthlyCalculator)
+
+Strategia di calcolo date per raccolte mensili, integrata con l’allineamento al giorno della settimana.
+
+**Dove:** `src/main/java/it/unibo/wastemaster/domain/strategy/MonthlyCalculator.java`  
+**Permalink:** https://github.com/Alex-Cambrini/pss24-25-WasteMaster-Cambrini-Ferrari-Ragazzini/blob/925f05189fa63debcb40e850869faae40e9f675a/src/main/java/it/unibo/wastemaster/domain/strategy/MonthlyCalculator.java#L24-L35
+
 ```java
-public enum ScheduleStatus {
-    ACTIVE, PAUSED, CANCELLED, COMPLETED
+
+@Override
+public LocalDate calculateNextDate(final RecurringSchedule schedule,
+                                   final WasteSchedule wasteSchedule) {
+  LocalDate date;
+  if (schedule.getNextCollectionDate() == null) {
+    date = schedule.getStartDate().plusDays(2);
+  } else {
+    date = schedule.getNextCollectionDate().plusMonths(1);
+  }
+
+  return alignToScheduledDay(date, wasteSchedule.getDayOfWeek());
 }
+
 ```
-*Rende il codice leggibile e meno soggetto a errori.*
 
----
+**Descrizione:**
+Calcola la prossima data mensile partendo dai dati del piano ricorrente, con riallineamento automatico al giorno corretto.
+Rende la logica di scheduling modulare e facilmente estendibile.
 
-**Codice adattato:**  
-Per la gestione delle date ricorrenti sono stati consultati esempi di uso di `TemporalAdjusters` dalla documentazione Java.
+> **Nota generale:** tutto il codice riportato nel presente documento è stato scritto dagli autori del progetto e non contiene snippet presi da altre fonti.
 
----
 
 ### Manuel Ragazzini
 
@@ -1397,19 +1448,18 @@ In conclusione, considero questa esperienza estremamente formativa: mi ha fatto 
 
 
 
+#### Alex Cambrini
 
+Nel gruppo di tre persone, ho contribuito principalmente allo sviluppo della parte relativa alle **collection** e alla **schedule** (comprendente sia le *one time schedule* sia le *recurring schedule*).  
+Questa componente gestisce la pianificazione delle collection, generandole una tantum o periodicamente in base alla frequenza impostata.
 
+Oltre a questa parte, ho collaborato anche su altre sezioni del codice, intervenendo spesso per integrare o correggere funzionalità sviluppate dagli altri membri del gruppo.  
+Ritengo di aver avuto un ruolo tecnico piuttosto centrale, anche se formalmente tutti avevamo lo stesso compito.
 
+Tra i punti di forza metto la costanza e la capacità di risolvere problemi complessi; come limite, riconosco una certa tendenza a curare troppo i dettagli, che ha rallentato alcune fasi.  
+Per lavori futuri, mi concentrerei su una maggiore pianificazione iniziale del lavoro di gruppo, per evitare sovrapposizioni e migliorare la distribuzione dei compiti.
 
-
-
-
-
-
-
-
-
-
+---
 
 
 
