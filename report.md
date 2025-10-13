@@ -746,194 +746,198 @@ CollectionManager --> Collection : manipulates
 
 ---
 
-### Design Dettagliato — Gestione Trip e Invoice (Manuel Ragazzini)
+# Design Dettagliato — Gestione Trip & Invoice (Manuel Ragazzini)
 
-#### 1. Problema affrontato
-
-La gestione del ciclo di vita dei **Trip** (viaggi di raccolta) e delle **Invoice** (fatture) è centrale per la coerenza e l’affidabilità dell’applicazione. Ogni Trip deve:
-- raggruppare le Collection da effettuare per una certa area e periodo,
-- assegnare veicolo e operatori compatibili e disponibili,
-- consentire modifiche, annullamenti e completamenti in modo sicuro e coerente,
-- propagare le modifiche alle Collection e aggiornare le Invoice collegate,
-- garantire che la fatturazione sia aggiornata solo a seguito di servizi effettivamente resi.
-
-Le principali criticità risiedono nell’evitare conflitti di risorse, mantenere la coerenza degli stati tra Trip, Collection e Invoice e assicurare che la generazione e l’aggiornamento delle fatture sia sempre corretto, anche in caso di annullamenti o variazioni.
+- **Trip**: Viaggio di raccolta che aggrega una o più Collection, assegnato a veicolo e operatori.
+- **Invoice**: Fattura generata sulle Collection completate, associata a un Customer, con gestione di pagamenti e cancellazioni.
+- **Collection**: Singola raccolta schedulata, collegata sia a Trip che a Invoice.
 
 ---
 
-#### 2. Alternative valutate
+## 1. Gestione delle transizioni di stato e propagazione tra entità
 
-All’inizio si era ipotizzato di gestire logiche di aggiornamento e propagazione degli stati in modo distribuito tra UI, manager e repository. Tuttavia:
-- questo avrebbe portato a duplicazione e dispersione di regole,
-- maggior rischio di inconsistenze tra i diversi componenti,
-- difficoltà di manutenzione e testing, soprattutto nei casi limite.
+### Problema
 
----
+Trip, Invoice e Collection hanno cicli di vita distinti ma intrecciati: certe transizioni (es. cancellazione, completamento, pagamento) devono propagarsi tra le entità correlate per mantenere la coerenza.
 
-#### 3. Soluzione adottata
+**Esempio concreto:**  
+Quando viene chiamato il metodo `InvoiceManager.deleteInvoice(invoiceId)`, la fattura viene marcata come cancellata tramite `setDeleted(true)` e tutte le Collection collegate vengono “sbillate” (`setIsBilled(false)`).  
+Allo stesso modo, `TripManager.deleteTrip(tripId)` mette tutte le Collection associate in stato `CANCELLED` aggiornando il loro attributo `CollectionStatus`.
 
-La soluzione definitiva ha previsto la **centralizzazione della logica nel `TripManager`**, che si occupa di:
-- creare, modificare, annullare e completare Trip, 
-- verificare la disponibilità e compatibilità di veicoli e operatori,
-- aggiornare coerentemente lo stato delle Collection e delle Invoice collegate,
-- propagare le notifiche ai clienti tramite `NotificationService`,
-- generare e aggiornare le Invoice solo in presenza di raccolte effettivamente svolte.
+### Alternative valutate
 
-Grazie a questa centralizzazione:
-- la logica di dominio è più solida e testabile,
-- si riduce la duplicazione,
-- la propagazione degli effetti tra Trip, Collection e Invoice è garantita anche nei casi di annullamento o modifica.
+- Gestire transizioni e propagazioni direttamente nelle entità (`Trip`, `Invoice`) o nei Controller avrebbe portato a duplicazione di codice, rischio di inconsistenze e difficoltà di manutenzione.
+- Demandare la propagazione all’UI o a più componenti avrebbe reso il sistema fragile e difficile da testare.
 
----
+### Soluzione
 
-#### 4. Pattern di progettazione applicati
+La logica di dominio è **centralizzata nei manager**:
+- `TripManager` e `InvoiceManager` orchestrano tutte le transizioni di stato e si occupano di propagare gli effetti su entità collegate.
+- Le transizioni non ammesse sollevano eccezioni (es. `IllegalStateException`) o restituiscono risultati negativi.
 
-- **Facade/Coordinator (`TripManager`)**: centralizza regole e coordinamento tra componenti.
-- **Repository**: per l’accesso a Trip, Collection, Invoice, Vehicle ed Employee, favorendo testabilità e disaccoppiamento.
-- **State (TripStatus, InvoiceStatus)**: definisce transizioni e automazioni tra gli stati.
-- **Observer-like (`NotificationService`)**: delega la notifica ai clienti a un servizio esterno, facilmente testabile.
-- **Guard Clauses & Validation**: tutte le operazioni avvengono solo se le condizioni di dominio sono rispettate.
 
----
+#### Pattern e principi applicati
 
-#### 5. Vantaggi della soluzione
+- **Transaction Script** centralizzato nei manager.
+- **Single Responsibility Principle**: tutto il dominio e la propagazione sono in un unico punto.
 
-- **Coerenza**: tutte le regole sui Trip e sulle fatture sono centralizzate e facilmente testabili.
-- **Chiarezza**: la UI è disaccoppiata dalla logica di dominio.
-- **Evolvibilità**: nuove regole o workflow richiedono modifiche solo al manager centrale.
-- **Testabilità**: i manager collaborano tramite interfacce, favorendo l’uso di mock nei test automatici.
-- **Robustezza**: la logica atomica di aggiornamento impedisce stati inconsistenti anche in caso di annullamenti o modifiche parziali.
+#### Vantaggi
 
----
+- Niente logica duplicata.
+- Coerenza garantita.
+- Facilità di test (mock dei DAO/servizi).
+- Facilità di estensione: nuove regole si aggiungono solo nei manager.
 
-#### 6. Schema UML
+#### Schema UML
 
 ```mermaid
 classDiagram
-  direction LR
+    direction LR
 
-  class Trip {
-    - Integer tripId
-    - Vehicle assignedVehicle
-    - List~Employee~ operators
-    - LocalDateTime departureTime
-    - TripStatus status
-    - List~Collection~ collections
-  }
+    class TripManager {
+      +deleteTrip(tripId)
+    }
+    class InvoiceManager {
+      +deleteInvoice(invoiceId)
+    }
+    class Trip
+    class Invoice
+    class Collection
 
-  class Invoice {
-    - Integer invoiceId
-    - Customer customer
-    - List~Collection~ collections
-    - InvoiceStatus status
-    - LocalDate emissionDate
-  }
-
-  class TripManager {
-    + void createTrip(...)
-    + boolean cancelTripAndNotify(trip)
-    + boolean setTripAsCompleted(trip)
-    + void updateVehicle(tripId, newVehicle)
-    + void updateOperators(tripId, newOperators)
-    + void generateInvoiceForTrip(trip)
-  }
-
-  class TripRepository
-  class InvoiceRepository
-  class CollectionRepository
-  class Vehicle
-  class Employee
-  class Customer
-  class NotificationService
-
-  class TripStatus {
-    <<enumeration>>
-    ACTIVE
-    COMPLETED
-    CANCELLED
-  }
-
-  class InvoiceStatus {
-    <<enumeration>>
-    EMITTED
-    PAID
-    CANCELLED
-  }
-
-  TripManager --> TripRepository
-  TripManager --> InvoiceRepository
-  TripManager --> CollectionRepository
-  TripManager --> NotificationService
-  Trip "1" o-- "*" Collection
-  Trip --> Vehicle
-  Trip --> "*" Employee
-  Invoice "1" o-- "*" Collection
-  Invoice --> Customer
-  Trip --> TripStatus
-  Invoice --> InvoiceStatus
+    TripManager --> Trip : gestisce
+    InvoiceManager --> Invoice : gestisce
+    Trip --* Collection : raggruppa
+    Invoice --* Collection : fattura
+    TripManager --> Collection : aggiorna stato
+    InvoiceManager --> Collection : aggiorna stato
 ```
 
 ---
 
-#### 7. Diagramma di Stato — TripStatus e InvoiceStatus
+## 2. Calcolo aggregato di importi e pagamenti
 
-```mermaid
-stateDiagram-v2
-    [*] --> ACTIVE : creazione Trip valida
+### Problema
 
-    ACTIVE --> CANCELLED : cancelTrip() / aggiorna Collection e Invoice collegate, invia notifiche
-    ACTIVE --> COMPLETED : setTripAsCompleted() / aggiorna Collection e genera Invoice
+Per ogni Customer è necessario calcolare in modo affidabile:
+- Il totale fatturato (somma delle Invoice emesse, escluse quelle cancellate).
+- Il totale pagato (somma delle Invoice pagate).
 
-    CANCELLED --> [*]
-    COMPLETED --> [*]
+**Esempio concreto:**  
+I metodi `InvoiceManager.getTotalBilledAmountForCustomer(customer)` e `InvoiceManager.getTotalPaidAmountForCustomer(customer)` interrogano il DAO delle invoice (`InvoiceDAO`) e aggregano solo gli importi delle fatture in stato valido o pagato.  
+Se una Invoice viene cancellata tramite `deleteInvoice()`, viene esclusa dai calcoli, grazie al controllo dell’attributo `deleted`.
 
-    note right of ACTIVE
-      Il Trip è pianificato e associato a Collection e Invoice.
-    end note
+### Alternative valutate
 
-    note right of CANCELLED
-      Stato terminale.
-      Collection e Invoice annullate.
-      Notifica inviata ai clienti.
-    end note
+- Calcolare i totali ad ogni richiesta iterando su tutte le Collection e Invoice (semplice ma inefficiente e potenzialmente soggetto a errori se la logica è duplicata).
+- Salvare valori aggregati come attributi persistenti (rischio di inconsistenza).
 
-    note right of COMPLETED
-      Il Trip è stato effettuato.
-      Le Collection e l’Invoice vengono marcate come completate/emesse.
-    end note
+### Soluzione
+
+I metodi di calcolo sono centralizzati in `InvoiceManager`:
+- `getTotalBilledAmountForCustomer(customer)` calcola la somma delle Invoice valide interrogando il DAO.
+- `getTotalPaidAmountForCustomer(customer)` somma solo le Invoice con `PaymentStatus.PAID`.
+- I calcoli sono sempre eseguiti interrogando i DAO, senza dati duplicati o rischi di inconsistenza.
+
+**Esempio di codice:**
+```java
+double totaleFatturato = getInvoiceManager().getTotalBilledAmountForCustomer(customer);
+double totalePagato = getInvoiceManager().getTotalPaidAmountForCustomer(customer);
 ```
 
+#### Pattern e principi applicati
+
+- Nessun pattern strutturato, ma forte applicazione del principio di **policy centralizzata** e **separazione della business logic** nei manager.
+- Tutti i calcoli e le query sono concentrati in un unico punto, evitando duplicazioni o errori di aggregazione.
+
+#### Vantaggi
+
+- Niente duplicazione.
+- Coerenza garantita anche in caso di modifiche.
+- Facilità di test (mock dei DAO).
+
+#### Schema UML
+
 ```mermaid
-stateDiagram-v2
-    [*] --> EMITTED : emissione Invoice dopo completamento Trip
+classDiagram
+    direction LR
 
-    EMITTED --> PAID : pagamento registrato
-    EMITTED --> CANCELLED : annullamento servizio/Trip
+    class InvoiceManager {
+      +getTotalBilledAmountForCustomer(customer)
+      +getTotalPaidAmountForCustomer(customer)
+    }
+    class Invoice
+    class Customer
 
-    PAID --> [*]
-    CANCELLED --> [*]
-
-    note right of EMITTED
-      La fattura è stata emessa, ma non ancora pagata.
-    end note
-
-    note right of PAID
-      La fattura è stata saldata.
-    end note
-
-    note right of CANCELLED
-      Il servizio è stato annullato, la fattura non è più dovuta.
-    end note
+    InvoiceManager --> Invoice : aggrega
+    Invoice --> Customer : riferimento
 ```
-
 ---
 
-#### 8. Motivazioni e alternative scartate
+## 3. Validazione di compatibilità e regole di dominio
 
-- La logica distribuita tra controller/repository avrebbe portato a duplicazioni e rischi di inconsistenza.
-- La centralizzazione nel TripManager permette di gestire tutte le regole di business in un unico punto, facilitando la manutenzione e i test.
-- Il coordinamento costante con gli altri componenti è stato fondamentale per garantire la correttezza delle operazioni e la coerenza tra Trip, Collection e Invoice.
+### Problema
 
+Operazioni come assegnare operatori a un Trip o saldare una Invoice richiedono validazioni di dominio:
+- Un Trip può essere assegnato solo a operatori con la patente richiesta dal veicolo.
+- Una Invoice può essere pagata solo se è in stato `EMESSA`.
+
+
+### Alternative valutate
+
+- Verifiche distribuite in UI/Controller (rischio di errori e duplicazione logica).
+- Controlli sparsi nelle entità (difficile da mantenere).
+
+### Soluzione
+
+La validazione è **centralizzata nei Manager**:
+- Prima di ogni operazione critica il manager esegue tutti i controlli sulle entità coinvolte.
+- Se una regola non è rispettata, il metodo solleva un’eccezione o restituisce errore.
+
+**Esempio di codice:**
+```java
+// Verifica patente durante assegnazione operatore
+if (!operator.getLicence().equals(vehicle.getRequiredLicence())) {
+    throw new IllegalArgumentException("Patente non compatibile per il veicolo selezionato.");
+}
+
+// Pagamento Invoice solo se in stato corretto
+if (invoice.getPaymentStatus() != PaymentStatus.UNPAID) {
+    throw new IllegalStateException("Invoice non saldabile nello stato attuale.");
+}
+invoice.setPaymentStatus(PaymentStatus.PAID);
+```
+
+#### Pattern e principi applicati
+
+- Nessun pattern strutturato, ma rigorosa **policy centralizzata**: tutte le regole e i controlli di validità sono implementati nei manager.
+- Uso di **guard clause** per fermare subito le operazioni non valide.
+
+#### Vantaggi
+
+- Robustezza e riusabilità.
+- Nessuna duplicazione di logica.
+- Facilità di modifica delle regole.
+
+#### Schema UML
+
+```mermaid
+classDiagram
+    direction LR
+
+    class TripManager {
+      +assignOperatorToTrip(trip, operator, vehicle)
+    }
+    class InvoiceManager {
+      +markAsPaid(invoice)
+    }
+    class Employee
+    class Vehicle
+
+    TripManager --> Trip : gestisce
+    TripManager --> Employee : assegna
+    TripManager --> Vehicle : assegna
+    InvoiceManager --> Invoice : aggiorna
+```
 ---
 
 ## Testing automatizzato
