@@ -1069,7 +1069,7 @@ void testCreateRecurringScheduleCalculatesNextCollectionDate() {
 
 ### Lorenzo Ferrari
 
-1) Query JPA null-safe con Optional e stream
+#### 1. Query JPA null-safe con Optional e stream
 
 **Dove:** `src/main/java/it/unibo/wastemaster/infrastructure/dao/EmployeeDAO.java`
 
@@ -1090,7 +1090,7 @@ public Optional<Employee> findByEmail(final String email) {
 
 ---
 
-2) Policy di dominio con switch expression ed enum
+#### 2. Policy di dominio con switch expression ed enum
 
 **Dove:** `src/main/java/it/unibo/wastemaster/domain/service/EmployeeManager.java`
 
@@ -1115,7 +1115,7 @@ public boolean canDriveVehicle(final Employee employee, final Vehicle vehicle) {
 
 ---
 
-3) Rollback applicativo con validazione centralizzata
+#### 3. Rollback applicativo con validazione centralizzata
 
 **Dove:** `src/main/java/it/unibo/wastemaster/domain/service/EmployeeManager.java`
 
@@ -1148,7 +1148,7 @@ public Employee addEmployee(final Employee employee, final String rawPassword) {
 
 ---
 
-4) Menu filtri dinamico per ricerca multi-campo (ContextMenu + CheckBox)
+#### 4. Menu filtri dinamico per ricerca multi-campo (ContextMenu + CheckBox)
 
 **Dove:** `src/main/java/it/unibo/wastemaster/controller/customer/CustomersController.java`
 
@@ -1194,7 +1194,7 @@ private void showFilterMenu(final javafx.scene.input.MouseEvent event) {
 
 ---
 
-5) DTO immutabile con formattazione locale per la UI
+#### 5. DTO immutabile con formattazione locale per la UI
 
 **Dove:** `src/main/java/it/unibo/wastemaster/presentationdto/CustomerRow.java`
 
