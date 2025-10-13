@@ -746,227 +746,195 @@ CollectionManager --> Collection : manipulates
 
 ---
 
-### Design Dettagliato - Trip (Manuel Ragazzini)
+### Design Dettagliato — Gestione Trip e Invoice (Manuel Ragazzini)
 
-### Problema affrontato
+#### 1. Problema affrontato
 
-La gestione del ciclo di vita dei **viaggi di raccolta rifiuti (Trip)** richiede la coordinazione di diverse responsabilità:
+La gestione del ciclo di vita dei **Trip** (viaggi di raccolta) e delle **Invoice** (fatture) è centrale per la coerenza e l’affidabilità dell’applicazione. Ogni Trip deve:
+- raggruppare le Collection da effettuare per una certa area e periodo,
+- assegnare veicolo e operatori compatibili e disponibili,
+- consentire modifiche, annullamenti e completamenti in modo sicuro e coerente,
+- propagare le modifiche alle Collection e aggiornare le Invoice collegate,
+- garantire che la fatturazione sia aggiornata solo a seguito di servizi effettivamente resi.
 
-- pianificazione per **CAP**,
-- **assegnazione** del veicolo e degli operatori qualificati e disponibili,
-- **associazione** delle Collection da eseguire,
-- **cancellazione** con eventuale **notifica ai clienti**,
-- **completamento** del viaggio con aggiornamento coerente delle Collection,
-- eventuale **ripianificazione** per gli schedule ricorrenti.
-
-I vincoli principali da rispettare sono:
-
-- evitare conflitti di risorse (veicoli/operatori già impegnati);
-- verificare la compatibilità tra **licenza del driver** e **veicolo assegnato**;
-- mantenere **consistenza tra Trip e Collection**;
-- gestire annullamenti e completamenti seguendo uno **stato macchina definito**.
+Le principali criticità risiedono nell’evitare conflitti di risorse, mantenere la coerenza degli stati tra Trip, Collection e Invoice e assicurare che la generazione e l’aggiornamento delle fatture sia sempre corretto, anche in caso di annullamenti o variazioni.
 
 ---
 
-### Soluzione adottata
+#### 2. Alternative valutate
 
-La logica applicativa è stata **centralizzata nel `TripManager`**, che funge da *coordinatore del dominio*.  
-Le sue responsabilità includono:
-
-- interrogare i **repository** per verificare disponibilità e qualifiche;
-- creare o aggiornare i **Trip**;
-- propagare automaticamente gli effetti su **Collection** (annullamenti, completamenti, ripianificazioni);
-- collaborare con `RecurringScheduleManager` e `NotificationService` quando necessario.
-
-La **UI** invoca esclusivamente **metodi di alto livello** (es. `createTrip`, `softDeleteTrip`, `setTripAsCompleted`) senza duplicare logica applicativa.
-
-#### API di dominio
-
-| Categoria          | Metodi principali                                                                                     |
-|-------------------|-------------------------------------------------------------------------------------------------------|
-| **Creazione**      | `createTrip(postalCode, vehicle, operators, departure, expectedReturn, collections)`                  |
-| **Disponibilità**  | `getAvailableVehicles(start, end)` · `getQualifiedDrivers(start, end, allowedLicences)` · `getAvailableOperatorsExcludeDriver(start, end, driver)` |
-| **Cancellazione**  | `softDeleteTrip(trip)` · `softDeleteAndRescheduleNextCollection(trip)` · `cancelTripAndNotify(trip[, subject, body])` |
-| **Completamento**  | `setTripAsCompleted(trip)`                                                                            |
-| **Aggiornamenti**  | `updateVehicle(tripId, newVehicle)` · `updateOperators(tripId, newOperators)`                        |
+All’inizio si era ipotizzato di gestire logiche di aggiornamento e propagazione degli stati in modo distribuito tra UI, manager e repository. Tuttavia:
+- questo avrebbe portato a duplicazione e dispersione di regole,
+- maggior rischio di inconsistenze tra i diversi componenti,
+- difficoltà di manutenzione e testing, soprattutto nei casi limite.
 
 ---
 
-### Pattern impiegati
+#### 3. Soluzione adottata
 
-- **Facade / Coordinator (TripManager)**  
-  Centralizza i casi d’uso e coordina le collaborazioni tra repository, gestione delle schedule ricorrenti e sistema di notifica.  
-  Riduce l’accoppiamento tra UI e dominio.
+La soluzione definitiva ha previsto la **centralizzazione della logica nel `TripManager`**, che si occupa di:
+- creare, modificare, annullare e completare Trip, 
+- verificare la disponibilità e compatibilità di veicoli e operatori,
+- aggiornare coerentemente lo stato delle Collection e delle Invoice collegate,
+- propagare le notifiche ai clienti tramite `NotificationService`,
+- generare e aggiornare le Invoice solo in presenza di raccolte effettivamente svolte.
 
-- **Repository**  
-  Astrazione per query di disponibilità, ricerca di veicoli/operatori/driver e recupero dei Trip.  
-  Favorisce testabilità e sostituibilità della persistenza.
-
-- **State (TripStatus)**  
-  Definisce le transizioni da `ACTIVE` a `CANCELLED` o `COMPLETED`, applicando automaticamente gli effetti sulle Collection collegate.
-
-- **Observer-like (NotificationService)**  
-  La notifica non è parte del dominio centrale: viene delegata a un’interfaccia esterna, facilmente sostituibile (es. mock vs implementazione reale).
-
-- **Guard Clauses & Validation**  
-  Verifiche *fail-fast* tramite `ValidateUtils` e controlli sugli argomenti, impedendo che vengano applicate modifiche con input incoerenti.
+Grazie a questa centralizzazione:
+- la logica di dominio è più solida e testabile,
+- si riduce la duplicazione,
+- la propagazione degli effetti tra Trip, Collection e Invoice è garantita anche nei casi di annullamento o modifica.
 
 ---
 
-### Schema UML della soluzione
+#### 4. Pattern di progettazione applicati
+
+- **Facade/Coordinator (`TripManager`)**: centralizza regole e coordinamento tra componenti.
+- **Repository**: per l’accesso a Trip, Collection, Invoice, Vehicle ed Employee, favorendo testabilità e disaccoppiamento.
+- **State (TripStatus, InvoiceStatus)**: definisce transizioni e automazioni tra gli stati.
+- **Observer-like (`NotificationService`)**: delega la notifica ai clienti a un servizio esterno, facilmente testabile.
+- **Guard Clauses & Validation**: tutte le operazioni avvengono solo se le condizioni di dominio sono rispettate.
+
+---
+
+#### 5. Vantaggi della soluzione
+
+- **Coerenza**: tutte le regole sui Trip e sulle fatture sono centralizzate e facilmente testabili.
+- **Chiarezza**: la UI è disaccoppiata dalla logica di dominio.
+- **Evolvibilità**: nuove regole o workflow richiedono modifiche solo al manager centrale.
+- **Testabilità**: i manager collaborano tramite interfacce, favorendo l’uso di mock nei test automatici.
+- **Robustezza**: la logica atomica di aggiornamento impedisce stati inconsistenti anche in caso di annullamenti o modifiche parziali.
+
+---
+
+#### 6. Schema UML
+
 ```mermaid
 classDiagram
-direction LR
+  direction LR
 
-class Trip {
-  - Integer tripId
-  - String postalCode
-  - Vehicle assignedVehicle
-  - List~Employee~ operators
-  - LocalDateTime departureTime
-  - LocalDateTime expectedReturnTime
-  - LocalDateTime lastModified
-  - TripStatus status
-  - List~Collection~ collections
-}
+  class Trip {
+    - Integer tripId
+    - Vehicle assignedVehicle
+    - List~Employee~ operators
+    - LocalDateTime departureTime
+    - TripStatus status
+    - List~Collection~ collections
+  }
 
-class Vehicle
-class Employee
-class Collection
-class Customer
+  class Invoice {
+    - Integer invoiceId
+    - Customer customer
+    - List~Collection~ collections
+    - InvoiceStatus status
+    - LocalDate emissionDate
+  }
 
-class TripStatus {
-  <<enumeration>>
-  ACTIVE
-  COMPLETED
-  CANCELLED
-}
+  class TripManager {
+    + void createTrip(...)
+    + boolean cancelTripAndNotify(trip)
+    + boolean setTripAsCompleted(trip)
+    + void updateVehicle(tripId, newVehicle)
+    + void updateOperators(tripId, newOperators)
+    + void generateInvoiceForTrip(trip)
+  }
 
-class TripManager {
-  + void createTrip(postalCode, vehicle, operators, dep, ret, collections)
-  + boolean softDeleteTrip(trip)
-  + boolean softDeleteAndRescheduleNextCollection(trip)
-  + CancellationResult cancelTripAndNotify(trip)
-  + CancellationResult cancelTripAndNotify(trip, subject, body)
-  + boolean setTripAsCompleted(trip)
-  + void updateVehicle(tripId, newVehicle)
-  + void updateOperators(tripId, newOperators)
-  + List~Vehicle~ getAvailableVehicles(start, end)
-  + List~Employee~ getQualifiedDrivers(start, end, allowedLicences)
-  + List~Employee~ getAvailableOperatorsExcludeDriver(start, end, driver)
-  + List~String~ getAvailablePostalCodes(date)
-  + int countCompletedTrips()
-}
+  class TripRepository
+  class InvoiceRepository
+  class CollectionRepository
+  class Vehicle
+  class Employee
+  class Customer
+  class NotificationService
 
-class TripRepository {
-  <<interface>>
-  + void save(trip)
-  + void update(trip)
-  + Optional~Trip~ findById(id)
-  + List~Trip~ findAll()
-  + List~Trip~ findByOperator(emp)
-  + List~Vehicle~ findAvailableVehicles(start, end)
-  + List~Employee~ findQualifiedDrivers(start, end, allowedLicences)
-  + List~Employee~ findAvailableOperatorsExcludeDriver(start, end, driver)
-  + List~Employee~ findAvailableOperatorsExcludeDriverToEdit(dep, ret, driver, trip)
-  + List~Employee~ findQualifiedDriversToEdit(dep, ret, licences, trip)
-  + int countCompleted()
-  + List~String~ findAvailablePostalCodes(date)
-}
+  class TripStatus {
+    <<enumeration>>
+    ACTIVE
+    COMPLETED
+    CANCELLED
+  }
 
-class CollectionRepository {
-  <<interface>>
-  + void save(collection)
-  + void update(collection)
-}
+  class InvoiceStatus {
+    <<enumeration>>
+    EMITTED
+    PAID
+    CANCELLED
+  }
 
-class RecurringScheduleManager {
-  + void rescheduleNextCollection(collection)
-}
-
-class NotificationService {
-  <<interface>>
-  + void notifyTripCancellation(recipients, subject, body)
-}
-
-TripManager --> TripRepository
-TripManager --> CollectionRepository
-TripManager --> RecurringScheduleManager
-TripManager --> NotificationService
-
-Trip "1" o-- "*" Collection
-Trip --> Vehicle
-Trip --> " * " Employee
-Collection --> Customer
-Trip --> TripStatus
+  TripManager --> TripRepository
+  TripManager --> InvoiceRepository
+  TripManager --> CollectionRepository
+  TripManager --> NotificationService
+  Trip "1" o-- "*" Collection
+  Trip --> Vehicle
+  Trip --> "*" Employee
+  Invoice "1" o-- "*" Collection
+  Invoice --> Customer
+  Trip --> TripStatus
+  Invoice --> InvoiceStatus
 ```
-### Diagramma di Stato - TripStatus
+
+---
+
+#### 7. Diagramma di Stato — TripStatus e InvoiceStatus
+
 ```mermaid
 stateDiagram-v2
-    [*] --> ACTIVE : creazione valida
+    [*] --> ACTIVE : creazione Trip valida
 
-    ACTIVE --> CANCELLED : cancelTrip() / aggiorna Collection collegate, invia notifiche (se richiesto)
-    ACTIVE --> COMPLETED : setTripAsCompleted() / marca Collection completate
+    ACTIVE --> CANCELLED : cancelTrip() / aggiorna Collection e Invoice collegate, invia notifiche
+    ACTIVE --> COMPLETED : setTripAsCompleted() / aggiorna Collection e genera Invoice
 
     CANCELLED --> [*]
     COMPLETED --> [*]
 
     note right of ACTIVE
-      Il Trip è pianificato e
-      associato a una o più Collection.
+      Il Trip è pianificato e associato a Collection e Invoice.
     end note
 
     note right of CANCELLED
       Stato terminale.
-      Le Collection attive vengono annullate
-      e, nel caso di ricorrenze,
-      può essere attivata ripianificazione.
+      Collection e Invoice annullate.
+      Notifica inviata ai clienti.
     end note
 
     note right of COMPLETED
       Il Trip è stato effettuato.
-      Le Collection vengono marcate come completate.
+      Le Collection e l’Invoice vengono marcate come completate/emesse.
     end note
 ```
-### Diagramma di Interazione - Cancellazione Trip con Notifica
+
 ```mermaid
-sequenceDiagram
-    participant UI
-    participant TripManager as TripManager
-    participant CollectionManager as CollectionManager
-    participant RecurringScheduleManager as RecurringScheduleManager
-    participant NotificationService as NotificationService
-    participant Trip as Trip
+stateDiagram-v2
+    [*] --> EMITTED : emissione Invoice dopo completamento Trip
 
-    UI ->> TripManager: cancelTripAndNotify(trip, subject, body)
-    TripManager ->> Trip: setStatus(CANCELLED)
+    EMITTED --> PAID : pagamento registrato
+    EMITTED --> CANCELLED : annullamento servizio/Trip
 
-    TripManager ->> CollectionManager: softDeleteCollection(collection) for each Collection attiva
+    PAID --> [*]
+    CANCELLED --> [*]
 
-    TripManager ->> RecurringScheduleManager: rescheduleNextCollection(collection) (solo per schedule ricorrenti)
+    note right of EMITTED
+      La fattura è stata emessa, ma non ancora pagata.
+    end note
 
-    TripManager ->> NotificationService: notifyTripCancellation(recipients, subject, body)
+    note right of PAID
+      La fattura è stata saldata.
+    end note
 
-    TripManager -->> UI: CancellationResult
+    note right of CANCELLED
+      Il servizio è stato annullato, la fattura non è più dovuta.
+    end note
 ```
-### Motivazioni e alternative scartate
-
-- **Separazione dei ruoli**: la UI non gestisce regole applicative, ma invoca operazioni ad alto livello.
-- **Coerenza dei dati**: ogni cancellazione o completamento aggiorna le Collection correlate e, se necessario, innesca la ripianificazione per schedule ricorrenti.
-- **Evolvibilità**: nuove strategie di disponibilità o nuovi canali di notifica possono essere aggiunti senza impattare gli strati superiori.
-- **Testabilità**: i casi d’uso sono isolabili tramite mock dei repository e dei servizi esterni.
-- **Robustezza**: le guard clauses impediscono percorsi inconsistenzi (es. completare un trip senza Collection attive).
 
 ---
 
-| Alternativa                     | Esito   | Motivazione dello scarto |
-|--------------------------------|---------|---------------------------|
-| Logica distribuita nei controller | Scartata | Rischio di duplicazioni e perdita di consistenza |
-| Eventi di dominio asincroni per le notifiche | Rimandata | Utile in scenari più complessi; la chiamata sincrona è sufficiente e più semplice |
-| Transazioni distribuite a livello di manager | Posticipata | L’attuale livello di persistenza è sufficiente; possibile evoluzione futura |
+#### 8. Motivazioni e alternative scartate
+
+- La logica distribuita tra controller/repository avrebbe portato a duplicazioni e rischi di inconsistenza.
+- La centralizzazione nel TripManager permette di gestire tutte le regole di business in un unico punto, facilitando la manutenzione e i test.
+- Il coordinamento costante con gli altri componenti è stato fondamentale per garantire la correttezza delle operazioni e la coerenza tra Trip, Collection e Invoice.
 
 ---
-
 
 ## Testing automatizzato
 
