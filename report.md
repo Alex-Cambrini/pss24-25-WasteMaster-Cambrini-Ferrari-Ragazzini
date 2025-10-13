@@ -1568,7 +1568,7 @@ FLUSH PRIVILEGES;
 > **Per importare i dati d’esempio:**
 > 1. Avvia l’applicazione una prima volta (per creare le tabelle e l’admin).
 > 2. Chiudi l’app.
-> 3. Esegui la query SQL di popolamento dei dati.
+> 3. Esegui la query SQL di popolamento dei dati dal file `database/dati_esempio.sql`.
 > 4. Riavvia l’applicazione.
 ---
 
