@@ -1323,7 +1323,7 @@ Rende la logica di scheduling modulare e facilmente estendibile.
 ### 1. Cancellazione di una Invoice e aggiornamento delle Collection associate
 
 **Dove:** src/test/java/it/unibo/wastemaster/domain/service/InvoiceManagerTest.java  
-Permalink: https://github.com/Alex-Cambrini/pss24-25-WasteMaster-Cambrini-Ferrari-Ragazzini/blob/925f05189fa63debcb40e850869faae40e9f675a/src/test/java/it/unibo/wastemaster/domain/service/InvoiceManagerTest.java#L54-L70
+Permalink: https://github.com/Alex-Cambrini/pss24-25-WasteMaster-Cambrini-Ferrari-Ragazzini/blob/925f05189fa63debcb40e850869faae40e9f675a/src/test/java/it/unibo/wastemaster/domain/service/InvoiceManagerTest.java#L111-L127
 
 ```java
 @Test
@@ -1434,7 +1434,7 @@ Setup che garantisce la presenza delle risorse necessarie per i test su Trip: ve
 ### 5. Calcolo dell’importo totale pagato per cliente
 
 **Dove:** src/test/java/it/unibo/wastemaster/domain/service/InvoiceManagerTest.java  
-Permalink: https://github.com/Alex-Cambrini/pss24-25-WasteMaster-Cambrini-Ferrari-Ragazzini/blob/925f05189fa63debcb40e850869faae40e9f675a/src/test/java/it/unibo/wastemaster/domain/service/InvoiceManagerTest.java#L34-L53
+Permalink: https://github.com/Alex-Cambrini/pss24-25-WasteMaster-Cambrini-Ferrari-Ragazzini/blob/925f05189fa63debcb40e850869faae40e9f675a/src/test/java/it/unibo/wastemaster/domain/service/InvoiceManagerTest.java##L17-L33
 
 ```java
 @Test
