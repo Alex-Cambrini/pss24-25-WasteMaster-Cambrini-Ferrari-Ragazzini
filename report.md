@@ -1459,6 +1459,21 @@ Ritengo di aver avuto un ruolo tecnico piuttosto centrale, anche se formalmente 
 Tra i punti di forza metto la costanza e la capacità di risolvere problemi complessi; come limite, riconosco una certa tendenza a curare troppo i dettagli, che ha rallentato alcune fasi.  
 Per lavori futuri, mi concentrerei su una maggiore pianificazione iniziale del lavoro di gruppo, per evitare sovrapposizioni e migliorare la distribuzione dei compiti.
 
+
+
+### Manuel Ragazzini
+
+Durante lo sviluppo del progetto mi sono concentrato principalmente sulla progettazione e implementazione della gestione dei **Trip** (viaggi di raccolta) e sulla gestione delle **Invoice** (fatturazione e stato dei pagamenti).  
+Ho lavorato in modo efficace sulla logica dei Trip e sulla gestione delle fatture, confrontandomi spesso con gli altri membri del team per decidere le funzionalità più adatte. Abbiamo sperimentato diverse soluzioni prima di arrivare a una versione completa e corretta. Ho posto particolare attenzione alla testabilità delle funzionalità, scrivendo test automatici sia per i casi di successo che di errore.
+
+Riconosco che devo ancora migliorare nella gestione del tempo, dell impegno e nella cura dei dettagli, ma considero questa esperienza molto formativa sia dal punto di vista personale che da quello tecnico, in particolare nell’approccio alla programmazione ad oggetti.  
+Dal momento che le funzionalità da me implementate erano strettamente collegate a quelle degli altri componenti, la collaborazione e il coordinamento sono stati fondamentali: questo mi ha fatto capire quanto sia importante lavorare in squadra e quanto ci sia ancora margine di crescita nella gestione delle risorse e del lavoro condiviso.
+
+Tra i punti di forza metto la cura per la validazione degli input, la copertura dei casi limite nei test e la propensione a documentare le motivazioni delle scelte progettuali.
+
+
+
+
 ---
 
 
