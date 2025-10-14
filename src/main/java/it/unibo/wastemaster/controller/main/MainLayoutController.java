@@ -116,7 +116,6 @@ public final class MainLayoutController {
         switch (role) {
             case OFFICE_WORKER -> {
                 employeesLink.setDisable(true);
-                vehiclesLink.setDisable(true);
                 handleDashboard();
             }
             case OPERATOR -> {
