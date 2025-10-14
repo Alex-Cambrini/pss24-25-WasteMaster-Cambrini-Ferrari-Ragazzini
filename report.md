@@ -737,7 +737,7 @@ CollectionManager --> Collection : manipulates
 
 - **Trip**: Viaggio di raccolta che aggrega una o più Collection, assegnato a veicolo e operatori.
 - **Invoice**: Fattura generata sulle Collection completate, associata a un Customer, con gestione di pagamenti e cancellazioni.
-- **Collection**: Singola raccolta schedulata, collegata sia a Trip che a Invoice.
+
 
 ---
 
@@ -745,16 +745,16 @@ CollectionManager --> Collection : manipulates
 
 #### Problema
 
-Trip, Invoice e Collection hanno cicli di vita distinti ma intrecciati: certe transizioni (es. cancellazione, completamento, pagamento) devono propagarsi tra le entità correlate per mantenere la coerenza.
+Trip e Invoice  hanno cicli di vita distinti ma intrecciati: certe transizioni (es. cancellazione, completamento, pagamento) devono propagarsi tra le entità correlate per mantenere la coerenza.
 
 **Esempio concreto:**  
-Quando viene chiamato il metodo `InvoiceManager.deleteInvoice(invoiceId)`, la fattura viene marcata come cancellata tramite `setDeleted(true)` e tutte le Collection collegate vengono “sbillate” (`setIsBilled(false)`).  
+Quando viene chiamato il metodo `InvoiceManager.deleteInvoice(invoiceId)`, la fattura viene marcata come cancellata tramite `setDeleted(true)` e tutte le Collection collegate vengono “billed come false” (`setIsBilled(false)`).  
 Allo stesso modo, `TripManager.deleteTrip(tripId)` mette tutte le Collection associate in stato `CANCELLED` aggiornando il loro attributo `CollectionStatus`.
 
 #### Alternative valutate
 
-- Gestire transizioni e propagazioni direttamente nelle entità (`Trip`, `Invoice`) o nei Controller avrebbe portato a duplicazione di codice, rischio di inconsistenze e difficoltà di manutenzione.
-- Demandare la propagazione all’UI o a più componenti avrebbe reso il sistema fragile e difficile da testare.
+- Gestire transizioni direttamente nelle entità (`Trip`, `Invoice`) o nei Controller avrebbe portato a duplicazione di codice, rischio di inconsistenze e difficoltà di manutenzione.
+- Far fare la propagazione all’UI o a più componenti avrebbe reso il sistema fragile e difficile da testare.
 
 #### Soluzione
 
@@ -765,8 +765,8 @@ La logica di dominio è **centralizzata nei manager**:
 
 #### Pattern e principi applicati
 
-- **Transaction Script** centralizzato nei manager.
-- **Single Responsibility Principle**: tutto il dominio e la propagazione sono in un unico punto.
+- Nessun pattern strutturato, ma forte applicazione del principio di **policy centralizzata** e **separazione della business logic** nei manager.
+
 
 #### Vantaggi
 
@@ -823,11 +823,6 @@ I metodi di calcolo sono centralizzati in `InvoiceManager`:
 - `getTotalPaidAmountForCustomer(customer)` somma solo le Invoice con `PaymentStatus.PAID`.
 - I calcoli sono sempre eseguiti interrogando i DAO, senza dati duplicati o rischi di inconsistenza.
 
-**Esempio di codice:**
-```java
-double totaleFatturato = getInvoiceManager().getTotalBilledAmountForCustomer(customer);
-double totalePagato = getInvoiceManager().getTotalPaidAmountForCustomer(customer);
-```
 
 #### Pattern e principi applicati
 
@@ -838,7 +833,7 @@ double totalePagato = getInvoiceManager().getTotalPaidAmountForCustomer(customer
 
 - Niente duplicazione.
 - Coerenza garantita anche in caso di modifiche.
-- Facilità di test (mock dei DAO).
+- Facilità di test .
 
 #### Schema UML
 
@@ -863,7 +858,7 @@ classDiagram
 
 Operazioni come assegnare operatori a un Trip o saldare una Invoice richiedono validazioni di dominio:
 - Un Trip può essere assegnato solo a operatori con la patente richiesta dal veicolo.
-- Una Invoice può essere pagata solo se è in stato `EMESSA`.
+- Una Invoice può essere pagata solo se è in stato `UNPAID`.
 
 
 #### Alternative valutate
@@ -877,19 +872,6 @@ La validazione è **centralizzata nei Manager**:
 - Prima di ogni operazione critica il manager esegue tutti i controlli sulle entità coinvolte.
 - Se una regola non è rispettata, il metodo solleva un’eccezione o restituisce errore.
 
-**Esempio di codice:**
-```java
-// Verifica patente durante assegnazione operatore
-if (!operator.getLicence().equals(vehicle.getRequiredLicence())) {
-    throw new IllegalArgumentException("Patente non compatibile per il veicolo selezionato.");
-}
-
-// Pagamento Invoice solo se in stato corretto
-if (invoice.getPaymentStatus() != PaymentStatus.UNPAID) {
-    throw new IllegalStateException("Invoice non saldabile nello stato attuale.");
-}
-invoice.setPaymentStatus(PaymentStatus.PAID);
-```
 
 #### Pattern e principi applicati
 
