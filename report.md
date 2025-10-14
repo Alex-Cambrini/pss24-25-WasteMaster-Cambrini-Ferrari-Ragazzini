@@ -340,40 +340,38 @@ In questo modo tutte le transizioni avvengono in un unico punto, evitando compor
 
 ```mermaid
 classDiagram
-    direction LR
+  direction LR
 
-    class Vehicle {
-        - VehicleStatus vehicleStatus
-        + updateStatus(status)
-    }
+  class Vehicle {
+    - VehicleStatus vehicleStatus
+    + updateStatus(status)
+  }
 
-    class VehicleManager {
-        + handleMaintenanceButton(vehicle)
-        + handleServiceButton(vehicle)
-        + markMaintenanceAsComplete(vehicle)
-    }
+  class VehicleManager {
+    + handleMaintenanceButton(vehicle)
+    + handleServiceButton(vehicle)
+    + markMaintenanceAsComplete(vehicle)
+  }
 
-    class VehicleStatus {
-        <<enumeration>>
-        IN_SERVICE
-        IN_MAINTENANCE
-        OUT_OF_SERVICE
-    }
+  class VehicleStatus {
+    <<enumeration>>
+    IN_SERVICE
+    IN_MAINTENANCE
+    OUT_OF_SERVICE
+  }
 
-    VehicleManager --> Vehicle
+  VehicleManager --> Vehicle
 ```
 ##### Diagramma di Stato - Transizioni del VehicleStatus
 ```mermaid
 stateDiagram-v2
-    [*] --> IN_SERVICE
+  [*] --> IN_SERVICE
 
-    IN_SERVICE --> IN_MAINTENANCE : handleMaintenanceButton()\n(Manutenzione avviata)
-    IN_MAINTENANCE --> IN_SERVICE : markMaintenanceAsComplete()\n(Manutenzione conclusa)
+  IN_SERVICE --> IN_MAINTENANCE : handleMaintenanceButton()
+  IN_MAINTENANCE --> IN_SERVICE : markMaintenanceAsComplete()
 
-    IN_SERVICE --> OUT_OF_SERVICE : handleServiceButton()\n(Disattivazione)
-    IN_MAINTENANCE --> OUT_OF_SERVICE : handleServiceButton()\n(Disattivazione)
-
-    OUT_OF_SERVICE --> IN_SERVICE : restoreService()\n(Rimessa in servizio)
+  IN_SERVICE --> OUT_OF_SERVICE : handleServiceButton()
+  OUT_OF_SERVICE --> IN_SERVICE : handleServiceButton()
 ```
 ### 2. Gestione Automatica delle Date di Manutenzione
 
@@ -400,18 +398,26 @@ Soluzione scartata perché soggetta a errori umani e difficile da verificare.
 
 La gestione è stata accentrata nel `VehicleManager`, in particolare nel metodo `markMaintenanceAsComplete(vehicle)` che:
 
-- Imposta `lastMaintenanceDate` alla data corrente.
-- Calcola `nextMaintenanceDate` secondo una politica predefinita (es. +6 mesi).
+- Imposta `lastMaintenanceDate` alla data corrente `LocalDate.now()`.
+- Calcola `nextMaintenanceDate` secondo una politica predefinita (+1 anno) `lastMaintenanceDate.plusYears(1)`.
 
+In aggiunta:
+
+Il costruttore di `Vehicle` inizializza per default `lastMaintenanceDate = now` e `nextMaintenanceDate = now + 1 anno` .
+
+L’annotazione `@FutureOrPresent` su `nextMaintenanceDate` previene valori nel passato a livello di validazione.
+
+>I setter delle date sono pubblici nell’entità; per prassi applicativa le date vengono modificate solo tramite VehicleManager.
 #### Pattern e principi applicati
 
 - Nessun pattern strutturato, ma forte applicazione del principio di **centralizzazione della business logic**.
 - Il `VehicleManager` funge da servizio di dominio responsabile delle politiche sulle date.
+- Validazione a livello di dominio (Bean Validation) per la coerenza dei dati.
 
 #### Vantaggi
 
 - Coerenza garantita.
-- Nessun altro componente può modificare direttamente le date.
+- Nessun altro componente modifica direttamente le date, mantenendo la policy centralizzata a livello di use-case.
 - Facilità di estendere la politica di manutenzione in futuro.
 
 #### Schema UML
@@ -437,25 +443,25 @@ classDiagram
 #### Problema
 
 Un veicolo può essere assegnato solo ad autisti con patente compatibile (`RequiredLicence`).  
-Se la verifica viene effettuata in più punti (UI, `TripManager`, Controller), si rischiano:
+Se la verifica venisse effettuata in più punti (UI, `TripManager`, Controller), si rischierebbero:
 
-- Eccezioni e incoerenze
-- Possibilità di assegnare veicoli non idonei
+- Incoerenze nelle assegnazioni
+- Eccezioni runtime dovute a controlli mancanti o duplicati
 
 #### Alternative valutate
 
-Una gestione distribuita con verifiche condizionali ovunque (`if(driver.licence >= vehicle.licence) ...`).
+Una gestione distribuita con verifiche condizionali esplicite (`if(driver.licence >= vehicle.licence) ...`) in tutti i punti dove avviene un’assegnazione.
 
-Soluzione scartata per rischio di duplicazione e buchi di controllo.
+Soluzione scartata perché soggetta a duplicazione e rischio di buchi logici.
 
 #### Soluzione
 
-È stato introdotto il metodo:
+È stata centralizzata la regola di compatibilità nel metodo:
 
 ```java
 VehicleManager.getAllowedLicences(vehicle);
 ```
-Confronta la `RequiredLicence` del veicolo con le licenze degli autisti disponibili e restituisce solo quelli idonei.
+Il metodo non restituisce direttamente gli autisti idonei, ma la lista delle patenti ammesse per quel veicolo. I componenti applicativi si limitano a filtrare gli autisti confrontando la loro patente con quella lista.
 
 #### Pattern / Principi applicati
 
@@ -464,9 +470,18 @@ Confronta la `RequiredLicence` del veicolo con le licenze degli autisti disponib
 #### Vantaggi
 
 - Nessuna duplicazione di logica.
-- Facile estendere nuove licenze o eccezioni.
-- Maggiore affidabilità operativa.
+- Estendibilità facilitata in caso di nuove licenze o eccezioni
+- Maggiore robustezza e leggibilità del dominio
 
+#### Esempio di utilizzo della policy
+
+```java
+List<Licence> allowed = vehicleManager.getAllowedLicences(vehicle);
+List<Employee> compatibleDrivers = allDrivers.stream()
+        .filter(d -> allowed.contains(d.getLicence()))
+        .toList();
+```
+In questo modo la regola rimane centralizzata nel `VehicleManager` e i componenti applicativi si limitano a consumarla senza conoscerne il dettaglio.
 #### Schema UML
 ```mermaid
 classDiagram
