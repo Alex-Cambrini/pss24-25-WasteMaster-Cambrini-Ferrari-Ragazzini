@@ -292,6 +292,8 @@ TripManager --> Trip : gestisce
 
 ### 1. Gestione dello Stato Operativo del Veicolo
 
+-**Vehicle**: entità che rappresenta un mezzo operativo
+
 #### Problema
 
 Ogni veicolo può trovarsi in diversi stati operativi (`IN_SERVICE`, `IN_MAINTENANCE`, `OUT_OF_SERVICE`) e tali stati devono poter cambiare in base alle azioni degli operatori.
