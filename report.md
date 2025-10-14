@@ -1486,23 +1486,15 @@ Tra i punti di forza metto la cura per la validazione degli input, la copertura 
 ## Difficoltà incontrate e commenti per i docenti
 
 
+Durante il progetto abbiamo incontrato alcune difficoltà, soprattutto nella collaborazione tra i membri del gruppo e nella gestione del codice su GitHub, ad esempio durante il merge di parti sviluppate separatamente.  
+Anche capire bene tutti i requisiti iniziali non è stato sempre facile e abbiamo dovuto confrontarci più volte per essere sicuri di seguire la direzione giusta.
 
+Inoltre, testare tutte le interazioni tra le varie parti del codice (come la fatturazione, i viaggi e la gestione dei veicoli) è stato più complicato del previsto.
 
+In generale ho trovato il progetto utile e stimolante.  
+Un suggerimento per il futuro: sarebbe comodo avere esempi pratici o linee guida più dettagliate sulla gestione di progetti di gruppo e sull’uso avanzato di Git.
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+Ringraziamo i docenti per la disponibilità durante il corso.
 
 
 # Guida utente
