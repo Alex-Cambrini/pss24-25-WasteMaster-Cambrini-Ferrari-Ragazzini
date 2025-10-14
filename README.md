@@ -49,8 +49,8 @@ e viaggi, e comunicare in modo chiaro eventuali errori o aggiornamenti agli uten
 ## Analisi e modello del dominio
 
 Il dominio riguarda la gestione operativa e amministrativa di un’azienda di smaltimento rifiuti. L’applicazione supporta
-le principali attività aziendali, consentendo la pianificazione dei ritiri, l’organizzazione delle risorse operative(
-personale e mezzi), il monitoraggio dello stato delle attività e la gestione della fatturazione verso i clienti.
+le principali attività aziendali, consentendo la pianificazione dei ritiri, l’organizzazione delle risorse operative (personale e mezzi),
+ il monitoraggio dello stato delle attività e la gestione della fatturazione verso i clienti.
 Gli attori principali sono i clienti, che richiedono il servizio di raccolta dei rifiuti, e il personale amministrativo
 e operativo, responsabile della pianificazione, della raccolta e del monitoraggio delle attività.
 
