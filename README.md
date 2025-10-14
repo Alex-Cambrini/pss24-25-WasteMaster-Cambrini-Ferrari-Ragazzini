@@ -519,7 +519,6 @@ classDiagram
 - **OneTimeSchedule**: una singola data richiesta dal cliente
 - **RecurringSchedule**: un ciclo (settimanale/mensile) allineato al giorno previsto dal calendario di quel rifiuto (*WasteSchedule*).
 
-
 ### 1. Calcolo della prossima data di raccolta
 
 #### Problema
@@ -615,7 +614,7 @@ Inizialmente era stata implementata una funzione `generateRecurringCollections()
 - Evitava date nel passato e duplicazioni.
 - Richiedeva controlli aggiuntivi e generava un **costo prestazionale** maggiore.
 
-Questo approccio automatizzava tutto, ma introdusse complessità, difficoltà di manutenzione e test più complicati.
+Questo approccio ha automatizzato gran parte del processo, ma ha anche aumentato la complessità del sistema, rendendo più difficile la manutenzione e i test.
 
 #### Nuovo approccio adottato
 - La collection viene generata **solo al momento della creazione dello schedule**.
@@ -718,7 +717,6 @@ Si è valutato l’uso del **State Pattern**, che rappresenta ogni stato come og
 - L’uso del pattern avrebbe aumentato la complessità senza benefici significativi in termini di estensibilità o chiarezza.
 - La gestione centralizzata risulta più leggibile, testabile e sufficiente per il progetto.
 
-
 #### Pattern applicati
 - Nessun pattern di progettazione noto è stato applicato in questa parte del progetto.
 
@@ -755,9 +753,6 @@ CollectionManager --> Collection : manipulates
 - **Trip**: Viaggio di raccolta che aggrega una o più Collection, assegnato a veicolo e operatori.
 - **Invoice**: Fattura generata sulle Collection completate, associata a un Customer, con gestione di pagamenti e cancellazioni.
 
-
----
-
 ### 1. Gestione delle transizioni di stato e propagazione tra entità
 
 #### Problema
@@ -779,11 +774,9 @@ La logica di dominio è **centralizzata nei manager**:
 - `TripManager` e `InvoiceManager` orchestrano tutte le transizioni di stato e si occupano di propagare gli effetti su entità collegate.
 - Le transizioni non ammesse sollevano eccezioni (es. `IllegalStateException`) o restituiscono risultati negativi.
 
-
 #### Pattern e principi applicati
 
 - Nessun pattern strutturato, ma forte applicazione del principio di **policy centralizzata** e **separazione della business logic** nei manager.
-
 
 #### Vantaggi
 
@@ -850,7 +843,7 @@ I metodi di calcolo sono centralizzati in `InvoiceManager`:
 
 - Niente duplicazione.
 - Coerenza garantita anche in caso di modifiche.
-- Facilità di test .
+- Facilità di test.
 
 #### Schema UML
 
@@ -876,7 +869,6 @@ classDiagram
 Operazioni come assegnare operatori a un Trip o saldare una Invoice richiedono validazioni di dominio:
 - Un Trip può essere assegnato solo a operatori con la patente richiesta dal veicolo.
 - Una Invoice può essere pagata solo se è in stato `UNPAID`.
-
 
 #### Alternative valutate
 
@@ -1298,9 +1290,6 @@ public LocalDate calculateNextDate(final RecurringSchedule schedule,
 Calcola la prossima data mensile partendo dai dati del piano ricorrente, con riallineamento automatico al giorno corretto.
 Rende la logica di scheduling modulare e facilmente estendibile.
 
-> **Nota generale:** tutto il codice riportato nel presente documento è stato scritto dagli autori del progetto e non contiene snippet presi da altre fonti.
-
-
 ## Note di sviluppo - Manuel Ragazzini
 
 ### 1. Cancellazione di una Invoice e aggiornamento delle Collection associate
@@ -1481,7 +1470,7 @@ Nel gruppo di tre persone, ho contribuito principalmente allo sviluppo della par
 Questa componente gestisce la pianificazione delle collection, generandole una tantum o periodicamente in base alla frequenza impostata.
 
 Oltre a questa parte, ho collaborato anche su altre sezioni del codice, intervenendo spesso per integrare o correggere funzionalità sviluppate dagli altri membri del gruppo.  
-Ritengo di aver avuto un ruolo tecnico piuttosto centrale, anche se formalmente tutti avevamo lo stesso compito.
+Ritengo di aver avuto un ruolo tecnico significativo, anche se formalmente tutti avevamo lo stesso compito.
 
 Tra i punti di forza metto la costanza e la capacità di risolvere problemi complessi; come limite, riconosco una certa tendenza a curare troppo i dettagli, che ha rallentato alcune fasi.  
 Per lavori futuri, mi concentrerei su una maggiore pianificazione iniziale del lavoro di gruppo, per evitare sovrapposizioni e migliorare la distribuzione dei compiti.
