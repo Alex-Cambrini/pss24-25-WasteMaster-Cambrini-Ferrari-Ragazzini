@@ -288,11 +288,11 @@ CustomerManager --> Customer : gestisce
 TripManager --> Trip : gestisce
 ```
 
-## Design Dettagliato - Gestione Veicoli (Ferrari Lorenzo)
+## Design Dettagliato - Gestione Veicoli - Ferrari Lorenzo
 
 ### 1. Gestione dello Stato Operativo del Veicolo
 
--**Vehicle**: entità che rappresenta un mezzo operativo
+**Vehicle**: entità che rappresenta un mezzo operativo
 
 #### Problema
 
@@ -514,7 +514,7 @@ classDiagram
     VehicleManager --> Vehicle
 ```
 
-## Design Dettagliato - Pianificazione delle Raccolte (Alex Cambrini)
+## Design Dettagliato - Pianificazione delle Raccolte - Alex Cambrini
 
 - **OneTimeSchedule**: una singola data richiesta dal cliente
 - **RecurringSchedule**: un ciclo (settimanale/mensile) allineato al giorno previsto dal calendario di quel rifiuto (*WasteSchedule*).
@@ -750,7 +750,7 @@ RecurringScheduleManager --> CollectionManager : coordinates
 CollectionManager --> Collection : manipulates
 ```
 
-## Design Dettagliato - Gestione Trip & Invoice (Manuel Ragazzini)
+## Design Dettagliato - Gestione Viaggi e fatturazione - Manuel Ragazzini
 
 - **Trip**: Viaggio di raccolta che aggrega una o più Collection, assegnato a veicolo e operatori.
 - **Invoice**: Fattura generata sulle Collection completate, associata a un Customer, con gestione di pagamenti e cancellazioni.
@@ -1448,9 +1448,8 @@ Test che verifica che la somma degli importi pagati venga calcolata correttament
 
 # Commenti finali
 
-## Autovalutazione e lavori futuri
+## Autovalutazione e lavori futuri - Ferrari Lorenzo
 
-### Ferrari Lorenzo
 La realizzazione di questo progetto mi ha permesso di lavorare su un sistema gestionale sviluppato in Java, pensato per coprire l’intero flusso operativo di un’azienda che si occupa di smaltimento rifiuti.
 
 Mi sono occupato in particolare di:
@@ -1476,8 +1475,7 @@ In futuro, mi piacerebbe collegare realmente il sistema di notifiche a un serviz
 In conclusione, considero questa esperienza estremamente formativa: mi ha fatto crescere sia dal punto di vista tecnico che organizzativo e mi ha dato una visione più chiara di cosa significhi applicare concretamente la programmazione orientata agli oggetti.
 
 
-
-### Alex Cambrini
+## Autovalutazione e lavori futuri - Alex Cambrini
 
 Nel gruppo di tre persone, ho contribuito principalmente allo sviluppo della parte relativa alle **collection** e alla **schedule** (comprendente sia le *one time schedule* sia le *recurring schedule*).  
 Questa componente gestisce la pianificazione delle collection, generandole una tantum o periodicamente in base alla frequenza impostata.
@@ -1489,8 +1487,7 @@ Tra i punti di forza metto la costanza e la capacità di risolvere problemi comp
 Per lavori futuri, mi concentrerei su una maggiore pianificazione iniziale del lavoro di gruppo, per evitare sovrapposizioni e migliorare la distribuzione dei compiti.
 
 
-
-### Manuel Ragazzini
+## Autovalutazione e lavori futuri - Manuel Ragazzini
 
 Durante lo sviluppo del progetto mi sono concentrato principalmente sulla progettazione e implementazione della gestione dei **Trip** (viaggi di raccolta) e sulla gestione delle **Invoice** (fatturazione e stato dei pagamenti).  
 Ho lavorato in modo efficace sulla logica dei Trip e sulla gestione delle fatture, confrontandomi spesso con gli altri membri del team per decidere le funzionalità più adatte. Abbiamo sperimentato diverse soluzioni prima di arrivare a una versione completa e corretta. Ho posto particolare attenzione alla testabilità delle funzionalità, scrivendo test automatici sia per i casi di successo che di errore.
@@ -1502,17 +1499,15 @@ Tra i punti di forza metto la cura per la validazione degli input, la copertura 
 
 ## Difficoltà incontrate e commenti per i docenti
 
+Durante il progetto sono state incontrate difficoltà legate alla collaborazione tra i membri del gruppo e alla gestione del codice con Git, ad esempio durante il merge di parti sviluppate separatamente.
 
-Durante il progetto abbiamo incontrato alcune difficoltà, soprattutto nella collaborazione tra i membri del gruppo e nella gestione del codice su GitHub, ad esempio durante il merge di parti sviluppate separatamente.  
-Anche capire bene tutti i requisiti iniziali non è stato sempre facile e abbiamo dovuto confrontarci più volte per essere sicuri di seguire la direzione giusta.
+Realizzare un’app avendo visto pochi esempi di programmi complessi è risultato impegnativo, in particolare utilizzando JavaFX, e anche organizzare la relazione non è stato immediato, nonostante la traccia fornita.
 
-Inoltre, testare tutte le interazioni tra le varie parti del codice (come la fatturazione, i viaggi e la gestione dei veicoli) è stato più complicato del previsto.
+Verificare le interazioni tra le varie parti del codice (fatturazione, viaggi e gestione dei veicoli) ha richiesto più tempo del previsto, sia per l’integrazione dei componenti sia per garantire la correttezza dei dati.
 
-In generale ho trovato il progetto utile e stimolante.  
-Un suggerimento per il futuro: sarebbe comodo avere esempi pratici o linee guida più dettagliate sulla gestione di progetti di gruppo e sull’uso avanzato di Git.
+Il progetto è stato considerato utile e stimolante. Per i futuri studenti, potrebbe essere utile avere esempi pratici o linee guida più dettagliate sulla gestione di progetti di gruppo e sull’uso avanzato di Git.
 
-Ringraziamo i docenti per la disponibilità durante il corso.
-
+Rispetto alle 60 ore stimate a persona per la realizzazione del progetto, il lavoro effettivo è stato superiore, a causa della complessità e dell’integrazione dei diversi componenti.
 
 # Guida utente
 
