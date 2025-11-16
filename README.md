@@ -74,7 +74,7 @@ Rappresenta le entità legate alle persone e ai clienti, mostrando l’ereditari
 - **Customer**: cliente che eredita da `Person`.
 - **Employee**: dipendente che eredita da `Person`.
 - **Account**: credenziali di accesso associate a un dipendente del sistema.
-- **Location**: indirizzo di residenza dei clienti.
+- **Location**: indirizzo di residenza sia dei Clienti (Customer) sia dei Dipendenti (Employee)
 - **Invoice**: fattura emessa per un cliente in seguito ai servizi di raccolta erogati.
 - **Collection**: operazione di raccolta associata a una fattura.
 
@@ -82,10 +82,10 @@ Rappresenta le entità legate alle persone e ai clienti, mostrando l’ereditari
 
 - `Customer` eredita da `Person`.
 - `Employee` eredita da `Person`.
-- Ogni `Employee` ha un singolo `Account` (1:1).
-- Ogni `Customer` risiede in una singola `Location` (1:1).
-- Ogni `Customer` può ricevere una o più `Invoice` (1:N).
-- Ogni `Invoice` include una o più `Collection` (1:N).
+- Ogni `Person` (e quindi `Customer` ed `Employee`) risiede in una `Location`.
+- Ogni `Account` è associato a un singolo `Employee.
+- Ogni `Customer` può ricevere una o più `Invoice`.
+- Ogni `Invoice` include una o più `Collection`.
 
 #### UML
 
@@ -99,12 +99,15 @@ classDiagram
   class Collection
   class Account
 
-  Person <|-- Customer
-  Person <|-- Employee
-  Customer "1" --> "1" Location : residesAt
+    %% Inheritance
+  Person <|-- Customer: extend
+  Person <|-- Employee: extend
+
+    %% Main associations
+  Person "*" --> "1" Location : residesAt
   Customer "1" --> "*" Invoice : receives
   Invoice "1" --> "*" Collection : includes
-  Employee "1" --> "1" Account : has
+  Account "1" --> "1" Employee : has
 ```
 
 ### Diagramma 2 – Programmazione della raccolta
@@ -118,23 +121,25 @@ Rappresenta le entità legate alla pianificazione e gestione della raccolta dei 
 - **Schedule**: piano di raccolta generico.
 - **OneTimeSchedule**: pianificazione di raccolta singola, eredita da `Schedule`.
 - **RecurringSchedule**: pianificazione ricorrente, eredita da `Schedule`.
-- **WasteSchedule**: programma specifico per un tipo di rifiuto in un giorno della settimana.
+- **WasteSchedule**: programma di ritiro specifico per un tipo di rifiuto in un giorno della settimana.
 - **Waste**: tipologia di rifiuto raccolto.
 - **Collection**: rappresenta un’operazione di raccolta specifica.
 - **Customer**: cliente associato a uno specifico programma di raccolta.
 
 #### Relazioni chiave
-
-- `OneTimeSchedule` e `RecurringSchedule` ereditano da `Schedule`.
+- `OneTimeSchedule` e `RecurringSchedule` estendono `Schedule`.
 - Ogni `Schedule` appartiene a un singolo `Customer`.
-- Ogni `WasteSchedule` è associato a un singolo `Waste`.
+- Ogni `Schedule` si riferisce a un singolo `Waste`.
+- Ogni `Schedule` può generare più `Collection`.
 - Ogni `Collection` appartiene a un singolo `Schedule`.
-- Ogni `Collection` raccoglie il `Waste` previsto dal `WasteSchedule`.
+- Ogni `Collection` è associata a un singolo `Waste`.
+- Ogni `WasteSchedule` si riferisce a un singolo `Waste`.
 
 #### UML
 
 ```mermaid
 classDiagram
+    %% Classi principali
     class Schedule
     class OneTimeSchedule
     class RecurringSchedule
@@ -143,13 +148,19 @@ classDiagram
     class Collection
     class Customer
 
-    Schedule <|-- OneTimeSchedule
-    Schedule <|-- RecurringSchedule
-    Schedule "1" --> "1" Customer : belongsTo
-    Schedule "1" --> "*" WasteSchedule : includes
-    Collection "1" --> "1" Schedule : belongsTo
-    Collection "1" --> "1" Waste : collects
-    WasteSchedule "1" --> "1" Waste : waste
+    %% Inheritance
+    Schedule <|-- OneTimeSchedule : extend
+    Schedule <|-- RecurringSchedule : extend
+
+
+    %% Main associations
+    Schedule "*" --> "1" Customer : belongsTo
+    Schedule "*" --> "1" Waste : schedules
+    Schedule "1" --> "*" Collection : generates
+    Collection "*" --> "1" Schedule : belongsTo
+    Collection "*" --> "1" Waste : collects
+    Collection "*" --> "1" Customer : belongsTo
+    WasteSchedule "*" --> "1" Waste : refersTo
 ```
 
 ### Diagramma 3 – Logistica e Trasporto
@@ -161,7 +172,7 @@ Rappresenta le entità legate alla gestione operativa della raccolta, inclusi vi
 #### Entità principali
 
 - **Trip**: viaggio operativo per effettuare le raccolte.
-- **Vehicle**: veicolo utilizzato per eseguire uno o più viaggi.
+- **Vehicle**: veicolo utilizzato per eseguire i viaggi.
 - **Employee**: operatore assegnato a uno o più viaggi.
 - **Collection**: raccolta specifica eseguita durante un viaggio.
 
@@ -170,7 +181,7 @@ Rappresenta le entità legate alla gestione operativa della raccolta, inclusi vi
 - Ogni `Trip` utilizza un singolo `Vehicle`.
 - Ogni `Trip` coinvolge uno o più `Employee` come operatori.
 - Ogni `Trip` comprende una o più `Collection`.
-- Ogni `Vehicle` può essere utilizzato in zero o più `Trip`.
+- Ogni `Collection` è associata a un singolo `Trip`.
 
 #### UML
 
@@ -181,10 +192,10 @@ classDiagram
     class Employee
     class Collection
 
-    Trip "1" --> "1" Vehicle : assignedVehicle
-    Trip "1" --> "*" Employee : operators
+    Trip "*" --> "1" Vehicle : assignedVehicle
+    Trip "*" --> "*" Employee : operators
     Trip "1" --> "*" Collection : collections
-    Vehicle "1" --> "0..*" Trip : usedIn
+    Collection "*" --> "1" Trip : trip
 ```
 
 ### Sintesi del modello del dominio
@@ -273,19 +284,19 @@ class TripRepository
 class CustomerView
 class TripView
 
-MainController --> CustomerController : coordina
-MainController --> TripController : coordina
+MainController --> CustomerController : coordinates
+MainController --> TripController : coordinates
 
-CustomerController --> CustomerManager : utilizza
-CustomerController --> CustomerView : aggiorna
+CustomerController --> CustomerManager : uses
+CustomerController --> CustomerView : updates
 
-TripController --> TripManager : utilizza
-TripController --> TripView : aggiorna
+TripController --> TripManager : uses
+TripController --> TripView : updates
 
-CustomerManager --> CustomerRepository : legge/scrive dati
-TripManager --> TripRepository : legge/scrive dati
-CustomerManager --> Customer : gestisce
-TripManager --> Trip : gestisce
+CustomerManager --> CustomerRepository : reads/writes data
+TripManager --> TripRepository : reads/writes data
+CustomerManager --> Customer : manages
+TripManager --> Trip : manages
 ```
 
 ## Design Dettagliato - Gestione Veicoli - Ferrari Lorenzo
@@ -490,28 +501,23 @@ classDiagram
     direction LR
 
     class Vehicle {
-        - RequiredLicence requiredLicence
+        - requiredLicence : RequiredLicence
     }
 
     class VehicleManager {
-        + List~Licence~ getAllowedLicences(vehicle)
+        + List~RequiredLicence ~ getAllowedLicences(vehicle)
     }
 
-    class RequiredLicence {
-        <<enumeration>>
-        B
-        C1
-        C
+    class RequiredLicence  {
+         <<enumeration>>
+         B
+         C1
+         C
     }
 
-    class Licence {
-        <<enumeration>>
-        B
-        C1
-        C
-    }
-
-    VehicleManager --> Vehicle
+    VehicleManager --> Vehicle : uses
+    VehicleManager ..> RequiredLicence : uses
+    Vehicle --> RequiredLicence : has a
 ```
 
 ## Design Dettagliato - Pianificazione delle Raccolte - Alex Cambrini
@@ -672,10 +678,10 @@ classDiagram
         +createOneTimeCollection(schedule: OneTimeSchedule): Collection
     }
 
-    %% Relazioni
+    %% Relationships
     CollectionManager --> CollectionFactory : uses
     CollectionFactoryImpl ..|> CollectionFactory
-    CollectionManager --> RecurringScheduleManager : retrieves schedule info
+    RecurringScheduleManager --> CollectionManager : uses
 ```
 
 ### 3. Gestione degli stati dello Schedule
