@@ -1298,148 +1298,103 @@ Rende la logica di scheduling modulare e facilmente estendibile.
 
 ## Note di sviluppo - Manuel Ragazzini
 
-### 1. Cancellazione di una Invoice e aggiornamento delle Collection associate
 
-**Dove:** src/test/java/it/unibo/wastemaster/domain/service/InvoiceManagerTest.java  
-Permalink: https://github.com/Alex-Cambrini/pss24-25-WasteMaster-Cambrini-Ferrari-Ragazzini/blob/925f05189fa63debcb40e850869faae40e9f675a/src/test/java/it/unibo/wastemaster/domain/service/InvoiceManagerTest.java#L111-L127
+### 1) Cancellazione di una Invoice e sblocco delle Collection   
+**Dove:** `src/main/java/it/unibo/wastemaster/domain/service/InvoiceManager.java`  
+**Permalink:** https://github.com/Alex-Cambrini/pss24-25-WasteMaster-Cambrini-Ferrari-Ragazzini/blob/508d237133af3668ab65370be98445154f945a9e/src/main/java/it/unibo/wastemaster/domain/service/InvoiceManager.java#L187-L202  
 
 ```java
-@Test
-void testDeleteInvoiceSetsDeletedAndUnbillsCollections() {
-    Collection c1 = insertCompletedCollection(LocalDate.now());
-    Invoice invoice =
-            getInvoiceManager().createInvoice(customer, new ArrayList<>(List.of(c1)));
-    int invoiceId = invoice.getInvoiceId();
-
-    boolean canceled = getInvoiceManager().deleteInvoice(invoiceId);
-    assertTrue(canceled);
-
-    Invoice canceledInvoice = getInvoiceDAO().findById(invoiceId).get();
-    assertTrue(canceledInvoice.isDeleted());
-    for (Collection c : canceledInvoice.getCollections()) {
-        assertFalse(c.getIsBilled());
+public boolean deleteInvoice(final int invoiceId) {
+    Invoice invoice = invoiceDAO.findById(invoiceId).orElseThrow(...);
+    invoice.setDeleted(true);
+    for (Collection c : invoice.getCollections()) {
+        c.setIsBilled(false);
+        collectionDAO.update(c);
     }
+    invoiceDAO.update(invoice);
+    return true;
 }
 ```
-**Descrizione:**  
-Test che verifica che l’eliminazione di una Invoice imposti il flag di cancellazione e rimuova la fatturazione dalle Collection collegate.
+ Descrizione: marca la fattura come cancellata e aggiorna tutte le collection collegate rimuovendo il flag di fatturazione.
 
 ---
 
-### 2. Calcolo dell’importo totale fatturato per cliente
-
-**Dove:** src/test/java/it/unibo/wastemaster/domain/service/InvoiceManagerTest.java  
-Permalink: https://github.com/Alex-Cambrini/pss24-25-WasteMaster-Cambrini-Ferrari-Ragazzini/blob/925f05189fa63debcb40e850869faae40e9f675a/src/test/java/it/unibo/wastemaster/domain/service/InvoiceManagerTest.java#L71-L95
+### 2) Totale fatturato per cliente 
+**Dove:** `src/main/java/it/unibo/wastemaster/domain/service/InvoiceManager.java`  
+**Permalink:** https://github.com/Alex-Cambrini/pss24-25-WasteMaster-Cambrini-Ferrari-Ragazzini/blob/508d237133af3668ab65370be98445154f945a9e/src/main/java/it/unibo/wastemaster/domain/service/InvoiceManager.java#L154-L160  
 
 ```java
-@Test
-void testGetTotalBilledAmountForCustomer() {
-    Collection c1 = insertCompletedCollection(LocalDate.now());
-    Collection c2 = insertCompletedCollection(LocalDate.now().plusDays(1));
-
-    Invoice invoice1 =
-            getInvoiceManager().createInvoice(customer, new ArrayList<>(List.of(c1)));
-    invoice1.setAmount(50.0);
-    invoice1.setPaymentStatus(PaymentStatus.UNPAID);
-    getInvoiceDAO().update(invoice1);
-
-    Invoice invoice2 =
-            getInvoiceManager().createInvoice(customer, new ArrayList<>(List.of(c2)));
-    invoice2.setAmount(100.0);
-    invoice2.setPaymentStatus(PaymentStatus.PAID);
-    getInvoiceDAO().update(invoice2);
-
-    double total = getInvoiceManager().getTotalBilledAmountForCustomer(customer);
-    assertEquals(150.0, total, 0.001);
+public double getTotalBilledAmountForCustomer(final Customer customer) {
+    return invoiceDAO.findByCustomer(customer).stream()
+            .mapToDouble(Invoice::getAmount)
+            .sum();
 }
 ```
-**Descrizione:**  
-Test che assicura il corretto calcolo della somma totale fatturata da un cliente, validando la logica di aggregazione sulle Invoice.
+ Descrizione: aggregazione tramite stream per ottenere l'importo complessivo fatturato a un cliente.
 
 ---
 
-### 3. Settaggio e verifica dello stato pagato su una Invoice
-
-**Dove:** src/test/java/it/unibo/wastemaster/domain/service/InvoiceManagerTest.java  
-Permalink: https://github.com/Alex-Cambrini/pss24-25-WasteMaster-Cambrini-Ferrari-Ragazzini/blob/925f05189fa63debcb40e850869faae40e9f675a/src/test/java/it/unibo/wastemaster/domain/service/InvoiceManagerTest.java#L96-L110
+### 3) Gestione del ciclo di vita dei Trip 
+**Dove:** `src/main/java/it/unibo/wastemaster/domain/service/TripManager.java`  
+**Permalink:** https://github.com/Alex-Cambrini/pss24-25-WasteMaster-Cambrini-Ferrari-Ragazzini/blob/508d237133af3668ab65370be98445154f945a9e/src/main/java/it/unibo/wastemaster/domain/service/TripManager.java#L58-L74  
 
 ```java
-@Test
-void testSetInvoicePaid() {
-    Collection c1 = insertCompletedCollection(LocalDate.now());
-    Invoice invoice = getInvoiceManager().createInvoice(customer, new ArrayList<>(List.of(c1)));
-    invoice.setAmount(50.0);
-    invoice.setPaymentStatus(PaymentStatus.UNPAID);
-    getInvoiceDAO().update(invoice);
+public Trip createTrip(final Vehicle vehicle, final Employee operator, final List<Collection> collections) {
+    ValidateUtils.requireArgNotNull(vehicle, "Vehicle cannot be null");
+    ValidateUtils.requireArgNotNull(operator, "Operator cannot be null");
+    Trip trip = new Trip();
+    trip.setVehicle(vehicle);
+    trip.setOperator(operator);
+    trip.setCollections(collections);
+    tripDAO.insert(trip);
+    return trip;
+}
+```
+ Descrizione: metodi per creare e inizializzare un Trip, assegnare veicolo e operatore, e persistere lo stato del viaggio.
 
+---
+
+### 4) Marcatura pagamento di una Invoice e persistenza dello stato 
+**Dove:** `src/main/java/it/unibo/wastemaster/domain/service/InvoiceManager.java`  
+**Permalink:** https://github.com/Alex-Cambrini/pss24-25-WasteMaster-Cambrini-Ferrari-Ragazzini/blob/508d237133af3668ab65370be98445154f945a9e/src/main/java/it/unibo/wastemaster/domain/service/InvoiceManager.java#L131-L146  
+
+```java
+public void markInvoiceAsPaid(final int invoiceId) {
+    Invoice invoice = invoiceDAO.findById(invoiceId).orElseThrow(...);
     invoice.setPaymentStatus(PaymentStatus.PAID);
-    getInvoiceDAO().update(invoice);
-
-    Invoice updated = getInvoiceDAO().findById(invoice.getInvoiceId()).get();
-    assertEquals(PaymentStatus.PAID, updated.getPaymentStatus());
+    invoiceDAO.update(invoice);
 }
 ```
-**Descrizione:**  
-Test che verifica che la marcatura come “paid” di una Invoice aggiorni correttamente lo stato e sia persistita senza errori.
+ Descrizione: metodo che imposta lo stato di pagamento su PAID e persiste l'aggiornamento tramite il DAO.
 
 ---
 
-### 4. Setup avanzato per test su Trip e risorse associate
-
-**Dove:** src/test/java/it/unibo/wastemaster/domain/service/TripManagerTest.java  
-Permalink: https://github.com/Alex-Cambrini/pss24-25-WasteMaster-Cambrini-Ferrari-Ragazzini/blob/925f05189fa63debcb40e850869faae40e9f675a/src/test/java/it/unibo/wastemaster/domain/service/TripManagerTest.java#L29-L100
+### 5) Creazione di una Invoice a partire da Collections 
+**Dove:** `src/main/java/it/unibo/wastemaster/domain/service/InvoiceManager.java`  
+**Permalink:** https://github.com/Alex-Cambrini/pss24-25-WasteMaster-Cambrini-Ferrari-Ragazzini/blob/508d237133af3668ab65370be98445154f945a9e/src/main/java/it/unibo/wastemaster/domain/service/InvoiceManager.java#L64-L104  
 
 ```java
-@BeforeEach
-public void setUp() {
-    super.setUp();
-    // Inserimento location, vehicle, employee/operator
-    vehicle1 = new Vehicle("AB123CD", "Iveco", "Daily", 2020,
-            Vehicle.RequiredLicence.C1, Vehicle.VehicleStatus.IN_SERVICE, 3);
-    getVehicleDAO().insert(vehicle1);
-    operator1 = new Employee("John", "Doe", locBo,
-            "john.doe@example.com", "+391234567890",
-            Employee.Role.OPERATOR, Employee.Licence.C1);
-    getEmployeeDAO().insert(operator1);
-    // ...
+public Invoice createInvoice(final Customer customer, final List<Collection> collections) {
+    Invoice invoice = new Invoice();
+    invoice.setCustomer(customer);
+    double total = collections.stream()
+            .mapToDouble(Collection::getPrice)
+            .sum();
+    invoice.setAmount(total);
+    invoice.setCollections(new HashSet<>(collections));
+    invoiceDAO.insert(invoice);
+
+    // segna le collection come fatturate
+    for (Collection c : collections) {
+        c.setIsBilled(true);
+        collectionDAO.update(c);
+    }
+
+    return invoice;
 }
 ```
-**Descrizione:**  
-Setup che garantisce la presenza delle risorse necessarie per i test su Trip: veicoli, operatori, location, permettendo test robusti su tutto il ciclo di vita dei viaggi.
-
----
-
-### 5. Calcolo dell’importo totale pagato per cliente
-
-**Dove:** src/test/java/it/unibo/wastemaster/domain/service/InvoiceManagerTest.java  
-Permalink: https://github.com/Alex-Cambrini/pss24-25-WasteMaster-Cambrini-Ferrari-Ragazzini/blob/925f05189fa63debcb40e850869faae40e9f675a/src/test/java/it/unibo/wastemaster/domain/service/InvoiceManagerTest.java##L81-L100
-
-```java
-@Test
-void testGetTotalPaidAmountForCustomer() {
-    Collection c1 = insertCompletedCollection(LocalDate.now());
-    Collection c2 = insertCompletedCollection(LocalDate.now().plusDays(1));
-
-    Invoice invoice1 =
-            getInvoiceManager().createInvoice(customer, new ArrayList<>(List.of(c1)));
-    invoice1.setAmount(50.0);
-    invoice1.setPaymentStatus(PaymentStatus.UNPAID);
-    getInvoiceDAO().update(invoice1);
-
-    Invoice invoice2 =
-            getInvoiceManager().createInvoice(customer, new ArrayList<>(List.of(c2)));
-    invoice2.setAmount(100.0);
-    invoice2.setPaymentStatus(PaymentStatus.PAID);
-    getInvoiceDAO().update(invoice2);
-
-    double totalPaid = getInvoiceManager().getTotalPaidAmountForCustomer(customer);
-    assertEquals(100.0, totalPaid, 0.001);
-}
+ Descrizione: crea la fattura aggregando le collection selezionate, imposta l'importo totale e marca le collection come fatturate (isBilled = true).
 ```
-**Descrizione:**  
-Test che verifica che la somma degli importi pagati venga calcolata correttamente solo sulle Invoice effettivamente saldate dal cliente.
-
----
 
 # Commenti finali
 
